@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/rtc_peerconnection.dart';
 import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/PluginHandle.dart';
+import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/io.dart';
@@ -25,6 +26,7 @@ class JanusClient {
   Uuid _uuid = Uuid();
   Map<String, dynamic> _transactions = {};
   Map<int, PluginHandle> _pluginHandles = {};
+  WebRTCHandle _webRTCStuff;
 
 //  Timer _retryError;
 //  Timer _retryComplete;
@@ -202,6 +204,8 @@ class JanusClient {
       print(data);
       int handleId = data["data"]["id"];
       debugPrint("Created handle: " + handleId.toString());
+      WebRTCHandle _webRTCStuff = WebRTCHandle();
+
       PluginHandle pluginHandle = PluginHandle(
           plugin: plugin.plugin,
           apiSecret: apiSecret,
@@ -217,79 +221,6 @@ class JanusClient {
         print(parse(event));
       });
       return;
-
-//        var pluginHandle =
-//        {
-//        session : that,
-//        plugin : plugin,
-//        id : handleId,
-//        token : handleToken,
-//        detached : false,
-//        webrtcStuff : {
-//        started : false,
-//        myStream : null,
-//        streamExternal : false,
-//        remoteStream : null,
-//        mySdp : null,
-//        mediaConstraints : null,
-//        pc : null,
-//        dataChannel : {},
-//        dtmfSender : null,
-//        trickle : true,
-//        iceDone : false,
-//        volume : {
-//        value : null,
-//        timer : null
-//        },
-//        bitrate : {
-//        value : null,
-//        bsnow : null,
-//        bsbefore : null,
-//        tsnow : null,
-//        tsbefore : null,
-//        timer : null
-//        }
-//        },
-//        getId : function()
-//        {
-//          return handleId;
-//        },
-//    getPlugin : function() { return plugin; },
-//    getVolume : function() { return getVolume(handleId, true); },
-//    getRemoteVolume : function() { return getVolume(handleId, true); },
-//    getLocalVolume : function() { return getVolume(handleId, false); },
-//    isAudioMuted : function() { return isMuted(handleId, false); },
-//    muteAudio : function() { return mute(handleId, false, true); },
-//    unmuteAudio : function() { return mute(handleId, false, false); },
-//    isVideoMuted : function() { return isMuted(handleId, true); },
-//    muteVideo : function() { return mute(handleId, true, true); },
-//    unmuteVideo : function() { return mute(handleId, true, false); },
-//    getBitrate : function() { return getBitrate(handleId); },
-//    send : function(callbacks) { sendMessage(handleId, callbacks); },
-//    data : function(callbacks) { sendData(handleId, callbacks); },
-//    dtmf : function(callbacks) { sendDtmf(handleId, callbacks); },
-//    consentDialog : callbacks.consentDialog,
-//    iceState : callbacks.iceState,
-//    mediaState : callbacks.mediaState,
-//    webrtcState : callbacks.webrtcState,
-//    slowLink : callbacks.slowLink,
-//    onmessage : callbacks.onmessage,
-//    createOffer : function(callbacks) { prepareWebrtc(handleId, true, callbacks); },
-//    createAnswer : function(callbacks) { prepareWebrtc(handleId, false, callbacks); },
-//    handleRemoteJsep : function(callbacks) { prepareWebrtcPeer(handleId, callbacks); },
-//    onlocalstream : callbacks.onlocalstream,
-//    onremotestream : callbacks.onremotestream,
-//    ondata : callbacks.ondata,
-//    ondataopen : callbacks.ondataopen,
-//    oncleanup : callbacks.oncleanup,
-//    ondetached : callbacks.ondetached,
-//    hangup : function(sendRequest) { cleanupWebrtc(handleId, sendRequest === true); },
-//    detach : function(callbacks) { destroyHandle(handleId, callbacks); }
-//    };
-//    pluginHandles[handleId] = pluginHandle;
-//    callbacks.success(pluginHandle);
-//    };
-
     }
   }
 }

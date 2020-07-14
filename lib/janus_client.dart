@@ -207,7 +207,7 @@ class JanusClient {
     }
   }
 
-  _handleEvent(Plugin plugin, json) {
+  _handleEvent(Plugin plugin, Map<String, dynamic> json) {
 //      if(!websockets && sessionId !== undefined && sessionId !== null && skipTimeout !== true)
 //        eventHandler();
 //      if(!websockets && Janus.isArray(json)) {
@@ -217,10 +217,12 @@ class JanusClient {
 //        }
 //        return;
 //      }
+    print('handle event called');
+    print(json);
+
     if (json["janus"] == "keepalive") {
       // Nothing happened
       debugPrint("Got a keepalive on session " + sessionId.toString());
-      return;
     } else if (json["janus"] == "ack") {
       // Just an ack, we can probably ignore
       debugPrint("Got an ack on session " + sessionId.toString());
@@ -231,7 +233,6 @@ class JanusClient {
         if (reportSuccess != null) reportSuccess(json);
 //          delete transactions[transaction];
       }
-      return;
     } else if (json["janus"] == "success") {
       // Success!
       debugPrint("Got a success on session " + sessionId.toString());
@@ -242,7 +243,6 @@ class JanusClient {
         if (reportSuccess) reportSuccess(json);
 //          delete transactions[transaction];
       }
-      return;
     } else if (json["janus"] == "trickle") {
       // We got a trickle candidate from Janus
       var sender = json["sender"];
@@ -254,7 +254,6 @@ class JanusClient {
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-        return;
       }
       var candidate = json["candidate"];
       debugPrint("Got a trickled candidate on session " + sessionId.toString());
@@ -268,15 +267,6 @@ class JanusClient {
           config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
               candidate["sdpMid"], candidate["sdpMLineIndex"]));
         }
-//        if (candidate != null || candidate.completed == true) {
-//          // end-of-candidates
-////          config.pc.addCandidate(
-////              RTCIceCandidate(candidate["candidate"], null, null));
-//        } else {
-//          // New candidate
-//          config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
-//              candidate["sdpMid"], candidate["sdpMLineIndex"]));
-//        }
       } else {
         // We didn't do setRemoteDescription (trickle got here before the offer?)
         debugPrint(
@@ -291,19 +281,16 @@ class JanusClient {
       debugPrint("Got a webrtcup event on session " + sessionId.toString());
       debugPrint(json.toString());
       var sender = json["sender"];
-      if (!sender) {
+      if (sender == null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-        return;
       }
       if (plugin.onWebRTCState != null) {
         plugin.onWebRTCState(true, null);
       }
-      return;
     } else if (json["janus"] == "hangup") {
       // A plugin asked the core to hangup a PeerConnection on one of our handles
       debugPrint("Got a hangup event on session " + sessionId.toString());
@@ -311,12 +298,10 @@ class JanusClient {
       var sender = json["sender"];
       if (sender != null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-        return;
       }
       plugin.onWebRTCState(false, json["reason"]);
       pluginHandle.hangup();
@@ -325,14 +310,12 @@ class JanusClient {
       debugPrint("Got a detached event on session " + sessionId.toString());
       debugPrint(json.toString());
       var sender = json["sender"];
-      if (!sender) {
+      if (sender == null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         // Don't warn here because destroyHandle causes this situation.
-        return;
       }
       plugin.onDetached();
       pluginHandle.detach();
@@ -343,27 +326,25 @@ class JanusClient {
       var sender = json["sender"];
       if (sender == null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-        return;
       }
-      plugin.onMediaState(json["type"], json["receiving"]);
+      if (plugin.onMediaState != null) {
+        plugin.onMediaState(json["type"], json["receiving"]);
+      }
     } else if (json["janus"] == "slowlink") {
       debugPrint("Got a slowlink event on session " + sessionId.toString());
       debugPrint(json.toString());
       // Trouble uplink or downlink
       var sender = json["sender"];
-      if (!sender) {
+      if (sender == null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-        return;
       }
       pluginHandle.slowLink(json["uplink"], json["lost"]);
     } else if (json["janus"] == "error") {
@@ -372,45 +353,40 @@ class JanusClient {
           json["error"].code +
           " " +
           json["error"].reason); // FIXME
-      debugPrint(json.toString());
       var transaction = json["transaction"];
       if (transaction) {
         var reportSuccess = _transactions[transaction];
         if (reportSuccess) {
           reportSuccess(json);
         }
-//          delete transactions[transaction];
       }
-      return;
     } else if (json["janus"] == "event") {
       debugPrint("Got a plugin event on session " + sessionId.toString());
       debugPrint(json.toString());
       var sender = json["sender"];
       if (sender != null) {
         debugPrint("WMissing sender...");
-        return;
       }
       var plugindata = json["plugindata"];
-      if (!plugindata) {
+      if (plugindata == null) {
         debugPrint("WMissing plugindata...");
         return;
       }
       debugPrint("  -- Event is coming from " +
-          sender +
+          sender.toString() +
           " (" +
-          plugindata["plugin"] +
+          plugindata["plugin"].toString() +
           ")");
       var data = plugindata["data"];
-      debugPrint(data);
+      debugPrint(data.toString());
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("WThis handle is not attached to this session");
-        return;
       }
       var jsep = json["jsep"];
       if (jsep != null) {
         debugPrint("Handling SDP as well...");
-        debugPrint(jsep);
+        debugPrint(jsep.toString());
       }
       var callback = plugin.onMessage;
       if (callback != null) {
@@ -427,7 +403,6 @@ class JanusClient {
       if (_webSocketChannel != null) {
         _webSocketChannel.sink.close(3504, "Gateway timeout");
       }
-      return;
     } else {
       debugPrint("WUnknown message/event  '" +
           json["janus"] +

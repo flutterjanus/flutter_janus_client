@@ -9,7 +9,7 @@ class Plugin {
   Function(dynamic) onLocalStream;
   Function(dynamic) onRemoteStream;
   Function(dynamic) onIceConnectionState;
-  Function(dynamic, dynamic) onWebRTCState;
+  Function(bool, dynamic) onWebRTCState;
   Function() onDetached;
   Function(dynamic, dynamic) onMediaState;
 

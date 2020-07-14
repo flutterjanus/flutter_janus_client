@@ -11,6 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  characters: ^1.0.0
+
 
   janus_client:
     # When depending on this package from a real application you should use:

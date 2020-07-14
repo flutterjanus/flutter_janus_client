@@ -27,14 +27,14 @@ class JanusClient {
   Uuid _uuid = Uuid();
   Map<String, dynamic> _transactions = {};
   Map<int, PluginHandle> _pluginHandles = {};
-  WebRTCHandle _webRTCHandle;
-
-  set webRTCHandle(WebRTCHandle value) {
-    _webRTCHandle = value;
-  } //  Timer _retryError;
-
-//  Timer _retryComplete;
-  get webRTCHandle => _webRTCHandle;
+//  WebRTCHandle _webRTCHandle;
+//
+//  set webRTCHandle(WebRTCHandle value) {
+//    _webRTCHandle = value;
+//  } //  Timer _retryError;
+//
+////  Timer _retryComplete;
+//  get webRTCHandle => _webRTCHandle;
 
   dynamic get _apiMap =>
       withCredentials ? apiSecret != null ? {"apisecret": apiSecret} : {} : {};
@@ -179,12 +179,12 @@ class JanusClient {
         "iceServers": iceServers.map((e) => e.toMap()).toList()
       };
       print(configuration);
-      this.webRTCHandle = WebRTCHandle(
+      WebRTCHandle webRTCHandle = WebRTCHandle(
           iceServers: iceServers,
           pc: await createPeerConnection(configuration, {}));
 
 //      calling callback for onIceConnectionState on plugin
-      this._webRTCHandle.pc.onIceConnectionState = (v) {
+      webRTCHandle.pc.onIceConnectionState = (v) {
         if (plugin.onIceConnectionState != null) {
           plugin.onIceConnectionState(v);
         }
@@ -199,7 +199,7 @@ class JanusClient {
           transactions: _transactions,
           webSocketStream: _webSocketStream,
           webSocketSink: _webSocketSink);
-      pluginHandle.webRTCHandle = _webRTCHandle;
+      pluginHandle.webRTCHandle = webRTCHandle;
       _pluginHandles[handleId] = pluginHandle;
       plugin.onSuccess(pluginHandle);
 
@@ -305,6 +305,9 @@ class JanusClient {
       }
       plugin.onWebRTCState(false, json["reason"]);
       pluginHandle.hangup();
+      if (plugin.onDestroy != null) {
+        plugin.onDestroy();
+      }
     } else if (json["janus"] == "detached") {
       // A plugin asked the core to detach one of our handles
       debugPrint("Got a detached event on session " + sessionId.toString());

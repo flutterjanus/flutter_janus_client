@@ -34,14 +34,12 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     initRenderers();
-//    initPlatformState();
   }
 
   initRenderers() async {
     await _localRenderer.initialize();
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     j = JanusClient(iceServers: [
       RTCIceServer(
@@ -62,6 +60,9 @@ class _MyAppState extends State<MyApp> {
         plugin: 'janus.plugin.videoroom',
         onWebRTCState: (bool state, reason) {
           print("Webrtc state " + (state ? "UP" : "Down"));
+        },
+        onDestroy: () {
+          _localRenderer.srcObject = null;
         },
         onMessage: (msg, jsep) async {
           print('on message hook called');
@@ -137,7 +138,7 @@ class _MyAppState extends State<MyApp> {
                   color: Colors.red,
                 ),
                 onPressed: () {
-                  this.pluginHandle.send(message: {"request": "leave"});
+                  pluginHandle.hangup();
                 }),
             IconButton(
                 icon: Icon(

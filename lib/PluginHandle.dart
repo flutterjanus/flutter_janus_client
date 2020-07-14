@@ -105,14 +105,14 @@ class PluginHandle {
       webSocketSink.add(stringify(request));
       dynamic json = parse(await webSocketStream.firstWhere(
           (element) => parse(element)["transaction"] == transaction));
-//      debugPrint("Message sent!");
-//      debugPrint(json.toString());
       if (json["janus"] == "success") {
         // We got a success, must have been a synchronous transaction
         var plugindata = json["plugindata"];
         if (plugindata == null) {
           debugPrint("Request succeeded, but missing plugindata...");
-          onSuccess();
+          if (onSuccess != null) {
+            onSuccess();
+          }
           return;
         }
         debugPrint("Synchronous transaction successful (" +
@@ -120,7 +120,9 @@ class PluginHandle {
             ")");
         var data = plugindata["data"];
 //        debugPrint(data.toString());
-        onSuccess(data);
+        if (onSuccess != null) {
+          onSuccess(data);
+        }
         return;
       } else if (json["janus"] != "ack") {
         // Not a success and not an ack, must be an error
@@ -129,21 +131,32 @@ class PluginHandle {
               json["error"].code +
               " " +
               json["error"].reason); // FIXME
-          onError(json["error"].code + " " + json["error"].reason);
+          if (onError != null) {
+            onError(json["error"].code + " " + json["error"].reason);
+          }
         } else {
           debugPrint("Unknown error"); // FIXME
-          onError("Unknown error");
+          if (onError != null) {
+            onError("Unknown error");
+          }
         }
         return;
       }
       // If we got here, the plugin decided to handle the request asynchronously
-      onSuccess();
+      if (onSuccess != null) {
+        onSuccess();
+      }
     }
 
     return;
   }
 
-  hangup() {}
+  hangup() async {
+    this.send(message: {"request": "leave"});
+    await _webRTCHandle.myStream.dispose();
+    await _webRTCHandle.pc.close();
+    _webRTCHandle.pc = null;
+  }
 
   detach() {}
 

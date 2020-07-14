@@ -11,6 +11,7 @@ class Plugin {
   Function(dynamic) onIceConnectionState;
   Function(bool, dynamic) onWebRTCState;
   Function() onDetached;
+  Function() onDestroy;
   Function(dynamic, dynamic) onMediaState;
 
   Plugin(
@@ -19,6 +20,8 @@ class Plugin {
       this.onError,
       this.onWebRTCState,
       this.onMessage,
+      this.onDestroy,
+      this.onDetached,
       this.onLocalStream,
       this.onRemoteStream});
 }

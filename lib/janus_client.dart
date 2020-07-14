@@ -3,13 +3,14 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_webrtc/rtc_peerconnection.dart';
+import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/PluginHandle.dart';
 import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class JanusClient {
   static const MethodChannel _channel = const MethodChannel('janus_client');
@@ -18,7 +19,7 @@ class JanusClient {
   String token;
   bool withCredentials;
   List<RTCIceServer> iceServers;
-  RTCPeerConnection peerConnection;
+  int refreshInterval;
   bool _connected = false;
   int _sessionId;
   void Function() _onSuccess;
@@ -26,10 +27,14 @@ class JanusClient {
   Uuid _uuid = Uuid();
   Map<String, dynamic> _transactions = {};
   Map<int, PluginHandle> _pluginHandles = {};
-  WebRTCHandle _webRTCStuff;
+  WebRTCHandle _webRTCHandle;
 
-//  Timer _retryError;
+  set webRTCHandle(WebRTCHandle value) {
+    _webRTCHandle = value;
+  } //  Timer _retryError;
+
 //  Timer _retryComplete;
+  get webRTCHandle => _webRTCHandle;
 
   dynamic get _apiMap =>
       withCredentials ? apiSecret != null ? {"apisecret": apiSecret} : {} : {};
@@ -37,7 +42,8 @@ class JanusClient {
   dynamic get _tokenMap =>
       withCredentials ? token != null ? {"token": token} : {} : {};
   IOWebSocketChannel _webSocketChannel;
-  StreamController _websocketStream = StreamController.broadcast();
+  Stream<dynamic> _webSocketStream;
+  WebSocketSink _webSocketSink;
 
   get isConnected => _connected;
 
@@ -46,6 +52,7 @@ class JanusClient {
   JanusClient(
       {@required this.server,
       @required this.iceServers,
+      this.refreshInterval = 5,
       this.apiSecret,
       this.token,
       this.withCredentials = false});
@@ -55,30 +62,22 @@ class JanusClient {
       String transaction = _uuid.v4().replaceAll('-', '');
       _webSocketChannel = IOWebSocketChannel.connect(url,
           protocols: ['janus-protocol'], pingInterval: Duration(seconds: 2));
-      _webSocketChannel.sink.add(stringify({
+      _webSocketSink = _webSocketChannel.sink;
+      _webSocketStream = _webSocketChannel.stream.asBroadcastStream();
+
+      _webSocketSink.add(stringify({
         "janus": "create",
         "transaction": transaction,
         ..._apiMap,
         ..._tokenMap
       }));
-      _websocketStream.addStream(_webSocketChannel.stream);
 
-//      _websocketStream.stream.listen((event) {}, onError: (e) {
-//        Timer.periodic(Duration(seconds: 2), (timer) {
-//          _retryComplete = timer;
-//          connect(onError: _onError, onSuccess: _onSuccess);
-//        });
-//      }, onDone: () {
-//        Timer.periodic(Duration(seconds: 2), (timer) {
-//          _retryComplete = timer;
-//          connect(onError: _onError, onSuccess: _onSuccess);
-//        });
-//      });
-
-      var data = parse(await _websocketStream.stream.first);
+      var data = parse(await _webSocketStream.first);
       if (data["janus"] == "success") {
         _sessionId = data["data"]["id"];
         _connected = true;
+//        to keep session alive otherwise session will die after default 60 seconds.
+        _keepAlive(refreshInterval: refreshInterval);
         this._onSuccess();
         return data;
       }
@@ -98,54 +97,6 @@ class JanusClient {
   connect({void Function() onSuccess, void Function(dynamic) onError}) async {
     this._onSuccess = onSuccess;
     this._onError = onError;
-//    Map<String, dynamic> configuration = {
-//      "iceServers": [
-//        {
-//          "url": "stun:onemandev.tech:3478",
-//          "username": "onemandev",
-//          "credential": "SecureIt"
-//        },
-//        {
-//          "url": "turn:onemandev.tech:3478",
-//          "username": "onemandev",
-//          "credential": "SecureIt"
-//        },
-//      ]
-//    };
-//
-//    final Map<String, dynamic> offerSdpConstraints = {
-//      "mandatory": {
-//        "OfferToReceiveAudio": false,
-//        "OfferToReceiveVideo": false,
-//      },
-//      "optional": [],
-//    };
-//    RTCDataChannelInit rtcDataChannelInit = RTCDataChannelInit();
-//    rtcDataChannelInit.id = 1;
-//    rtcDataChannelInit.ordered = true;
-//    rtcDataChannelInit.maxRetransmitTime = -1;
-//    rtcDataChannelInit.maxRetransmits = -1;
-//    rtcDataChannelInit.protocol = "sctp";
-//    rtcDataChannelInit.negotiated = false;
-//    peerConnection =
-//        await createPeerConnection(configuration, offerSdpConstraints);
-//    peerConnection.onIceCandidate = (RTCIceCandidate candidate) {
-//      print('onCandidate: ' + candidate.candidate);
-//      peerConnection.addCandidate(candidate);
-////      setState(() {
-////        _sdp += '\n';
-////        _sdp += candidate.candidate;
-////      });
-//    };
-//    peerConnection.createDataChannel("datachannel", rtcDataChannelInit);
-//    peerConnection.onDataChannel = (datachannel) {
-//      datachannel.send(RTCDataChannelMessage());
-//    };
-//
-//    RTCSessionDescription description =
-//        await peerConnection.createOffer(offerSdpConstraints);
-//    print(description.sdp);
-//    peerConnection.setLocalDescription(description);
 
     if (server is String) {
       debugPrint('only string');
@@ -176,8 +127,23 @@ class JanusClient {
     }
   }
 
+  _keepAlive({int refreshInterval}) {
+    //                keep session live dude!
+    Timer.periodic(Duration(seconds: refreshInterval), (timer) {
+      _webSocketSink.add(stringify({
+        "janus": "keepalive",
+        "session_id": _sessionId,
+        "transaction": _uuid.v4(),
+        ..._apiMap,
+        ..._tokenMap
+      }));
+    });
+  }
+
   attach(Plugin plugin) async {
-    if (_webSocketChannel != null) {
+    if (_webSocketSink != null &&
+        _webSocketStream != null &&
+        _webSocketChannel != null) {
       var opaqueId = plugin.opaqueId;
       var transaction = _uuid.v4();
       Map<String, dynamic> request = {
@@ -189,14 +155,14 @@ class JanusClient {
       request["token"] = token;
       request["apisecret"] = apiSecret;
       request["session_id"] = sessionId;
-      _webSocketChannel.sink.add(stringify(request));
-      var data = parse(await _websocketStream.stream.firstWhere(
+      _webSocketSink.add(stringify(request));
+      var data = parse(await _webSocketStream.firstWhere(
           (element) => parse(element)["transaction"] == transaction));
       if (data["janus"] != "success") {
-        debugPrint("Ooops: " +
-            data["error"].code +
-            " " +
-            data["error"].reason); // FIXME
+//        debugPrint("Ooops: " +
+//            data["error"].code +
+//            " " +
+//            data["error"].reason); // FIXME
         plugin.onError(
             "Ooops: " + data["error"].code + " " + data["error"].reason);
         return;
@@ -204,7 +170,25 @@ class JanusClient {
       print(data);
       int handleId = data["data"]["id"];
       debugPrint("Created handle: " + handleId.toString());
-      WebRTCHandle _webRTCStuff = WebRTCHandle();
+
+      _webSocketStream.listen((event) {
+        _handleEvent(plugin, parse(event));
+      });
+
+      Map<String, dynamic> configuration = {
+        "iceServers": iceServers.map((e) => e.toMap()).toList()
+      };
+      print(configuration);
+      this.webRTCHandle = WebRTCHandle(
+          iceServers: iceServers,
+          pc: await createPeerConnection(configuration, {}));
+
+//      calling callback for onIceConnectionState on plugin
+      this._webRTCHandle.pc.onIceConnectionState = (v) {
+        if (plugin.onIceConnectionState != null) {
+          plugin.onIceConnectionState(v);
+        }
+      };
 
       PluginHandle pluginHandle = PluginHandle(
           plugin: plugin.plugin,
@@ -213,14 +197,243 @@ class JanusClient {
           sessionId: _sessionId,
           handleId: handleId,
           transactions: _transactions,
-          webSocketChannel: _webSocketChannel,
-          webSocketStream: _websocketStream);
+          webSocketStream: _webSocketStream,
+          webSocketSink: _webSocketSink);
+      pluginHandle.webRTCHandle = _webRTCHandle;
       _pluginHandles[handleId] = pluginHandle;
       plugin.onSuccess(pluginHandle);
-      _websocketStream.stream.listen((event) {
-        print(parse(event));
-      });
+
       return;
+    }
+  }
+
+  _handleEvent(Plugin plugin, json) {
+//      if(!websockets && sessionId !== undefined && sessionId !== null && skipTimeout !== true)
+//        eventHandler();
+//      if(!websockets && Janus.isArray(json)) {
+//        // We got an array: it means we passed a maxev > 1, iterate on all objects
+//        for(var i=0; i<json.length; i++) {
+//          handleEvent(json[i], true);
+//        }
+//        return;
+//      }
+    if (json["janus"] == "keepalive") {
+      // Nothing happened
+      debugPrint("Got a keepalive on session " + sessionId.toString());
+      return;
+    } else if (json["janus"] == "ack") {
+      // Just an ack, we can probably ignore
+      debugPrint("Got an ack on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var transaction = json["transaction"];
+      if (transaction != null) {
+        var reportSuccess = _transactions[transaction];
+        if (reportSuccess != null) reportSuccess(json);
+//          delete transactions[transaction];
+      }
+      return;
+    } else if (json["janus"] == "success") {
+      // Success!
+      debugPrint("Got a success on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var transaction = json["transaction"];
+      if (transaction) {
+        var reportSuccess = _transactions[transaction];
+        if (reportSuccess) reportSuccess(json);
+//          delete transactions[transaction];
+      }
+      return;
+    } else if (json["janus"] == "trickle") {
+      // We got a trickle candidate from Janus
+      var sender = json["sender"];
+
+      if (sender == null) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("This handle is not attached to this session");
+        return;
+      }
+      var candidate = json["candidate"];
+      debugPrint("Got a trickled candidate on session " + sessionId.toString());
+      debugPrint(candidate.toString());
+      var config = pluginHandle.webRTCHandle;
+      if (config.pc != null) {
+        // Add candidate right now
+        debugPrint("Adding remote candidate:" + candidate.toString());
+        if (candidate.containsKey("sdpMid") &&
+            candidate.containsKey("sdpMLineIndex")) {
+          config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
+              candidate["sdpMid"], candidate["sdpMLineIndex"]));
+        }
+//        if (candidate != null || candidate.completed == true) {
+//          // end-of-candidates
+////          config.pc.addCandidate(
+////              RTCIceCandidate(candidate["candidate"], null, null));
+//        } else {
+//          // New candidate
+//          config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
+//              candidate["sdpMid"], candidate["sdpMLineIndex"]));
+//        }
+      } else {
+        // We didn't do setRemoteDescription (trickle got here before the offer?)
+        debugPrint(
+            "We didn't do setRemoteDescription (trickle got here before the offer?), caching candidate");
+//          if(!config.candidates)
+//            config.candidates = [];
+//          config.candidates.push(candidate);
+//          debugPrint(config.candidates);
+      }
+    } else if (json["janus"] == "webrtcup") {
+      // The PeerConnection with the server is up! Notify this
+      debugPrint("Got a webrtcup event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var sender = json["sender"];
+      if (!sender) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("This handle is not attached to this session");
+        return;
+      }
+      if (plugin.onWebRTCState != null) {
+        plugin.onWebRTCState(true, null);
+      }
+      return;
+    } else if (json["janus"] == "hangup") {
+      // A plugin asked the core to hangup a PeerConnection on one of our handles
+      debugPrint("Got a hangup event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var sender = json["sender"];
+      if (sender != null) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("This handle is not attached to this session");
+        return;
+      }
+      plugin.onWebRTCState(false, json["reason"]);
+      pluginHandle.hangup();
+    } else if (json["janus"] == "detached") {
+      // A plugin asked the core to detach one of our handles
+      debugPrint("Got a detached event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var sender = json["sender"];
+      if (!sender) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        // Don't warn here because destroyHandle causes this situation.
+        return;
+      }
+      plugin.onDetached();
+      pluginHandle.detach();
+    } else if (json["janus"] == "media") {
+      // Media started/stopped flowing
+      debugPrint("Got a media event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var sender = json["sender"];
+      if (sender == null) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("This handle is not attached to this session");
+        return;
+      }
+      plugin.onMediaState(json["type"], json["receiving"]);
+    } else if (json["janus"] == "slowlink") {
+      debugPrint("Got a slowlink event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      // Trouble uplink or downlink
+      var sender = json["sender"];
+      if (!sender) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("This handle is not attached to this session");
+        return;
+      }
+      pluginHandle.slowLink(json["uplink"], json["lost"]);
+    } else if (json["janus"] == "error") {
+      // Oops, something wrong happened
+      debugPrint("EOoops: " +
+          json["error"].code +
+          " " +
+          json["error"].reason); // FIXME
+      debugPrint(json.toString());
+      var transaction = json["transaction"];
+      if (transaction) {
+        var reportSuccess = _transactions[transaction];
+        if (reportSuccess) {
+          reportSuccess(json);
+        }
+//          delete transactions[transaction];
+      }
+      return;
+    } else if (json["janus"] == "event") {
+      debugPrint("Got a plugin event on session " + sessionId.toString());
+      debugPrint(json.toString());
+      var sender = json["sender"];
+      if (sender != null) {
+        debugPrint("WMissing sender...");
+        return;
+      }
+      var plugindata = json["plugindata"];
+      if (!plugindata) {
+        debugPrint("WMissing plugindata...");
+        return;
+      }
+      debugPrint("  -- Event is coming from " +
+          sender +
+          " (" +
+          plugindata["plugin"] +
+          ")");
+      var data = plugindata["data"];
+      debugPrint(data);
+      var pluginHandle = _pluginHandles[sender];
+      if (pluginHandle == null) {
+        debugPrint("WThis handle is not attached to this session");
+        return;
+      }
+      var jsep = json["jsep"];
+      if (jsep != null) {
+        debugPrint("Handling SDP as well...");
+        debugPrint(jsep);
+      }
+      var callback = plugin.onMessage;
+      if (callback != null) {
+        debugPrint("Notifying application...");
+        // Send to callback specified when attaching plugin handle
+        callback(data, jsep);
+      } else {
+        // Send to generic callback (?)
+        debugPrint("No provided notification callback");
+      }
+    } else if (json["janus"] == "timeout") {
+      debugPrint("ETimeout on session " + sessionId.toString());
+      debugPrint(json.toString());
+      if (_webSocketChannel != null) {
+        _webSocketChannel.sink.close(3504, "Gateway timeout");
+      }
+      return;
+    } else {
+      debugPrint("WUnknown message/event  '" +
+          json["janus"] +
+          "' on session " +
+          _sessionId.toString());
+      debugPrint(json.toString());
     }
   }
 }

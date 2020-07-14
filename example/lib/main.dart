@@ -1,14 +1,12 @@
 import 'dart:async';
-import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/rtc_peerconnection.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
+import 'package:janus_client/PluginHandle.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
-import 'package:uuid/uuid.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,13 +20,21 @@ class MyApp extends StatefulWidget {
 final _localRenderer = new RTCVideoRenderer();
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  JanusClient j;
+  PluginHandle pluginHandle;
+
+  @override
+  void didChangeDependencies() async {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
+    await initPlatformState();
+  }
 
   @override
   void initState() {
     super.initState();
     initRenderers();
-    initPlatformState();
+//    initPlatformState();
   }
 
   initRenderers() async {
@@ -37,8 +43,15 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    JanusClient j = JanusClient(iceServers: [
-      RTCIceServer()
+    j = JanusClient(iceServers: [
+      RTCIceServer(
+          url: "stun:40.85.216.95:3478",
+          username: "onemandev",
+          credential: "SecureIt"),
+      RTCIceServer(
+          url: "turn:40.85.216.95:3478",
+          username: "onemandev",
+          credential: "SecureIt")
     ], server: [
       'wss://janus.onemandev.tech/websocket',
       'http://104.45.152.100:55493/janus'
@@ -47,99 +60,136 @@ class _MyAppState extends State<MyApp> {
       debugPrint('voilla! connection established');
       j.attach(Plugin(
         plugin: 'janus.plugin.videoroom',
+        onWebRTCState: (state, reason) {
+          print("fuck onwebrtc state");
+          print(state.toString() + reason.toString());
+        },
+
+//        onMessage: (msg, jsep) async {
+//          if (jsep != null) {
+//            await pluginHandle.webRTCHandle.pc.setRemoteDescription(
+//                RTCSessionDescription(jsep["sdp"], jsep["type"]));
+//          }
+//        },
         onSuccess: (pluginHandle) async {
+          setState(() {
+            this.pluginHandle = pluginHandle;
+          });
           print(pluginHandle);
+          MediaStream myStream = await pluginHandle.initializeMediaDevices();
+          setState(() {
+            _localRenderer.srcObject = myStream;
+            _localRenderer.mirror = true;
+          });
+          await pluginHandle.switchCamera();
           var register = {
             "request": "join",
             "room": 1234,
             "ptype": "publisher",
             "display": 'shivansh'
           };
-          Uuid uuid = Uuid();
-          var transaction = uuid.v4();
-//          var request = {
-//            "janus": "message",
-//            "body": register,
-//            "transaction": transaction
-//          };
           pluginHandle.send(
               message: register,
               onSuccess: () async {
                 print('fuck it works');
+//                Map<String, dynamic> configuration = {
+//                  "iceServers": [
+//                    {
+//                      "url": "stun:40.85.216.95:3478",
+//                      "username": "onemandev",
+//                      "credential": "SecureIt"
+//                    },
+//                    {
+//                      "url": "turn:40.85.216.95:3478",
+//                      "username": "onemandev",
+//                      "credential": "SecureIt"
+//                    },
+//                  ]
+//                };
+//
+//                final Map<String, dynamic> offerSdpConstraints = {};
+//                RTCPeerConnection peerConnection = await createPeerConnection(
+//                    configuration, offerSdpConstraints);
 
-//                keep session live dude!
-                Timer.periodic(Duration(seconds: 5), (timer) {
-                  pluginHandle.webSocketChannel.sink.add(stringify({
-                    "janus": "keepalive",
-                    "session_id": pluginHandle.sessionId,
-                    "transaction": "sBJNyUhH6Vc6",
-                    "apisecret": pluginHandle.apiSecret
-                  }));
-                });
-
-                Map<String, dynamic> configuration = {
-                  "iceServers": [
-                    {
-                      "url": "stun:104.45.152.100:3478",
-                      "username": "onemandev",
-                      "credential": "SecureIt"
-                    },
-                    {
-                      "url": "turn:104.45.152.100:3478",
-                      "username": "onemandev",
-                      "credential": "SecureIt"
-                    },
-                  ]
-                };
-
-                final Map<String, dynamic> offerSdpConstraints = {};
-                RTCPeerConnection peerConnection = await createPeerConnection(
-                    configuration, offerSdpConstraints);
 //                peerConnection.
 
-                final Map<String, dynamic> mediaConstraints = {
-                  "audio": true,
-                  "video": {
-                    "mandatory": {
-                      "minWidth":
-                          '1280', // Provide your own width, height and frame rate here
-                      "minHeight": '720',
-                      "minFrameRate": '60',
-                    },
-                    "facingMode": "user",
-                    "optional": [],
-                  }
-                };
-                MediaStream mediaStream =
-                    await navigator.getUserMedia(mediaConstraints);
-                setState(() {
-                  _localRenderer.srcObject = mediaStream;
-                });
-                peerConnection.addStream(mediaStream);
-                RTCSessionDescription offer = await peerConnection.createOffer(
-                    {"offerToReceiveAudio": true, "offerToReceiveVideo": true});
-                peerConnection.setLocalDescription(offer);
+//                final Map<String, dynamic> mediaConstraints = {
+//                  "audio": true,
+//                  "video": {
+//                    "mandatory": {
+//                      "minWidth":
+//                          '1280', // Provide your own width, height and frame rate here
+//                      "minHeight": '720',
+//                      "minFrameRate": '60',
+//                    },
+//                    "facingMode": "user",
+//                    "optional": [],
+//                  }
+//                };
+//                MediaStream mediaStream =
+//                    await navigator.getUserMedia(mediaConstraints);
+//                setState(() {
+//                  _localRenderer.srcObject = mediaStream;
+//                  _localRenderer.mirror = true;
+//                });
+//                await mediaStream
+//                    .getVideoTracks()
+//                    .firstWhere((track) => track.kind == "video")
+//                    .switchCamera();
+//                await peerConnection.addStream(mediaStream);
+
+//                peerConnection.onIceConnectionState =
+//                    (RTCIceConnectionState s) {
+//                  print('got state');
+//                  print(s.toString());
+//                };
+//                RTCSessionDescription offer = await peerConnection.createOffer(
+//                    {"offerToReceiveAudio": true, "offerToReceiveVideo": true});
+//                await peerConnection.setLocalDescription(offer);
+                RTCSessionDescription offer = await pluginHandle.createOffer();
                 var publish = {
                   "request": "configure",
                   "audio": true,
                   "video": true,
-                  "bitrate": 20000000
+                  "bitrate": 90000000
                 };
                 pluginHandle.send(
                     message: publish,
                     jsep: offer,
                     onSuccess: () async {
                       print("trash here");
+                      pluginHandle.webSocketStream.listen((event) async {
+                        print('bottom hook worked for some event');
+                        Map<String, dynamic> data = parse(event);
+                        if (data.containsKey("janus")) {
+                          if (data["janus"] == "event" &&
+                              data.containsKey("jsep")) {
+                            print('trash2');
+                            await pluginHandle.webRTCHandle.pc
+                                .setRemoteDescription(RTCSessionDescription(
+                                    data["jsep"]["sdp"], data["jsep"]["type"]));
+                          }
 
-                      var data = parse(await pluginHandle.webSocketStream.stream
-                          .firstWhere(
-                              (element) => parse(element)["janus"] == "event"));
-                      print(data["jsep"]);
-                      peerConnection.setRemoteDescription(RTCSessionDescription(
-                          data["jsep"]["sdp"], data["jsep"]["type"]));
-                      peerConnection.onIceCandidate =
+//                          if (data["janus"] == "trickle") {
+//                            print('got trickle');
+//                            print(data["candidate"]);
+//                            Map<dynamic, dynamic> candidate = data["candidate"];
+//                            if (candidate.containsKey("sdpMid") &&
+//                                candidate.containsKey("sdpMLineIndex")) {
+//                              await j.webRTCHandle.pc.addCandidate(
+//                                  RTCIceCandidate(
+//                                      candidate["candidate"],
+//                                      candidate["sdpMid"],
+//                                      candidate["sdpMLineIndex"]));
+//                            }
+//                          }
+                        }
+                      });
+
+                      pluginHandle.webRTCHandle.pc.onIceCandidate =
                           (RTCIceCandidate candidate) {
-                        print(candidate);
+//                        print(candidate);
+                        debugPrint('sending trickle');
                         Map<dynamic, dynamic> request = {
                           "janus": "trickle",
                           "candidate": candidate.toMap(),
@@ -148,61 +198,13 @@ class _MyAppState extends State<MyApp> {
                         request["session_id"] = pluginHandle.sessionId;
                         request["handle_id"] = pluginHandle.handleId;
                         request["apisecret"] = "SecureIt";
-                        pluginHandle.webSocketChannel.sink
-                            .add(stringify(request));
-
-//
-                      };
-                      pluginHandle.webSocketStream.stream.listen((event) {
-                        dynamic data = parse(event);
-                        if (data["janus"] == "trickle") {
-                          Map<dynamic, dynamic> candidate = data["candidate"];
-                          if (candidate.containsKey("sdpMid") &&
-                              candidate.containsKey("sdpMLineIndex")) {
-                            peerConnection.addCandidate(RTCIceCandidate(
-                                candidate["candidate"],
-                                candidate["sdpMid"],
-                                candidate["sdpMLineIndex"]));
-                          }
-                        }
-                      });
-//                      print(await peerConnection.getRemoteStreams());
-                      peerConnection.onIceConnectionState =
-                          (RTCIceConnectionState s) {
-                        print('got state');
-                        print(s.toString());
+                        pluginHandle.webSocketSink.add(stringify(request));
                       };
                     });
               },
               onError: (e) {
                 print(e);
               });
-
-//          peerConnection.onIceCandidate = (RTCIceCandidate candidate) {
-//            print('onCandidate: ' + candidate.candidate);
-//            peerConnection.addCandidate(candidate);
-//      setState(() {
-//        _sdp += '\n';
-//        _sdp += candidate.candidate;
-//      });
-//          }
-//          peerConnection.createDataChannel("datachannel", rtcDataChannelInit);
-//          peerConnection.onDataChannel = (datachannel) {
-//            print(datachannel.state);
-//            datachannel.onMessage = (msg) {
-//              print(msg.text);
-//            };
-//            datachannel.send(RTCDataChannelMessage(stringify(request)));
-//          };
-//          peerConnection.onIceConnectionState = (conn) {
-//            print(conn);
-//          };
-
-//          RTCSessionDescription description =
-//              await peerConnection.createOffer(offerSdpConstraints);
-//          print(description.sdp);
-//          peerConnection.setLocalDescription(description);
-//          pluginHandle.send(message: request);
         },
       ));
     }, onError: (e) {
@@ -215,14 +217,27 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          actions: [
+            IconButton(
+                icon: Icon(
+                  Icons.call_end,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  this.pluginHandle.send(message: {"request": "leave"});
+                }),
+            IconButton(
+                icon: Icon(
+                  Icons.switch_camera,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  this.pluginHandle.switchCamera();
+                })
+          ],
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.rotationY(math.pi),
-              child: RTCVideoView(_localRenderer)),
-        ),
+        body: Center(child: RTCVideoView(_localRenderer)),
       ),
     );
   }

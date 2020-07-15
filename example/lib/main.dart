@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
-import 'package:janus_client/janus_client_experimental.dart';
+import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 
 void main() {
@@ -20,7 +20,7 @@ final _localRenderer = new RTCVideoRenderer();
 final _remoteRenderer = new RTCVideoRenderer();
 
 class _MyAppState extends State<MyApp> {
-  JanusClientExperimental j;
+  JanusClient j;
   Plugin pluginHandle;
   Plugin subscriberHandle;
   MediaStream remoteStream;
@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
     await _remoteRenderer.initialize();
   }
 
-  _newRemoteFeed(JanusClientExperimental j, feed) async {
+  _newRemoteFeed(JanusClient j, feed) async {
     print('remote plugin attached');
     j.attach(Plugin(
         plugin: 'janus.plugin.videoroom',
@@ -69,22 +69,21 @@ class _MyAppState extends State<MyApp> {
             "feed": feed,
 //            "private_id": 12535
           };
-          plugin.webRTCHandle.pc.onAddStream = (stream) {
-            print('got remote stream');
-            setState(() {
-              remoteStream = stream;
-              _remoteRenderer.srcObject = remoteStream;
-            });
-          };
-
           subscriberHandle.send(message: register, onSuccess: () async {});
         },
-        onRemoteStream: (stream) {}));
+        onRemoteStream: (stream) {
+          print('got remote stream');
+          setState(() {
+            remoteStream = stream;
+            _remoteRenderer.srcObject = remoteStream;
+            _remoteRenderer.mirror = true;
+          });
+        }));
   }
 
   Future<void> initPlatformState() async {
     setState(() {
-      j = JanusClientExperimental(iceServers: [
+      j = JanusClient(iceServers: [
         RTCIceServer(
             url: "stun:40.85.216.95:3478",
             username: "onemandev",
@@ -165,18 +164,41 @@ class _MyAppState extends State<MyApp> {
           actions: [
             IconButton(
                 icon: Icon(
+                  Icons.call,
+                  color: Colors.greenAccent,
+                ),
+                onPressed: () async {
+                  await this.initRenderers();
+                  await this.initPlatformState();
+//                  -_localRenderer.
+                }),
+            IconButton(
+                icon: Icon(
                   Icons.call_end,
                   color: Colors.red,
                 ),
                 onPressed: () {
                   pluginHandle.hangup();
+                  subscriberHandle.hangup();
+                  _localRenderer.srcObject = null;
+                  _localRenderer.dispose();
+                  _remoteRenderer.srcObject = null;
+                  _remoteRenderer.dispose();
+                  setState(() {
+                    pluginHandle = null;
+                    subscriberHandle = null;
+                  });
                 }),
             IconButton(
                 icon: Icon(
                   Icons.switch_camera,
                   color: Colors.white,
                 ),
-                onPressed: () {})
+                onPressed: () {
+                  if (pluginHandle != null) {
+                    pluginHandle.switchCamera();
+                  }
+                })
           ],
           title: const Text('janus_client'),
         ),

@@ -181,20 +181,10 @@ class JanusClientExperimental {
       plugin.token = token;
       plugin.pluginHandles = _pluginHandles;
       plugin.transactions = _transactions;
-
-//      calling callback for onIceConnectionState on plugin
-//      webRTCHandle.pc.onIceConnectionState = (v) {
-//        if (plugin.onIceConnectionState != null) {
-//          plugin.onIceConnectionState(v);
-//        }
-//      };
-
+      if (plugin.onLocalStream != null) {
+        plugin.onLocalStream(peerConnection.getLocalStreams());
+      }
       peerConnection.onAddStream = (MediaStream stream) {
-        if (plugin.onLocalStream != null) {
-          plugin.onLocalStream(stream);
-        }
-      };
-      peerConnection.onRemoveStream = (MediaStream stream) {
         if (plugin.onRemoteStream != null) {
           plugin.onRemoteStream(stream);
         }
@@ -288,10 +278,6 @@ class JanusClientExperimental {
         // We didn't do setRemoteDescription (trickle got here before the offer?)
         debugPrint(
             "We didn't do setRemoteDescription (trickle got here before the offer?), caching candidate");
-//          if(!config.candidates)
-//            config.candidates = [];
-//          config.candidates.push(candidate);
-//          debugPrint(config.candidates);
       }
     } else if (json["janus"] == "webrtcup") {
       // The PeerConnection with the server is up! Notify this
@@ -319,11 +305,15 @@ class JanusClientExperimental {
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
-      }
-      plugin.onWebRTCState(false, json["reason"]);
-      pluginHandle.hangup();
-      if (plugin.onDestroy != null) {
-        plugin.onDestroy();
+      } else {
+        if (plugin.onWebRTCState != null) {
+          pluginHandle.onWebRTCState(false, json["reason"]);
+        }
+//      pluginHandle.hangup();
+        if (plugin.onDestroy != null) {
+          pluginHandle.onDestroy();
+        }
+        _pluginHandles.remove(sender);
       }
     } else if (json["janus"] == "detached") {
       // A plugin asked the core to detach one of our handles

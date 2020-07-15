@@ -172,6 +172,16 @@ class PluginHandle {
     return offer;
   }
 
+  Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
+    if (offerOptions == null) {
+      offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
+    }
+    RTCSessionDescription offer =
+        await _webRTCHandle.pc.createAnswer(offerOptions);
+    _webRTCHandle.pc.setLocalDescription(offer);
+    return offer;
+  }
+
   sendData(dynamic text, dynamic data,
       {Function onSuccess, Function(dynamic) onError}) {
     var pluginHandle = pluginHandles[handleId];

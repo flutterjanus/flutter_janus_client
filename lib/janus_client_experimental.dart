@@ -5,14 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
-import 'package:janus_client/PluginHandle.dart';
 import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class JanusClient {
+class JanusClientExperimental {
   static const MethodChannel _channel = const MethodChannel('janus_client');
   dynamic server;
   String apiSecret;
@@ -26,15 +25,7 @@ class JanusClient {
   void Function(dynamic) _onError;
   Uuid _uuid = Uuid();
   Map<String, dynamic> _transactions = {};
-  Map<int, PluginHandle> _pluginHandles = {};
-//  WebRTCHandle _webRTCHandle;
-//
-//  set webRTCHandle(WebRTCHandle value) {
-//    _webRTCHandle = value;
-//  } //  Timer _retryError;
-//
-////  Timer _retryComplete;
-//  get webRTCHandle => _webRTCHandle;
+  Map<int, Plugin> _pluginHandles = {};
 
   dynamic get _apiMap =>
       withCredentials ? apiSecret != null ? {"apisecret": apiSecret} : {} : {};
@@ -49,7 +40,7 @@ class JanusClient {
 
   int get sessionId => _sessionId;
 
-  JanusClient(
+  JanusClientExperimental(
       {@required this.server,
       @required this.iceServers,
       this.refreshInterval = 5,
@@ -159,13 +150,9 @@ class JanusClient {
       var data = parse(await _webSocketStream.firstWhere(
           (element) => parse(element)["transaction"] == transaction));
       if (data["janus"] != "success") {
-//        debugPrint("Ooops: " +
-//            data["error"].code +
-//            " " +
-//            data["error"].reason); // FIXME
         plugin.onError(
             "Ooops: " + data["error"].code + " " + data["error"].reason);
-        return;
+        return null;
       }
       print(data);
       int handleId = data["data"]["id"];
@@ -178,36 +165,62 @@ class JanusClient {
       Map<String, dynamic> configuration = {
         "iceServers": iceServers.map((e) => e.toMap()).toList()
       };
-      print(configuration);
+//      print(configuration);
       RTCPeerConnection peerConnection =
           await createPeerConnection(configuration, {});
       WebRTCHandle webRTCHandle = WebRTCHandle(
         iceServers: iceServers,
       );
       webRTCHandle.pc = peerConnection;
+      plugin.webRTCHandle = webRTCHandle;
+      plugin.webSocketStream = _webSocketStream;
+      plugin.webSocketSink = _webSocketSink;
+      plugin.handleId = handleId;
+      plugin.apiSecret = apiSecret;
+      plugin.sessionId = _sessionId;
+      plugin.token = token;
+      plugin.pluginHandles = _pluginHandles;
+      plugin.transactions = _transactions;
 
 //      calling callback for onIceConnectionState on plugin
-      webRTCHandle.pc.onIceConnectionState = (v) {
-        if (plugin.onIceConnectionState != null) {
-          plugin.onIceConnectionState(v);
+//      webRTCHandle.pc.onIceConnectionState = (v) {
+//        if (plugin.onIceConnectionState != null) {
+//          plugin.onIceConnectionState(v);
+//        }
+//      };
+
+      peerConnection.onAddStream = (MediaStream stream) {
+        if (plugin.onLocalStream != null) {
+          plugin.onLocalStream(stream);
+        }
+      };
+      peerConnection.onRemoveStream = (MediaStream stream) {
+        if (plugin.onRemoteStream != null) {
+          plugin.onRemoteStream(stream);
         }
       };
 
-      PluginHandle pluginHandle = PluginHandle(
-          plugin: plugin.plugin,
-          apiSecret: apiSecret,
-          token: token,
-          pluginHandles: _pluginHandles,
-          sessionId: _sessionId,
-          handleId: handleId,
-          transactions: _transactions,
-          webSocketStream: _webSocketStream,
-          webSocketSink: _webSocketSink);
-      pluginHandle.webRTCHandle = webRTCHandle;
-      _pluginHandles[handleId] = pluginHandle;
-      plugin.onSuccess(plugin);
+//      send trickle
+      peerConnection.onIceCandidate = (RTCIceCandidate candidate) {
+        debugPrint('sending trickle');
+        Map<dynamic, dynamic> request = {
+          "janus": "trickle",
+          "candidate": candidate.toMap(),
+          "transaction": "sendtrickle"
+        };
+        request["session_id"] = plugin.sessionId;
+        request["handle_id"] = plugin.handleId;
+        request["apisecret"] = plugin.apiSecret;
+        request["token"] = plugin.token;
+        plugin.webSocketSink.add(stringify(request));
+      };
 
-      return;
+      _pluginHandles[handleId] = plugin;
+      if (plugin.onSuccess != null) {
+        plugin.onSuccess(plugin);
+      }
+    } else {
+      return null;
     }
   }
 
@@ -371,8 +384,9 @@ class JanusClient {
       debugPrint("Got a plugin event on session " + sessionId.toString());
       debugPrint(json.toString());
       var sender = json["sender"];
-      if (sender != null) {
+      if (sender == null) {
         debugPrint("WMissing sender...");
+        return;
       }
       var plugindata = json["plugindata"];
       if (plugindata == null) {
@@ -385,7 +399,7 @@ class JanusClient {
           plugindata["plugin"].toString() +
           ")");
       var data = plugindata["data"];
-      debugPrint(data.toString());
+//      debugPrint(data.toString());
       var pluginHandle = _pluginHandles[sender];
       if (pluginHandle == null) {
         debugPrint("WThis handle is not attached to this session");
@@ -395,7 +409,7 @@ class JanusClient {
         debugPrint("Handling SDP as well...");
         debugPrint(jsep.toString());
       }
-      var callback = plugin.onMessage;
+      var callback = pluginHandle.onMessage;
       if (callback != null) {
         debugPrint("Notifying application...");
         // Send to callback specified when attaching plugin handle

@@ -25,6 +25,8 @@ class _MyAppState extends State<MyApp> {
   Plugin subscriberHandle;
   MediaStream remoteStream;
   MediaStream myStream;
+  RTCPeerConnection subscriberPc;
+
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
@@ -49,19 +51,42 @@ class _MyAppState extends State<MyApp> {
         plugin: 'janus.plugin.videoroom',
         onMessage: (msg, jsep) async {
           if (jsep != null) {
-            await subscriberHandle.handleRemoteJsep(jsep);
+            await subscriberPc.setRemoteDescription(
+                RTCSessionDescription(jsep["sdp"], jsep["type"]));
+            RTCSessionDescription offer = await subscriberPc.createAnswer(
+                {"offerToReceiveAudio": false, "offerToReceiveVideo": false});
+            await subscriberPc.setLocalDescription(offer);
             var body = {"request": "start", "room": 1234};
-
-            await subscriberHandle.send(
+            subscriberHandle.send(
                 message: body,
-                jsep: await subscriberHandle.createAnswer(),
-                onSuccess: () {});
+                jsep: offer,
+                onSuccess: () {
+                  subscriberPc.onIceCandidate = (RTCIceCandidate candidate) {
+//                        print(candidate);
+                    debugPrint('remote sending trickle');
+                    Map<dynamic, dynamic> request = {
+                      "janus": "trickle",
+                      "candidate": candidate.toMap(),
+                      "transaction": "sendtrickle"
+                    };
+                    request["session_id"] = subscriberHandle.sessionId;
+                    request["handle_id"] = subscriberHandle.handleId;
+                    request["apisecret"] = "SecureIt";
+                    subscriberHandle.webSocketSink.add(stringify(request));
+                  };
+                });
+          }
+          if (msg["janus"] == "trickle") {
+            var candidate = msg["candidate"];
+            if (candidate.containsKey("sdpMid") &&
+                candidate.containsKey("sdpMLineIndex")) {
+              subscriberPc.addCandidate(RTCIceCandidate(candidate["candidate"],
+                  candidate["sdpMid"], candidate["sdpMLineIndex"]));
+            }
           }
         },
         onSuccess: (plugin) {
-          setState(() {
-            subscriberHandle = plugin;
-          });
+          subscriberHandle = plugin;
           var register = {
             "request": "join",
             "room": 1234,
@@ -69,17 +94,15 @@ class _MyAppState extends State<MyApp> {
             "feed": feed,
 //            "private_id": 12535
           };
-          plugin.webRTCHandle.pc.onAddStream = (stream) {
+          subscriberPc.onAddStream = (stream) {
             print('got remote stream');
             setState(() {
               remoteStream = stream;
               _remoteRenderer.srcObject = remoteStream;
             });
           };
-
           subscriberHandle.send(message: register, onSuccess: () async {});
-        },
-        onRemoteStream: (stream) {}));
+        }));
   }
 
   Future<void> initPlatformState() async {
@@ -102,6 +125,12 @@ class _MyAppState extends State<MyApp> {
         Map<String, dynamic> configuration = {
           "iceServers": j.iceServers.map((e) => e.toMap()).toList()
         };
+
+        RTCPeerConnection subscriberP =
+            await createPeerConnection(configuration, {});
+        setState(() {
+          subscriberPc = subscriberP;
+        });
 
         j.attach(Plugin(
             plugin: 'janus.plugin.videoroom',

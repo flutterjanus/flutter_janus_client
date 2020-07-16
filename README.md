@@ -9,7 +9,7 @@ If you want to help support this plugin development, then you are more than welc
 
 # Sample
 
-<img style="width:10em;height:20em;" src="https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videoroom_2_participants.jpg">
+<img style="width:200px;height:300px;" src="https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videoroom_2_participants.jpg">
 
 ## status
 | Feature            | Support | Well Tested |

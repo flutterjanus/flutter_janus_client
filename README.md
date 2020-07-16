@@ -8,9 +8,8 @@ This plugin is under heavy development and lot of features present in janusjs li
 If you want to help support this plugin development, then you are more than welcome.
 
 # Sample
-(sample image)[]
 
-![sample image](https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videoroom_2_participants.jpg)
+<img style="width:10em;height:20em;" src="https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videoroom_2_participants.jpg">
 
 ## status
 | Feature            | Support | Well Tested |

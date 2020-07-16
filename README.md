@@ -55,7 +55,6 @@ If you want to help support this plugin development, then you are more than welc
       void didChangeDependencies() async {
         // TODO: implement didChangeDependencies
         super.didChangeDependencies();
-        await initPlatformState();
       }
     
       @override
@@ -140,7 +139,7 @@ If you want to help support this plugin development, then you are more than welc
                   }
     
                   if (jsep != null) {
-    //              print('got jsep');
+    
                     pluginHandle.handleRemoteJsep(jsep);
                   }
                 },
@@ -249,5 +248,3 @@ If you want to help support this plugin development, then you are more than welc
         );
       }
     }
-
-

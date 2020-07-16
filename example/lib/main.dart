@@ -29,7 +29,6 @@ class _MyAppState extends State<MyApp> {
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    await initPlatformState();
   }
 
   @override
@@ -114,7 +113,6 @@ class _MyAppState extends State<MyApp> {
               }
 
               if (jsep != null) {
-//              print('got jsep');
                 pluginHandle.handleRemoteJsep(jsep);
               }
             },

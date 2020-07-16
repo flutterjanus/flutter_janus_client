@@ -198,10 +198,19 @@ class Plugin {
     if (offerOptions == null) {
       offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
     }
-    RTCSessionDescription offer =
-        await _webRTCHandle.pc.createAnswer(offerOptions);
-    await _webRTCHandle.pc.setLocalDescription(offer);
-    return offer;
+
+//    handling kstable exception most ugly way but currently there's no other workarround, it just works
+    try {
+      RTCSessionDescription offer =
+          await _webRTCHandle.pc.createAnswer(offerOptions);
+      await _webRTCHandle.pc.setLocalDescription(offer);
+      return offer;
+    } catch (e) {
+      RTCSessionDescription offer =
+          await _webRTCHandle.pc.createAnswer(offerOptions);
+      await _webRTCHandle.pc.setLocalDescription(offer);
+      return offer;
+    }
   }
 
   sendData(dynamic text, dynamic data,

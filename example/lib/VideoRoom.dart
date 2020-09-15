@@ -1,37 +1,29 @@
-import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:janus_client/janus_client.dart';
+import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
-import 'package:janus_client/janus_client_experimental.dart';
+import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatefulWidget {
+import 'dart:async';
+class VideoRoom extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _VideoRoomState createState() => _VideoRoomState();
 }
 
-final _localRenderer = new RTCVideoRenderer();
-final _remoteRenderer = new RTCVideoRenderer();
-
-class _MyAppState extends State<MyApp> {
-  JanusClientExperimental j;
+class _VideoRoomState extends State<VideoRoom> {
+  JanusClient j;
+  RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
+  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
   Plugin pluginHandle;
   Plugin subscriberHandle;
   MediaStream remoteStream;
   MediaStream myStream;
-  RTCPeerConnection subscriberPc;
 
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    await initPlatformState();
   }
 
   @override
@@ -45,48 +37,25 @@ class _MyAppState extends State<MyApp> {
     await _remoteRenderer.initialize();
   }
 
-  _newRemoteFeed(JanusClientExperimental j, feed) async {
+  _newRemoteFeed(JanusClient j, feed) async {
     print('remote plugin attached');
     j.attach(Plugin(
         plugin: 'janus.plugin.videoroom',
         onMessage: (msg, jsep) async {
           if (jsep != null) {
-            await subscriberPc.setRemoteDescription(
-                RTCSessionDescription(jsep["sdp"], jsep["type"]));
-            RTCSessionDescription offer = await subscriberPc.createAnswer(
-                {"offerToReceiveAudio": false, "offerToReceiveVideo": false});
-            await subscriberPc.setLocalDescription(offer);
+            await subscriberHandle.handleRemoteJsep(jsep);
             var body = {"request": "start", "room": 1234};
-            subscriberHandle.send(
+
+            await subscriberHandle.send(
                 message: body,
-                jsep: offer,
-                onSuccess: () {
-                  subscriberPc.onIceCandidate = (RTCIceCandidate candidate) {
-//                        print(candidate);
-                    debugPrint('remote sending trickle');
-                    Map<dynamic, dynamic> request = {
-                      "janus": "trickle",
-                      "candidate": candidate.toMap(),
-                      "transaction": "sendtrickle"
-                    };
-                    request["session_id"] = subscriberHandle.sessionId;
-                    request["handle_id"] = subscriberHandle.handleId;
-                    request["apisecret"] = "SecureIt";
-                    subscriberHandle.webSocketSink.add(stringify(request));
-                  };
-                });
-          }
-          if (msg["janus"] == "trickle") {
-            var candidate = msg["candidate"];
-            if (candidate.containsKey("sdpMid") &&
-                candidate.containsKey("sdpMLineIndex")) {
-              subscriberPc.addCandidate(RTCIceCandidate(candidate["candidate"],
-                  candidate["sdpMid"], candidate["sdpMLineIndex"]));
-            }
+                jsep: await subscriberHandle.createAnswer(),
+                onSuccess: () {});
           }
         },
         onSuccess: (plugin) {
-          subscriberHandle = plugin;
+          setState(() {
+            subscriberHandle = plugin;
+          });
           var register = {
             "request": "join",
             "room": 1234,
@@ -94,20 +63,21 @@ class _MyAppState extends State<MyApp> {
             "feed": feed,
 //            "private_id": 12535
           };
-          subscriberPc.onAddStream = (stream) {
-            print('got remote stream');
-            setState(() {
-              remoteStream = stream;
-              _remoteRenderer.srcObject = remoteStream;
-            });
-          };
           subscriberHandle.send(message: register, onSuccess: () async {});
+        },
+        onRemoteStream: (stream) {
+          print('got remote stream');
+          setState(() {
+            remoteStream = stream;
+            _remoteRenderer.srcObject = remoteStream;
+            _remoteRenderer.mirror = true;
+          });
         }));
   }
 
   Future<void> initPlatformState() async {
     setState(() {
-      j = JanusClientExperimental(iceServers: [
+      j = JanusClient(iceServers: [
         RTCIceServer(
             url: "stun:40.85.216.95:3478",
             username: "onemandev",
@@ -117,20 +87,15 @@ class _MyAppState extends State<MyApp> {
             username: "onemandev",
             credential: "SecureIt")
       ], server: [
+        'https://janus.onemandev.tech/janus',
         'wss://janus.onemandev.tech/websocket',
-        'http://104.45.152.100:55493/janus'
       ], withCredentials: true, apiSecret: "SecureIt");
-      j.connect(onSuccess: () async {
-        debugPrint('voilla! connection established');
+      j.connect(onSuccess: (sessionId) async {
+        debugPrint('voilla! connection established with session id as' +
+            sessionId.toString());
         Map<String, dynamic> configuration = {
           "iceServers": j.iceServers.map((e) => e.toMap()).toList()
         };
-
-        RTCPeerConnection subscriberP =
-            await createPeerConnection(configuration, {});
-        setState(() {
-          subscriberPc = subscriberP;
-        });
 
         j.attach(Plugin(
             plugin: 'janus.plugin.videoroom',
@@ -144,7 +109,6 @@ class _MyAppState extends State<MyApp> {
               }
 
               if (jsep != null) {
-//              print('got jsep');
                 pluginHandle.handleRemoteJsep(jsep);
               }
             },
@@ -188,45 +152,67 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-                icon: Icon(
-                  Icons.call_end,
-                  color: Colors.red,
-                ),
-                onPressed: () {
-                  pluginHandle.hangup();
-                }),
-            IconButton(
-                icon: Icon(
-                  Icons.switch_camera,
-                  color: Colors.white,
-                ),
-                onPressed: () {})
-          ],
-          title: const Text('janus_client'),
-        ),
-        body: Stack(children: [
-          Positioned.fill(
-            child: RTCVideoView(
-              _remoteRenderer,
-            ),
-          ),
-          Align(
-            child: Container(
-              child: RTCVideoView(
-                _localRenderer,
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              icon: Icon(
+                Icons.call,
+                color: Colors.greenAccent,
               ),
-              height: 200,
-              width: 200,
-            ),
-            alignment: Alignment.bottomRight,
-          )
-        ]),
+              onPressed: () async {
+                await this.initRenderers();
+                await this.initPlatformState();
+//                  -_localRenderer.
+              }),
+          IconButton(
+              icon: Icon(
+                Icons.call_end,
+                color: Colors.red,
+              ),
+              onPressed: () {
+                j.destroy();
+                pluginHandle.hangup();
+                subscriberHandle.hangup();
+                _localRenderer.srcObject = null;
+                _localRenderer.dispose();
+                _remoteRenderer.srcObject = null;
+                _remoteRenderer.dispose();
+                setState(() {
+                  pluginHandle = null;
+                  subscriberHandle = null;
+                });
+              }),
+          IconButton(
+              icon: Icon(
+                Icons.switch_camera,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (pluginHandle != null) {
+                  pluginHandle.switchCamera();
+                }
+              })
+        ],
+        title: const Text('janus_client'),
       ),
+      body: Stack(children: [
+        Positioned.fill(
+          child: RTCVideoView(
+            _remoteRenderer,
+          ),
+        ),
+        Align(
+          child: Container(
+            child: RTCVideoView(
+              _localRenderer,
+            ),
+            height: 200,
+            width: 200,
+          ),
+          alignment: Alignment.bottomRight,
+        )
+      ]),
     );
   }
 }

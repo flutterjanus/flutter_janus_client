@@ -17,7 +17,7 @@ If you want to help support this plugin development, then you are more than welc
 | Feature            | Support | Well Tested |
 |--------------------|---------|-------------|
 | WebSocket          | Yes     | No          |
-| Rest/Http API      | No      | No          |
+| Rest/Http API      | WIP     | No          |
 | Video Room Plugin  | Yes     | No          |
 | Video Call Plugin  | Yes     | No          |
 | Audio Call Plugin  | No      | No          |

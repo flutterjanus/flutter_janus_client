@@ -1,8 +1,5 @@
 import 'dart:async';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/WebRTCHandle.dart';
@@ -10,18 +7,22 @@ import 'package:janus_client/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:http/http.dart' as http;
+import 'utils.dart';
 
 class JanusClient {
-  static const MethodChannel _channel = const MethodChannel('janus_client');
   dynamic server;
   String apiSecret;
   String token;
   bool withCredentials;
+  bool _usingRest;
+  String _currentJanusUri;
+  Timer _keepAliveTimer;
   List<RTCIceServer> iceServers;
   int refreshInterval;
   bool _connected = false;
   int _sessionId;
-  void Function() _onSuccess;
+  void Function(int sessionId) _onSuccess;
   void Function(dynamic) _onError;
   Uuid _uuid = Uuid();
   Map<String, dynamic> _transactions = {};
@@ -38,12 +39,20 @@ class JanusClient {
 
   get isConnected => _connected;
 
+  get currentJanusURI => _currentJanusUri;
+
   int get sessionId => _sessionId;
 
+  /*
+  * Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
+  * refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
+  * value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
+  *
+  * */
   JanusClient(
       {@required this.server,
       @required this.iceServers,
-      this.refreshInterval = 5,
+      this.refreshInterval = 50,
       this.apiSecret,
       this.token,
       this.withCredentials = false});
@@ -51,6 +60,7 @@ class JanusClient {
   Future<dynamic> _attemptWebSocket(String url) async {
     try {
       String transaction = _uuid.v4().replaceAll('-', '');
+      _currentJanusUri = url;
       _webSocketChannel = IOWebSocketChannel.connect(url,
           protocols: ['janus-protocol'], pingInterval: Duration(seconds: 2));
       _webSocketSink = _webSocketChannel.sink;
@@ -67,13 +77,15 @@ class JanusClient {
       if (data["janus"] == "success") {
         _sessionId = data["data"]["id"];
         _connected = true;
+        _usingRest = false;
 //        to keep session alive otherwise session will die after default 60 seconds.
         _keepAlive(refreshInterval: refreshInterval);
-        this._onSuccess();
+        this._onSuccess(_sessionId);
         return data;
       }
     } catch (e) {
       this._connected = false;
+      _keepAliveTimer.cancel();
       debugPrint(e.toString());
       print(e.toString());
       this._onError(e);
@@ -81,11 +93,61 @@ class JanusClient {
     }
   }
 
-  _attemptRest(String item) {
-//todo:implement all http connect interface
+  /*
+  * private method for posting data to janus by using http client
+  * */
+  Future<dynamic> _postRestClient(bod, {int handleId}) async {
+    var suffixUrl = '';
+    if (_sessionId != null&& handleId == null) {
+      suffixUrl = suffixUrl + "/$_sessionId";
+    }
+    else if (_sessionId != null && handleId != null) {
+      suffixUrl = suffixUrl + "/$_sessionId/$handleId";
+    }
+    return parse(
+        (await http.post(_currentJanusUri + suffixUrl, body: stringify(bod)))
+            .body);
   }
 
-  connect({void Function() onSuccess, void Function(dynamic) onError}) async {
+  /*private method that tries to establish rest connection with janus server,
+   along with setting up keepLive Timer which forces janus to keep session live unless explicitly closed by destroy()*/
+  _attemptRest(String url) async {
+    String transaction = _uuid.v4().replaceAll('-', '');
+    var rootUrl = url;
+    if (!url.endsWith("/janus")) rootUrl = url + '/janus';
+    _currentJanusUri = rootUrl;
+    debugPrint('should print ');
+    debugPrint(rootUrl);
+    debugPrint(_currentJanusUri);
+    try {
+      var response = await _postRestClient({
+        "janus": "create",
+        "transaction": transaction,
+        ..._apiMap,
+        ..._tokenMap
+      });
+      print(response);
+      if (response["janus"] == "success") {
+        _sessionId = response["data"]["id"];
+        _connected = true;
+        _usingRest = true;
+//        to keep session alive otherwise session will die after default 60 seconds.
+        _keepAlive(refreshInterval: refreshInterval);
+        this._onSuccess(_sessionId);
+        // return response;
+      }
+
+//todo:implement all http connect interface
+    } catch (e) {
+      // _keepAliveTimer.cancel();
+      throw e;
+    }
+  }
+
+  //generates sessionId and returns it as callback value in onSuccess
+  connect(
+      {void Function(int sessionId) onSuccess,
+      void Function(dynamic) onError}) async {
     this._onSuccess = onSuccess;
     this._onError = onError;
 
@@ -109,6 +171,7 @@ class JanusClient {
           if (isConnected) break;
         } else {
           debugPrint('trying http/https interface');
+          debugPrint(item);
           await _attemptRest(item);
           if (isConnected) break;
         }
@@ -118,40 +181,79 @@ class JanusClient {
     }
   }
 
-  _keepAlive({int refreshInterval}) {
-    //                keep session live dude!
-    Timer.periodic(Duration(seconds: refreshInterval), (timer) {
-      _webSocketSink.add(stringify({
-        "janus": "keepalive",
-        "session_id": _sessionId,
-        "transaction": _uuid.v4(),
-        ..._apiMap,
-        ..._tokenMap
-      }));
-    });
+  destroy() {
+    _keepAliveTimer.cancel();
   }
 
+  _keepAlive({int refreshInterval}) {
+    //                keep session live dude!
+    if (isConnected) {
+      _keepAliveTimer =
+          Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
+        if (_usingRest) {
+          debugPrint("keep live ping from rest client");
+          await _postRestClient({
+            "janus": "keepalive",
+            "session_id": _sessionId,
+            "transaction": _uuid.v4(),
+            ..._apiMap,
+            ..._tokenMap
+          });
+        } else {
+          _webSocketSink.add(stringify({
+            "janus": "keepalive",
+            "session_id": _sessionId,
+            "transaction": _uuid.v4(),
+            ..._apiMap,
+            ..._tokenMap
+          }));
+        }
+      });
+    }
+  }
+/*
+*
+* */
   attach(Plugin plugin) async {
+    var transaction = _uuid.v4();
+    Map<String, dynamic> request = {
+      "janus": "attach",
+      "plugin": plugin.plugin,
+      "transaction": transaction
+    };
+    request["token"] = token;
+    request["apisecret"] = apiSecret;
+    request["session_id"] = sessionId;
+    plugin.context = this;
+    Map<String, dynamic> configuration = {
+      "iceServers": iceServers.map((e) => e.toMap()).toList()
+    };
+
+    RTCPeerConnection peerConnection =
+        await createPeerConnection(configuration, {});
+    WebRTCHandle webRTCHandle = WebRTCHandle(
+      iceServers: iceServers,
+    );
+    webRTCHandle.pc = peerConnection;
+    plugin.webRTCHandle = webRTCHandle;
+    plugin.apiSecret = apiSecret;
+    plugin.sessionId = _sessionId;
+    plugin.token = token;
+    plugin.pluginHandles = _pluginHandles;
+    plugin.transactions = _transactions;
+
+    //WebSocket Related Code
     if (_webSocketSink != null &&
         _webSocketStream != null &&
         _webSocketChannel != null) {
       var opaqueId = plugin.opaqueId;
-      var transaction = _uuid.v4();
-      Map<String, dynamic> request = {
-        "janus": "attach",
-        "plugin": plugin.plugin,
-        "transaction": transaction
-      };
       if (plugin.opaqueId != null) request["opaque_id"] = opaqueId;
-      request["token"] = token;
-      request["apisecret"] = apiSecret;
-      request["session_id"] = sessionId;
       _webSocketSink.add(stringify(request));
       var data = parse(await _webSocketStream.firstWhere(
           (element) => parse(element)["transaction"] == transaction));
       if (data["janus"] != "success") {
         plugin.onError(
-            "Ooops: " + data["error"].code + " " + data["error"].reason);
+            "Ooops: " + data["error"].code + " " + data["error"]["reason"]);
         return null;
       }
       print(data);
@@ -162,25 +264,11 @@ class JanusClient {
         _handleEvent(plugin, parse(event));
       });
 
-      Map<String, dynamic> configuration = {
-        "iceServers": iceServers.map((e) => e.toMap()).toList()
-      };
-//      print(configuration);
-      RTCPeerConnection peerConnection =
-          await createPeerConnection(configuration, {});
-      WebRTCHandle webRTCHandle = WebRTCHandle(
-        iceServers: iceServers,
-      );
-      webRTCHandle.pc = peerConnection;
-      plugin.webRTCHandle = webRTCHandle;
+      //attaching websocket sink and stream on plugin handle
       plugin.webSocketStream = _webSocketStream;
       plugin.webSocketSink = _webSocketSink;
       plugin.handleId = handleId;
-      plugin.apiSecret = apiSecret;
-      plugin.sessionId = _sessionId;
-      plugin.token = token;
-      plugin.pluginHandles = _pluginHandles;
-      plugin.transactions = _transactions;
+
       if (plugin.onLocalStream != null) {
         plugin.onLocalStream(peerConnection.getLocalStreams());
       }
@@ -206,24 +294,33 @@ class JanusClient {
       };
 
       _pluginHandles[handleId] = plugin;
+      debugPrint(_pluginHandles.toString());
       if (plugin.onSuccess != null) {
         plugin.onSuccess(plugin);
       }
     } else {
-      return null;
+      //attaching plugin considering rest as fallback mechanism
+      var data = await _postRestClient(request);
+      if (data["janus"] != "success") {
+        debugPrint("Ooops: " +
+            data["error"]["code"].toString() +
+            " " +
+            data["error"]["reason"]);
+        plugin.onError(
+            "Error: " + data["error"]["code"] + " " + data["error"]["reason"]);
+        return null;
+      }
+      int handleId = data["data"]["id"];
+      plugin.handleId=handleId;
+      debugPrint("Created handle: " + handleId.toString());
+      _pluginHandles[handleId] = plugin;
+      if (plugin.onSuccess != null) {
+        plugin.onSuccess(plugin);
+      }
     }
   }
 
   _handleEvent(Plugin plugin, Map<String, dynamic> json) {
-//      if(!websockets && sessionId !== undefined && sessionId !== null && skipTimeout !== true)
-//        eventHandler();
-//      if(!websockets && Janus.isArray(json)) {
-//        // We got an array: it means we passed a maxev > 1, iterate on all objects
-//        for(var i=0; i<json.length; i++) {
-//          handleEvent(json[i], true);
-//        }
-//        return;
-//      }
     print('handle event called');
     print(json);
 

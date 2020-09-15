@@ -9,11 +9,32 @@ import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'WebRTCHandle.dart';
+import 'janus_client.dart';
+import 'janus_client.dart';
+import 'package:http/http.dart' as http;
 
 class Plugin {
   String plugin;
   String opaqueId;
   int _handleId;
+  JanusClient _context;
+
+  set context(JanusClient val) {
+    _context = val;
+  }
+
+  Future<dynamic> _postRestClient(bod, {int handleId}) async {
+    var suffixUrl = '';
+    if (_sessionId != null&& handleId == null) {
+      suffixUrl = suffixUrl + "/$_sessionId";
+    }
+    else if (_sessionId != null && handleId != null) {
+      suffixUrl = suffixUrl + "/$_sessionId/$handleId";
+    }
+    return parse((await http.post(_context.currentJanusURI + suffixUrl,
+            body: stringify(bod)))
+        .body);
+  }
 
   int get handleId => _handleId;
 
@@ -104,6 +125,51 @@ class Plugin {
     }
   }
 
+  _handleSendResponse(json, onSuccess, onError) {
+    print(json);
+    if (json["janus"] == "success") {
+      // We got a success, must have been a synchronous transaction
+      var plugindata = json["plugindata"];
+      if (plugindata == null) {
+        debugPrint("Request succeeded, but missing plugindata...");
+        if (onSuccess != null) {
+          onSuccess(json);
+        }
+        return;
+      }
+      debugPrint(
+          "Synchronous transaction successful (" + plugindata["plugin"] + ")");
+      var data = plugindata["data"];
+//        debugPrint(data.toString());
+      if (onSuccess != null) {
+        onSuccess(data);
+      }
+      return;
+    } else if (json["janus"] != "ack") {
+      // Not a success and not an ack, must be an error
+      if (json["error"] != null) {
+        debugPrint("Ooops: " +
+            json["error"]["code"].toString() +
+            " " +
+            json["error"]["reason"]); // FIXME
+        if (onError != null) {
+          onError(
+              json["error"]["code"].toString() + " " + json["error"]["reason"]);
+        }
+      } else {
+        debugPrint("Unknown error"); // FIXME
+        if (onError != null) {
+          onError("Unknown error");
+        }
+      }
+      return;
+    }
+    // If we got here, the plugin decided to handle the request asynchronously
+    if (onSuccess != null) {
+      onSuccess(json);
+    }
+  }
+
   send(
       {dynamic message,
       RTCSessionDescription jsep,
@@ -122,52 +188,15 @@ class Plugin {
     }
     request["session_id"] = sessionId;
     request["handle_id"] = handleId;
-//    debugPrint(request.toString());
+
     if (webSocketSink != null && webSocketStream != null) {
       webSocketSink.add(stringify(request));
       dynamic json = parse(await webSocketStream.firstWhere(
           (element) => parse(element)["transaction"] == transaction));
-      if (json["janus"] == "success") {
-        // We got a success, must have been a synchronous transaction
-        var plugindata = json["plugindata"];
-        if (plugindata == null) {
-          debugPrint("Request succeeded, but missing plugindata...");
-          if (onSuccess != null) {
-            onSuccess();
-          }
-          return;
-        }
-        debugPrint("Synchronous transaction successful (" +
-            plugindata["plugin"] +
-            ")");
-        var data = plugindata["data"];
-//        debugPrint(data.toString());
-        if (onSuccess != null) {
-          onSuccess(data);
-        }
-        return;
-      } else if (json["janus"] != "ack") {
-        // Not a success and not an ack, must be an error
-        if (json["error"] != null) {
-          debugPrint("Ooops: " +
-              json["error"].code +
-              " " +
-              json["error"].reason); // FIXME
-          if (onError != null) {
-            onError(json["error"].code + " " + json["error"].reason);
-          }
-        } else {
-          debugPrint("Unknown error"); // FIXME
-          if (onError != null) {
-            onError("Unknown error");
-          }
-        }
-        return;
-      }
-      // If we got here, the plugin decided to handle the request asynchronously
-      if (onSuccess != null) {
-        onSuccess();
-      }
+      _handleSendResponse(json, onSuccess, onError);
+    } else {
+      var json = await _postRestClient(request, handleId: handleId);
+      _handleSendResponse(json, onSuccess, onError);
     }
 
     return;
@@ -177,6 +206,7 @@ class Plugin {
     this.send(message: {"request": "leave"});
     await _webRTCHandle.myStream.dispose();
     await _webRTCHandle.pc.close();
+    _context.destroy();
     _webRTCHandle.pc = null;
   }
 

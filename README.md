@@ -24,5 +24,5 @@ for implementing webrtc stack, flutter_webrtc plugin is used.
 | Text Room Plugin   | No      | No          |
 
 # Getting Started
-[VideoRoom Example](https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/example/lib/VideoRoom.dart)
-[VideoCall Example](https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/example/lib/videoCall.dart)
+[VideoRoom Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom.dart)
+[VideoCall Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/videoCall.dart)

@@ -1,3 +1,8 @@
-## 0.0.1
+## 0.0.2
+* Added Videocall example  
+* Updated WebRTC dependencies  
+* bug fixes and improvements  
 
-* TODO: Describe initial release.
+
+## 0.0.1
+* initial Release

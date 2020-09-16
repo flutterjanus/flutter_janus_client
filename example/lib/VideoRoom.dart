@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/Plugin.dart';
-import 'package:janus_client/janus_client.dart';
-import 'package:janus_client/utils.dart';
+
 import 'dart:async';
 class VideoRoom extends StatefulWidget {
   @override
@@ -70,7 +69,6 @@ class _VideoRoomState extends State<VideoRoom> {
           setState(() {
             remoteStream = stream;
             _remoteRenderer.srcObject = remoteStream;
-            _remoteRenderer.mirror = true;
           });
         }));
   }
@@ -88,7 +86,9 @@ class _VideoRoomState extends State<VideoRoom> {
             credential: "SecureIt")
       ], server: [
         'https://janus.onemandev.tech/janus',
-        'wss://janus.onemandev.tech/websocket',
+        // 'wss://janus.onemandev.tech/janus/websocket',
+        // 'https://janus.onemandev.tech/janus',
+
       ], withCredentials: true, apiSecret: "SecureIt");
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
@@ -122,7 +122,6 @@ class _VideoRoomState extends State<VideoRoom> {
               });
               setState(() {
                 _localRenderer.srcObject = myStream;
-                _localRenderer.mirror = true;
               });
               var register = {
                 "request": "join",

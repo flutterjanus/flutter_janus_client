@@ -1,17 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_webrtc/rtc_session_description.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
 import 'package:uuid/uuid.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
-
+import 'package:flutter/foundation.dart';
 import 'WebRTCHandle.dart';
 import 'janus_client.dart';
-import 'janus_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_webrtc/src/get_user_media.dart';
 
 class Plugin {
   String plugin;
@@ -25,10 +23,9 @@ class Plugin {
 
   Future<dynamic> _postRestClient(bod, {int handleId}) async {
     var suffixUrl = '';
-    if (_sessionId != null&& handleId == null) {
+    if (_sessionId != null && handleId == null) {
       suffixUrl = suffixUrl + "/$_sessionId";
-    }
-    else if (_sessionId != null && handleId != null) {
+    } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
     return parse((await http.post(_context.currentJanusURI + suffixUrl,
@@ -105,11 +102,12 @@ class Plugin {
       };
     }
     if (_webRTCHandle != null) {
-      _webRTCHandle.myStream = await navigator.getUserMedia(mediaConstraints);
+      _webRTCHandle.myStream =
+          await MediaDevices.getUserMedia(mediaConstraints);
       _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
       return _webRTCHandle.myStream;
     } else {
-      debugPrint("error webrtchandle cant be null");
+      print("error webrtchandle cant be null");
       return null;
     }
   }
@@ -133,7 +131,7 @@ class Plugin {
       if (plugindata == null) {
         debugPrint("Request succeeded, but missing plugindata...");
         if (onSuccess != null) {
-          onSuccess(json);
+          onSuccess();
         }
         return;
       }
@@ -142,7 +140,7 @@ class Plugin {
       var data = plugindata["data"];
 //        debugPrint(data.toString());
       if (onSuccess != null) {
-        onSuccess(data);
+        onSuccess();
       }
       return;
     } else if (json["janus"] != "ack") {
@@ -166,7 +164,7 @@ class Plugin {
     }
     // If we got here, the plugin decided to handle the request asynchronously
     if (onSuccess != null) {
-      onSuccess(json);
+      onSuccess();
     }
   }
 
@@ -191,9 +189,17 @@ class Plugin {
 
     if (webSocketSink != null && webSocketStream != null) {
       webSocketSink.add(stringify(request));
-      dynamic json = parse(await webSocketStream.firstWhere(
-          (element) => parse(element)["transaction"] == transaction));
-      _handleSendResponse(json, onSuccess, onError);
+      _transactions[transaction] = (json) {
+          _handleSendResponse(json, onSuccess, onError);
+          // _transactions.remove(transaction);
+      };
+      _webSocketStream.listen((event) {
+        if (parse(event)["transaction"] == transaction && parse(event)["janus"]!="ack") {
+          print('got event in send method');
+          print(event);
+          _transactions[transaction](parse(event));
+        }
+      });
     } else {
       var json = await _postRestClient(request, handleId: handleId);
       _handleSendResponse(json, onSuccess, onError);
@@ -220,7 +226,7 @@ class Plugin {
     }
     RTCSessionDescription offer =
         await _webRTCHandle.pc.createOffer(offerOptions);
-    _webRTCHandle.pc.setLocalDescription(offer);
+    await _webRTCHandle.pc.setLocalDescription(offer);
     return offer;
   }
 

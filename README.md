@@ -3,7 +3,8 @@
 # janus_client
 **all dependencies updated**
 It will allow you to connect to janus gateway server from your flutter application.
-for implementing webrtc stack, flutter_webrtc plugin is used.
+for implementing webrtc stack, flutter_webrtc plugin is used.   
+
 **please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready**
 
 # Sample

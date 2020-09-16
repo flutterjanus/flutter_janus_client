@@ -1,6 +1,5 @@
-import 'package:flutter_webrtc/media_stream.dart';
-import 'package:flutter_webrtc/rtc_dtmf_sender.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/utils.dart';
 
 class WebRTCHandle {

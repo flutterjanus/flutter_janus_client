@@ -1,6 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/webrtc.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
@@ -47,7 +48,7 @@ class JanusClient {
   * Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
   * refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
   * value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
-  *
+  * maxEvent property is an optional value whose function is to specify maximum number of events fetched using polling in rest/http mechanism by default it fetches 10 events in a single api call
   * */
   JanusClient(
       {@required this.server,
@@ -55,6 +56,7 @@ class JanusClient {
       this.refreshInterval = 50,
       this.apiSecret,
       this.token,
+        this.maxEvent=10,
       this.withCredentials = false});
 
   Future<dynamic> _attemptWebSocket(String url) async {
@@ -85,7 +87,7 @@ class JanusClient {
       }
     } catch (e) {
       this._connected = false;
-      _keepAliveTimer.cancel();
+      // _keepAliveTimer.cancel();
       debugPrint(e.toString());
       print(e.toString());
       this._onError(e);
@@ -98,15 +100,27 @@ class JanusClient {
   * */
   Future<dynamic> _postRestClient(bod, {int handleId}) async {
     var suffixUrl = '';
-    if (_sessionId != null&& handleId == null) {
+    if (_sessionId != null && handleId == null) {
       suffixUrl = suffixUrl + "/$_sessionId";
-    }
-    else if (_sessionId != null && handleId != null) {
+    } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
     return parse(
         (await http.post(_currentJanusUri + suffixUrl, body: stringify(bod)))
             .body);
+  }
+
+  /*
+  * private method for get data to janus by using http client
+  * */
+  Future<dynamic> _getRestClient(bod, {int handleId}) async {
+    var suffixUrl = '';
+    if (_sessionId != null && handleId == null) {
+      suffixUrl = suffixUrl + "/$_sessionId";
+    } else if (_sessionId != null && handleId != null) {
+      suffixUrl = suffixUrl + "/$_sessionId/$handleId";
+    }
+    return parse((await http.get(_currentJanusUri + suffixUrl)).body);
   }
 
   /*private method that tries to establish rest connection with janus server,
@@ -211,6 +225,7 @@ class JanusClient {
       });
     }
   }
+
 /*
 *
 * */
@@ -242,6 +257,38 @@ class JanusClient {
     plugin.pluginHandles = _pluginHandles;
     plugin.transactions = _transactions;
 
+    if (plugin.onLocalStream != null) {
+      plugin.onLocalStream(peerConnection.getLocalStreams());
+    }
+    peerConnection.onAddStream = (MediaStream stream) {
+      if (plugin.onRemoteStream != null) {
+        plugin.onRemoteStream(stream);
+      }
+    };
+    //      send trickle
+    peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
+      debugPrint('sending trickle');
+      Map<dynamic, dynamic> request = {
+        "janus": "trickle",
+        "candidate": candidate.toMap(),
+        "transaction": "sendtrickle"
+      };
+      request["session_id"] = plugin.sessionId;
+      request["handle_id"] = plugin.handleId;
+      request["apisecret"] = plugin.apiSecret;
+      request["token"] = plugin.token;
+
+      //checking and posting using websocket if in available
+      if (!_usingRest) {
+        plugin.webSocketSink.add(stringify(request));
+      } else {
+        //posting using rest mechanism
+        var data = await _postRestClient(request, handleId: plugin.handleId);
+        print("trickle sent");
+        print(data);
+      }
+    };
+
     //WebSocket Related Code
     if (_webSocketSink != null &&
         _webSocketStream != null &&
@@ -249,55 +296,40 @@ class JanusClient {
       var opaqueId = plugin.opaqueId;
       if (plugin.opaqueId != null) request["opaque_id"] = opaqueId;
       _webSocketSink.add(stringify(request));
-      var data = parse(await _webSocketStream.firstWhere(
-          (element) => parse(element)["transaction"] == transaction));
-      if (data["janus"] != "success") {
-        plugin.onError(
-            "Ooops: " + data["error"].code + " " + data["error"]["reason"]);
-        return null;
-      }
-      print(data);
-      int handleId = data["data"]["id"];
-      debugPrint("Created handle: " + handleId.toString());
+      print('error here');
+      _transactions[transaction] = (data) {
+        if (data["janus"] != "success") {
+          plugin.onError(
+              "Ooops: " + data["error"].code + " " + data["error"]["reason"]);
+          return null;
+        }
+        print('attaching plugin success');
+        print(data);
+        int handleId = data["data"]["id"];
+        debugPrint("Created handle: " + handleId.toString());
+//attaching websocket sink and stream on plugin handle
+        plugin.webSocketStream = _webSocketStream;
+        plugin.webSocketSink = _webSocketSink;
+        plugin.handleId = handleId;
+        _pluginHandles[handleId] = plugin;
+        debugPrint(_pluginHandles.toString());
+        if (plugin.onSuccess != null) {
+          plugin.onSuccess(plugin);
+        }
+      };
+      _webSocketStream.listen((event) {
+        print('outer event');
+        print(event);
+        if (parse(event)["transaction"] == transaction) {
+          print('got event');
+          print(event);
+          _transactions[transaction](parse(event));
+        }
+      });
 
       _webSocketStream.listen((event) {
         _handleEvent(plugin, parse(event));
       });
-
-      //attaching websocket sink and stream on plugin handle
-      plugin.webSocketStream = _webSocketStream;
-      plugin.webSocketSink = _webSocketSink;
-      plugin.handleId = handleId;
-
-      if (plugin.onLocalStream != null) {
-        plugin.onLocalStream(peerConnection.getLocalStreams());
-      }
-      peerConnection.onAddStream = (MediaStream stream) {
-        if (plugin.onRemoteStream != null) {
-          plugin.onRemoteStream(stream);
-        }
-      };
-
-//      send trickle
-      peerConnection.onIceCandidate = (RTCIceCandidate candidate) {
-        debugPrint('sending trickle');
-        Map<dynamic, dynamic> request = {
-          "janus": "trickle",
-          "candidate": candidate.toMap(),
-          "transaction": "sendtrickle"
-        };
-        request["session_id"] = plugin.sessionId;
-        request["handle_id"] = plugin.handleId;
-        request["apisecret"] = plugin.apiSecret;
-        request["token"] = plugin.token;
-        plugin.webSocketSink.add(stringify(request));
-      };
-
-      _pluginHandles[handleId] = plugin;
-      debugPrint(_pluginHandles.toString());
-      if (plugin.onSuccess != null) {
-        plugin.onSuccess(plugin);
-      }
     } else {
       //attaching plugin considering rest as fallback mechanism
       var data = await _postRestClient(request);
@@ -311,12 +343,65 @@ class JanusClient {
         return null;
       }
       int handleId = data["data"]["id"];
-      plugin.handleId=handleId;
+      plugin.handleId = handleId;
       debugPrint("Created handle: " + handleId.toString());
+
+      //attaching event handler using http polling
+      _eventHandler(plugin);
+      //adding plugin handle to plugin handles map
       _pluginHandles[handleId] = plugin;
+      //if not provided then don't attempt callback
       if (plugin.onSuccess != null) {
         plugin.onSuccess(plugin);
       }
+    }
+  }
+
+  //counter to try reconnecting in event of network failure
+  int _pollingRetries = 0;
+  int maxEvent;
+
+  _eventHandler(Plugin plugin) async {
+    if (_sessionId == null) return;
+    debugPrint('Long poll...');
+    if (!isConnected) {
+      debugPrint("Is the server down? (connected=false)");
+      return;
+    }
+    try {
+      var longpoll = currentJanusURI +
+          "/" +
+          _sessionId.toString() +
+          "?rid=" +
+          new DateTime.now().millisecondsSinceEpoch.toString();
+      if (maxEvent!=null)
+        longpoll = longpoll + "&maxev=" + maxEvent.toString();
+      if (token != null) longpoll = longpoll + "&token=" + token;
+      if (apiSecret != null) longpoll = longpoll + "&apisecret=" + apiSecret;
+      print(longpoll);
+      print("polling active");
+      var json = parse((await http.get(longpoll)).body);
+      print(json);
+      (json as List<dynamic>).forEach((element) {
+        _handleEvent(plugin, element);
+      });
+      _pollingRetries = 0;
+      _eventHandler(plugin);
+    }
+    on HttpException catch(e){
+    //   print('bloody exception');
+    //   print(e);
+      _pollingRetries++;
+      if (_pollingRetries > 2) {
+        // Did we just lose the server? :-(
+        _connected = false;
+        debugPrint("Lost connection to the server (is it down?)");
+        return;
+      }
+    }
+    catch(e){
+      print("fatal Exception");
+      return;
     }
   }
 

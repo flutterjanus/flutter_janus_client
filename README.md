@@ -1,7 +1,8 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 # janus_client
-**all dependencies updated**
+**all dependencies updated**  
+
 It will allow you to connect to janus gateway server from your flutter application.
 for implementing webrtc stack, flutter_webrtc plugin is used.   
 

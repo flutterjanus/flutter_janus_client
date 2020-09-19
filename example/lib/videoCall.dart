@@ -8,6 +8,7 @@ class VideoCallExample extends StatefulWidget {
   @override
   _VideoCallExampleState createState() => _VideoCallExampleState();
 }
+
 /*
 * Subscriber functionality not complete due to time constraints, i will try to update it when i will get time!
 * Regards.
@@ -27,10 +28,8 @@ class _VideoCallExampleState extends State<VideoCallExample> {
   ], server: [
     'https://janus.onemandev.tech/janus',
     'wss://janus.onemandev.tech/janus/websocket',
-
   ], withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
-  Plugin subscribeVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
@@ -51,13 +50,16 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     });
     RTCSessionDescription offerToCall = await publishVideo.createOffer();
     var body = {"request": "call", "username": nameController.text};
-    publishVideo.send(message: body, jsep: offerToCall,onSuccess: (){
-      print("Calling");
-    },onError: (e){
-      print('got error in calling');
-      print(e);
-
-    });
+    publishVideo.send(
+        message: body,
+        jsep: offerToCall,
+        onSuccess: () {
+          print("Calling");
+        },
+        onError: (e) {
+          print('got error in calling');
+          print(e);
+        });
     nameController.text = "";
   }
 
@@ -68,7 +70,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         child: AlertDialog(
           title: Text("Register As"),
           content: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               TextFormField(
                 decoration: InputDecoration(labelText: "Your Name"),
@@ -92,13 +94,13 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         context: context,
         barrierDismissible: false,
         child: AlertDialog(
-          title: Text("Call Registered User"),
+          title: Text("Call Registered User or wait for user to call you"),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
                 decoration:
-                    InputDecoration(labelText: "Name Of Registered User"),
+                    InputDecoration(labelText: "Name Of Registered User to call"),
                 controller: nameController,
               ),
               RaisedButton(
@@ -116,9 +118,12 @@ class _VideoCallExampleState extends State<VideoCallExample> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async{
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
+    await _localRenderer.initialize();
+    await _remoteRenderer.initialize();
+
   }
 
   @override
@@ -127,23 +132,47 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     super.initState();
     janusClient.connect(onSuccess: (sessionId) {
       janusClient.attach(Plugin(
+          onRemoteStream: (remoteStream) {
+            _remoteRenderer.srcObject=remoteStream;
+          },
           plugin: "janus.plugin.videocall",
-          onMessage: (msg, jsep) {
+          onMessage: (msg, jsep) async {
             print('got onmsg');
             print(msg);
             var result = msg["result"];
-            if (result!=null) {
-              if (result["event"]!=null) {
+            if (result != null) {
+              if (result["event"] != null) {
                 var event = result["event"];
                 if (event == 'accepted') {
                   var peer = result["username"];
-                  if (peer!=null) {
+                  if (peer != null) {
                     debugPrint("Call started!");
                   } else {
-                    debugPrint(peer + " accepted the call!");
+                    // debugPrint(peer + " accepted the call!");
                   }
                   // Video call can start
-                  if (jsep!=null) publishVideo.handleRemoteJsep(jsep);
+                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                } else if (event == 'incomingcall') {
+                  Navigator.pop(context);
+                  debugPrint("Incoming call from " + result["username"] + "!");
+                  var yourusername = result["username"];
+
+                  _localRenderer.srcObject=await publishVideo.initializeMediaDevices();
+
+                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                  // Notify user
+                  var offer = await publishVideo.createAnswer();
+                  var body = {"request": "accept"};
+                  publishVideo.send(
+                      message: body,
+                      jsep: offer,
+                      onSuccess: () {
+                        print('call connected');
+                      });
+                  // print(publishVideo.webRTCHandle.pc.);
+                }
+                else if(event == 'hangup') {
+                  await cleanUpAndBack();
                 }
               }
             }
@@ -165,6 +194,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
             print("User registered");
             nameController.text = "";
             Navigator.pop(context);
+            makeCallDialog();
           },
           onError: (error) {
             print(error);
@@ -172,26 +202,28 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     }
   }
 
+ Future<void> cleanUpAndBack()async{
+
+
+    await publishVideo.destroy();
+    janusClient.destroy();
+    await _localRenderer.dispose();
+    await _remoteRenderer.dispose();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: BackButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        actions: [
-          IconButton(icon: Icon(Icons.call), onPressed: makeCallDialog)
-        ],
-        title: Text("Video Call"),
-      ),
       body: Stack(children: [
         Column(
           children: [
             Expanded(
               child: RTCVideoView(
                 _remoteRenderer,
+                mirror: true,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+
               ),
             ),
             Expanded(
@@ -208,11 +240,31 @@ class _VideoCallExampleState extends State<VideoCallExample> {
           ],
         ),
         Align(
+          alignment: Alignment.topRight,
+          child:Padding(child:IconButton(
+                  icon: Icon(Icons.refresh), color: Colors.white, onPressed: () {
+            publishVideo.switchCamera();
+              }),padding: EdgeInsets.all(25),),
+        ),
+        Align(
           alignment: Alignment.bottomCenter,
-          child: IconButton(
-              icon: Icon(Icons.call_end), color: Colors.red, onPressed: () {}),
+          child:Padding(child:CircleAvatar(
+              backgroundColor: Colors.red,
+              radius:30,
+              child:IconButton(
+              icon: Icon(Icons.call_end), color: Colors.white, onPressed: () {
+                publishVideo.send(message: {'request':'hangup'},onSuccess: ()async{
+                 await cleanUpAndBack();
+                });
+          })),padding: EdgeInsets.all(10),),
         )
       ]),
     );
+  }
+  @override
+  void dispose()async{
+    // TODO: implement dispose
+    super.dispose();
+
   }
 }

@@ -190,11 +190,12 @@ class Plugin {
     if (webSocketSink != null && webSocketStream != null) {
       webSocketSink.add(stringify(request));
       _transactions[transaction] = (json) {
-          _handleSendResponse(json, onSuccess, onError);
-          // _transactions.remove(transaction);
+        _handleSendResponse(json, onSuccess, onError);
+        // _transactions.remove(transaction);
       };
       _webSocketStream.listen((event) {
-        if (parse(event)["transaction"] == transaction && parse(event)["janus"]!="ack") {
+        if (parse(event)["transaction"] == transaction &&
+            parse(event)["janus"] != "ack") {
           print('got event in send method');
           print(event);
           _transactions[transaction](parse(event));
@@ -216,7 +217,16 @@ class Plugin {
     _webRTCHandle.pc = null;
   }
 
-  detach() {}
+  // Cleans Up everything related to individual plugin handle
+  Future<void> destroy() async {
+    await _webRTCHandle.myStream.dispose();
+    await _webRTCHandle.pc.close();
+    await  _webRTCHandle.pc.dispose();
+    if(_webSocketSink!=null){
+      await webSocketSink.close();
+    }
+    _pluginHandles.remove(handleId);
+  }
 
   slowLink(a, b) {}
 

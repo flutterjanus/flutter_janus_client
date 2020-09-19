@@ -9,9 +9,10 @@ for implementing webrtc stack, flutter_webrtc plugin is used.
 
 **please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready**
 
-# Sample
+# Video Call Sample
+<a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
+                                            width='300' height='600'></a>
 
-<img width="400" height="600" src="https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videoroom_2_participants.jpg">
 
 ## status
 | Feature            | Support | Well Tested |

@@ -195,8 +195,16 @@ class JanusClient {
     }
   }
 
+  // cleans up rest polling timer or WebSocket connection if used.
   destroy() {
+    //stops polling
     _keepAliveTimer.cancel();
+    //close WebSocket
+    if(_webSocketChannel!=null)
+      _webSocketChannel.sink.close();
+    //clean maps
+    _pluginHandles.clear();
+    _transactions.clear();
   }
 
   _keepAlive({int refreshInterval}) {
@@ -260,6 +268,7 @@ class JanusClient {
     if (plugin.onLocalStream != null) {
       plugin.onLocalStream(peerConnection.getLocalStreams());
     }
+
     peerConnection.onAddStream = (MediaStream stream) {
       if (plugin.onRemoteStream != null) {
         plugin.onRemoteStream(stream);
@@ -510,7 +519,6 @@ class JanusClient {
         // Don't warn here because destroyHandle causes this situation.
       }
       plugin.onDetached();
-      pluginHandle.detach();
     } else if (json["janus"] == "media") {
       // Media started/stopped flowing
       debugPrint("Got a media event on session " + sessionId.toString());

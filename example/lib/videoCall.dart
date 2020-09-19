@@ -9,12 +9,7 @@ class VideoCallExample extends StatefulWidget {
   _VideoCallExampleState createState() => _VideoCallExampleState();
 }
 
-/*
-* Subscriber functionality not complete due to time constraints, i will try to update it when i will get time!
-* Regards.
-* Shivansh Talwar
-*
-* */
+
 class _VideoCallExampleState extends State<VideoCallExample> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(

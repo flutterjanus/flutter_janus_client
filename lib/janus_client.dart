@@ -29,11 +29,17 @@ class JanusClient {
   Map<String, dynamic> _transactions = {};
   Map<int, Plugin> _pluginHandles = {};
 
-  dynamic get _apiMap =>
-      withCredentials ? apiSecret != null ? {"apisecret": apiSecret} : {} : {};
+  dynamic get _apiMap => withCredentials
+      ? apiSecret != null
+          ? {"apisecret": apiSecret}
+          : {}
+      : {};
 
-  dynamic get _tokenMap =>
-      withCredentials ? token != null ? {"token": token} : {} : {};
+  dynamic get _tokenMap => withCredentials
+      ? token != null
+          ? {"token": token}
+          : {}
+      : {};
   IOWebSocketChannel _webSocketChannel;
   Stream<dynamic> _webSocketStream;
   WebSocketSink _webSocketSink;
@@ -56,7 +62,7 @@ class JanusClient {
       this.refreshInterval = 50,
       this.apiSecret,
       this.token,
-        this.maxEvent=10,
+      this.maxEvent = 10,
       this.withCredentials = false});
 
   Future<dynamic> _attemptWebSocket(String url) async {
@@ -200,8 +206,7 @@ class JanusClient {
     //stops polling
     _keepAliveTimer.cancel();
     //close WebSocket
-    if(_webSocketChannel!=null)
-      _webSocketChannel.sink.close();
+    if (_webSocketChannel != null) _webSocketChannel.sink.close();
     //clean maps
     _pluginHandles.clear();
     _transactions.clear();
@@ -383,23 +388,23 @@ class JanusClient {
           _sessionId.toString() +
           "?rid=" +
           new DateTime.now().millisecondsSinceEpoch.toString();
-      if (maxEvent!=null)
+      if (maxEvent != null)
         longpoll = longpoll + "&maxev=" + maxEvent.toString();
       if (token != null) longpoll = longpoll + "&token=" + token;
       if (apiSecret != null) longpoll = longpoll + "&apisecret=" + apiSecret;
       print(longpoll);
       print("polling active");
       var json = parse((await http.get(longpoll)).body);
+      debugPrint("_eventHandler");
       print(json);
       (json as List<dynamic>).forEach((element) {
         _handleEvent(plugin, element);
       });
       _pollingRetries = 0;
       _eventHandler(plugin);
-    }
-    on HttpException catch(e){
-    //   print('bloody exception');
-    //   print(e);
+    } on HttpException catch (e) {
+      //   print('bloody exception');
+      //   print(e);
       _pollingRetries++;
       if (_pollingRetries > 2) {
         // Did we just lose the server? :-(
@@ -407,8 +412,7 @@ class JanusClient {
         debugPrint("Lost connection to the server (is it down?)");
         return;
       }
-    }
-    catch(e){
+    } catch (e) {
       print("fatal Exception");
       return;
     }

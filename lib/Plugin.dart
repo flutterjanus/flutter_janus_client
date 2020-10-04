@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart';
 import 'WebRTCHandle.dart';
 import 'janus_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_webrtc/src/get_user_media.dart';
 
 class Plugin {
   String plugin;
@@ -123,24 +122,26 @@ class Plugin {
     }
   }
 
-  _handleSendResponse(json, onSuccess, onError) {
-    print(json);
+  _handleSendResponse(json,Function onsuccess, Function(dynamic) onerror) {
+
     if (json["janus"] == "success") {
       // We got a success, must have been a synchronous transaction
       var plugindata = json["plugindata"];
       if (plugindata == null) {
-        debugPrint("Request succeeded, but missing plugindata...");
-        if (onSuccess != null) {
-          onSuccess();
+        debugPrint("Request succeeded, but missing plugindata...possibly an issue from janus side");
+        if (onsuccess != null) {
+          onsuccess();
         }
         return;
       }
       debugPrint(
           "Synchronous transaction successful (" + plugindata["plugin"] + ")");
-      var data = plugindata["data"];
-//        debugPrint(data.toString());
-      if (onSuccess != null) {
-        onSuccess();
+
+      if(onMessage!=null){
+        onMessage(json,null);
+      }
+      if (onsuccess != null) {
+        onsuccess();
       }
       return;
     } else if (json["janus"] != "ack") {
@@ -150,21 +151,22 @@ class Plugin {
             json["error"]["code"].toString() +
             " " +
             json["error"]["reason"]); // FIXME
-        if (onError != null) {
-          onError(
+        if (onerror != null) {
+          onerror(
               json["error"]["code"].toString() + " " + json["error"]["reason"]);
         }
       } else {
         debugPrint("Unknown error"); // FIXME
-        if (onError != null) {
-          onError("Unknown error");
+        if (onerror != null) {
+          onerror("Unknown error");
         }
       }
       return;
     }
     // If we got here, the plugin decided to handle the request asynchronously
-    if (onSuccess != null) {
-      onSuccess();
+    if (onsuccess != null) {
+      onMessage(json,null);
+      onsuccess();
     }
   }
 
@@ -172,7 +174,7 @@ class Plugin {
       {dynamic message,
       RTCSessionDescription jsep,
       Function onSuccess,
-      Function onError}) async {
+      Function(dynamic) onError}) async {
     var transaction = _uuid.v4();
     var request = {
       "janus": "message",
@@ -245,7 +247,7 @@ class Plugin {
       offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
     }
 
-//    handling kstable exception most ugly way but currently there's no other workarround, it just works
+//    handling kstable exception most ugly way but currently there's no other workaround, it just works
     try {
       RTCSessionDescription offer =
           await _webRTCHandle.pc.createAnswer(offerOptions);

@@ -20,7 +20,6 @@ class WebRTCHandle {
   RTCPeerConnection pc;
 
   Map<dynamic, RTCDataChannel> dataChannel = {};
-  RTCDTMFSender dtmfSender;
   bool trickle;
   bool iceDone;
   Map<dynamic, dynamic> volume;
@@ -33,7 +32,6 @@ class WebRTCHandle {
       this.mySdp,
       this.mediaConstraints,
       this.dataChannel,
-      this.dtmfSender,
       this.trickle,
       this.pc,
       this.iceDone,

@@ -18,6 +18,12 @@ class Home extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pushNamed("/video_room");
               },
+            ),
+            ListTile(
+              title: Text("Streaming Example"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/streaming");
+              },
             )
           ],
         ));

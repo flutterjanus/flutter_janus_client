@@ -221,7 +221,10 @@ class Plugin {
 
   // Cleans Up everything related to individual plugin handle
   Future<void> destroy() async {
-    await _webRTCHandle.myStream.dispose();
+    if(_webRTCHandle.myStream!=null){
+      await _webRTCHandle.myStream.dispose();
+    }
+
     await _webRTCHandle.pc.close();
     await  _webRTCHandle.pc.dispose();
     if(_webSocketSink!=null){

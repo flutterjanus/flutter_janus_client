@@ -57,13 +57,15 @@ class Plugin {
   Function(Plugin) onSuccess;
   Function(dynamic) onError;
   Function(dynamic, dynamic) onMessage;
+  Function(dynamic, bool) onLocalTrack;
+  Function(dynamic, dynamic, dynamic, bool) onRemoteTrack;
   Function(dynamic) onLocalStream;
   Function(dynamic) onRemoteStream;
   Function(dynamic) onIceConnectionState;
   Function(bool, dynamic) onWebRTCState;
   Function() onDetached;
   Function() onDestroy;
-  Function(dynamic, dynamic) onMediaState;
+  Function(dynamic, dynamic, dynamic) onMediaState;
 
   Plugin({
     this.plugin,
@@ -74,6 +76,8 @@ class Plugin {
     this.onMessage,
     this.onDestroy,
     this.onDetached,
+    this.onLocalTrack,
+    this.onRemoteTrack,
     this.onLocalStream,
     this.onRemoteStream,
   });
@@ -122,13 +126,13 @@ class Plugin {
     }
   }
 
-  _handleSendResponse(json,Function onsuccess, Function(dynamic) onerror) {
-
+  _handleSendResponse(json, Function onsuccess, Function(dynamic) onerror) {
     if (json["janus"] == "success") {
       // We got a success, must have been a synchronous transaction
       var plugindata = json["plugindata"];
       if (plugindata == null) {
-        debugPrint("Request succeeded, but missing plugindata...possibly an issue from janus side");
+        debugPrint(
+            "Request succeeded, but missing plugindata...possibly an issue from janus side");
         if (onsuccess != null) {
           onsuccess();
         }
@@ -137,14 +141,14 @@ class Plugin {
       debugPrint(
           "Synchronous transaction successful (" + plugindata["plugin"] + ")");
 
-      if(onMessage!=null){
-        onMessage(json,null);
+      if (onMessage != null) {
+        onMessage(json, null);
       }
       if (onsuccess != null) {
         onsuccess();
       }
       return;
-    } else if (json["janus"] != "ack") {
+    } else if (json["janus"] == "error") {
       // Not a success and not an ack, must be an error
       if (json["error"] != null) {
         debugPrint("Ooops: " +
@@ -156,7 +160,7 @@ class Plugin {
               json["error"]["code"].toString() + " " + json["error"]["reason"]);
         }
       } else {
-        debugPrint("Unknown error"); // FIXME
+        debugPrint("Unknown error:" + json.toString()); // FIXME
         if (onerror != null) {
           onerror("Unknown error");
         }
@@ -165,7 +169,7 @@ class Plugin {
     }
     // If we got here, the plugin decided to handle the request asynchronously
     if (onsuccess != null) {
-      onMessage(json,null);
+      onMessage(json, null);
       onsuccess();
     }
   }
@@ -221,21 +225,25 @@ class Plugin {
 
   // Cleans Up everything related to individual plugin handle
   Future<void> destroy() async {
-    if(_webRTCHandle.myStream!=null){
+    if (_webRTCHandle.myStream != null) {
       await _webRTCHandle.myStream.dispose();
     }
 
     await _webRTCHandle.pc.close();
-    await  _webRTCHandle.pc.dispose();
-    if(_webSocketSink!=null){
+    await _webRTCHandle.pc.dispose();
+    if (_webSocketSink != null) {
       await webSocketSink.close();
     }
     _pluginHandles.remove(handleId);
   }
 
-  slowLink(a, b) {}
+  slowLink(a, b, c) {}
 
   Future<RTCSessionDescription> createOffer({dynamic offerOptions}) async {
+    if (_context.isUnifiedPlan) {
+      await prepareTranscievers(true);
+      //_webRTCHandle.pc.onTrack =
+    }
     if (offerOptions == null) {
       offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
     }
@@ -246,14 +254,20 @@ class Plugin {
   }
 
   Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
-    if (offerOptions == null) {
-      offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
+    if (_context.isUnifiedPlan) {
+      await prepareTranscievers(false);
+    } else {
+      if (offerOptions == null) {
+        offerOptions = {
+          "offerToReceiveAudio": true,
+          "offerToReceiveVideo": true
+        };
+      }
     }
-
 //    handling kstable exception most ugly way but currently there's no other workaround, it just works
     try {
-      RTCSessionDescription offer =
-          await _webRTCHandle.pc.createAnswer(offerOptions);
+      if (offerOptions == null) offerOptions = new Map();
+      RTCSessionDescription offer = await _webRTCHandle.pc.createAnswer({});
       await _webRTCHandle.pc.setLocalDescription(offer);
       return offer;
     } catch (e) {
@@ -261,6 +275,60 @@ class Plugin {
           await _webRTCHandle.pc.createAnswer(offerOptions);
       await _webRTCHandle.pc.setLocalDescription(offer);
       return offer;
+    }
+  }
+
+  Future prepareTranscievers(bool offer) async {
+    RTCRtpTransceiver audioTransceiver;
+    RTCRtpTransceiver videoTransceiver;
+    var transceivers = _webRTCHandle.pc.transceivers;
+    if (transceivers != null && transceivers.length > 0) {
+      transceivers.forEach((t) {
+        if ((t.sender != null &&
+                t.sender.track != null &&
+                t.sender.track.kind == "audio") ||
+            (t.receiver != null &&
+                t.receiver.track != null &&
+                t.receiver.track.kind == "audio")) {
+          if (audioTransceiver == null) {
+            audioTransceiver = t;
+          }
+        }
+        if ((t.sender != null &&
+                t.sender.track != null &&
+                t.sender.track.kind == "video") ||
+            (t.receiver != null &&
+                t.receiver.track != null &&
+                t.receiver.track.kind == "video")) {
+          if (videoTransceiver == null) {
+            videoTransceiver = t;
+          }
+        }
+      });
+    }
+    if (audioTransceiver != null && audioTransceiver.setDirection != null) {
+      audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+    } else {
+      audioTransceiver = await _webRTCHandle.pc.addTransceiver(
+          track: null,
+          kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+          init: RTCRtpTransceiverInit(
+              direction: offer
+                  ? TransceiverDirection.SendOnly
+                  : TransceiverDirection.RecvOnly,
+              streams: new List()));
+    }
+    if (videoTransceiver != null && videoTransceiver.setDirection != null) {
+      videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+    } else {
+      videoTransceiver = await _webRTCHandle.pc.addTransceiver(
+          track: null,
+          kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+          init: RTCRtpTransceiverInit(
+              direction: offer
+                  ? TransceiverDirection.SendOnly
+                  : TransceiverDirection.RecvOnly,
+              streams: new List()));
     }
   }
 

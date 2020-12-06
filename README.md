@@ -19,18 +19,20 @@ For more info visit
 <a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
                                             width='300' height='600'></a>
 
+## News & Updates
+**Streaming plugin now supports unified plan a.k.a multi-streaming support**
 
 ## status
-| Feature            | Support | Well Tested |
-|--------------------|---------|-------------|
-| WebSocket          | Yes     | No          |
-| Rest/Http API      | Yes     | No          |
-| Video Room Plugin  | Yes     | No          |
-| Video Call Plugin  | Yes     | No          |
-| Streaming Plugin   | Yes     | No          |
-| Audio Call Plugin  | wip     | No          |
-| Sip Plugin         | No      | No          |
-| Text Room Plugin   | wip     | No          |
+| Feature           | Support | Well Tested | Unified Plan |
+|-------------------|---------|-------------|--------------|
+| WebSocket         | Yes     | No          | -            |
+| Rest/Http API     | Yes     | No          | -            |
+| Video Room Plugin | Yes     | No          | wip          |
+| Video Call Plugin | Yes     | No          | wip          |
+| Streaming Plugin  | Yes     | No          | Yes          |
+| Audio Room Plugin | wip     | No          | wip          |
+| Sip Plugin        | No      | No          | No           |
+| Text Room Plugin  | wip     | No          | wip          |
 
 # Getting Started
 [VideoRoom Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom.dart)  

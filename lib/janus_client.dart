@@ -10,7 +10,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'utils.dart';
-
+/// Main Class for setting up janus server connection details and important methods for interacting with janus server
 class JanusClient {
   dynamic server;
   String apiSecret;
@@ -22,7 +22,7 @@ class JanusClient {
   List<RTCIceServer> iceServers;
   int refreshInterval;
   bool _connected = false;
-  bool isUnifiedPlan = true;
+  bool isUnifiedPlan;
   int _sessionId;
   void Function(int sessionId) _onSuccess;
   void Function(dynamic) _onError;
@@ -52,18 +52,17 @@ class JanusClient {
 
   int get sessionId => _sessionId;
 
-  /*
-  * Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
-  * refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
-  * value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
-  * maxEvent property is an optional value whose function is to specify maximum number of events fetched using polling in rest/http mechanism by default it fetches 10 events in a single api call
-  * */
+   /// Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
+  /// refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
+  /// value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
+  /// maxEvent property is an optional value whose function is to specify maximum number of events fetched using polling in rest/http mechanism by default it fetches 10 events in a single api call
+  /// isUnifiedPlan is a new feature introduced by google for supporting multiple streams on a single peer connection, you can enable it by setting it to true by default it is false
   JanusClient(
       {@required this.server,
       @required this.iceServers,
       this.refreshInterval = 50,
       this.apiSecret,
-      this.isUnifiedPlan,
+      this.isUnifiedPlan=false,
       this.token,
       this.maxEvent = 10,
       this.withCredentials = false});
@@ -167,7 +166,7 @@ class JanusClient {
     }
   }
 
-  //generates sessionId and returns it as callback value in onSuccess
+  /// Generates sessionId and returns it as callback value in onSuccess Function, whereas in case of any connection errors is thrown in onError callback if provided.
   connect(
       {void Function(int sessionId) onSuccess,
       void Function(dynamic) onError}) async {
@@ -204,7 +203,7 @@ class JanusClient {
     }
   }
 
-  // cleans up rest polling timer or WebSocket connection if used.
+  /// cleans up rest polling timer or WebSocket connection if used.
   destroy() {
     //stops polling
     _keepAliveTimer.cancel();
@@ -213,6 +212,7 @@ class JanusClient {
     //clean maps
     _pluginHandles.clear();
     _transactions.clear();
+
   }
 
   _keepAlive({int refreshInterval}) {
@@ -241,10 +241,7 @@ class JanusClient {
       });
     }
   }
-
-/*
-*
-* */
+  /// Attach Plugin to janus instance, for any project you need single janus instance to which you can attach any number of supported plugin
   attach(Plugin plugin) async {
     var transaction = _uuid.v4();
     Map<String, dynamic> request = {
@@ -259,7 +256,9 @@ class JanusClient {
     Map<String, dynamic> configuration = {
       "iceServers": iceServers.map((e) => e.toMap()).toList()
     };
-    configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
+    if(isUnifiedPlan){
+      configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
+    }
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
     WebRTCHandle webRTCHandle = WebRTCHandle(
@@ -354,7 +353,7 @@ class JanusClient {
         print(data);
         int handleId = data["data"]["id"];
         debugPrint("Created handle: " + handleId.toString());
-//attaching websocket sink and stream on plugin handle
+        /// attaching websocket sink and stream on plugin handle
         plugin.webSocketStream = _webSocketStream;
         plugin.webSocketSink = _webSocketSink;
         plugin.handleId = handleId;

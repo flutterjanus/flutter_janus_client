@@ -10,6 +10,7 @@ import 'WebRTCHandle.dart';
 import 'janus_client.dart';
 import 'package:http/http.dart' as http;
 
+/// This Class exposes methods and utility function necessary for directly interacting with plugin.
 class Plugin {
   String plugin;
   String opaqueId;
@@ -82,11 +83,15 @@ class Plugin {
     this.onRemoteStream,
   });
 
+  /// It allows you to set Remote Description on internal peer connection, Received from janus server
   Future<void> handleRemoteJsep(data) async {
     await webRTCHandle.pc
         .setRemoteDescription(RTCSessionDescription(data["sdp"], data["type"]));
   }
 
+  /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
+  ///
+  /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView
   Future<MediaStream> initializeMediaDevices(
       {Map<String, dynamic> mediaConstraints}) async {
     if (mediaConstraints == null) {
@@ -106,7 +111,7 @@ class Plugin {
     }
     if (_webRTCHandle != null) {
       _webRTCHandle.myStream =
-          await MediaDevices.getUserMedia(mediaConstraints);
+          await navigator.getUserMedia(mediaConstraints);
       _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
       return _webRTCHandle.myStream;
     } else {
@@ -115,6 +120,7 @@ class Plugin {
     }
   }
 
+  /// a utility method which can be used to switch camera of user device if it has more than one camera
   switchCamera() async {
     if (_webRTCHandle.myStream != null) {
       final videoTrack = _webRTCHandle.myStream
@@ -174,6 +180,13 @@ class Plugin {
     }
   }
 
+  /// this method exposes communication mechanism to janus server,
+  ///
+  /// you can send data to janus server in the form of dart map depending on type of plugin used that's why it is dynamic in type
+  ///
+  /// you can also send jsep (LocalDescription sdp) to janus server if it is required by plugin under use
+  ///
+  /// onSuccess method is a callback that indicates completion of the request
   send(
       {dynamic message,
       RTCSessionDescription jsep,
@@ -215,6 +228,7 @@ class Plugin {
     return;
   }
 
+  /// ends videocall,leaves videoroom and leaves audio room
   hangup() async {
     this.send(message: {"request": "leave"});
     await _webRTCHandle.myStream.dispose();
@@ -223,7 +237,7 @@ class Plugin {
     _webRTCHandle.pc = null;
   }
 
-  // Cleans Up everything related to individual plugin handle
+  /// Cleans Up everything related to individual plugin handle
   Future<void> destroy() async {
     if (_webRTCHandle.myStream != null) {
       await _webRTCHandle.myStream.dispose();

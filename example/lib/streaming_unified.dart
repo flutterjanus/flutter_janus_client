@@ -4,12 +4,12 @@ import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-class Streaming extends StatefulWidget {
+class StreamingUnified extends StatefulWidget {
   @override
-  _StreamingState createState() => _StreamingState();
+  _StreamingUnifiedState createState() => _StreamingUnifiedState();
 }
 
-class _StreamingState extends State<Streaming> {
+class _StreamingUnifiedState extends State<StreamingUnified> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
         url: "turn:40.85.216.95:3478",
@@ -18,10 +18,11 @@ class _StreamingState extends State<Streaming> {
   ], server: [
     'wss://janus.conf.meetecho.com/ws',
     'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+  ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
+  MediaStream _remoteStream;
 
   List<dynamic> streams = [];
   int selectedStreamId;
@@ -47,6 +48,7 @@ class _StreamingState extends State<Streaming> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _remoteRenderer.initialize();
+    _remoteStream = await createLocalMediaStream("local");
   }
 
   @override
@@ -55,9 +57,11 @@ class _StreamingState extends State<Streaming> {
     super.initState();
     janusClient.connect(onSuccess: (sessionId) {
       janusClient.attach(Plugin(
-          onRemoteStream: (remoteStream) {
+          onRemoteTrack: (stream, track, mid, on) {
             print('got remote stream');
-            _remoteRenderer.srcObject = remoteStream;
+            _remoteStream
+                .addTrack(track)
+                .then((value) => _remoteRenderer.srcObject = _remoteStream);
           },
           plugin: "janus.plugin.streaming",
           onMessage: (msg, jsep) async {
@@ -148,7 +152,7 @@ class _StreamingState extends State<Streaming> {
             Expanded(
               child: RTCVideoView(
                 _remoteRenderer,
-                mirror: true,
+                mirror: false,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),
             ),

@@ -22,6 +22,7 @@ class JanusClient {
   List<RTCIceServer> iceServers;
   int refreshInterval;
   bool _connected = false;
+  bool isUnifiedPlan = true;
   int _sessionId;
   void Function(int sessionId) _onSuccess;
   void Function(dynamic) _onError;
@@ -45,6 +46,7 @@ class JanusClient {
   WebSocketSink _webSocketSink;
 
   get isConnected => _connected;
+  get isUnifiedPlan_ => isUnifiedPlan;
 
   get currentJanusURI => _currentJanusUri;
 
@@ -61,6 +63,7 @@ class JanusClient {
       @required this.iceServers,
       this.refreshInterval = 50,
       this.apiSecret,
+      this.isUnifiedPlan,
       this.token,
       this.maxEvent = 10,
       this.withCredentials = false});
@@ -134,7 +137,7 @@ class JanusClient {
   _attemptRest(String url) async {
     String transaction = _uuid.v4().replaceAll('-', '');
     var rootUrl = url;
-    if (!url.endsWith("/janus")) rootUrl = url + '/janus';
+    // if (!url.endsWith("/janus")) rootUrl = url + '/janus';
     _currentJanusUri = rootUrl;
     debugPrint('should print ');
     debugPrint(rootUrl);
@@ -256,7 +259,7 @@ class JanusClient {
     Map<String, dynamic> configuration = {
       "iceServers": iceServers.map((e) => e.toMap()).toList()
     };
-
+    configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
     WebRTCHandle webRTCHandle = WebRTCHandle(
@@ -270,15 +273,45 @@ class JanusClient {
     plugin.pluginHandles = _pluginHandles;
     plugin.transactions = _transactions;
 
-    if (plugin.onLocalStream != null) {
-      plugin.onLocalStream(peerConnection.getLocalStreams());
-    }
-
-    peerConnection.onAddStream = (MediaStream stream) {
-      if (plugin.onRemoteStream != null) {
-        plugin.onRemoteStream(stream);
+    if (!isUnifiedPlan) {
+      if (plugin.onLocalStream != null) {
+        plugin.onLocalStream(peerConnection.getLocalStreams());
       }
-    };
+
+      peerConnection.onAddStream = (MediaStream stream) {
+        if (plugin.onRemoteStream != null) {
+          plugin.onRemoteStream(stream);
+        }
+      };
+    } else {
+      peerConnection.onTrack = (RTCTrackEvent event) async {
+        if (event.streams == null || event.transceiver == null) return;
+        var mid =
+            event.transceiver != null ? event.transceiver.mid : event.track.id;
+        plugin.onRemoteTrack(event.streams[0], event.track, mid, true);
+        if (event.track.onEnded == null) return;
+        event.track.onEnded = () async {
+          if (webRTCHandle.remoteStream != null) {
+            webRTCHandle.remoteStream.removeTrack(event.track);
+            var mid = event.track.id;
+            var transceiver = peerConnection.transceivers
+                .firstWhere((element) => element.receiver.track == event.track);
+            mid = transceiver.mid;
+            plugin.onRemoteTrack(event.streams[0], event.track, mid, false);
+          }
+        };
+        event.track.onMute = () async {
+          if (webRTCHandle.remoteStream != null) {
+            webRTCHandle.remoteStream.removeTrack(event.track);
+            var mid = event.track.id;
+            var transceiver = peerConnection.transceivers
+                .firstWhere((element) => element.receiver.track == event.track);
+            mid = transceiver.mid;
+            plugin.onRemoteTrack(event.streams[0], event.track, mid, false);
+          }
+        };
+      };
+    }
     //      send trickle
     peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
       debugPrint('sending trickle');
@@ -352,8 +385,10 @@ class JanusClient {
             data["error"]["code"].toString() +
             " " +
             data["error"]["reason"]);
-        plugin.onError(
-            "Error: " + data["error"]["code"] + " " + data["error"]["reason"]);
+        plugin.onError("Error: " +
+            data["error"]["code"].toString() +
+            " " +
+            data["error"]["reason"]);
         return null;
       }
       int handleId = data["data"]["id"];
@@ -536,7 +571,7 @@ class JanusClient {
         debugPrint("This handle is not attached to this session");
       }
       if (plugin.onMediaState != null) {
-        plugin.onMediaState(json["type"], json["receiving"]);
+        plugin.onMediaState(json["type"], json["receiving"], json["mid"]);
       }
     } else if (json["janus"] == "slowlink") {
       debugPrint("Got a slowlink event on session " + sessionId.toString());
@@ -550,7 +585,7 @@ class JanusClient {
       if (pluginHandle == null) {
         debugPrint("This handle is not attached to this session");
       }
-      pluginHandle.slowLink(json["uplink"], json["lost"]);
+      pluginHandle.slowLink(json["uplink"], json["lost"], json["mid"]);
     } else if (json["janus"] == "error") {
       // Oops, something wrong happened
       debugPrint("EOoops: " +

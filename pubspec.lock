@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.5"
+  dart_webrtc:
+    dependency: transitive
+    description:
+      name: dart_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.3"
   fake_async:
     dependency: transitive
     description:
@@ -91,12 +98,10 @@ packages:
   flutter_webrtc:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: c6423b2afcb911dce58466e14aed8fc1dc6292b6
-      url: "https://github.com/flutter-webrtc/flutter-webrtc.git"
-    source: git
-    version: "0.3.3"
+      name: flutter_webrtc
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.0"
   http:
     dependency: "direct main"
     description:
@@ -118,6 +123,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.2"
   matcher:
     dependency: transitive
     description:

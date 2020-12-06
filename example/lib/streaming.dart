@@ -12,26 +12,21 @@ class Streaming extends StatefulWidget {
 class _StreamingState extends State<Streaming> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
-        url: "stun:40.85.216.95:3478",
-        username: "onemandev",
-        credential: "SecureIt"),
-    RTCIceServer(
         url: "turn:40.85.216.95:3478",
         username: "onemandev",
         credential: "SecureIt")
   ], server: [
     'https://janus.onemandev.tech/janus',
     'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+  ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-
-
+  MediaStream _remoteStream;
 
   List<dynamic> streams = [];
   int selectedStreamId;
-  bool _loader=true;
+  bool _loader = true;
 
   StateSetter _setState;
 
@@ -48,12 +43,12 @@ class _StreamingState extends State<Streaming> {
         });
   }
 
-
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _remoteRenderer.initialize();
+    _remoteStream = await createLocalMediaStream("local");
   }
 
   @override
@@ -62,9 +57,11 @@ class _StreamingState extends State<Streaming> {
     super.initState();
     janusClient.connect(onSuccess: (sessionId) {
       janusClient.attach(Plugin(
-          onRemoteStream: (remoteStream) {
+          onRemoteTrack: (stream, track, mid, on) {
             print('got remote stream');
-            _remoteRenderer.srcObject = remoteStream;
+            _remoteStream
+                .addTrack(track)
+                .then((value) => _remoteRenderer.srcObject = _remoteStream);
           },
           plugin: "janus.plugin.streaming",
           onMessage: (msg, jsep) async {
@@ -121,14 +118,12 @@ class _StreamingState extends State<Streaming> {
 
             if (jsep != null) {
               debugPrint("Handling SDP as well..." + jsep.toString());
-             await publishVideo.handleRemoteJsep(jsep);
-              RTCSessionDescription answer =
-              await publishVideo.createAnswer();
-              publishVideo
-                  .send(message: {"request": "start"}, jsep: answer);
+              await publishVideo.handleRemoteJsep(jsep);
+              RTCSessionDescription answer = await publishVideo.createAnswer();
+              publishVideo.send(message: {"request": "start"}, jsep: answer);
               Navigator.of(context).pop();
               setState(() {
-                _loader=false;
+                _loader = false;
               });
             }
           },
@@ -137,9 +132,7 @@ class _StreamingState extends State<Streaming> {
               publishVideo = plugin;
               this.getStreamListing();
             });
-          }
-
-          ));
+          }));
     });
   }
 
@@ -154,49 +147,52 @@ class _StreamingState extends State<Streaming> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
-
         Column(
           children: [
             Expanded(
               child: RTCVideoView(
                 _remoteRenderer,
-                mirror: true,
+                mirror: false,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),
             ),
           ],
         ),
-        !_loader?Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            child: CircleAvatar(
-                backgroundColor: Colors.red,
-                radius: 30,
-                child: IconButton(
-                    icon: Icon(Icons.stop),
-                    color: Colors.white,
-                    onPressed: () {
-                      publishVideo.send(
-                          message: {
-                            "request" : "stop"
-                          },
-                          onSuccess: () async {
-                            await cleanUpAndBack();
-                          });
-                    })),
-            padding: EdgeInsets.all(10),
-          ),
-        ):Padding(padding: EdgeInsets.zero),
-        _loader?Align(alignment: Alignment.center,child:
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-          CircularProgressIndicator(),
-          Padding(padding: EdgeInsets.all(10)),
-          Text("Fetching Available Streams..")
-        ],)
-        ,):Padding(padding: EdgeInsets.zero),
+        !_loader
+            ? Align(
+                alignment: Alignment.bottomCenter,
+                child: Padding(
+                  child: CircleAvatar(
+                      backgroundColor: Colors.red,
+                      radius: 30,
+                      child: IconButton(
+                          icon: Icon(Icons.stop),
+                          color: Colors.white,
+                          onPressed: () {
+                            publishVideo.send(
+                                message: {"request": "stop"},
+                                onSuccess: () async {
+                                  await cleanUpAndBack();
+                                });
+                          })),
+                  padding: EdgeInsets.all(10),
+                ),
+              )
+            : Padding(padding: EdgeInsets.zero),
+        _loader
+            ? Align(
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    Padding(padding: EdgeInsets.all(10)),
+                    Text("Fetching Available Streams..")
+                  ],
+                ),
+              )
+            : Padding(padding: EdgeInsets.zero),
       ]),
     );
   }

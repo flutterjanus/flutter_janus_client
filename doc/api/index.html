@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="generator" content="made with love by dartdoc 0.37.0">
+  <meta name="description" content="janus_client API docs, for the Dart programming language.">
+  <title>janus_client - Dart API docs</title>
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="static-assets/github.css">
+  <link rel="stylesheet" href="static-assets/styles.css">
+  <link rel="icon" href="static-assets/favicon.png">
+
+</head>
+
+<body data-base-href=""
+      data-using-base-href="false">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="https://github.com/shivanshtalwar0/flutter_janus_client">janus_client package</a></li>
+  </ol>
+  <div class="self-name">janus_client</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div id="dartdoc-sidebar-left" class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+      <form class="search-sidebar" role="search">
+        <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+      </form>
+    </header>
+    
+    <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+      <li><a href="https://github.com/shivanshtalwar0/flutter_janus_client">janus_client package</a></li>
+    </ol>
+    
+    <h5 class="hidden-xs"><span class="package-name">janus_client</span> <span class="package-kind">package</span></h5>
+    <ol>
+          <li class="section-title">Libraries</li>
+          <li><a href="Plugin/Plugin-library.html">Plugin</a></li>
+          <li><a href="WebRTCHandle/WebRTCHandle-library.html">WebRTCHandle</a></li>
+          <li><a href="janus_client/janus_client-library.html">janus_client</a></li>
+          <li><a href="utils/utils-library.html">utils</a></li>
+    </ol>
+  </div>
+
+  <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <section class="desc markdown">
+        <p><a href="https://ko-fi.com/U7U11OZL8"><img src="https://www.ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a></p>
+<p><a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;"></a></p>
+<h1 id="janus_client">janus_client</h1>
+<p><strong>all dependencies updated</strong><br>
+official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.</p>
+<h2 id="what-is-janus">what is janus?</h2>
+<p>The Janus WebRTC Server has been conceived as a general purpose server. As such, it doesn't provide any functionality per se other than implementing the means to set up a WebRTC media communication with a browser, exchanging JSON messages with it, and relaying RTP/RTCP and messages between browsers and the server-side application logic they're attached to. Any specific feature/application needs to be implemented in server side plugins, that browsers can then contact via the Janus core to take advantage of the functionality they provide. Example of such plugins can be implementations of applications like echo tests, conference bridges, media recorders, SIP gateways and the like.
+For more info visit<br>
+<a href="https://janus.conf.meetecho.com/">Janus: the general purpose WebRTC server</a></p>
+<p><strong>please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready</strong></p>
+<h1 id="video-call-sample">Video Call Sample</h1>
+<p><a href="https://youtu.be/wRo5nd7JnB4"><img src="https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg" width="300" height="600"></a></p>
+<h2 id="news--updates">News &amp; Updates</h2>
+<p><strong>Streaming plugin now supports unified plan a.k.a multi-streaming support</strong></p>
+<h2 id="status">status</h2>
+<table><thead><tr><th>Feature</th><th>Support</th><th>Well Tested</th><th>Unified Plan</th></tr></thead><tbody><tr><td>WebSocket</td><td>Yes</td><td>No</td><td>-</td></tr><tr><td>Rest/Http API</td><td>Yes</td><td>No</td><td>-</td></tr><tr><td>Video Room Plugin</td><td>Yes</td><td>No</td><td>wip</td></tr><tr><td>Video Call Plugin</td><td>Yes</td><td>No</td><td>wip</td></tr><tr><td>Streaming Plugin</td><td>Yes</td><td>No</td><td>Yes</td></tr><tr><td>Audio Room Plugin</td><td>wip</td><td>No</td><td>wip</td></tr><tr><td>Sip Plugin</td><td>No</td><td>No</td><td>No</td></tr><tr><td>Text Room Plugin</td><td>wip</td><td>No</td><td>wip</td></tr></tbody></table>
+<h1 id="getting-started">Getting Started</h1>
+<p><a href="https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom.dart">VideoRoom Example</a></p>
+<p><a href="https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/videoCall.dart">VideoCall Example</a></p>
+<p><a href="https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming.dart">Streaming Example</a></p>
+      </section>
+      
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+          <dt id="Plugin">
+            <span class="name"><a href="Plugin/Plugin-library.html">Plugin</a></span>           
+          </dt>
+          <dd>
+             
+          </dd>
+          <dt id="WebRTCHandle">
+            <span class="name"><a href="WebRTCHandle/WebRTCHandle-library.html">WebRTCHandle</a></span>           
+          </dt>
+          <dd>
+             
+          </dd>
+          <dt id="janus_client">
+            <span class="name"><a href="janus_client/janus_client-library.html">janus_client</a></span>           
+          </dt>
+          <dd>
+             
+          </dd>
+          <dt id="utils">
+            <span class="name"><a href="utils/utils-library.html">utils</a></span>           
+          </dt>
+          <dd>
+             
+          </dd>
+        </dl>
+      </section>
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-right" class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+  </div>
+
+</main>
+
+<footer>
+  <span class="no-break">
+    janus_client
+      0.0.4
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="static-assets/typeahead.bundle.min.js"></script>
+<script src="static-assets/highlight.pack.js"></script>
+<script src="static-assets/URI.js"></script>
+<script src="static-assets/script.js"></script>
+
+
+</body>
+
+</html>

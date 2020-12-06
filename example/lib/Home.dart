@@ -24,6 +24,12 @@ class Home extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pushNamed("/streaming");
               },
+            ),
+            ListTile(
+              title: Text("Streaming Unified Example (MultiStream Support)"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/streaming_unified");
+              },
             )
           ],
         ));

@@ -102,7 +102,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                 textColor: Colors.white,
                 onPressed: () {
                   makeCall();
-                  Navigator.of(context).pop();
+
                 },
                 child: Text("Call"),
               )
@@ -141,10 +141,11 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   if (peer != null) {
                     debugPrint("Call started!");
                   } else {
-                    // debugPrint(peer + " accepted the call!");
                   }
                   // Video call can start
-                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                  if (jsep != null){ publishVideo.handleRemoteJsep(jsep);
+                  Navigator.of(context).pop();
+                  }
                 } else if (event == 'incomingcall') {
                   Navigator.pop(context);
                   debugPrint("Incoming call from " + result["username"] + "!");
@@ -153,7 +154,9 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   _localRenderer.srcObject =
                       await publishVideo.initializeMediaDevices();
 
-                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                  if (jsep != null) {publishVideo.handleRemoteJsep(jsep);
+                  Navigator.of(context).pop();
+                  }
                   // Notify user
                   var offer = await publishVideo.createAnswer();
                   var body = {"request": "accept"};
@@ -165,7 +168,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                       });
                   // print(publishVideo.webRTCHandle.pc.);
                 } else if (event == 'hangup') {
-                  await cleanUpAndBack();
+                  await destroy();
                 }
               }
             }
@@ -194,15 +197,15 @@ class _VideoCallExampleState extends State<VideoCallExample> {
           });
     }
   }
-
-  Future<void> cleanUpAndBack() async {
+  destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
-    _localRenderer.srcObject = null;
-    _remoteRenderer.srcObject = null;
-    Navigator.pop(context);
+    if (_remoteRenderer != null) {
+      _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
+    }
+    Navigator.of(context).pop();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,7 +257,6 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                       publishVideo.send(
                           message: {'request': 'hangup'},
                           onSuccess: () async {
-                            await cleanUpAndBack();
                           });
                     })),
             padding: EdgeInsets.all(10),

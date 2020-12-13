@@ -16,6 +16,7 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
         username: "onemandev",
         credential: "SecureIt")
   ], server: [
+    'https://janus.conf.meetecho.com/janus',
     'wss://janus.conf.meetecho.com/ws',
     'wss://janus.onemandev.tech/janus/websocket',
   ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
@@ -67,6 +68,13 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
           onMessage: (msg, jsep) async {
             print('got onmsg');
             print(msg);
+            if (msg['streaming'] != null && msg['result'] != null) {
+              if (msg['streaming'] == 'event' &&
+                  msg['result']['status'] == 'stopping') {
+                await this.destroy();
+              }
+            }
+
             if (msg['janus'] == 'success' && msg['plugindata'] != null) {
               var plugindata = msg['plugindata'];
               print('got plugin data');
@@ -137,10 +145,17 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
   }
 
   Future<void> cleanUpAndBack() async {
+    publishVideo.send(message: {"request": "stop"});
+  }
+
+  destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
-    await _remoteRenderer.dispose();
-    Navigator.pop(context);
+    if (_remoteRenderer != null) {
+      _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
+    }
+    Navigator.of(context).pop();
   }
 
   @override

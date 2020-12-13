@@ -85,6 +85,7 @@ class _VideoRoomState extends State<VideoRoom> {
             username: "onemandev",
             credential: "SecureIt")
       ], server: [
+        'https://janus.conf.meetecho.com/janus',
         'https://janus.onemandev.tech/janus',
         // 'wss://janus.onemandev.tech/janus/websocket',
         // 'https://janus.onemandev.tech/janus',

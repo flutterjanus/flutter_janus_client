@@ -16,7 +16,8 @@ class _StreamingState extends State<Streaming> {
         username: "onemandev",
         credential: "SecureIt")
   ], server: [
-    'wss://janus.conf.meetecho.com/ws',
+    'https://janus.conf.meetecho.com/janus',
+    'https://master-janus.onemandev.tech/rest',
     'wss://janus.onemandev.tech/janus/websocket',
   ], withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
@@ -63,6 +64,13 @@ class _StreamingState extends State<Streaming> {
           onMessage: (msg, jsep) async {
             print('got onmsg');
             print(msg);
+            if (msg['streaming'] != null && msg['result'] != null) {
+              if (msg['streaming'] == 'event' &&
+                  msg['result']['status'] == 'stopping') {
+                await this.destroy();
+              }
+            }
+
             if (msg['janus'] == 'success' && msg['plugindata'] != null) {
               var plugindata = msg['plugindata'];
               print('got plugin data');
@@ -133,10 +141,17 @@ class _StreamingState extends State<Streaming> {
   }
 
   Future<void> cleanUpAndBack() async {
+    publishVideo.send(message: {"request": "stop"});
+  }
+
+  destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
-    await _remoteRenderer.dispose();
-    Navigator.pop(context);
+    if (_remoteRenderer != null) {
+      _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -168,7 +183,7 @@ class _StreamingState extends State<Streaming> {
                             publishVideo.send(
                                 message: {"request": "stop"},
                                 onSuccess: () async {
-                                  await cleanUpAndBack();
+                                  publishVideo.send(message: {});
                                 });
                           })),
                   padding: EdgeInsets.all(10),

@@ -110,8 +110,7 @@ class Plugin {
       };
     }
     if (_webRTCHandle != null) {
-      _webRTCHandle.myStream =
-          await navigator.getUserMedia(mediaConstraints);
+      _webRTCHandle.myStream = await navigator.getUserMedia(mediaConstraints);
       _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
       return _webRTCHandle.myStream;
     } else {
@@ -217,7 +216,9 @@ class Plugin {
             parse(event)["janus"] != "ack") {
           print('got event in send method');
           print(event);
-          _transactions[transaction](parse(event));
+          if (_transactions[transaction] != null) {
+            _transactions[transaction](parse(event));
+          }
         }
       });
     } else {
@@ -239,32 +240,40 @@ class Plugin {
 
   /// Cleans Up everything related to individual plugin handle
   Future<void> destroy() async {
-    if (_webRTCHandle.myStream != null) {
+    if (_webRTCHandle != null && _webRTCHandle.myStream != null) {
       await _webRTCHandle.myStream.dispose();
     }
 
-    await _webRTCHandle.pc.close();
-    await _webRTCHandle.pc.dispose();
+    if (_webRTCHandle.pc != null) {
+      await _webRTCHandle.pc.dispose();
+    }
+
     if (_webSocketSink != null) {
       await webSocketSink.close();
     }
     _pluginHandles.remove(handleId);
+    _handleId = null;
   }
 
   slowLink(a, b, c) {}
 
-  Future<RTCSessionDescription> createOffer({dynamic offerOptions}) async {
+  Future<RTCSessionDescription> createOffer(
+      {bool iceRestart = false,
+      bool offerToReceiveAudio = true,
+      bool offerToReceiveVideo = true}) async {
     if (_context.isUnifiedPlan) {
       await prepareTranscievers(true);
-      //_webRTCHandle.pc.onTrack =
+    } else {
+      var offerOptions = {
+        "offerToReceiveAudio": offerToReceiveAudio,
+        "offerToReceiveVideo": offerToReceiveVideo,
+        "iceRestart": iceRestart
+      };
+      RTCSessionDescription offer =
+          await _webRTCHandle.pc.createOffer(offerOptions);
+      await _webRTCHandle.pc.setLocalDescription(offer);
+      return offer;
     }
-    if (offerOptions == null) {
-      offerOptions = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
-    }
-    RTCSessionDescription offer =
-        await _webRTCHandle.pc.createOffer(offerOptions);
-    await _webRTCHandle.pc.setLocalDescription(offer);
-    return offer;
   }
 
   Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {

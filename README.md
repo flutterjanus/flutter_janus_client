@@ -20,7 +20,7 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
-**Audio Bridge tested with raw ui**
+**Audio Bridge tested with raw ui**  
 **Streaming plugin now supports unified plan a.k.a multi-streaming support**
 
 ## status

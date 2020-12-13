@@ -20,6 +20,7 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
+**Audio Bridge tested with raw ui**
 **Streaming plugin now supports unified plan a.k.a multi-streaming support**
 
 ## status
@@ -30,7 +31,7 @@ For more info visit
 | Video Room Plugin | Yes     | No          | wip          |
 | Video Call Plugin | Yes     | No          | wip          |
 | Streaming Plugin  | Yes     | No          | Yes          |
-| Audio Room Plugin | wip     | No          | wip          |
+| Audio Room Plugin | Yes     | No          | wip          |
 | Sip Plugin        | No      | No          | No           |
 | Text Room Plugin  | wip     | No          | wip          |
 

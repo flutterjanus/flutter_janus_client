@@ -40,4 +40,8 @@ For more info visit
 
 [VideoCall Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/videoCall.dart)  
 
-[Streaming Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming.dart)
+[Streaming Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming.dart)  
+
+[Streaming\(unified\) Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming_unified.dart)  
+
+[Audio Room Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/audioRoom.dart)

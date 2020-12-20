@@ -281,55 +281,125 @@ class Plugin {
   Future prepareTranscievers(bool offer) async {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
+    var media;
+    if (!_context.isUnifiedPlan) {
+      media = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
+    } else {
+      media = prepareMedia(media);
+    }
     var transceivers = _webRTCHandle.pc.transceivers;
-    if (transceivers != null && transceivers.length > 0) {
-      transceivers.forEach((t) {
-        if ((t.sender != null &&
-                t.sender.track != null &&
-                t.sender.track.kind == "audio") ||
-            (t.receiver != null &&
-                t.receiver.track != null &&
-                t.receiver.track.kind == "audio")) {
-          if (audioTransceiver == null) {
-            audioTransceiver = t;
+    var audioSend = isAudioSendEnabled(media);
+    var audioRecv = isAudioRecvEnabled(media);
+    if (!audioSend && !audioRecv) {
+      if (transceivers != null && transceivers.length > 0) {
+        transceivers.forEach((t) {
+          if ((t.sender != null &&
+                  t.sender.track != null &&
+                  t.sender.track.kind == "audio") ||
+              (t.receiver != null &&
+                  t.receiver.track != null &&
+                  t.receiver.track.kind == "audio")) {
+            if (audioTransceiver == null) {
+              audioTransceiver = t;
+            }
           }
-        }
-        if ((t.sender != null &&
-                t.sender.track != null &&
-                t.sender.track.kind == "video") ||
-            (t.receiver != null &&
-                t.receiver.track != null &&
-                t.receiver.track.kind == "video")) {
-          if (videoTransceiver == null) {
-            videoTransceiver = t;
+          if ((t.sender != null &&
+                  t.sender.track != null &&
+                  t.sender.track.kind == "video") ||
+              (t.receiver != null &&
+                  t.receiver.track != null &&
+                  t.receiver.track.kind == "video")) {
+            if (videoTransceiver == null) {
+              videoTransceiver = t;
+            }
           }
-        }
-      });
+        });
+      }
+      if (audioTransceiver != null && audioTransceiver.setDirection != null) {
+        audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+      } else {
+        audioTransceiver = await _webRTCHandle.pc.addTransceiver(
+            track: null,
+            kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+            init: RTCRtpTransceiverInit(
+                direction: offer
+                    ? TransceiverDirection.SendOnly
+                    : TransceiverDirection.RecvOnly,
+                streams: new List()));
+      }
+      if (videoTransceiver != null && videoTransceiver.setDirection != null) {
+        videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+      } else {
+        videoTransceiver = await _webRTCHandle.pc.addTransceiver(
+            track: null,
+            kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+            init: RTCRtpTransceiverInit(
+                direction: offer
+                    ? TransceiverDirection.SendOnly
+                    : TransceiverDirection.RecvOnly,
+                streams: new List()));
+      }
     }
-    if (audioTransceiver != null && audioTransceiver.setDirection != null) {
-      audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    } else {
-      audioTransceiver = await _webRTCHandle.pc.addTransceiver(
-          track: null,
-          kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-          init: RTCRtpTransceiverInit(
-              direction: offer
-                  ? TransceiverDirection.SendOnly
-                  : TransceiverDirection.RecvOnly,
-              streams: new List()));
+  }
+
+  Map prepareMedia(Map<String, bool> media) {
+    if (_webRTCHandle.pc == null) {
+      // Nope, new PeerConnection
+      media.putIfAbsent("update", () => false);
+      media.putIfAbsent("keepAudio", () => false);
+      media.putIfAbsent("keepVideo", () => false);
     }
-    if (videoTransceiver != null && videoTransceiver.setDirection != null) {
-      videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    } else {
-      videoTransceiver = await _webRTCHandle.pc.addTransceiver(
-          track: null,
-          kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-          init: RTCRtpTransceiverInit(
-              direction: offer
-                  ? TransceiverDirection.SendOnly
-                  : TransceiverDirection.RecvOnly,
-              streams: new List()));
-    }
+  }
+
+  // Helper methods to parse a media object
+  bool isAudioSendEnabled(Map<String, bool> media) {
+    //Janus.debug("isAudioSendEnabled:", media);
+    if (media != null) return true; // Default
+    if (media["audio"] == false) return false; // Generic audio has precedence
+    if (media["audioSend"] == null) return true; // Default
+    return (media["audioSend"] = true);
+  }
+
+  bool isAudioSendRequired(Map<String, bool> media) {
+    // Janus.debug("isAudioSendRequired:", media);
+    if (media != null) return false; // Default
+    if (media["audio"] == false || media["audioSend"] == false)
+      return false; // If we're not asking to capture audio, it's not required
+    if (media["failIfNoAudio"] == null) return false; // Default
+    return (media["failIfNoAudio"] = true);
+  }
+
+  bool isAudioRecvEnabled(Map<String, bool> media) {
+    // Janus.debug("isAudioRecvEnabled:", media);
+    if (media != null) return true; // Default
+    if (media["audio"] == false) return false; // Generic audio has precedence
+    if (media["audioRecv"] == null) return true; // Default
+    return (media["audioRecv"] = true);
+  }
+
+  bool isVideoSendEnabled(Map<String, bool> media) {
+    //   Janus.debug("isVideoSendEnabled:", media);
+    if (media != null) return true; // Default
+    if (media["video"] == false) return false; // Generic video has precedence
+    if (media["videoSend"] == null) return true; // Default
+    return (media["videoSend"] = true);
+  }
+
+  bool isVideoSendRequired(Map<String, bool> media) {
+    //Janus.debug("isVideoSendRequired:", media);
+    if (media != null) return false; // Default
+    if (media["video"] == false || media["videoSend"] == false)
+      return false; // If we're not asking to capture video, it's not required
+    if (media["failIfNoVideo"] == null) return false; // Default
+    return (media["failIfNoVideo"] = true);
+  }
+
+  bool isVideoRecvEnabled(Map<String, bool> media) {
+    //Janus.debug("isVideoRecvEnabled:", media);
+    if (media != null) return true; // Default
+    if (media["video"] == false) return false; // Generic video has precedence
+    if (media["videoRecv"] == null) return true; // Default
+    return (media["videoRecv"] = true);
   }
 
   sendData(dynamic text, dynamic data,

@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
@@ -6,6 +7,7 @@ import 'package:janus_client/Plugin.dart';
 
 import 'dart:async';
 class VideoRoom extends StatefulWidget {
+  List<RTCVideoView> remote_videos = new List();
   @override
   _VideoRoomState createState() => _VideoRoomState();
 }
@@ -13,10 +15,10 @@ class VideoRoom extends StatefulWidget {
 class _VideoRoomState extends State<VideoRoom> {
   JanusClient j;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
+  List<RTCVideoRenderer> _remoteRenderer = new List<RTCVideoRenderer>();
   Plugin pluginHandle;
   Plugin subscriberHandle;
-  MediaStream remoteStream;
+  List<MediaStream> remoteStream = new List<MediaStream>();
   MediaStream myStream;
 
   @override
@@ -32,19 +34,37 @@ class _VideoRoomState extends State<VideoRoom> {
   }
 
   initRenderers() async {
+    int count = 0;
+    while (count < 4) {
+      _remoteRenderer.add(new RTCVideoRenderer());
+      count++;
+    }
     await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+    // _remoteRenderer.map((e) => null)
+    for (var renderer in _remoteRenderer) {
+      await renderer.initialize();
+    }
+    count = 0;
+    while (count < 4) {
+      createLocalMediaStream("local").then((value) => remoteStream.add(value));
+      count++;
+    }
+    // await _remoteRenderer.initialize();
   }
 
-  _newRemoteFeed(JanusClient j, feed) async {
+  _newRemoteFeed(JanusClient j, List<Map> feeds) async {
+    List<Map> myFeeds = feeds;
     print('remote plugin attached');
     j.attach(Plugin(
         plugin: 'janus.plugin.videoroom',
         onMessage: (msg, jsep) async {
           if (jsep != null) {
             await subscriberHandle.handleRemoteJsep(jsep);
-            var body = {"request": "start", "room": 1234};
-
+            // var body = {"request": "start", "room": 2157};
+            var body = {
+              "request": "start",
+              "room": 2157,
+            };
             await subscriberHandle.send(
                 message: body,
                 jsep: await subscriberHandle.createAnswer(),
@@ -57,39 +77,57 @@ class _VideoRoomState extends State<VideoRoom> {
           });
           var register = {
             "request": "join",
-            "room": 1234,
+            "room": 2157, //2462,
             "ptype": "subscriber",
-            "feed": feed,
+            "streams": feeds, //feeds.first.values.first,
 //            "private_id": 12535
           };
+          print("Requesting to subscribe to publishers...");
           subscriberHandle.send(message: register, onSuccess: () async {});
         },
-        onRemoteStream: (stream) {
-          print('got remote stream');
+        onRemoteTrack: (stream, track, mid, on) {
+          print('got remote track with mid=$mid');
           setState(() {
-            remoteStream = stream;
-            _remoteRenderer.srcObject = remoteStream;
+            if ((track as MediaStreamTrack).kind == "video" && on == true) {
+              //  _remoteRenderer.elementAt(num.tryParse(mid as String).toInt()).srcObject = stream;
+              // widget.remote_videos
+              //         .elementAt(num.tryParse(mid as String).toInt())
+              //         .videoRenderer
+              //         .srcObject =
+              //     stream; //_remoteRenderer.elementAt(num.tryParse(mid as String).toInt());
+              if (num.tryParse(mid).toInt() < 4) {
+                remoteStream
+                    .elementAt(num.tryParse(mid).toInt())
+                    .addTrack(track, addToNative: true);
+                print('added track to stream locally');
+                _remoteRenderer
+                        .elementAt(num.tryParse(mid as String).toInt())
+                        .srcObject =
+                    remoteStream.elementAt(num.tryParse(mid).toInt());
+                // .(track)
+                // .then((value) => _remoteRenderer.srcObject = remoteStream)
+              }
+            }
+            //  _remoteRenderer.srcObject = stream;
+            //  remoteStream = stream;
           });
         }));
   }
 
   Future<void> initPlatformState() async {
     setState(() {
-      j = JanusClient(iceServers: [
+      j = JanusClient(
+          iceServers: [
         RTCIceServer(
-            url: "stun:40.85.216.95:3478",
-            username: "onemandev",
-            credential: "SecureIt"),
-        RTCIceServer(
-            url: "turn:40.85.216.95:3478",
-            username: "onemandev",
-            credential: "SecureIt")
-      ], server: [
-        'https://janus.onemandev.tech/janus',
+                url: "stun:galaxy.kli.one:3478", username: "", credential: ""),
+          ],
+          server: [
+            'https://gxy2.kli.one/janusgxy',
         // 'wss://janus.onemandev.tech/janus/websocket',
         // 'https://janus.onemandev.tech/janus',
-
-      ], withCredentials: true, apiSecret: "SecureIt");
+          ],
+          withCredentials: true,
+          token: "X9E9j8WhrqaHA4Q6"); //"KdnsQzHrSGubOzAD");
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());
@@ -98,6 +136,7 @@ class _VideoRoomState extends State<VideoRoom> {
         };
 
         j.attach(Plugin(
+            opaqueId: "videoroom_user",
             plugin: 'janus.plugin.videoroom',
             onMessage: (msg, jsep) async {
               print('publisheronmsg');
@@ -105,7 +144,17 @@ class _VideoRoomState extends State<VideoRoom> {
                 var list = msg["publishers"];
                 print('got publihers');
                 print(list);
-                _newRemoteFeed(j, list[0]["id"]);
+                List<Map> subscription = new List<Map>();
+                //    _newRemoteFeed(j, list[0]["id"]);
+                final filtereList = List.from(list);
+                filtereList.forEach((item) => {
+                      subscription.add({
+                        "feed": LinkedHashMap.of(item).remove("id"),
+                        "mid": "1"
+                      })
+                    });
+                //Map.from(item)..forEach((key, value) => if(key != ("id")) ));
+                _newRemoteFeed(j, subscription);
               }
 
               if (jsep != null) {
@@ -125,9 +174,9 @@ class _VideoRoomState extends State<VideoRoom> {
               });
               var register = {
                 "request": "join",
-                "room": 1234,
+                "room": 2157, //2462
                 "ptype": "publisher",
-                "display": 'shivansh'
+                "display": 'Igal test'
               };
               plugin.send(
                   message: register,
@@ -175,8 +224,8 @@ class _VideoRoomState extends State<VideoRoom> {
                 subscriberHandle.hangup();
                 _localRenderer.srcObject = null;
                 _localRenderer.dispose();
-                _remoteRenderer.srcObject = null;
-                _remoteRenderer.dispose();
+                _remoteRenderer.map((e) => e.srcObject = null);
+                _remoteRenderer.map((e) => e.dispose());
                 setState(() {
                   pluginHandle = null;
                   subscriberHandle = null;
@@ -195,12 +244,39 @@ class _VideoRoomState extends State<VideoRoom> {
         ],
         title: const Text('janus_client'),
       ),
-      body: Stack(children: [
-        Positioned.fill(
-          child: RTCVideoView(
-            _remoteRenderer,
-          ),
-        ),
+      body: Row(children: [
+        Expanded(
+            child: (_remoteRenderer != null &&
+                    _remoteRenderer.elementAt(0) != null)
+                ? RTCVideoView(_remoteRenderer.elementAt(0))
+                : Text(
+                    "Waiting...",
+                    style: TextStyle(color: Colors.black),
+                  )),
+        Expanded(
+            child: (_remoteRenderer != null &&
+                    _remoteRenderer.elementAt(1) != null)
+                ? RTCVideoView(_remoteRenderer.elementAt(1))
+                : Text(
+                    "Waiting...",
+                    style: TextStyle(color: Colors.black),
+                  )),
+        Expanded(
+            child: (_remoteRenderer != null &&
+                    _remoteRenderer.elementAt(2) != null)
+                ? RTCVideoView(_remoteRenderer.elementAt(2))
+                : Text(
+                    "Waiting...",
+                    style: TextStyle(color: Colors.black),
+                  )),
+        Expanded(
+            child: (_remoteRenderer != null &&
+                    _remoteRenderer.elementAt(3) != null)
+                ? RTCVideoView(_remoteRenderer.elementAt(3))
+                : Text(
+                    "Waiting...",
+                    style: TextStyle(color: Colors.black),
+                  )),
         Align(
           child: Container(
             child: RTCVideoView(

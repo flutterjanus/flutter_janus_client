@@ -348,7 +348,148 @@ class Plugin {
       media.putIfAbsent("update", () => false);
       media.putIfAbsent("keepAudio", () => false);
       media.putIfAbsent("keepVideo", () => false);
+    } else {
+      debugPrint("Updating existing media session");
+      media["update"] = true;
+
+      //check if we pass a stream and if it is new, otherwise udate the current stream
+      // if(callbacks.stream) {
+      //   // External stream: is this the same as the one we were using before?
+      //   if(callbacks.stream !== config.myStream) {
+      //     Janus.log("Renegotiation involves a new external stream");
+      //   }
+      // } else {
+      if (media["addAudio"]) {
+        media["keepAudio"] = false;
+        media["replaceAudio"] = false;
+        media["removeAudio"] = false;
+        media["audioSend"] = true;
+
+        if (webRTCHandle.myStream != null &&
+            webRTCHandle.myStream.getAudioTracks() != null &&
+            webRTCHandle.myStream.getAudioTracks().length > 0) {
+          debugPrint("Can't add audio stream, there already is one");
+          //return error on callback??
+          onError("Can't add audio stream, there already is one");
+          return null;
+        } else if (media["removeAudio"]) {
+          media["keepAudio"] = false;
+          media["replaceAudio"] = false;
+          media["addAudio"] = false;
+          media["audioSend"] = false;
+        } else if (media["replaceAudio"]) {
+          media["keepAudio"] = false;
+          media["addAudio"] = false;
+          media["removeAudio"] = false;
+          media["audioSend"] = true;
+        }
+        if (webRTCHandle.myStream == null) {
+          if (media["replaceAudio"]) {
+            media["keepAudio"] = false;
+            media["replaceAudio"] = false;
+            media["addAudio"] = true;
+            media["audioSend"] = true;
+
+            if (isAudioSendEnabled(media)) {
+              media["keepAudio"] = false;
+              media["addAudio"] = true;
+            }
+          } else {
+            if (webRTCHandle.myStream.getAudioTracks() == null ||
+                webRTCHandle.myStream.getAudioTracks().length == 0) {
+              // No audio track: if we were asked to replace, it's actually an "add"
+              if (media["replaceAudio"]) {
+                media["keepAudio"] = false;
+                media["replaceAudio"] = false;
+                media["addAudio"] = true;
+                media["audioSend"] = true;
+
+                if (isAudioSendEnabled(media)) {
+                  media["keepAudio"] = false;
+                  media["addAudio"] = true;
+                }
+              } else {
+                // We have an audio track: should we keep it as it is?
+                if (isAudioSendEnabled(media) &&
+                    media["removeAudio"] == false &&
+                    media["replaceAudio"] == false) {
+                  media["keepAudio"] = true;
+                }
+              }
+            }
+            if (media["addVideo"]) {
+              media["keepVideo"] = false;
+              media["replaceVideo"] = false;
+              media["removeVideo"] = false;
+              media["videoSend"] = true;
+
+              if (webRTCHandle.myStream != null &&
+                  webRTCHandle.myStream.getVideoTracks() != null &&
+                  webRTCHandle.myStream.getVideoTracks().length > 0) {
+                debugPrint("Can't add video stream, there already is one");
+                onError("Can't add video stream, there already is one");
+                return null;
+              }
+            } else {}
+            if (media["removeVideo"]) {
+              media["keepVideo"] = false;
+              media["replaceVideo"] = false;
+              media["removeVideo"] = false;
+              media["videoSend"] = false;
+            } else if (media["replaceVideo"]) {
+              media["keepVideo"] = false;
+              media["addVideo"] = false;
+              media["removeVideo"] = false;
+              media["videoSend"] = true;
+            }
+          }
+          if (webRTCHandle.myStream != null) {
+            // No media stream: if we were asked to replace, it's actually an "add"
+
+            if (media["replaceVideo"]) {
+              media["keepVideo"] = false;
+              media["replaceVideo"] = false;
+              media["addVideo"] = true;
+              media["videoSend"] = true;
+            }
+
+            if (isVideoSendEnabled(media)) {
+              media["keepVideo"] = false;
+              media["addVideo"] = true;
+            }
+          } else {
+            if (webRTCHandle.myStream.getVideoTracks() != null ||
+                webRTCHandle.myStream.getVideoTracks().length == 0) {
+              // No video track: if we were asked to replace, it's actually an "add"
+
+              if (media["replaceVideo"]) {
+                media["keepVideo"] = false;
+                media["replaceVideo"] = false;
+                media["addVideo"] = true;
+                media["videoSend"] = true;
+              }
+
+              if (isVideoSendEnabled(media)) {
+                media["keepVideo"] = false;
+                media["addVideo"] = true;
+              }
+            } else {
+              // We have a video track: should we keep it as it is?
+              if (isVideoSendEnabled(media) &&
+                  media["removeVideo"] != null &&
+                  media["replaceVideo"] != null) {
+                media["keepVideo"] = true;
+              }
+            }
+          }
+          // Data channels can only be added
+          if (media["addData"]) {
+            media["data"] = true;
+          }
+        }
+      }
     }
+    return media;
   }
 
   // Helper methods to parse a media object

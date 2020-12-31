@@ -286,58 +286,95 @@ class Plugin {
       media = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
     } else {
       media = prepareMedia(media);
-    }
-    var transceivers = _webRTCHandle.pc.transceivers;
-    var audioSend = isAudioSendEnabled(media);
-    var audioRecv = isAudioRecvEnabled(media);
-    if (!audioSend && !audioRecv) {
-      if (transceivers != null && transceivers.length > 0) {
-        transceivers.forEach((t) {
-          if ((t.sender != null &&
-                  t.sender.track != null &&
-                  t.sender.track.kind == "audio") ||
-              (t.receiver != null &&
-                  t.receiver.track != null &&
-                  t.receiver.track.kind == "audio")) {
-            if (audioTransceiver == null) {
-              audioTransceiver = t;
+
+      var transceivers = _webRTCHandle.pc.transceivers;
+      var audioSend = isAudioSendEnabled(media);
+      var audioRecv = isAudioRecvEnabled(media);
+      if (!audioSend && !audioRecv) {
+        if (transceivers != null && transceivers.length > 0) {
+          transceivers.forEach((t) {
+            if ((t.sender != null &&
+                    t.sender.track != null &&
+                    t.sender.track.kind == "audio") ||
+                (t.receiver != null &&
+                    t.receiver.track != null &&
+                    t.receiver.track.kind == "audio")) {
+              if (audioTransceiver == null) {
+                audioTransceiver = t;
+              }
+            }
+            if ((t.sender != null &&
+                    t.sender.track != null &&
+                    t.sender.track.kind == "video") ||
+                (t.receiver != null &&
+                    t.receiver.track != null &&
+                    t.receiver.track.kind == "video")) {
+              if (videoTransceiver == null) {
+                videoTransceiver = t;
+              }
+            }
+          });
+        }
+        if (audioTransceiver != null && audioTransceiver.setDirection != null) {
+          audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+        } else {
+          audioTransceiver = await _webRTCHandle.pc.addTransceiver(
+              track: null,
+              kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+              init: RTCRtpTransceiverInit(
+                  direction: offer
+                      ? TransceiverDirection.SendOnly
+                      : TransceiverDirection.RecvOnly,
+                  streams: new List()));
+        }
+        if (videoTransceiver != null && videoTransceiver.setDirection != null) {
+          videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+        } else {
+          videoTransceiver = await _webRTCHandle.pc.addTransceiver(
+              track: null,
+              kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+              init: RTCRtpTransceiverInit(
+                  direction: offer
+                      ? TransceiverDirection.SendOnly
+                      : TransceiverDirection.RecvOnly,
+                  streams: new List()));
+        }
+      }
+
+      if (((!media["update"] && isVideoSendEnabled(media)) ||
+              (media["update"] &&
+                  (media["addVideo"] || media["replaceVideo"]))) &&
+          webRTCHandle.myStream.getVideoTracks() != null &&
+          webRTCHandle.myStream.getVideoTracks().length > 0) {
+        // webRTCHandle.myStream.addTrack(stream.getVideoTracks()[0]);
+        if (_context.isUnifiedPlan) {
+          // Use Transceivers
+          //  Janus.log((media.replaceVideo ? "Replacing" : "Adding") + " video track:", stream.getVideoTracks()[0]);
+          var videoTransceiver = null;
+          var transceivers = webRTCHandle.pc.transceivers;
+          if (transceivers != null && transceivers.length > 0) {
+            for (RTCRtpTransceiver t in transceivers) {
+              if ((t.sender != null &&
+                      t.sender.track != null &&
+                      t.sender.track.kind == "video") ||
+                  (t.receiver != null &&
+                      t.receiver.track != null &&
+                      t.receiver.track.kind == "video")) {
+                videoTransceiver = t;
+                break;
+              }
             }
           }
-          if ((t.sender != null &&
-                  t.sender.track != null &&
-                  t.sender.track.kind == "video") ||
-              (t.receiver != null &&
-                  t.receiver.track != null &&
-                  t.receiver.track.kind == "video")) {
-            if (videoTransceiver == null) {
-              videoTransceiver = t;
-            }
+          if (videoTransceiver != null && videoTransceiver.sender != null) {
+            videoTransceiver.sender
+                .replaceTrack(webRTCHandle.myStream.getVideoTracks()[0]);
+          } else {
+            // webRTCHandle.pc.addTrack(webRTCHandle.myStream.getVideoTracks()[0], stream);???
           }
-        });
-      }
-      if (audioTransceiver != null && audioTransceiver.setDirection != null) {
-        audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
-      } else {
-        audioTransceiver = await _webRTCHandle.pc.addTransceiver(
-            track: null,
-            kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-            init: RTCRtpTransceiverInit(
-                direction: offer
-                    ? TransceiverDirection.SendOnly
-                    : TransceiverDirection.RecvOnly,
-                streams: new List()));
-      }
-      if (videoTransceiver != null && videoTransceiver.setDirection != null) {
-        videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
-      } else {
-        videoTransceiver = await _webRTCHandle.pc.addTransceiver(
-            track: null,
-            kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-            init: RTCRtpTransceiverInit(
-                direction: offer
-                    ? TransceiverDirection.SendOnly
-                    : TransceiverDirection.RecvOnly,
-                streams: new List()));
+        } else {
+          // Janus.log((media.replaceVideo ? "Replacing" : "Adding") + " video track:", stream.getVideoTracks()[0]);
+          // webRTCHandle.pc.addTrack(stream.getVideoTracks()[0], stream);
+        }
       }
     }
   }

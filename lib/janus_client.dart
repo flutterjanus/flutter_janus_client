@@ -63,7 +63,7 @@ class JanusClient {
       @required this.iceServers,
       this.refreshInterval = 50,
       this.apiSecret,
-      this.isUnifiedPlan,
+      this.isUnifiedPlan = false,
       this.token,
       this.maxEvent = 10,
       this.withCredentials = false});
@@ -149,7 +149,7 @@ class JanusClient {
         ..._apiMap,
         ..._tokenMap
       });
-      print(response);
+      print("response: " + response.toString());
       if (response["janus"] == "success") {
         _sessionId = response["data"]["id"];
         _connected = true;

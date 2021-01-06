@@ -107,7 +107,14 @@ class Plugin {
     if (_webRTCHandle != null) {
       _webRTCHandle.myStream =
           await MediaDevices.getUserMedia(mediaConstraints);
-      _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
+      if (_context.isUnifiedPlan) {
+        _webRTCHandle.pc
+            .addTrack(_webRTCHandle.myStream.getVideoTracks().first);
+        _webRTCHandle.pc
+            .addTrack(_webRTCHandle.myStream.getAudioTracks().first);
+      } else {
+        _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
+      }
       return _webRTCHandle.myStream;
     } else {
       print("error webrtchandle cant be null");
@@ -241,7 +248,7 @@ class Plugin {
 
   Future<RTCSessionDescription> createOffer({dynamic offerOptions}) async {
     if (_context.isUnifiedPlan) {
-      await prepareTranscievers(true);
+      prepareTranscievers(true);
       //_webRTCHandle.pc.onTrack =
     }
     if (offerOptions == null) {
@@ -255,7 +262,7 @@ class Plugin {
 
   Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
     if (_context.isUnifiedPlan) {
-      await prepareTranscievers(false);
+      prepareTranscievers(false);
     } else {
       if (offerOptions == null) {
         offerOptions = {
@@ -278,7 +285,7 @@ class Plugin {
     }
   }
 
-  Future prepareTranscievers(bool offer) async {
+  prepareTranscievers(bool offer) async {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
     var media;

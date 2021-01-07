@@ -6,6 +6,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/Plugin.dart';
 
 import 'dart:async';
+
 class VideoRoom extends StatefulWidget {
   List<RTCVideoView> remote_videos = new List();
   @override
@@ -40,7 +41,6 @@ class _VideoRoomState extends State<VideoRoom> {
       count++;
     }
     await _localRenderer.initialize();
-    // _remoteRenderer.map((e) => null)
     for (var renderer in _remoteRenderer) {
       await renderer.initialize();
     }
@@ -49,7 +49,6 @@ class _VideoRoomState extends State<VideoRoom> {
       createLocalMediaStream("local").then((value) => remoteStream.add(value));
       count++;
     }
-    // await _remoteRenderer.initialize();
   }
 
   _newRemoteFeed(JanusClient j, List<Map> feeds) async {
@@ -63,7 +62,7 @@ class _VideoRoomState extends State<VideoRoom> {
             // var body = {"request": "start", "room": 2157};
             var body = {
               "request": "start",
-              "room": 2157,
+              "room": 1234,
             };
             await subscriberHandle.send(
                 message: body,
@@ -77,10 +76,9 @@ class _VideoRoomState extends State<VideoRoom> {
           });
           var register = {
             "request": "join",
-            "room": 2157, //2462,
+            "room": 1234,
             "ptype": "subscriber",
-            "streams": feeds, //feeds.first.values.first,
-//            "private_id": 12535
+            "streams": feeds,
           };
           print("Requesting to subscribe to publishers...");
           subscriberHandle.send(message: register, onSuccess: () async {});
@@ -89,12 +87,6 @@ class _VideoRoomState extends State<VideoRoom> {
           print('got remote track with mid=$mid');
           setState(() {
             if ((track as MediaStreamTrack).kind == "video" && on == true) {
-              //  _remoteRenderer.elementAt(num.tryParse(mid as String).toInt()).srcObject = stream;
-              // widget.remote_videos
-              //         .elementAt(num.tryParse(mid as String).toInt())
-              //         .videoRenderer
-              //         .srcObject =
-              //     stream; //_remoteRenderer.elementAt(num.tryParse(mid as String).toInt());
               if (num.tryParse(mid).toInt() < 4) {
                 remoteStream
                     .elementAt(num.tryParse(mid).toInt())
@@ -104,30 +96,22 @@ class _VideoRoomState extends State<VideoRoom> {
                         .elementAt(num.tryParse(mid as String).toInt())
                         .srcObject =
                     remoteStream.elementAt(num.tryParse(mid).toInt());
-                // .(track)
-                // .then((value) => _remoteRenderer.srcObject = remoteStream)
               }
             }
-            //  _remoteRenderer.srcObject = stream;
-            //  remoteStream = stream;
           });
         }));
   }
 
   Future<void> initPlatformState() async {
     setState(() {
-      j = JanusClient(
-          iceServers: [
+      j = JanusClient(iceServers: [
         RTCIceServer(
-                url: "stun:galaxy.kli.one:3478", username: "", credential: ""),
-          ],
-          server: [
-            'https://gxy2.kli.one/janusgxy',
-        // 'wss://janus.onemandev.tech/janus/websocket',
-        // 'https://janus.onemandev.tech/janus',
-          ],
-          withCredentials: true,
-          token: "X9E9j8WhrqaHA4Q6"); //"KdnsQzHrSGubOzAD");
+            url: "turn:40.85.216.95:3478",
+            username: "onemandev",
+            credential: "SecureIt"),
+      ], server: [
+        'https://janus.onemandev.tech/janus',
+      ], withCredentials: true, isUnifiedPlan: true);
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());
@@ -174,9 +158,9 @@ class _VideoRoomState extends State<VideoRoom> {
               });
               var register = {
                 "request": "join",
-                "room": 2157, //2462
+                "room": 1234,
                 "ptype": "publisher",
-                "display": 'Igal test'
+                "display": 'User test'
               };
               plugin.send(
                   message: register,

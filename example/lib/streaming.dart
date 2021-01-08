@@ -20,14 +20,13 @@ class _StreamingState extends State<Streaming> {
     //     username: "onemandev",
     //     credential: "SecureIt")
   ], server: [
-    //'https://janus.onemandev.tech/janus',
-    // 'wss://janus.onemandev.tech/janus/websocket',
-    "https://str2.kli.one/janustrl"
+    'https://janus.conf.meetecho.com/janus',
+    'https://master-janus.onemandev.tech/rest',
+    'wss://janus.onemandev.tech/janus/websocket',
   ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-  MediaStream _remoteStream;
 
   List<dynamic> streams = [];
   int selectedStreamId;
@@ -53,7 +52,6 @@ class _StreamingState extends State<Streaming> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _remoteRenderer.initialize();
-    _remoteStream = await createLocalMediaStream("local");
   }
 
   @override
@@ -62,16 +60,21 @@ class _StreamingState extends State<Streaming> {
     super.initState();
     janusClient.connect(onSuccess: (sessionId) {
       janusClient.attach(Plugin(
-          onRemoteTrack: (stream, track, mid, on) {
+          onRemoteStream: (remoteStream) {
             print('got remote stream');
-            _remoteStream
-                .addTrack(track)
-                .then((value) => _remoteRenderer.srcObject = _remoteStream);
+            _remoteRenderer.srcObject = remoteStream;
           },
           plugin: "janus.plugin.streaming",
           onMessage: (msg, jsep) async {
             print('got onmsg');
             print(msg);
+            if (msg['streaming'] != null && msg['result'] != null) {
+              if (msg['streaming'] == 'event' &&
+                  msg['result']['status'] == 'stopping') {
+                await this.destroy();
+              }
+            }
+
             if (msg['janus'] == 'success' && msg['plugindata'] != null) {
               var plugindata = msg['plugindata'];
               print('got plugin data');
@@ -142,10 +145,17 @@ class _StreamingState extends State<Streaming> {
   }
 
   Future<void> cleanUpAndBack() async {
+    publishVideo.send(message: {"request": "stop"});
+  }
+
+  destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
-    await _remoteRenderer.dispose();
-    Navigator.pop(context);
+    if (_remoteRenderer != null) {
+      _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -157,7 +167,7 @@ class _StreamingState extends State<Streaming> {
             Expanded(
               child: RTCVideoView(
                 _remoteRenderer,
-                mirror: false,
+                mirror: true,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
               ),
             ),
@@ -177,7 +187,7 @@ class _StreamingState extends State<Streaming> {
                             publishVideo.send(
                                 message: {"request": "stop"},
                                 onSuccess: () async {
-                                  await cleanUpAndBack();
+                                  publishVideo.send(message: {});
                                 });
                           })),
                   padding: EdgeInsets.all(10),

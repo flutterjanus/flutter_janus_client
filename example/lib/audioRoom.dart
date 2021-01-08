@@ -145,17 +145,16 @@ class _AudioRoomState extends State<AudioRoom> {
               print(event);
               if (event != null && event == 'joined' || event == 'event') {
                 var participant = msg['participants'];
-                var data=msg['data'];
+                var data = msg['data'];
 
-                if(data!=null){
-                  if(data['leaving']!=null){
+                if (data != null) {
+                  if (data['leaving'] != null) {
                     setState(() {
-                      participants.removeWhere((element) => element.id==data['leaving']);
+                      participants.removeWhere(
+                          (element) => element.id == data['leaving']);
                     });
                   }
-
-                }
-                else{
+                } else {
                   if (participant is List && participant != null) {
                     setState(() {
                       participants = participant.map((element) {
@@ -171,7 +170,7 @@ class _AudioRoomState extends State<AudioRoom> {
                 }
                 if (event == 'joined') {
                   RTCSessionDescription offer = await pluginHandle.createOffer(
-                      offerToReceiveVideo: false);
+                      offerOptions: {"offerToReceiveVideo": false});
                   var publish = {"request": "configure", "muted": false};
                   pluginHandle.send(message: publish, jsep: offer);
                 }
@@ -250,18 +249,20 @@ class _AudioRoomState extends State<AudioRoom> {
             _remoteRenderer,
           ),
         ),
-       Container(
-          child:participants.length>0? GridView.count(
-            crossAxisCount: participants.length,
-            children: List.generate(
-                participants.length,
-                (index) => Container(
-                      color: Colors.red,
-                      child: Column(
-                        children: [Text(participants[index].display)],
-                      ),
-                    )),
-          ):Text('Join Room or No participants yet!'),
+        Container(
+          child: participants.length > 0
+              ? GridView.count(
+                  crossAxisCount: participants.length,
+                  children: List.generate(
+                      participants.length,
+                      (index) => Container(
+                            color: Colors.red,
+                            child: Column(
+                              children: [Text(participants[index].display)],
+                            ),
+                          )),
+                )
+              : Text('Join Room or No participants yet!'),
         )
 
         // Align(

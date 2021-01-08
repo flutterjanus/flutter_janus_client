@@ -110,6 +110,7 @@ class _VideoRoomState extends State<VideoRoom> {
             username: "onemandev",
             credential: "SecureIt"),
       ], server: [
+        'https://janus.conf.meetecho.com/janus',
         'https://janus.onemandev.tech/janus',
       ], withCredentials: true, isUnifiedPlan: true);
       j.connect(onSuccess: (sessionId) async {

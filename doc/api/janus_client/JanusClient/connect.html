@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the connect method from the JanusClient class, for the Dart programming language.">
+  <title>connect method - JanusClient class - janus_client library - Dart API</title>
+
+  
+  <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500,400i,400,300|Source+Sans+Pro:400,300,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../static-assets/github.css">
+  <link rel="stylesheet" href="../../static-assets/styles.css">
+  <link rel="icon" href="../../static-assets/favicon.png">
+
+</head>
+
+<body data-base-href="../../"
+      data-using-base-href="false">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">janus_client</a></li>
+    <li><a href="../../janus_client/janus_client-library.html">janus_client</a></li>
+    <li><a href="../../janus_client/JanusClient-class.html">JanusClient</a></li>
+    <li class="self-crumb">connect method</li>
+  </ol>
+  <div class="self-name">connect</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+  <div id="dartdoc-sidebar-left" class="col-xs-6 col-sm-3 col-md-2 sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+      <form class="search-sidebar" role="search">
+        <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+      </form>
+    </header>
+    
+    <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+      <li><a href="../../index.html">janus_client</a></li>
+      <li><a href="../../janus_client/janus_client-library.html">janus_client</a></li>
+      <li><a href="../../janus_client/JanusClient-class.html">JanusClient</a></li>
+      <li class="self-crumb">connect method</li>
+    </ol>
+    
+    <h5>JanusClient class</h5>
+    <ol>
+    
+        <li class="section-title"><a href="../../janus_client/JanusClient-class.html#constructors">Constructors</a></li>
+        <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
+    
+        <li class="section-title">
+            <a href="../../janus_client/JanusClient-class.html#instance-properties">Properties</a>
+        </li>
+        <li><a href="../../janus_client/JanusClient/apiSecret.html">apiSecret</a></li>
+        <li><a href="../../janus_client/JanusClient/currentJanusURI.html">currentJanusURI</a></li>
+        <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></li>
+        <li><a href="../../janus_client/JanusClient/iceServers.html">iceServers</a></li>
+        <li><a href="../../janus_client/JanusClient/isConnected.html">isConnected</a></li>
+        <li><a href="../../janus_client/JanusClient/isUnifiedPlan.html">isUnifiedPlan</a></li>
+        <li><a href="../../janus_client/JanusClient/isUnifiedPlan_.html">isUnifiedPlan_</a></li>
+        <li><a href="../../janus_client/JanusClient/maxEvent.html">maxEvent</a></li>
+        <li><a href="../../janus_client/JanusClient/refreshInterval.html">refreshInterval</a></li>
+        <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
+        <li><a href="../../janus_client/JanusClient/server.html">server</a></li>
+        <li><a href="../../janus_client/JanusClient/sessionId.html">sessionId</a></li>
+        <li><a href="../../janus_client/JanusClient/token.html">token</a></li>
+        <li><a href="../../janus_client/JanusClient/withCredentials.html">withCredentials</a></li>
+    
+        <li class="section-title"><a href="../../janus_client/JanusClient-class.html#instance-methods">Methods</a></li>
+        <li><a href="../../janus_client/JanusClient/attach.html">attach</a></li>
+        <li><a href="../../janus_client/JanusClient/connect.html">connect</a></li>
+        <li><a href="../../janus_client/JanusClient/destroy.html">destroy</a></li>
+        <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+        <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+    
+        <li class="section-title inherited"><a href="../../janus_client/JanusClient-class.html#operators">Operators</a></li>
+        <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
+    
+    
+    
+    
+    
+    </ol>
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-main-content" class="col-xs-12 col-sm-9 col-md-8 main-content">
+      <div><h1><span class="kind-method">connect</span> method </h1></div>
+
+    <section class="multi-line-signature">
+      <span class="returntype">Future</span>
+            <span class="name ">connect</span>
+(<wbr><ol class="parameter-list"><li><span class="parameter" id="connect-param-onSuccess">{<span class="type-annotation">void</span> <span class="parameter-name">onSuccess</span>(<ol class="parameter-list"><li><span class="parameter" id="param-sessionId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">sessionId</span></span></li>
+</ol>
+), </span></li>
+<li><span class="parameter" id="connect-param-onError"><span class="type-annotation">void</span> <span class="parameter-name">onError</span>(<ol class="parameter-list"><li><span class="parameter" id="param-"><span class="type-annotation">dynamic</span></span></li>
+</ol>
+)}</span></li>
+</ol>)
+      
+    </section>
+    <section class="desc markdown">
+      <p>Generates sessionId and returns it as callback value in onSuccess Function, whereas in case of any connection errors is thrown in onError callback if provided.</p>
+    </section>
+    
+    <section class="summary source-code" id="source">
+      <h2><span>Implementation</span></h2>
+      <pre class="language-dart"><code class="language-dart">connect(
+    {void Function(int sessionId) onSuccess,
+    void Function(dynamic) onError}) async {
+  this._onSuccess = onSuccess;
+  this._onError = onError;
+
+  if (server is String) {
+    debugPrint(&#39;only string&#39;);
+    if (server.startsWith(&#39;ws&#39;) || server.startsWith(&#39;wss&#39;)) {
+      debugPrint(&#39;trying websocket interface&#39;);
+      await _attemptWebSocket(server);
+    } else {
+      debugPrint(&#39;trying http&#47;https interface&#39;);
+      await _attemptRest(server);
+    }
+  } else if (server is List&lt;String&gt;) {
+    debugPrint(&#39;only list&#39;);
+    List&lt;String&gt; tempServer = server;
+    for (int i = 0; i &lt; tempServer.length; i++) {
+      String item = tempServer[i];
+      if (item.startsWith(&#39;ws&#39;) || item.startsWith(&#39;wss&#39;)) {
+        debugPrint(&#39;trying websocket interface&#39;);
+        await _attemptWebSocket(item);
+        if (isConnected) break;
+      } else {
+        debugPrint(&#39;trying http&#47;https interface&#39;);
+        debugPrint(item);
+        await _attemptRest(item);
+        if (isConnected) break;
+      }
+    }
+  } else {
+    debugPrint(&#39;invalid server format&#39;);
+  }
+}</code></pre>
+    </section>
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-right" class="col-xs-6 col-sm-6 col-md-2 sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    janus_client
+      0.0.4
+  </span>
+
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="../../static-assets/typeahead.bundle.min.js"></script>
+<script src="../../static-assets/highlight.pack.js"></script>
+<script src="../../static-assets/URI.js"></script>
+<script src="../../static-assets/script.js"></script>
+
+
+</body>
+
+</html>

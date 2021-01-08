@@ -9,7 +9,6 @@ class VideoCallExample extends StatefulWidget {
   _VideoCallExampleState createState() => _VideoCallExampleState();
 }
 
-
 class _VideoCallExampleState extends State<VideoCallExample> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
@@ -21,7 +20,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         username: "onemandev",
         credential: "SecureIt")
   ], server: [
-    'https://janus.onemandev.tech/janus',
+    'wss://janus.conf.meetecho.com/ws',
     'wss://janus.onemandev.tech/janus/websocket',
   ], withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
@@ -94,8 +93,8 @@ class _VideoCallExampleState extends State<VideoCallExample> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextFormField(
-                decoration:
-                    InputDecoration(labelText: "Name Of Registered User to call"),
+                decoration: InputDecoration(
+                    labelText: "Name Of Registered User to call"),
                 controller: nameController,
               ),
               RaisedButton(
@@ -103,7 +102,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                 textColor: Colors.white,
                 onPressed: () {
                   makeCall();
-                  Navigator.of(context).pop();
+
                 },
                 child: Text("Call"),
               )
@@ -113,12 +112,11 @@ class _VideoCallExampleState extends State<VideoCallExample> {
   }
 
   @override
-  void didChangeDependencies() async{
+  void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-
   }
 
   @override
@@ -128,7 +126,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     janusClient.connect(onSuccess: (sessionId) {
       janusClient.attach(Plugin(
           onRemoteStream: (remoteStream) {
-            _remoteRenderer.srcObject=remoteStream;
+            _remoteRenderer.srcObject = remoteStream;
           },
           plugin: "janus.plugin.videocall",
           onMessage: (msg, jsep) async {
@@ -143,18 +141,22 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   if (peer != null) {
                     debugPrint("Call started!");
                   } else {
-                    // debugPrint(peer + " accepted the call!");
                   }
                   // Video call can start
-                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                  if (jsep != null){ publishVideo.handleRemoteJsep(jsep);
+                  Navigator.of(context).pop();
+                  }
                 } else if (event == 'incomingcall') {
                   Navigator.pop(context);
                   debugPrint("Incoming call from " + result["username"] + "!");
                   var yourusername = result["username"];
 
-                  _localRenderer.srcObject=await publishVideo.initializeMediaDevices();
+                  _localRenderer.srcObject =
+                      await publishVideo.initializeMediaDevices();
 
-                  if (jsep != null) publishVideo.handleRemoteJsep(jsep);
+                  if (jsep != null) {publishVideo.handleRemoteJsep(jsep);
+                  Navigator.of(context).pop();
+                  }
                   // Notify user
                   var offer = await publishVideo.createAnswer();
                   var body = {"request": "accept"};
@@ -165,9 +167,8 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                         print('call connected');
                       });
                   // print(publishVideo.webRTCHandle.pc.);
-                }
-                else if(event == 'hangup') {
-                  await cleanUpAndBack();
+                } else if (event == 'hangup') {
+                  await destroy();
                 }
               }
             }
@@ -196,17 +197,15 @@ class _VideoCallExampleState extends State<VideoCallExample> {
           });
     }
   }
-
- Future<void> cleanUpAndBack()async{
-
-
+  destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
-    await _localRenderer.dispose();
-    await _remoteRenderer.dispose();
-    Navigator.pop(context);
+    if (_remoteRenderer != null) {
+      _remoteRenderer.srcObject = null;
+      await _remoteRenderer.dispose();
+    }
+    Navigator.of(context).pop();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -218,7 +217,6 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                 _remoteRenderer,
                 mirror: true,
                 objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-
               ),
             ),
             Expanded(
@@ -236,30 +234,41 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         ),
         Align(
           alignment: Alignment.topRight,
-          child:Padding(child:IconButton(
-                  icon: Icon(Icons.refresh), color: Colors.white, onPressed: () {
-            publishVideo.switchCamera();
-              }),padding: EdgeInsets.all(25),),
+          child: Padding(
+            child: IconButton(
+                icon: Icon(Icons.refresh),
+                color: Colors.white,
+                onPressed: () {
+                  publishVideo.switchCamera();
+                }),
+            padding: EdgeInsets.all(25),
+          ),
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child:Padding(child:CircleAvatar(
-              backgroundColor: Colors.red,
-              radius:30,
-              child:IconButton(
-              icon: Icon(Icons.call_end), color: Colors.white, onPressed: () {
-                publishVideo.send(message: {'request':'hangup'},onSuccess: ()async{
-                 await cleanUpAndBack();
-                });
-          })),padding: EdgeInsets.all(10),),
+          child: Padding(
+            child: CircleAvatar(
+                backgroundColor: Colors.red,
+                radius: 30,
+                child: IconButton(
+                    icon: Icon(Icons.call_end),
+                    color: Colors.white,
+                    onPressed: () {
+                      publishVideo.send(
+                          message: {'request': 'hangup'},
+                          onSuccess: () async {
+                          });
+                    })),
+            padding: EdgeInsets.all(10),
+          ),
         )
       ]),
     );
   }
+
   @override
-  void dispose()async{
+  void dispose() async {
     // TODO: implement dispose
     super.dispose();
-
   }
 }

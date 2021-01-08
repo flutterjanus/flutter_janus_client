@@ -11,6 +11,7 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'utils.dart';
 
+/// Main Class for setting up janus server connection details and important methods for interacting with janus server
 class JanusClient {
   dynamic server;
   String apiSecret;
@@ -22,7 +23,7 @@ class JanusClient {
   List<RTCIceServer> iceServers;
   int refreshInterval;
   bool _connected = false;
-  bool isUnifiedPlan = true;
+  bool isUnifiedPlan;
   int _sessionId;
   void Function(int sessionId) _onSuccess;
   void Function(dynamic) _onError;
@@ -46,18 +47,18 @@ class JanusClient {
   WebSocketSink _webSocketSink;
 
   get isConnected => _connected;
+
   get isUnifiedPlan_ => isUnifiedPlan;
 
   get currentJanusURI => _currentJanusUri;
 
   int get sessionId => _sessionId;
 
-  /*
-  * Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
-  * refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
-  * value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
-  * maxEvent property is an optional value whose function is to specify maximum number of events fetched using polling in rest/http mechanism by default it fetches 10 events in a single api call
-  * */
+  /// Instance of JanusClient is Starting point of any WebRTC operations with janus WebRTC gateway
+  /// refreshInterval is by default 50, make sure this value is less than session_timeout in janus configuration
+  /// value greater than session_timeout might lead to session being destroyed and can cause general functionality to fail
+  /// maxEvent property is an optional value whose function is to specify maximum number of events fetched using polling in rest/http mechanism by default it fetches 10 events in a single api call
+  /// isUnifiedPlan is a new feature introduced by google for supporting multiple streams on a single peer connection, you can enable it by setting it to true by default it is false
   JanusClient(
       {@required this.server,
       @required this.iceServers,
@@ -87,10 +88,14 @@ class JanusClient {
       var data = parse(await _webSocketStream.first);
       if (data["janus"] == "success") {
         _sessionId = data["data"]["id"];
-        _connected = true;
+
         _usingRest = false;
 //        to keep session alive otherwise session will die after default 60 seconds.
-        _keepAlive(refreshInterval: refreshInterval);
+        if (!isConnected) {
+          _keepAlive(refreshInterval: refreshInterval);
+        }
+        _connected = true;
+
         this._onSuccess(_sessionId);
         return data;
       }
@@ -114,9 +119,11 @@ class JanusClient {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    return parse(
+    var response =
         (await http.post(_currentJanusUri + suffixUrl, body: stringify(bod)))
-            .body);
+            .body;
+    print(response);
+    return parse(response);
   }
 
   /*
@@ -152,22 +159,28 @@ class JanusClient {
       print("response: " + response.toString());
       if (response["janus"] == "success") {
         _sessionId = response["data"]["id"];
-        _connected = true;
+
         _usingRest = true;
 //        to keep session alive otherwise session will die after default 60 seconds.
-        _keepAlive(refreshInterval: refreshInterval);
+        if (!isConnected) {
+          _keepAlive(refreshInterval: refreshInterval);
+        }
+        _connected = true;
         this._onSuccess(_sessionId);
         // return response;
       }
 
 //todo:implement all http connect interface
     } catch (e) {
-      // _keepAliveTimer.cancel();
+      if (_keepAliveTimer!=null) {
+        _keepAliveTimer.cancel();
+      }
+
       throw e;
     }
   }
 
-  //generates sessionId and returns it as callback value in onSuccess
+  /// Generates sessionId and returns it as callback value in onSuccess Function, whereas in case of any connection errors is thrown in onError callback if provided.
   connect(
       {void Function(int sessionId) onSuccess,
       void Function(dynamic) onError}) async {
@@ -204,22 +217,30 @@ class JanusClient {
     }
   }
 
-  // cleans up rest polling timer or WebSocket connection if used.
+  /// cleans up rest polling timer or WebSocket connection if used.
   destroy() {
     //stops polling
-    _keepAliveTimer.cancel();
+    if (_keepAliveTimer != null) {
+      _keepAliveTimer.cancel();
+    }
+
+
     //close WebSocket
     if (_webSocketChannel != null) _webSocketChannel.sink.close();
     //clean maps
     _pluginHandles.clear();
     _transactions.clear();
+    if (_sessionId != null) {
+      _sessionId = null;
+    }
+    _connected = false;
   }
 
   _keepAlive({int refreshInterval}) {
     //                keep session live dude!
     if (isConnected) {
-      _keepAliveTimer =
-          Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
+      Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
+        this._keepAliveTimer = timer;
         if (_usingRest) {
           debugPrint("keep live ping from rest client");
           await _postRestClient({
@@ -242,9 +263,7 @@ class JanusClient {
     }
   }
 
-/*
-*
-* */
+  /// Attach Plugin to janus instance, for any project you need single janus instance to which you can attach any number of supported plugin
   attach(Plugin plugin) async {
     var transaction = _uuid.v4();
     Map<String, dynamic> request = {
@@ -259,7 +278,9 @@ class JanusClient {
     Map<String, dynamic> configuration = {
       "iceServers": iceServers.map((e) => e.toMap()).toList()
     };
-    configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
+    if (isUnifiedPlan) {
+      configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
+    }
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
     WebRTCHandle webRTCHandle = WebRTCHandle(
@@ -369,7 +390,8 @@ class JanusClient {
         print(data);
         int handleId = data["data"]["id"];
         debugPrint("Created handle: " + handleId.toString());
-//attaching websocket sink and stream on plugin handle
+
+        /// attaching websocket sink and stream on plugin handle
         plugin.webSocketStream = _webSocketStream;
         plugin.webSocketSink = _webSocketSink;
         plugin.handleId = handleId;
@@ -445,8 +467,6 @@ class JanusClient {
       print(longpoll);
       print("polling active");
       var json = parse((await http.get(longpoll)).body);
-      debugPrint("_eventHandler");
-      print(json);
       (json as List<dynamic>).forEach((element) {
         _handleEvent(plugin, element);
       });
@@ -469,9 +489,6 @@ class JanusClient {
   }
 
   _handleEvent(Plugin plugin, Map<String, dynamic> json) {
-    print('handle event called');
-    print(json);
-
     if (json["janus"] == "keepalive") {
       // Nothing happened
       debugPrint("Got a keepalive on session " + sessionId.toString());

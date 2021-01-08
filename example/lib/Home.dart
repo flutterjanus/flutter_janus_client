@@ -20,9 +20,21 @@ class Home extends StatelessWidget {
               },
             ),
             ListTile(
+              title: Text("Audio Room Example"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/audio_room");
+              },
+            ),
+            ListTile(
               title: Text("Streaming Example"),
               onTap: () {
                 Navigator.of(context).pushNamed("/streaming");
+              },
+            ),
+            ListTile(
+              title: Text("Streaming Unified Example (MultiStream Support)"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/streaming_unified");
               },
             )
           ],

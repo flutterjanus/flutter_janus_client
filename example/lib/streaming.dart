@@ -12,14 +12,18 @@ class Streaming extends StatefulWidget {
 class _StreamingState extends State<Streaming> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
-        url: "turn:40.85.216.95:3478",
+        url: "stun:stream.kli.one:3478",
         username: "onemandev",
-        credential: "SecureIt")
+        credential: "SecureIt"),
+    // RTCIceServer(
+    //     url: "turn:40.85.216.95:3478",
+    //     username: "onemandev",
+    //     credential: "SecureIt")
   ], server: [
     'https://janus.conf.meetecho.com/janus',
     'https://master-janus.onemandev.tech/rest',
     'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+  ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();

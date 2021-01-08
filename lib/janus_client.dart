@@ -156,7 +156,7 @@ class JanusClient {
         ..._apiMap,
         ..._tokenMap
       });
-      print(response);
+      print("response: " + response.toString());
       if (response["janus"] == "success") {
         _sessionId = response["data"]["id"];
 
@@ -311,6 +311,21 @@ class JanusClient {
             event.transceiver != null ? event.transceiver.mid : event.track.id;
         plugin.onRemoteTrack(event.streams[0], event.track, mid, true);
         if (event.track.onEnded == null) return;
+
+        if (webRTCHandle.pc.receivers != null) {
+          var receiverStreams = null;
+          // if(event.track.kind == "audio" && webRTCHandle.pc.receivers.first.track["audio"]) {
+          //   receiverStreams = event.receiver.createEncodedAudioStreams();
+          // } else if(event.track.kind === "video" && config.receiverTransforms["video"]) {
+          //   receiverStreams = event.receiver.createEncodedVideoStreams();
+          // }
+          // if(receiverStreams) {
+          //   receiverStreams.readableStream
+          //       .pipeThrough(config.receiverTransforms[event.track.kind])
+          //       .pipeTo(receiverStreams.writableStream);
+          // }
+        }
+
         event.track.onEnded = () async {
           if (webRTCHandle.remoteStream != null) {
             webRTCHandle.remoteStream.removeTrack(event.track);

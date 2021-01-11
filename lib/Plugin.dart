@@ -308,7 +308,7 @@ class Plugin {
   prepareTranscievers(bool offer) async {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
-    var media;
+    var media = new Map<String, bool>();
     if (!_context.isUnifiedPlan) {
       media = {"offerToReceiveAudio": true, "offerToReceiveVideo": true};
     } else {
@@ -368,9 +368,12 @@ class Plugin {
         }
       }
 
-      if (((!media["update"] && isVideoSendEnabled(media)) ||
-              (media["update"] &&
-                  (media["addVideo"] || media["replaceVideo"]))) &&
+      if ((((media["update"] != null && !media["update"]) &&
+                  isVideoSendEnabled(media)) ||
+              ((media["update"] != null && media["update"]) &&
+                  ((media["addVideo"] != null && media["addVideo"]) ||
+                      (media["replaceVideo"] != null &&
+                          media["replaceVideo"])))) &&
           webRTCHandle.myStream.getVideoTracks() != null &&
           webRTCHandle.myStream.getVideoTracks().length > 0) {
         // webRTCHandle.myStream.addTrack(stream.getVideoTracks()[0]);
@@ -423,7 +426,7 @@ class Plugin {
       //     Janus.log("Renegotiation involves a new external stream");
       //   }
       // } else {
-      if (media["addAudio"]) {
+      if (media["addAudio"] != null && media["addAudio"]) {
         media["keepAudio"] = false;
         media["replaceAudio"] = false;
         media["removeAudio"] = false;
@@ -436,19 +439,19 @@ class Plugin {
           //return error on callback??
           onError("Can't add audio stream, there already is one");
           return null;
-        } else if (media["removeAudio"]) {
+        } else if (media["removeAudio"] != null && media["removeAudio"]) {
           media["keepAudio"] = false;
           media["replaceAudio"] = false;
           media["addAudio"] = false;
           media["audioSend"] = false;
-        } else if (media["replaceAudio"]) {
+        } else if (media["replaceAudio"] != null && media["replaceAudio"]) {
           media["keepAudio"] = false;
           media["addAudio"] = false;
           media["removeAudio"] = false;
           media["audioSend"] = true;
         }
         if (webRTCHandle.myStream == null) {
-          if (media["replaceAudio"]) {
+          if (media["replaceAudio"] != null && media["replaceAudio"]) {
             media["keepAudio"] = false;
             media["replaceAudio"] = false;
             media["addAudio"] = true;
@@ -462,7 +465,7 @@ class Plugin {
             if (webRTCHandle.myStream.getAudioTracks() == null ||
                 webRTCHandle.myStream.getAudioTracks().length == 0) {
               // No audio track: if we were asked to replace, it's actually an "add"
-              if (media["replaceAudio"]) {
+              if (media["replaceAudio"] != null && media["replaceAudio"]) {
                 media["keepAudio"] = false;
                 media["replaceAudio"] = false;
                 media["addAudio"] = true;
@@ -481,7 +484,7 @@ class Plugin {
                 }
               }
             }
-            if (media["addVideo"]) {
+            if (media["addVideo"] != null && media["addVideo"]) {
               media["keepVideo"] = false;
               media["replaceVideo"] = false;
               media["removeVideo"] = false;
@@ -495,12 +498,12 @@ class Plugin {
                 return null;
               }
             } else {}
-            if (media["removeVideo"]) {
+            if (media["removeVideo"] != null && media["removeVideo"]) {
               media["keepVideo"] = false;
               media["replaceVideo"] = false;
               media["removeVideo"] = false;
               media["videoSend"] = false;
-            } else if (media["replaceVideo"]) {
+            } else if (media["replaceVideo"] != null && media["replaceVideo"]) {
               media["keepVideo"] = false;
               media["addVideo"] = false;
               media["removeVideo"] = false;
@@ -510,7 +513,7 @@ class Plugin {
           if (webRTCHandle.myStream != null) {
             // No media stream: if we were asked to replace, it's actually an "add"
 
-            if (media["replaceVideo"]) {
+            if (media["replaceVideo"] != null && media["replaceVideo"]) {
               media["keepVideo"] = false;
               media["replaceVideo"] = false;
               media["addVideo"] = true;
@@ -526,7 +529,7 @@ class Plugin {
                 webRTCHandle.myStream.getVideoTracks().length == 0) {
               // No video track: if we were asked to replace, it's actually an "add"
 
-              if (media["replaceVideo"]) {
+              if (media["replaceVideo"] != null && media["replaceVideo"]) {
                 media["keepVideo"] = false;
                 media["replaceVideo"] = false;
                 media["addVideo"] = true;
@@ -547,7 +550,7 @@ class Plugin {
             }
           }
           // Data channels can only be added
-          if (media["addData"]) {
+          if (media["addData"] != null && media["addData"]) {
             media["data"] = true;
           }
         }

@@ -104,6 +104,7 @@ class _SipCallState extends State<SipCall> {
 
   register() {
     try{
+      // replace the [sip-username], [sip-server], [sip-displayname] with the actual data
       const register = {
             "username": "sip:[sip-username]@[sip-server]",
             "display_name": "[sip-displayname]",
@@ -120,6 +121,7 @@ class _SipCallState extends State<SipCall> {
   call(phone) async {
     try{
       RTCSessionDescription offer = await pluginHandle.createOffer(offerOptions: {"offerToReceiveVideo": false});
+      // [sip-server] value need to be replaced
       var call = {"request": "call", "uri": "sip:"+ phone +"@[sip-server]"};
       pluginHandle.send(message: call, jsep: offer);
     }catch(e){

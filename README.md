@@ -32,7 +32,7 @@ For more info visit
 | Video Call Plugin | Yes     | No          | wip          |
 | Streaming Plugin  | Yes     | No          | Yes          |
 | Audio Room Plugin | Yes     | No          | wip          |
-| Sip Plugin        | No      | No          | No           |
+| Sip Plugin        | Yes     | No          | No           |
 | Text Room Plugin  | wip     | No          | wip          |
 
 # Getting Started
@@ -45,3 +45,5 @@ For more info visit
 [Streaming\(unified\) Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming_unified.dart)  
 
 [Audio Room Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/audioRoom.dart)
+
+[Sip Call Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/sipCall.dart)

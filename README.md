@@ -32,7 +32,7 @@ For more info visit
 | Video Call Plugin | Yes     | No          | wip          |
 | Streaming Plugin  | Yes     | No          | Yes          |
 | Audio Room Plugin | Yes     | No          | wip          |
-| Sip Plugin        | No      | No          | No           |
+| Sip Plugin        | Yes     | No          | No           |
 | Text Room Plugin  | wip     | No          | wip          |
 
 # Getting Started

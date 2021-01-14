@@ -36,6 +36,12 @@ class Home extends StatelessWidget {
               onTap: () {
                 Navigator.of(context).pushNamed("/streaming_unified");
               },
+            ),
+            ListTile(
+              title: Text("Sip Call Example"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/sip_call");
+              },
             )
           ],
         ));

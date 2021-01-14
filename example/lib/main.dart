@@ -5,6 +5,7 @@ import 'package:janus_client_example/streaming.dart';
 import 'package:janus_client_example/videoCall.dart';
 import 'package:janus_client_example/streaming_unified.dart';
 import 'package:janus_client_example/audioRoom.dart';
+import 'package:janus_client_example/sipCall.dart';
 void main() {
   runApp(MyApp());
 }
@@ -24,6 +25,7 @@ class _MyAppState extends State<MyApp> {
         "/streaming": (c) => Streaming(),
         "/audio_room": (c) => AudioRoom(),
         "/streaming_unified": (c) => StreamingUnified(),
+        "/sip_call": (c) => SipCall(),
         "/": (c) => Home()
       },
     );

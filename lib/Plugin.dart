@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'WebRTCHandle.dart';
 import 'janus_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:uuid/uuid.dart';
 
 /// This Class exposes methods and utility function necessary for directly interacting with plugin.
 class Plugin {
@@ -16,6 +17,101 @@ class Plugin {
   String opaqueId;
   int _handleId;
   JanusClient _context;
+
+  int get handleId => _handleId;
+
+  set handleId(int value) {
+    _handleId = value;
+  }
+
+  int _sessionId;
+  Map<String, dynamic> _transactions;
+  Map<int, Plugin> _pluginHandles;
+  String _token;
+  String _apiSecret;
+  Stream<dynamic> _webSocketStream;
+  WebSocketSink _webSocketSink;
+  WebRTCHandle _webRTCHandle;
+  Uuid _uuid = Uuid();
+
+  int get sessionId => _sessionId;
+
+  set sessionId(int value) {
+    _sessionId = value;
+  }
+
+  Map<String, dynamic> get transactions => _transactions;
+
+  set transactions(Map<String, dynamic> value) {
+    _transactions = value;
+  }
+
+  Map<int, dynamic> get pluginHandles => _pluginHandles;
+
+  set pluginHandles(Map<int, dynamic> value) {
+    _pluginHandles = value;
+  }
+
+  String get token => _token;
+
+  set token(String value) {
+    _token = value;
+  }
+
+  String get apiSecret => _apiSecret;
+
+  set apiSecret(String value) {
+    _apiSecret = value;
+  }
+
+  Stream<dynamic> get webSocketStream => _webSocketStream;
+
+  set webSocketStream(Stream<dynamic> value) {
+    _webSocketStream = value;
+  }
+
+  WebSocketSink get webSocketSink => _webSocketSink;
+
+  set webSocketSink(WebSocketSink value) {
+    _webSocketSink = value;
+  }
+
+  WebRTCHandle get webRTCHandle => _webRTCHandle;
+
+  set webRTCHandle(WebRTCHandle data) {
+    _webRTCHandle = data;
+  }
+
+  Function(Plugin) onSuccess;
+  Function(dynamic) onError;
+  Function(dynamic, dynamic) onMessage;
+  Function(dynamic, bool) onLocalTrack;
+  Function(dynamic, dynamic, dynamic, bool) onRemoteTrack;
+  Function(dynamic) onLocalStream;
+  Function(dynamic) onRemoteStream;
+  Function(RTCDataChannelState) onDataOpen;
+  Function(RTCDataChannelMessage) onData;
+  Function(dynamic) onIceConnectionState;
+  Function(bool, dynamic) onWebRTCState;
+  Function() onDetached;
+  Function() onDestroy;
+  Function(dynamic, dynamic, dynamic) onMediaState;
+
+  Plugin(
+      {this.plugin,
+      this.opaqueId,
+      this.onSuccess,
+      this.onError,
+      this.onWebRTCState,
+      this.onMessage,
+      this.onDestroy,
+      this.onDetached,
+      this.onLocalTrack,
+      this.onRemoteTrack,
+      this.onLocalStream,
+      this.onRemoteStream,
+      this.onDataOpen,
+      this.onData});
 
   set context(JanusClient val) {
     _context = val;
@@ -32,56 +128,6 @@ class Plugin {
             body: stringify(bod)))
         .body);
   }
-
-  int get handleId => _handleId;
-
-  set handleId(int value) {
-    _handleId = value;
-  }
-
-  int _sessionId;
-  Map<String, dynamic> _transactions;
-  Map<int, dynamic> _pluginHandles;
-  String _token;
-  String _apiSecret;
-  Stream<dynamic> _webSocketStream;
-  WebSocketSink _webSocketSink;
-  WebRTCHandle _webRTCHandle;
-  Uuid _uuid = Uuid();
-
-  WebRTCHandle get webRTCHandle => _webRTCHandle;
-
-  set webRTCHandle(WebRTCHandle data) {
-    _webRTCHandle = data;
-  }
-
-  Function(Plugin) onSuccess;
-  Function(dynamic) onError;
-  Function(dynamic, dynamic) onMessage;
-  Function(dynamic, bool) onLocalTrack;
-  Function(dynamic, dynamic, dynamic, bool) onRemoteTrack;
-  Function(dynamic) onLocalStream;
-  Function(dynamic) onRemoteStream;
-  Function(dynamic) onIceConnectionState;
-  Function(bool, dynamic) onWebRTCState;
-  Function() onDetached;
-  Function() onDestroy;
-  Function(dynamic, dynamic, dynamic) onMediaState;
-
-  Plugin({
-    this.plugin,
-    this.opaqueId,
-    this.onSuccess,
-    this.onError,
-    this.onWebRTCState,
-    this.onMessage,
-    this.onDestroy,
-    this.onDetached,
-    this.onLocalTrack,
-    this.onRemoteTrack,
-    this.onLocalStream,
-    this.onRemoteStream,
-  });
 
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
   Future<void> handleRemoteJsep(data) async {
@@ -355,89 +401,61 @@ class Plugin {
     }
   }
 
-  sendData(dynamic text, dynamic data,
-      {Function onSuccess, Function(dynamic) onError}) {
-    var pluginHandle = pluginHandles[handleId];
-    if (pluginHandle == null || !pluginHandle.webrtcStuff) {
-      debugPrint("Invalid handle");
-      onError("Invalid handle");
-      return;
+  Future<void> initDataChannel(
+      {@required String label, RTCDataChannelInit rtcDataChannelInit}) async {
+    if (_webRTCHandle.pc != null) {
+      if (label == null) {
+        throw Exception("Label Must Be Provided!");
+      }
+      if (rtcDataChannelInit == null) {
+        rtcDataChannelInit = RTCDataChannelInit();
+      }
+      webRTCHandle.dataChannel[label] =
+          await _webRTCHandle.pc.createDataChannel("", rtcDataChannelInit);
+      webRTCHandle.dataChannel[label].onDataChannelState =
+          (RTCDataChannelState state) {
+        if (_pluginHandles.containsKey(handleId)) {
+          if (_pluginHandles[handleId].onDataOpen != null) {
+            _pluginHandles[handleId].onDataOpen(state);
+          }
+        }
+      };
+      webRTCHandle.dataChannel[label].onMessage =
+          (RTCDataChannelMessage message) {
+        if (_pluginHandles.containsKey(handleId)) {
+          if (_pluginHandles[handleId].onData != null) {
+            _pluginHandles[handleId].onData(message);
+          }
+        }
+      };
+    } else {
+      throw Exception(
+          "You Must Initialize Peer Connection before even attempting data channel creation!");
     }
-    var config = pluginHandle.webrtcStuff;
-    var dat = text || data;
-    if (dat == null) {
-      debugPrint("Invalid data");
-      onError("Invalid data");
-      return;
+  }
+
+  /// Send text message on existing text room using data channel with same label as specified during initDataChannel() method call.
+  ///
+  /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
+  Future<void> sendData(
+      {@required String label, @required String message}) async {
+    if (label != null && message != null) {
+      if (_webRTCHandle.pc != null &&
+          webRTCHandle.dataChannel.containsKey(label)) {
+        return webRTCHandle.dataChannel[label]
+            .send(RTCDataChannelMessage(message));
+      } else {
+        throw Exception(
+            "You Must Initialize Peer Connection before even attempting data channel creation or call initDataChannel method!");
+      }
+    } else {
+      throw Exception("Label and message must be provided!");
     }
-
-//    var label = callbacks.label ? callbacks.label : Janus.dataChanDefaultLabel;
-//    if(!config.dataChannel[label]) {
-//      // Create new data channel and wait for it to open
-//      createDataChannel(handleId, label, callbacks.protocol, false, data, callbacks.protocol);
-//      callbacks.success();
-//      return;
-//    }
-//    if(config.dataChannel[label].readyState !== "open") {
-//      config.dataChannel[label].pending.push(data);
-//      callbacks.success();
-//      return;
-//    }
-//    Janus.log("Sending data on data channel <" + label + ">");
-//    Janus.debug(data);
-//    config.dataChannel[label].send(data);
-//    callbacks.success();
   }
 
-  int get sessionId => _sessionId;
-
-  set sessionId(int value) {
-    _sessionId = value;
-  }
-
-  Map<String, dynamic> get transactions => _transactions;
-
-  set transactions(Map<String, dynamic> value) {
-    _transactions = value;
-  }
-
-  Map<int, dynamic> get pluginHandles => _pluginHandles;
-
-  set pluginHandles(Map<int, dynamic> value) {
-    _pluginHandles = value;
-  }
-
-  String get token => _token;
-
-  set token(String value) {
-    _token = value;
-  }
-
-  String get apiSecret => _apiSecret;
-
-  set apiSecret(String value) {
-    _apiSecret = value;
-  }
-
-  Stream<dynamic> get webSocketStream => _webSocketStream;
-
-  set webSocketStream(Stream<dynamic> value) {
-    _webSocketStream = value;
-  }
-
-  WebSocketSink get webSocketSink => _webSocketSink;
-
-  set webSocketSink(WebSocketSink value) {
-    _webSocketSink = value;
-  }
-
-// todo createOffer(callbacks): asks the library to create a WebRTC compliant OFFER;
-// todo createAnswer(callbacks): asks the library to create a WebRTC compliant ANSWER;
-// todo handleRemoteJsep(callbacks): asks the library to handle an incoming WebRTC compliant session description;
 // todo dtmf(parameters): sends a DTMF tone on the PeerConnection;
 // todo data(parameters): sends data through the Data Channel, if available;
 // todo getBitrate(): gets a verbose description of the currently received stream bitrate;
-// todo hangup(sendRequest): tells the library to close the PeerConnection; if the optional sendRequest argument is set to true, then a hangup Janus API request is sent to Janus as well (disabled by default, Janus can usually figure this out via DTLS alerts and the like but it may be useful to enable it sometimes);
 // todo detach(parameters):
 
 }

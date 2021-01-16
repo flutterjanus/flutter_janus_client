@@ -14,6 +14,12 @@ class Home extends StatelessWidget {
               },
             ),
             ListTile(
+              title: Text("Text Room Example"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/text_room");
+              },
+            ),
+            ListTile(
               title: Text("Video Room Example"),
               onTap: () {
                 Navigator.of(context).pushNamed("/video_room");

@@ -10,6 +10,9 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:http/http.dart' as http;
 import 'utils.dart';
+export 'Plugin.dart';
+export 'utils.dart';
+export 'WebRTCHandle.dart';
 
 /// Main Class for setting up janus server connection details and important methods for interacting with janus server
 class JanusClient {
@@ -172,7 +175,7 @@ class JanusClient {
 
 //todo:implement all http connect interface
     } catch (e) {
-      if (_keepAliveTimer!=null) {
+      if (_keepAliveTimer != null) {
         _keepAliveTimer.cancel();
       }
 
@@ -223,7 +226,6 @@ class JanusClient {
     if (_keepAliveTimer != null) {
       _keepAliveTimer.cancel();
     }
-
 
     //close WebSocket
     if (_webSocketChannel != null) _webSocketChannel.sink.close();
@@ -286,6 +288,7 @@ class JanusClient {
     WebRTCHandle webRTCHandle = WebRTCHandle(
       iceServers: iceServers,
     );
+    webRTCHandle.dataChannel = {};
     webRTCHandle.pc = peerConnection;
     plugin.webRTCHandle = webRTCHandle;
     plugin.apiSecret = apiSecret;

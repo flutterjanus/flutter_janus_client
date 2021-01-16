@@ -20,7 +20,8 @@ class _SipCallState extends State<SipCall> {
   Plugin subscriberHandle;
   MediaStream remoteStream;
   MediaStream myStream;
-  bool registered = false; 
+  bool registered = false;
+
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
@@ -42,17 +43,17 @@ class _SipCallState extends State<SipCall> {
     setState(() {
       j = JanusClient(iceServers: [
         RTCIceServer(
-        url: "stun:40.85.216.95:3478",
-        username: "onemandev",
-        credential: "SecureIt"),
-    RTCIceServer(
-        url: "turn:40.85.216.95:3478",
-        username: "onemandev",
-        credential: "SecureIt")
+            url: "stun:40.85.216.95:3478",
+            username: "onemandev",
+            credential: "SecureIt"),
+        RTCIceServer(
+            url: "turn:40.85.216.95:3478",
+            username: "onemandev",
+            credential: "SecureIt")
       ], server: [
-    'wss://janus.conf.meetecho.com/ws',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+        'wss://janus.conf.meetecho.com/ws',
+        'wss://janus.onemandev.tech/janus/websocket',
+      ], withCredentials: true, apiSecret: "SecureIt");
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());
@@ -67,7 +68,7 @@ class _SipCallState extends State<SipCall> {
               }
               var result = msg["result"];
               var event = result["event"];
-              if (result !=  null && event != null) {
+              if (result != null && event != null) {
                 if (jsep != null) {
                   debugPrint('handling jsep');
                   pluginHandle.handleRemoteJsep(jsep);
@@ -103,31 +104,30 @@ class _SipCallState extends State<SipCall> {
   }
 
   register() {
-    try{
+    try {
       // replace the [sip-username], [sip-server], [sip-displayname] with the actual data
       const register = {
-            "username": "sip:[sip-username]@[sip-server]",
-            "display_name": "[sip-displayname]",
-            "secret": "SecureIt",
-            "proxy": "sip:[sip-server]:5060",
-            "sips": false,
-            "request": 'register'
-          };
+        "username": "sip:[sip-username]@[sip-server]",
+        "display_name": "[sip-displayname]",
+        "secret": "SecureIt",
+        "proxy": "sip:[sip-server]:5060",
+        "sips": false,
+        "request": 'register'
+      };
       pluginHandle.send(message: register);
-    }catch(e){
-
-    }
+    } catch (e) {}
   }
+
   call(phone) async {
-    try{
-      RTCSessionDescription offer = await pluginHandle.createOffer(offerOptions: {"offerToReceiveVideo": false});
+    try {
+      RTCSessionDescription offer =
+          await pluginHandle.createOffer(offerToReceiveVideo: false);
       // [sip-server] value need to be replaced
-      var call = {"request": "call", "uri": "sip:"+ phone +"@[sip-server]"};
+      var call = {"request": "call", "uri": "sip:" + phone + "@[sip-server]"};
       pluginHandle.send(message: call, jsep: offer);
-    }catch(e){
-
-    }
+    } catch (e) {}
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,24 +143,24 @@ class _SipCallState extends State<SipCall> {
                 await this.initPlatformState();
 //                  -_localRenderer.
               }),
-           IconButton(
+          IconButton(
               icon: Icon(
                 Icons.call,
                 color: Colors.greenAccent,
               ),
               onPressed: () async {
-                if(this.registered){
-                    var phone = await prompt(context,
-                    title: Text('Please enter the number you wish to call'),
-                    textOK: Text('Call'),
-                    textCancel: Text('Cancel'),
-                    hintText: '0044xxxxxx',
-                    autoFocus: true);
-                    if(phone != null) {
-                      this.call(phone);
-                    }
+                if (this.registered) {
+                  var phone = await prompt(context,
+                      title: Text('Please enter the number you wish to call'),
+                      textOK: Text('Call'),
+                      textCancel: Text('Cancel'),
+                      hintText: '0044xxxxxx',
+                      autoFocus: true);
+                  if (phone != null) {
+                    this.call(phone);
+                  }
                 }
-//              
+//
               }),
           IconButton(
               icon: Icon(

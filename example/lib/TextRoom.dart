@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/conf.dart';
 
 class TextRoomExample extends StatefulWidget {
   @override
@@ -10,14 +11,10 @@ class TextRoomExample extends StatefulWidget {
 class _TextRoomExampleState extends State<TextRoomExample> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
-        url: "turn:40.85.216.95:3478",
-        username: "onemandev",
-        credential: "SecureIt")
-  ], server: [
-    'wss://janus.conf.meetecho.com/ws',
-    'https://master-janus.onemandev.tech/rest',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+        url: "stun:stun.voip.eutelia.it:3478",
+        username: "",
+        credential: "")
+  ], server: servers, withCredentials: true, apiSecret: "SecureIt");
   Plugin textRoom;
   TextEditingController nameController = TextEditingController();
   String label = "mychatroom";
@@ -56,6 +53,11 @@ class _TextRoomExampleState extends State<TextRoomExample> {
             textRoom.sendData(label: label, message: stringify(register));
             // }
           },
+          onWebRTCState: (state)async{
+            if(state==RTCPeerConnectionState.RTCPeerConnectionStateConnected){
+              await textRoom.initDataChannel(label: label);
+            }
+          },
           onMessage: (msg, jsep) async {
             if (msg != null) {
               print(msg);
@@ -64,10 +66,15 @@ class _TextRoomExampleState extends State<TextRoomExample> {
             if (jsep != null) {
               textRoom.handleRemoteJsep(jsep);
               var body = {"request": "ack"};
-              RTCSessionDescription answer = await textRoom.createAnswer();
+              RTCSessionDescription answer = await textRoom.createAnswer(offerOptions:{"offerToReceiveAudio": false,
+                "offerToReceiveVideo": false});
               textRoom.send(
-                  message: body, jsep: answer, onSuccess: () async {});
-              await textRoom.initDataChannel(label: label);
+                  message: body, jsep: answer, onSuccess: () async {
+                    print('creating data channel');
+
+
+              });
+
             }
           }));
     });

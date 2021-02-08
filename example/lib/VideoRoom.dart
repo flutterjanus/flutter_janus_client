@@ -5,6 +5,9 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/Plugin.dart';
 
 import 'dart:async';
+
+import 'package:janus_client_example/conf.dart';
+
 class VideoRoom extends StatefulWidget {
   @override
   _VideoRoomState createState() => _VideoRoomState();
@@ -75,22 +78,21 @@ class _VideoRoomState extends State<VideoRoom> {
 
   Future<void> initPlatformState() async {
     setState(() {
-      j = JanusClient(iceServers: [
-        RTCIceServer(
-            url: "stun:40.85.216.95:3478",
-            username: "onemandev",
-            credential: "SecureIt"),
-        RTCIceServer(
-            url: "turn:40.85.216.95:3478",
-            username: "onemandev",
-            credential: "SecureIt")
-      ], server: [
-        'https://janus.conf.meetecho.com/janus',
-        'https://janus.onemandev.tech/janus',
-        // 'wss://janus.onemandev.tech/janus/websocket',
-        // 'https://janus.onemandev.tech/janus',
-
-      ], withCredentials: true, apiSecret: "SecureIt");
+      j = JanusClient(
+          iceServers: [
+            RTCIceServer(
+                url: "stun:40.85.216.95:3478",
+                username: "onemandev",
+                credential: "SecureIt"),
+            RTCIceServer(
+                url: "turn:40.85.216.95:3478",
+                username: "onemandev",
+                credential: "SecureIt")
+          ],
+          server: servers,
+          withCredentials: true,
+          apiSecret: "SecureIt",
+          isUnifiedPlan: false);
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());

@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.5.0
-  path_provider: ^1.6.18
+  flutter_webrtc: 0.5.6
+  path_provider: ^1.6.27
   http: ^0.12.2
-  web_socket_channel: ^1.1.0
+  web_socket_channel: ^1.2.0
   stream_channel: ^2.0.0
   uuid: ^2.2.2
 

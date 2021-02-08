@@ -6,6 +6,8 @@ import 'package:janus_client/Plugin.dart';
 
 import 'dart:async';
 
+import 'package:janus_client_example/conf.dart';
+
 class Participant {
   num id;
   String display;
@@ -127,13 +129,7 @@ class _AudioRoomState extends State<AudioRoom> {
             url: "stun:40.85.216.95:3478",
             username: "onemandev",
             credential: "SecureIt"),
-        RTCIceServer(
-            url: "turn:40.85.216.95:3478",
-            username: "onemandev",
-            credential: "SecureIt")
-      ], server: [
-        'https://janus.conf.meetecho.com/janus',
-      ], withCredentials: true, apiSecret: "SecureIt");
+      ], server: servers, withCredentials: true, apiSecret: "SecureIt");
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());

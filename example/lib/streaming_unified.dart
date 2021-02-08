@@ -3,6 +3,7 @@ import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/conf.dart';
 
 class StreamingUnified extends StatefulWidget {
   @override
@@ -15,11 +16,7 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
         url: "turn:40.85.216.95:3478",
         username: "onemandev",
         credential: "SecureIt")
-  ], server: [
-    'https://janus.conf.meetecho.com/janus',
-    'wss://janus.conf.meetecho.com/ws',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
+  ], server: servers, withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();

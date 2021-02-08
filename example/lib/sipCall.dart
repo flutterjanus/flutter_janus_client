@@ -3,6 +3,7 @@ import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/Plugin.dart';
+import 'package:janus_client_example/conf.dart';
 import 'package:prompt_dialog/prompt_dialog.dart';
 
 import 'dart:async';
@@ -50,10 +51,7 @@ class _SipCallState extends State<SipCall> {
             url: "turn:40.85.216.95:3478",
             username: "onemandev",
             credential: "SecureIt")
-      ], server: [
-        'wss://janus.conf.meetecho.com/ws',
-        'wss://janus.onemandev.tech/janus/websocket',
-      ], withCredentials: true, apiSecret: "SecureIt");
+      ], server: servers, withCredentials: true, apiSecret: "SecureIt");
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());

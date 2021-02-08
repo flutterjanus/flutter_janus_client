@@ -3,6 +3,7 @@ import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/conf.dart';
 
 class VideoCallExample extends StatefulWidget {
   @override
@@ -19,10 +20,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         url: "turn:40.85.216.95:3478",
         username: "onemandev",
         credential: "SecureIt")
-  ], server: [
-    'wss://janus.conf.meetecho.com/ws',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+  ], server: servers, withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
@@ -102,7 +100,6 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                 textColor: Colors.white,
                 onPressed: () {
                   makeCall();
-
                 },
                 child: Text("Call"),
               )
@@ -140,11 +137,11 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   var peer = result["username"];
                   if (peer != null) {
                     debugPrint("Call started!");
-                  } else {
-                  }
+                  } else {}
                   // Video call can start
-                  if (jsep != null){ publishVideo.handleRemoteJsep(jsep);
-                  Navigator.of(context).pop();
+                  if (jsep != null) {
+                    publishVideo.handleRemoteJsep(jsep);
+                    Navigator.of(context).pop();
                   }
                 } else if (event == 'incomingcall') {
                   Navigator.pop(context);
@@ -154,8 +151,9 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   _localRenderer.srcObject =
                       await publishVideo.initializeMediaDevices();
 
-                  if (jsep != null) {publishVideo.handleRemoteJsep(jsep);
-                  Navigator.of(context).pop();
+                  if (jsep != null) {
+                    publishVideo.handleRemoteJsep(jsep);
+                    Navigator.of(context).pop();
                   }
                   // Notify user
                   var offer = await publishVideo.createAnswer();
@@ -197,6 +195,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
           });
     }
   }
+
   destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
@@ -206,6 +205,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     }
     Navigator.of(context).pop();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,8 +256,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                     onPressed: () {
                       publishVideo.send(
                           message: {'request': 'hangup'},
-                          onSuccess: () async {
-                          });
+                          onSuccess: () async {});
                     })),
             padding: EdgeInsets.all(10),
           ),

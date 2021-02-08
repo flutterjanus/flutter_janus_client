@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/WebRTCHandle.dart';
 import 'package:janus_client/utils.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/foundation.dart';
 import 'WebRTCHandle.dart';
 import 'janus_client.dart';
 import 'package:http/http.dart' as http;
-import 'package:uuid/uuid.dart';
 
 /// This Class exposes methods and utility function necessary for directly interacting with plugin.
 class Plugin {
@@ -92,7 +90,7 @@ class Plugin {
   Function(RTCDataChannelState) onDataOpen;
   Function(RTCDataChannelMessage) onData;
   Function(dynamic) onIceConnectionState;
-  Function(bool, dynamic) onWebRTCState;
+  Function(RTCPeerConnectionState) onWebRTCState;
   Function() onDetached;
   Function() onDestroy;
   Function(dynamic, dynamic, dynamic) onMediaState;
@@ -350,7 +348,7 @@ class Plugin {
   Future prepareTranscievers(bool offer) async {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
-    var transceivers = _webRTCHandle.pc.transceivers;
+    var transceivers = await _webRTCHandle.pc.transceivers;
     if (transceivers != null && transceivers.length > 0) {
       transceivers.forEach((t) {
         if ((t.sender != null &&
@@ -409,25 +407,55 @@ class Plugin {
       }
       if (rtcDataChannelInit == null) {
         rtcDataChannelInit = RTCDataChannelInit();
+        rtcDataChannelInit = RTCDataChannelInit();
+        rtcDataChannelInit.id = 1;
+        rtcDataChannelInit.ordered = true;
+        rtcDataChannelInit.maxRetransmitTime = -1;
+        rtcDataChannelInit.maxRetransmits = -1;
+        rtcDataChannelInit.protocol = 'sctp';
+        rtcDataChannelInit.negotiated = false;
       }
-      webRTCHandle.dataChannel[label] =
-          await _webRTCHandle.pc.createDataChannel("", rtcDataChannelInit);
-      webRTCHandle.dataChannel[label].onDataChannelState =
-          (RTCDataChannelState state) {
-        if (_pluginHandles.containsKey(handleId)) {
-          if (_pluginHandles[handleId].onDataOpen != null) {
-            _pluginHandles[handleId].onDataOpen(state);
-          }
-        }
-      };
-      webRTCHandle.dataChannel[label].onMessage =
-          (RTCDataChannelMessage message) {
-        if (_pluginHandles.containsKey(handleId)) {
-          if (_pluginHandles[handleId].onData != null) {
-            _pluginHandles[handleId].onData(message);
-          }
-        }
-      };
+      RTCDataChannel dataChannel =
+          await webRTCHandle.pc.createDataChannel(label, rtcDataChannelInit);
+      if (dataChannel != null) {
+        print('data channel state');
+        print(dataChannel.toString());
+        dataChannel.onDataChannelState = (state) {
+          onDataOpen(state);
+        };
+        dataChannel.onMessage = (message) {
+          onData(message);
+        };
+      }
+      // webRTCHandle.pc.onDataChannel = (RTCDataChannel chanel) {
+      //   if (onDataOpen != null) {
+      //     chanel.onDataChannelState = (RTCDataChannelState state) {
+      //       print('Plugin:on data channel open:' + state.toString());
+      //     };
+      //   }
+      //   if (onData != null) {
+      //     chanel.onMessage = (RTCDataChannelMessage message) {
+      //       print(message);
+      //       onData(message);
+      //     };
+      //   }
+      // };
+      // webRTCHandle.dataChannel[label] =
+      //     await _webRTCHandle.pc.createDataChannel("", rtcDataChannelInit);
+      // webRTCHandle.pc.dataChannel[label].onDataChannelState =
+      //     (RTCDataChannelState state) {
+      //   if (_pluginHandles.containsKey(handleId)) {
+      //
+      //   }
+      // };
+      // webRTCHandle.dataChannel[label].onMessage =
+      //     (RTCDataChannelMessage message) {
+      //   if (_pluginHandles.containsKey(handleId)) {
+      //     if (_pluginHandles[handleId].onData != null) {
+      //       _pluginHandles[handleId].onData(message);
+      //     }
+      //   }
+      // };
     } else {
       throw Exception(
           "You Must Initialize Peer Connection before even attempting data channel creation!");

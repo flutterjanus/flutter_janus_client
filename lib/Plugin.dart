@@ -113,10 +113,10 @@ class Plugin {
       _webRTCHandle.myStream = await navigator.getUserMedia(mediaConstraints);
 
       if (_context.isUnifiedPlan) {
-        _webRTCHandle.pc
-            .addTrack(_webRTCHandle.myStream.getVideoTracks().first);
-        _webRTCHandle.pc
-            .addTrack(_webRTCHandle.myStream.getAudioTracks().first);
+        _webRTCHandle.pc.addTrack(_webRTCHandle.myStream.getVideoTracks().first,
+            _webRTCHandle.myStream);
+        _webRTCHandle.pc.addTrack(_webRTCHandle.myStream.getAudioTracks().first,
+            _webRTCHandle.myStream);
       } else {
         _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
       }

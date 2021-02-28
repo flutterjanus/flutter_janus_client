@@ -48,6 +48,7 @@ class JanusClient {
   IOWebSocketChannel _webSocketChannel;
   Stream<dynamic> _webSocketStream;
   WebSocketSink _webSocketSink;
+  http.Client _httpClient;
 
   get isConnected => _connected;
 
@@ -89,13 +90,12 @@ class JanusClient {
       var data = parse(await _webSocketStream.first);
       if (data["janus"] == "success") {
         _sessionId = data["data"]["id"];
-
+        _connected = true;
         _usingRest = false;
 //        to keep session alive otherwise session will die after default 60 seconds.
-        if (!isConnected) {
+        if (isConnected) {
           _keepAlive(refreshInterval: refreshInterval);
         }
-        _connected = true;
 
         this._onSuccess(_sessionId);
         return data;
@@ -105,7 +105,9 @@ class JanusClient {
       // _keepAliveTimer.cancel();
       debugPrint(e.toString());
       print(e.toString());
-      this._onError(e);
+      if (this._onError != null) {
+        this._onError(e);
+      }
       return Future.value(e);
     }
   }
@@ -120,9 +122,9 @@ class JanusClient {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    var response =
-        (await http.post(_currentJanusUri + suffixUrl, body: stringify(bod)))
-            .body;
+    var response = (await http.post(Uri.parse(_currentJanusUri + suffixUrl),
+            body: stringify(bod)))
+        .body;
     print(response);
     return parse(response);
   }
@@ -137,7 +139,8 @@ class JanusClient {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    return parse((await http.get(_currentJanusUri + suffixUrl)).body);
+    return parse(
+        (await http.get(Uri.parse(_currentJanusUri + suffixUrl))).body);
   }
 
   /*private method that tries to establish rest connection with janus server,
@@ -147,9 +150,6 @@ class JanusClient {
     var rootUrl = url;
     // if (!url.endsWith("/janus")) rootUrl = url + '/janus';
     _currentJanusUri = rootUrl;
-    debugPrint('should print ');
-    debugPrint(rootUrl);
-    debugPrint(_currentJanusUri);
     try {
       var response = await _postRestClient({
         "janus": "create",
@@ -157,16 +157,15 @@ class JanusClient {
         ..._apiMap,
         ..._tokenMap
       });
-      print(response);
       if (response["janus"] == "success") {
         _sessionId = response["data"]["id"];
-
         _usingRest = true;
+        _connected = true;
 //        to keep session alive otherwise session will die after default 60 seconds.
-        if (!isConnected) {
+        if (isConnected) {
           _keepAlive(refreshInterval: refreshInterval);
         }
-        _connected = true;
+
         this._onSuccess(_sessionId);
         // return response;
       }
@@ -238,34 +237,48 @@ class JanusClient {
 
   _keepAlive({int refreshInterval}) {
     //                keep session live dude!
+    print('keep live timer activated');
     if (isConnected) {
       Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
         this._keepAliveTimer = timer;
-        if (_usingRest) {
-          debugPrint("keep live ping from rest client");
-          await _postRestClient({
-            "janus": "keepalive",
-            "session_id": _sessionId,
-            "transaction": _uuid.v4(),
-            ..._apiMap,
-            ..._tokenMap
-          });
-        } else {
-          _webSocketSink.add(stringify({
-            "janus": "keepalive",
-            "session_id": _sessionId,
-            "transaction": _uuid.v4(),
-            ..._apiMap,
-            ..._tokenMap
-          }));
+        try {
+          if (_usingRest) {
+            debugPrint("keep live ping from rest client");
+            await _postRestClient({
+              "janus": "keepalive",
+              "session_id": _sessionId,
+              "transaction": _uuid.v4(),
+              ..._apiMap,
+              ..._tokenMap
+            });
+          } else {
+            debugPrint("keep live ping from websocket client");
+            _webSocketSink.add(stringify({
+              "janus": "keepalive",
+              "session_id": _sessionId,
+              "transaction": _uuid.v4(),
+              ..._apiMap,
+              ..._tokenMap
+            }));
+          }
+        } catch (e) {
+          print(
+              'got an exception while sending ping marking connection closed and canceling timer');
+          this._connected = false;
+          timer.cancel();
         }
       });
     }
   }
 
+  /*
+  * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
+  * */
+  String get dataChannelDefaultLabel => "JanusDataChannel";
+
   /// Attach Plugin to janus instance, for any project you need single janus instance to which you can attach any number of supported plugin
   attach(Plugin plugin) async {
-    var transaction = _uuid.v4();
+    var transaction = _uuid.v4() + _uuid.v1();
     Map<String, dynamic> request = {
       "janus": "attach",
       "plugin": plugin.plugin,
@@ -274,7 +287,6 @@ class JanusClient {
     request["token"] = token;
     request["apisecret"] = apiSecret;
     request["session_id"] = sessionId;
-    plugin.context = this;
     Map<String, dynamic> configuration = {
       "iceServers": iceServers.map((e) => e.toMap()).toList()
     };
@@ -296,6 +308,7 @@ class JanusClient {
     plugin.token = token;
     plugin.pluginHandles = _pluginHandles;
     plugin.transactions = _transactions;
+    plugin.context = this;
 
     if (!isUnifiedPlan) {
       if (plugin.onLocalStream != null) {
@@ -343,24 +356,26 @@ class JanusClient {
     };
     //      send trickle
     peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
-      debugPrint('sending trickle');
-      Map<dynamic, dynamic> request = {
-        "janus": "trickle",
-        "candidate": candidate.toMap(),
-        "transaction": "sendtrickle"
-      };
-      request["session_id"] = plugin.sessionId;
-      request["handle_id"] = plugin.handleId;
-      request["apisecret"] = plugin.apiSecret;
-      request["token"] = plugin.token;
-      //checking and posting using websocket if in available
-      if (!_usingRest) {
-        plugin.webSocketSink.add(stringify(request));
-      } else {
-        //posting using rest mechanism
-        var data = await _postRestClient(request, handleId: plugin.handleId);
-        print("trickle sent");
-        print(data);
+      if (!plugin.plugin.contains('textroom')) {
+        debugPrint('sending trickle');
+        Map<dynamic, dynamic> request = {
+          "janus": "trickle",
+          "candidate": candidate.toMap(),
+          "transaction": _uuid.v4()
+        };
+        request["session_id"] = plugin.sessionId;
+        request["handle_id"] = plugin.handleId;
+        request["apisecret"] = plugin.apiSecret;
+        request["token"] = plugin.token;
+        //checking and posting using websocket if in available
+        if (!_usingRest) {
+          plugin.webSocketSink.add(stringify(request));
+        } else {
+          //posting using rest mechanism
+          var data = await _postRestClient(request, handleId: plugin.handleId);
+          print("trickle sent");
+          print(data);
+        }
       }
     };
 
@@ -371,7 +386,6 @@ class JanusClient {
       var opaqueId = plugin.opaqueId;
       if (plugin.opaqueId != null) request["opaque_id"] = opaqueId;
       _webSocketSink.add(stringify(request));
-      print('error here');
       _transactions[transaction] = (data) {
         if (data["janus"] != "success") {
           plugin.onError(
@@ -388,18 +402,15 @@ class JanusClient {
         plugin.webSocketSink = _webSocketSink;
         plugin.handleId = handleId;
         _pluginHandles[handleId] = plugin;
-        debugPrint(_pluginHandles.toString());
         if (plugin.onSuccess != null) {
           plugin.onSuccess(plugin);
         }
       };
       _webSocketStream.listen((event) {
-        print('outer event');
-        print(event);
-        if (parse(event)["transaction"] == transaction) {
-          print('got event');
-          print(event);
-          _transactions[transaction](parse(event));
+        if (_transactions.containsKey(parse(event)["transaction"]) &&
+            parse(event)["janus"] != 'ack') {
+          _transactions[parse(event)["transaction"]](parse(event));
+          _transactions.remove(parse(event)["transaction"]);
         }
       });
 
@@ -520,11 +531,12 @@ class JanusClient {
       debugPrint("Got a trickled candidate on session " + sessionId.toString());
       debugPrint(candidate.toString());
       var config = pluginHandle.webRTCHandle;
-      if (config.pc != null) {
+      if (config.pc != null && !plugin.plugin.contains('textroom')) {
         // Add candidate right now
         debugPrint("Adding remote candidate:" + candidate.toString());
         if (candidate.containsKey("sdpMid") &&
-            candidate.containsKey("sdpMLineIndex")) {
+            candidate.containsKey("sdpMLineIndex") &&
+            !pluginHandle.plugin.contains('textroom')) {
           config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
               candidate["sdpMid"], candidate["sdpMLineIndex"]));
         }
@@ -619,7 +631,6 @@ class JanusClient {
       }
     } else if (json["janus"] == "event") {
       debugPrint("Got a plugin event on session " + sessionId.toString());
-      debugPrint(json.toString());
       var sender = json["sender"];
       if (sender == null) {
         debugPrint("WMissing sender...");
@@ -644,10 +655,12 @@ class JanusClient {
       var jsep = json["jsep"];
       if (jsep != null) {
         debugPrint("Handling SDP as well...");
-        debugPrint(jsep.toString());
       }
-      var callback = pluginHandle.onMessage;
-      if (callback != null) {
+      var callback;
+      if (pluginHandle != null) {
+        callback = pluginHandle.onMessage;
+      }
+      if (callback != null && jsep != null) {
         debugPrint("Notifying application...");
         // Send to callback specified when attaching plugin handle
         callback(data, jsep);
@@ -655,9 +668,9 @@ class JanusClient {
         // Send to generic callback (?)
         debugPrint("No provided notification callback");
       }
+
     } else if (json["janus"] == "timeout") {
       debugPrint("ETimeout on session " + sessionId.toString());
-      debugPrint(json.toString());
       if (_webSocketChannel != null) {
         _webSocketChannel.sink.close(3504, "Gateway timeout");
       }

@@ -122,7 +122,8 @@ class Plugin {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    return parse((await http.post(_context.currentJanusURI + suffixUrl,
+    return parse((await http.post(
+            Uri.parse(_context.currentJanusURI + suffixUrl),
             body: stringify(bod)))
         .body);
   }
@@ -154,7 +155,8 @@ class Plugin {
       };
     }
     if (_webRTCHandle != null) {
-      _webRTCHandle.myStream = await navigator.getUserMedia(mediaConstraints);
+      _webRTCHandle.myStream =
+          await navigator.mediaDevices.getUserMedia(mediaConstraints);
       _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
       return _webRTCHandle.myStream;
     } else {
@@ -175,27 +177,34 @@ class Plugin {
     }
   }
 
-  _handleSendResponse(json, Function onsuccess, Function(dynamic) onerror) {
-    if (json["janus"] == "success") {
+  _handleSendResponse(json) {
+    print('handleSendResponse');
+    print(json);
+    if (json["janus"] == "event") {
+      var jsep;
       // We got a success, must have been a synchronous transaction
       var plugindata = json["plugindata"];
+
+      if (plugindata['jsep'] != null) {
+        jsep = plugindata['jsep'];
+      }
       if (plugindata == null) {
         debugPrint(
             "Request succeeded, but missing plugindata...possibly an issue from janus side");
-        if (onsuccess != null) {
-          onsuccess();
-        }
+
         return;
       }
-      debugPrint(
-          "Synchronous transaction successful (" + plugindata["plugin"] + ")");
 
-      if (onMessage != null) {
-        onMessage(json, null);
+      if (_pluginHandles[handleId] != null) {
+        if (_pluginHandles[handleId].onMessage != null) {
+          _pluginHandles[handleId].onMessage(json,jsep);
+        }
       }
-      if (onsuccess != null) {
-        onsuccess();
-      }
+
+      // if (onMessage != null) {
+      //   onMessage(json, jsep);
+      // }
+
       return;
     } else if (json["janus"] == "error") {
       // Not a success and not an ack, must be an error
@@ -204,23 +213,14 @@ class Plugin {
             json["error"]["code"].toString() +
             " " +
             json["error"]["reason"]); // FIXME
-        if (onerror != null) {
-          onerror(
-              json["error"]["code"].toString() + " " + json["error"]["reason"]);
-        }
+
       } else {
         debugPrint("Unknown error:" + json.toString()); // FIXME
-        if (onerror != null) {
-          onerror("Unknown error");
-        }
+
       }
       return;
     }
     // If we got here, the plugin decided to handle the request asynchronously
-    if (onsuccess != null) {
-      onMessage(json, null);
-      onsuccess();
-    }
   }
 
   /// this method exposes communication mechanism to janus server,
@@ -230,12 +230,8 @@ class Plugin {
   /// you can also send jsep (LocalDescription sdp) to janus server if it is required by plugin under use
   ///
   /// onSuccess method is a callback that indicates completion of the request
-  send(
-      {dynamic message,
-      RTCSessionDescription jsep,
-      Function onSuccess,
-      Function(dynamic) onError}) async {
-    var transaction = _uuid.v4();
+  Future<void> send({dynamic message, RTCSessionDescription jsep}) async {
+    var transaction = _uuid.v4() + _uuid.v1() + _uuid.v4();
     var request = {
       "janus": "message",
       "body": message,
@@ -252,22 +248,21 @@ class Plugin {
     if (webSocketSink != null && webSocketStream != null) {
       webSocketSink.add(stringify(request));
       _transactions[transaction] = (json) {
-        _handleSendResponse(json, onSuccess, onError);
+        _handleSendResponse(json);
         // _transactions.remove(transaction);
       };
-      _webSocketStream.listen((event) {
-        if (parse(event)["transaction"] == transaction &&
-            parse(event)["janus"] != "ack") {
-          print('got event in send method');
-          print(event);
-          if (_transactions[transaction] != null) {
-            _transactions[transaction](parse(event));
-          }
-        }
-      });
+      // _webSocketStream.listen((event) {
+      //   if (_transactions.containsKey(parse(event)["transaction"]) &&
+      //       parse(event)["janus"] != "ack") {
+      //     print('got event in send method');
+      //       _transactions[parse(event)["transaction"]](parse(event));
+      //     _transactions.remove(parse(event)["transaction"]);
+      //   }
+      // });
+      // subscription.cancel();
     } else {
       var json = await _postRestClient(request, handleId: handleId);
-      _handleSendResponse(json, onSuccess, onError);
+      _handleSendResponse(json);
     }
 
     return;
@@ -302,17 +297,16 @@ class Plugin {
   slowLink(a, b, c) {}
 
   Future<RTCSessionDescription> createOffer(
-      {bool iceRestart = false,
-      bool offerToReceiveAudio = true,
+      {bool offerToReceiveAudio = true,
       bool offerToReceiveVideo = true}) async {
     if (_context.isUnifiedPlan) {
       await prepareTranscievers(true);
     } else {
       var offerOptions = {
         "offerToReceiveAudio": offerToReceiveAudio,
-        "offerToReceiveVideo": offerToReceiveVideo,
-        "iceRestart": iceRestart
+        "offerToReceiveVideo": offerToReceiveVideo
       };
+      print(offerOptions);
       RTCSessionDescription offer =
           await _webRTCHandle.pc.createOffer(offerOptions);
       await _webRTCHandle.pc.setLocalDescription(offer);
@@ -322,30 +316,32 @@ class Plugin {
 
   Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
     if (_context.isUnifiedPlan) {
+      print('using transrecievers');
       await prepareTranscievers(false);
     } else {
-      if (offerOptions == null) {
-        offerOptions = {
-          "offerToReceiveAudio": true,
-          "offerToReceiveVideo": true
-        };
+      try {
+        if (offerOptions == null) {
+          offerOptions = {
+            "offerToReceiveAudio": true,
+            "offerToReceiveVideo": true
+          };
+        }
+        RTCSessionDescription offer =
+            await _webRTCHandle.pc.createAnswer(offerOptions);
+        await _webRTCHandle.pc.setLocalDescription(offer);
+        return offer;
+      } catch (e) {
+        RTCSessionDescription offer =
+            await _webRTCHandle.pc.createAnswer(offerOptions);
+        await _webRTCHandle.pc.setLocalDescription(offer);
+        return offer;
       }
     }
 //    handling kstable exception most ugly way but currently there's no other workaround, it just works
-    try {
-      if (offerOptions == null) offerOptions = new Map();
-      RTCSessionDescription offer = await _webRTCHandle.pc.createAnswer({});
-      await _webRTCHandle.pc.setLocalDescription(offer);
-      return offer;
-    } catch (e) {
-      RTCSessionDescription offer =
-          await _webRTCHandle.pc.createAnswer(offerOptions);
-      await _webRTCHandle.pc.setLocalDescription(offer);
-      return offer;
-    }
   }
 
   Future prepareTranscievers(bool offer) async {
+    print('using transrecievers in prepare transrecievers');
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
     var transceivers = await _webRTCHandle.pc.transceivers;
@@ -399,63 +395,26 @@ class Plugin {
     }
   }
 
-  Future<void> initDataChannel(
-      {@required String label, RTCDataChannelInit rtcDataChannelInit}) async {
+  Future<void> initDataChannel({RTCDataChannelInit rtcDataChannelInit}) async {
     if (_webRTCHandle.pc != null) {
-      if (label == null) {
-        throw Exception("Label Must Be Provided!");
-      }
       if (rtcDataChannelInit == null) {
         rtcDataChannelInit = RTCDataChannelInit();
-        rtcDataChannelInit = RTCDataChannelInit();
-        rtcDataChannelInit.id = 1;
         rtcDataChannelInit.ordered = true;
-        rtcDataChannelInit.maxRetransmitTime = -1;
-        rtcDataChannelInit.maxRetransmits = -1;
-        rtcDataChannelInit.protocol = 'sctp';
-        rtcDataChannelInit.negotiated = false;
+        rtcDataChannelInit.protocol = 'janus-protocol';
       }
-      RTCDataChannel dataChannel =
-          await webRTCHandle.pc.createDataChannel(label, rtcDataChannelInit);
-      if (dataChannel != null) {
-        print('data channel state');
-        print(dataChannel.toString());
-        dataChannel.onDataChannelState = (state) {
+      webRTCHandle.dataChannel[_context.dataChannelDefaultLabel] =
+          await webRTCHandle.pc.createDataChannel(
+              _context.dataChannelDefaultLabel, rtcDataChannelInit);
+      if (webRTCHandle.dataChannel[_context.dataChannelDefaultLabel] != null) {
+        webRTCHandle.dataChannel[_context.dataChannelDefaultLabel]
+            .onDataChannelState = (state) {
           onDataOpen(state);
         };
-        dataChannel.onMessage = (message) {
+        webRTCHandle.dataChannel[_context.dataChannelDefaultLabel].onMessage =
+            (RTCDataChannelMessage message) {
           onData(message);
         };
       }
-      // webRTCHandle.pc.onDataChannel = (RTCDataChannel chanel) {
-      //   if (onDataOpen != null) {
-      //     chanel.onDataChannelState = (RTCDataChannelState state) {
-      //       print('Plugin:on data channel open:' + state.toString());
-      //     };
-      //   }
-      //   if (onData != null) {
-      //     chanel.onMessage = (RTCDataChannelMessage message) {
-      //       print(message);
-      //       onData(message);
-      //     };
-      //   }
-      // };
-      // webRTCHandle.dataChannel[label] =
-      //     await _webRTCHandle.pc.createDataChannel("", rtcDataChannelInit);
-      // webRTCHandle.pc.dataChannel[label].onDataChannelState =
-      //     (RTCDataChannelState state) {
-      //   if (_pluginHandles.containsKey(handleId)) {
-      //
-      //   }
-      // };
-      // webRTCHandle.dataChannel[label].onMessage =
-      //     (RTCDataChannelMessage message) {
-      //   if (_pluginHandles.containsKey(handleId)) {
-      //     if (_pluginHandles[handleId].onData != null) {
-      //       _pluginHandles[handleId].onData(message);
-      //     }
-      //   }
-      // };
     } else {
       throw Exception(
           "You Must Initialize Peer Connection before even attempting data channel creation!");
@@ -465,19 +424,18 @@ class Plugin {
   /// Send text message on existing text room using data channel with same label as specified during initDataChannel() method call.
   ///
   /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
-  Future<void> sendData(
-      {@required String label, @required String message}) async {
-    if (label != null && message != null) {
-      if (_webRTCHandle.pc != null &&
-          webRTCHandle.dataChannel.containsKey(label)) {
-        return webRTCHandle.dataChannel[label]
+  Future<void> sendData({@required String message}) async {
+    if (message != null) {
+      if (_webRTCHandle.pc != null) {
+        print('before send RTCDataChannelMessage');
+        return await webRTCHandle.dataChannel[_context.dataChannelDefaultLabel]
             .send(RTCDataChannelMessage(message));
       } else {
         throw Exception(
             "You Must Initialize Peer Connection before even attempting data channel creation or call initDataChannel method!");
       }
     } else {
-      throw Exception("Label and message must be provided!");
+      throw Exception("message must be provided!");
     }
   }
 

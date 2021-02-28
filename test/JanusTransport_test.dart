@@ -1,0 +1,65 @@
+import 'package:flutter/material.dart';
+import 'package:test/test.dart';
+import 'package:janus_client/JanusTransport.dart';
+import 'dart:io';
+void main() {
+  RestJanusTransport rest =
+      RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
+
+  WebSocketJanusTransport ws = WebSocketJanusTransport(
+      url: 'wss://master-janus.onemandev.tech/websocket');
+  ws.connect();
+  group('RestJanusTransport', () {
+    test('Create a new Session', () async {
+      var response =
+          await rest.post({"janus": "create", "transaction": "sdhbds"});
+      rest.sessionId = response['data']['id'];
+      expect(response['janus'], 'success');
+    });
+
+    test('Attach A Plugin', () async {
+      Map<String, dynamic> request = {
+        "janus": "attach",
+        "plugin": "janus.plugin.videoroom",
+        "transaction": "random for attaching plugin"
+      };
+      var response = await rest.post(request);
+      rest.handleId = response['data']['id'];
+
+      expect(response['janus'], 'success');
+    });
+  });
+
+  test('Create a new Session', () async {
+    ws.sink.add({"janus": "create", "transaction": "wscreatesession"});
+    ws.stream.listen((event) {
+      print(event);
+      if (event['transaction'] == 'wscreatesession') {
+        rest.sessionId = event['data']['id'];
+        print(rest.sessionId);
+        stderr.writeln('print me');
+        debugPrint(rest.sessionId.toString());
+        expect(event['janus'], 'success');
+      }
+    });
+  });
+  group('WebSocketJanusTransport', () {
+
+
+
+    test('Attach A Plugin', () async {
+      Map<String, dynamic> request = {
+        "janus": "attach",
+        "plugin": "janus.plugin.videoroom",
+        "transaction": "random for attaching plugin"
+      };
+      ws.sink.add(request);
+      ws.stream.listen((event) {
+        if (event['transaction'] == request['transaction']) {
+          rest.handleId = event['data']['id'];
+          expect(event['janus'], 'success');
+        }
+      });
+    });
+  });
+}

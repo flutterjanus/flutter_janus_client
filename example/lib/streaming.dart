@@ -13,10 +13,8 @@ class Streaming extends StatefulWidget {
 class _StreamingState extends State<Streaming> {
   JanusClient janusClient = JanusClient(iceServers: [
     RTCIceServer(
-        url: "stun:stun.voip.eutelia.it:3478",
-        username: "",
-        credential: "")
-  ], server:servers, withCredentials: true, apiSecret: "SecureIt");
+        url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
+  ], server: servers, withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
@@ -31,13 +29,7 @@ class _StreamingState extends State<Streaming> {
     var body = {"request": "list"};
     publishVideo.send(
         message: body,
-        onSuccess: () {
-          print("listing");
-        },
-        onError: (e) {
-          print('got error in listing');
-          print(e);
-        });
+    );
   }
 
   @override
@@ -74,47 +66,49 @@ class _StreamingState extends State<Streaming> {
               showDialog(
                   context: context,
                   barrierDismissible: false,
-                  child: StatefulBuilder(builder: (context, setstate) {
-                    _setState = setstate;
-                    _setState(() {
-                      streams = plugindata['data']['list'];
-                    });
+                  builder: (context) {
+                    return StatefulBuilder(builder: (context, setstate) {
+                      _setState = setstate;
+                      _setState(() {
+                        streams = plugindata['data']['list'];
+                      });
 
-                    return AlertDialog(
-                      title: Text("Choose Stream To Play"),
-                      content: Column(
-                        children: [
-                          DropdownButtonFormField(
-                              isExpanded: true,
-                              value: selectedStreamId,
-                              items: List.generate(
-                                  streams.length,
-                                  (index) => DropdownMenuItem(
-                                      value: streams[index]['id'],
-                                      child:
-                                          Text(streams[index]['description']))),
-                              onChanged: (v) {
-                                _setState(() {
-                                  selectedStreamId = v;
+                      return AlertDialog(
+                        title: Text("Choose Stream To Play"),
+                        content: Column(
+                          children: [
+                            DropdownButtonFormField(
+                                isExpanded: true,
+                                value: selectedStreamId,
+                                items: List.generate(
+                                    streams.length,
+                                    (index) => DropdownMenuItem(
+                                        value: streams[index]['id'],
+                                        child: Text(
+                                            streams[index]['description']))),
+                                onChanged: (v) {
+                                  _setState(() {
+                                    selectedStreamId = v;
+                                  });
+                                }),
+                            RaisedButton(
+                              color: Colors.green,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                publishVideo.send(message: {
+                                  "request": "watch",
+                                  "id": selectedStreamId,
+                                  "offer_audio": true,
+                                  "offer_video": true,
                                 });
-                              }),
-                          RaisedButton(
-                            color: Colors.green,
-                            textColor: Colors.white,
-                            onPressed: () {
-                              publishVideo.send(message: {
-                                "request": "watch",
-                                "id": selectedStreamId,
-                                "offer_audio": true,
-                                "offer_video": true,
-                              });
-                            },
-                            child: Text("Play"),
-                          )
-                        ],
-                      ),
-                    );
-                  }));
+                              },
+                              child: Text("Play"),
+                            )
+                          ],
+                        ),
+                      );
+                    });
+                  });
             }
 
             if (jsep != null) {
@@ -179,9 +173,10 @@ class _StreamingState extends State<Streaming> {
                           onPressed: () {
                             publishVideo.send(
                                 message: {"request": "stop"},
-                                onSuccess: () async {
-                                  publishVideo.send(message: {});
-                                });
+                                );
+                            // onSuccess: () async {
+                            //   publishVideo.send(message: {});
+                            // }
                           })),
                   padding: EdgeInsets.all(10),
                 ),

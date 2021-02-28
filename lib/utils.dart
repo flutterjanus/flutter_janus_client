@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:math' as Math;
+import 'dart:convert' as conv;
 import 'package:flutter/cupertino.dart';
+import 'package:uuid/uuid.dart';
 
 class RTCIceServer {
   String username;
@@ -68,6 +70,9 @@ class RTCIceServer {
 //</editor-fold>
 }
 
+Uuid getUuid(){
+  return Uuid();
+}
 stringify(dynamic) {
   JsonEncoder encoder = JsonEncoder();
   return '${encoder.convert(dynamic)}';

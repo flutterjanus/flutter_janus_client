@@ -8,13 +8,16 @@ environment:
   flutter: ">=1.10.0"
 
 dependencies:
+  flutter_web_plugins:
+    sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: 0.5.6
+  flutter_webrtc:
+    git: https://github.com/flutter-webrtc/flutter-webrtc.git
   path_provider: ^1.6.27
-  http: ^0.12.2
+  http: ^0.13.0
   web_socket_channel: ^1.2.0
-  stream_channel: ^2.0.0
+  stream_channel: ^2.1.0
   uuid: ^2.2.2
 
 

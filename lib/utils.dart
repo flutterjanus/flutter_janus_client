@@ -1,5 +1,6 @@
 import 'dart:convert';
-
+import 'dart:developer';
+import 'dart:math' as Math;
 import 'package:flutter/cupertino.dart';
 
 class RTCIceServer {
@@ -75,4 +76,13 @@ stringify(dynamic) {
 parse(dynamic) {
   JsonDecoder jsonDecoder = JsonDecoder();
   return jsonDecoder.convert(dynamic);
+}
+
+randomString({int len=10, String charSet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
+  var randomString = '';
+  for (var i = 0; i < len; i++) {
+    var randomPoz = (Math.Random().nextInt(charSet.length-1)).floor();
+    randomString += charSet.substring(randomPoz, randomPoz + 1);
+  }
+  return randomString+Timeline.now.toString();
 }

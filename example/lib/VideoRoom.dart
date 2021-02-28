@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
@@ -16,10 +17,9 @@ class VideoRoom extends StatefulWidget {
 class _VideoRoomState extends State<VideoRoom> {
   JanusClient j;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
+  Map<int, RTCVideoRenderer> remoteRenderers = {};
   Plugin pluginHandle;
-  Plugin subscriberHandle;
-  MediaStream remoteStream;
+  Map<int, Plugin> subscriberHandles = {};
   MediaStream myStream;
 
   @override
@@ -36,27 +36,41 @@ class _VideoRoomState extends State<VideoRoom> {
 
   initRenderers() async {
     await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
   }
 
-  _newRemoteFeed(JanusClient j, feed) async {
+  _newRemoteFeed(feed) async {
+    setState(() {
+      remoteRenderers[feed] = new RTCVideoRenderer();
+    });
+    await remoteRenderers[feed].initialize();
     print('remote plugin attached');
     j.attach(Plugin(
         plugin: 'janus.plugin.videoroom',
         onMessage: (msg, jsep) async {
-          if (jsep != null) {
-            await subscriberHandle.handleRemoteJsep(jsep);
-            var body = {"request": "start", "room": 1234};
+          // if (msg['janus'] == 'event') {
+          //   var pluginData = msg['plugindata'];
+          //   if (pluginData != null) {
+          //     var data = pluginData['data'];
+          //     if (data != null) {
+          //       if (data['videoroom'] == 'joined') {
+          //         print('setting subscriber loop');
+          //         var body = {"request": "start", "room": 1234};
+          //         await subscriberHandles[feed].send(
+          //             message: body,
+          //             jsep: await subscriberHandles[feed].createAnswer(),
+          //             onSuccess: () {});
+          //       }
+          //     }
+          //   }
+          // }
 
-            await subscriberHandle.send(
-                message: body,
-                jsep: await subscriberHandle.createAnswer(),
-                onSuccess: () {});
-          }
+          // if (jsep != null) {
+          //   await subscriberHandles[feed].handleRemoteJsep(jsep);
+          // }
         },
-        onSuccess: (plugin) {
+        onSuccess: (plugin) async {
           setState(() {
-            subscriberHandle = plugin;
+            subscriberHandles.putIfAbsent(feed, () => plugin);
           });
           var register = {
             "request": "join",
@@ -65,13 +79,13 @@ class _VideoRoomState extends State<VideoRoom> {
             "feed": feed,
 //            "private_id": 12535
           };
-          subscriberHandle.send(message: register, onSuccess: () async {});
+          await subscriberHandles[feed]
+              .send(message: register);
         },
         onRemoteStream: (stream) {
           print('got remote stream');
           setState(() {
-            remoteStream = stream;
-            _remoteRenderer.srcObject = remoteStream;
+            remoteRenderers[feed].srcObject = stream;
           });
         }));
   }
@@ -81,13 +95,9 @@ class _VideoRoomState extends State<VideoRoom> {
       j = JanusClient(
           iceServers: [
             RTCIceServer(
-                url: "stun:40.85.216.95:3478",
-                username: "onemandev",
-                credential: "SecureIt"),
-            RTCIceServer(
-                url: "turn:40.85.216.95:3478",
-                username: "onemandev",
-                credential: "SecureIt")
+                url: "stun:stun.voip.eutelia.it:3478",
+                username: "",
+                credential: "")
           ],
           server: servers,
           withCredentials: true,
@@ -96,26 +106,47 @@ class _VideoRoomState extends State<VideoRoom> {
       j.connect(onSuccess: (sessionId) async {
         debugPrint('voilla! connection established with session id as' +
             sessionId.toString());
-        Map<String, dynamic> configuration = {
-          "iceServers": j.iceServers.map((e) => e.toMap()).toList()
-        };
-
         j.attach(Plugin(
             plugin: 'janus.plugin.videoroom',
             onMessage: (msg, jsep) async {
-              print('publisheronmsg');
-              if (msg["publishers"] != null) {
-                var list = msg["publishers"];
-                print('got publihers');
-                print(list);
-                _newRemoteFeed(j, list[0]["id"]);
+              print('publisher onMessage');
+              print(msg);
+              if (msg['janus'] == 'event') {
+                var pluginData = msg['plugindata'];
+                if (pluginData != null) {
+                  var data = pluginData['data'];
+                  if (data != null) {
+                    if (data["publishers"] != null) {
+                      List<dynamic> list = data["publishers"];
+                      print('got publihers');
+                      print(list);
+                      list.forEach((element) {
+                        _newRemoteFeed(element['id']);
+                      });
+
+
+                    }
+                    if (data['videoroom'] == 'joined') {
+                      print('user joined configuring video stream');
+                      var publish = {"request": "publish", "bitrate": 200000};
+                      RTCSessionDescription offer =
+                          await pluginHandle.createOffer(
+                              offerToReceiveAudio: true,
+                              offerToReceiveVideo: true);
+                      await pluginHandle.send(
+                          message: publish, jsep: offer);
+                    }
+                  }
+                }
               }
 
               if (jsep != null) {
-                pluginHandle.handleRemoteJsep(jsep);
+                print('handling sdp');
+                await pluginHandle.handleRemoteJsep(jsep);
               }
             },
             onSuccess: (plugin) async {
+              print('plugin created');
               setState(() {
                 pluginHandle = plugin;
               });
@@ -128,23 +159,12 @@ class _VideoRoomState extends State<VideoRoom> {
               });
               var register = {
                 "request": "join",
-                "room": 1234,
                 "ptype": "publisher",
-                "display": 'shivansh'
+                "room": 1234,
+                "display": "Shivansh"
               };
-              plugin.send(
-                  message: register,
-                  onSuccess: () async {
-                    var publish = {
-                      "request": "configure",
-                      "audio": true,
-                      "video": true,
-                      "bitrate": 2000000
-                    };
-                    RTCSessionDescription offer = await plugin.createOffer();
-                    plugin.send(
-                        message: publish, jsep: offer, onSuccess: () {});
-                  });
+              await plugin.send(
+                message: register);
             }));
       }, onError: (e) {
         debugPrint('some error occured');
@@ -173,17 +193,21 @@ class _VideoRoomState extends State<VideoRoom> {
                 color: Colors.red,
               ),
               onPressed: () {
-                j.destroy();
-                pluginHandle.hangup();
-                subscriberHandle.hangup();
+                if (pluginHandle != null) {
+                  pluginHandle.hangup();
+                }
+                // if (subscriberHandle != null) {
+                //   subscriberHandle.hangup();
+                // }
                 _localRenderer.srcObject = null;
                 _localRenderer.dispose();
-                _remoteRenderer.srcObject = null;
-                _remoteRenderer.dispose();
-                setState(() {
-                  pluginHandle = null;
-                  subscriberHandle = null;
-                });
+                // _remoteRenderer.srcObject = null;
+                // _remoteRenderer.dispose();
+                // j.destroy();
+                // setState(() {
+                //   pluginHandle = null;
+                //   subscriberHandle = null;
+                // });
               }),
           IconButton(
               icon: Icon(
@@ -199,20 +223,23 @@ class _VideoRoomState extends State<VideoRoom> {
         title: const Text('janus_client'),
       ),
       body: Stack(children: [
-        Positioned.fill(
-          child: RTCVideoView(
-            _remoteRenderer,
-          ),
-        ),
-        Align(
-          child: Container(
-            child: RTCVideoView(
+        GridView.count(
+          crossAxisCount: 2,
+          childAspectRatio: 16 / 4,
+          children: [
+            RTCVideoView(
               _localRenderer,
+              mirror: true,
+              objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
             ),
-            height: 200,
-            width: 200,
-          ),
-          alignment: Alignment.bottomRight,
+            ...remoteRenderers.entries.map((e){
+              return RTCVideoView(
+                e.value,
+                mirror: true,
+                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+              );
+            }).toList()
+          ],
         )
       ]),
     );

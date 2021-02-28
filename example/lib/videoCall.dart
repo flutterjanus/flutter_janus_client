@@ -45,13 +45,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     publishVideo.send(
         message: body,
         jsep: offerToCall,
-        onSuccess: () {
-          print("Calling");
-        },
-        onError: (e) {
-          print('got error in calling');
-          print(e);
-        });
+        );
     nameController.text = "";
   }
 
@@ -59,53 +53,57 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        child: AlertDialog(
-          title: Text("Register As"),
-          content: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: "Your Name"),
-                controller: nameController,
-              ),
-              RaisedButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                onPressed: () {
-                  registerUser(nameController.text);
-                },
-                child: Text("Proceed"),
-              )
-            ],
-          ),
-        ));
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Register As"),
+            content: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(labelText: "Your Name"),
+                  controller: nameController,
+                ),
+                RaisedButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    registerUser(nameController.text);
+                  },
+                  child: Text("Proceed"),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   makeCallDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
-        child: AlertDialog(
-          title: Text("Call Registered User or wait for user to call you"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(
-                    labelText: "Name Of Registered User to call"),
-                controller: nameController,
-              ),
-              RaisedButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                onPressed: () {
-                  makeCall();
-                },
-                child: Text("Call"),
-              )
-            ],
-          ),
-        ));
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Call Registered User or wait for user to call you"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(
+                      labelText: "Name Of Registered User to call"),
+                  controller: nameController,
+                ),
+                RaisedButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    makeCall();
+                  },
+                  child: Text("Call"),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -161,9 +159,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   publishVideo.send(
                       message: body,
                       jsep: offer,
-                      onSuccess: () {
-                        print('call connected');
-                      });
+                      );
                   // print(publishVideo.webRTCHandle.pc.);
                 } else if (event == 'hangup') {
                   await destroy();
@@ -183,16 +179,16 @@ class _VideoCallExampleState extends State<VideoCallExample> {
   registerUser(userName) {
     if (publishVideo != null) {
       publishVideo.send(
-          message: {"request": "register", "username": userName},
-          onSuccess: () {
-            print("User registered");
-            nameController.text = "";
-            Navigator.pop(context);
-            makeCallDialog();
-          },
-          onError: (error) {
-            print(error);
-          });
+          message: {"request": "register", "username": userName});
+    //   onSuccess: () {
+    //     print("User registered");
+    //     nameController.text = "";
+    //     Navigator.pop(context);
+    //     makeCallDialog();
+    //   },
+    // onError: (error) {
+    // print(error);
+    // }
     }
   }
 
@@ -256,7 +252,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                     onPressed: () {
                       publishVideo.send(
                           message: {'request': 'hangup'},
-                          onSuccess: () async {});
+                      );
                     })),
             padding: EdgeInsets.all(10),
           ),

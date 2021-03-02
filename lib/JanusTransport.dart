@@ -11,6 +11,7 @@ abstract class JanusTransport {
   int sessionId;
   int handleId;
   JanusTransport({this.url});
+  void dispose();
 }
 
 class RestJanusTransport extends JanusTransport {
@@ -51,6 +52,11 @@ class RestJanusTransport extends JanusTransport {
       suffixUrl = suffixUrl + "/$sessionId/$handleId";
     }
     return parse((await http.get(Uri.parse(url + suffixUrl))).body);
+  }
+
+  @override
+  void dispose() {
+
   }
 
 }

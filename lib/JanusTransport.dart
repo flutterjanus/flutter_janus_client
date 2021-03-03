@@ -9,8 +9,9 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 abstract class JanusTransport {
   String url;
   int sessionId;
-  int handleId;
+
   JanusTransport({this.url});
+
   void dispose();
 }
 
@@ -20,7 +21,7 @@ class RestJanusTransport extends JanusTransport {
   /*
   * method for posting data to janus by using http client
   * */
-  Future<dynamic> post(body) async {
+  Future<dynamic> post(body, {int handleId}) async {
     var suffixUrl = '';
     if (sessionId != null && handleId == null) {
       suffixUrl = suffixUrl + "/$sessionId";
@@ -44,7 +45,7 @@ class RestJanusTransport extends JanusTransport {
   /*
   * private method for get data to janus by using http client
   * */
-  Future<dynamic> get() async {
+  Future<dynamic> get({handleId}) async {
     var suffixUrl = '';
     if (sessionId != null && handleId == null) {
       suffixUrl = suffixUrl + "/$sessionId";
@@ -55,10 +56,7 @@ class RestJanusTransport extends JanusTransport {
   }
 
   @override
-  void dispose() {
-
-  }
-
+  void dispose() {}
 }
 
 class WebSocketJanusTransport extends JanusTransport {
@@ -67,9 +65,24 @@ class WebSocketJanusTransport extends JanusTransport {
   Duration pingInterval;
   WebSocketSink sink;
   Stream stream;
-  bool isConnected=false;
+  bool isConnected = false;
+
   void dispose() {
     sink.close();
+  }
+
+  Future<dynamic> send(Map<String, dynamic> data, {int handleId}) async {
+    if (data['transaction'] != null) {
+      data['session_id'] = sessionId;
+      if (handleId != null) {
+        data['handle_id'] = handleId;
+      }
+      sink.add(stringify(data));
+      return parse(await stream.firstWhere(
+          (element) => (parse(element)['transaction'] == data['transaction'])));
+    } else {
+      throw "transaction key missing in body";
+    }
   }
 
   void connect() {

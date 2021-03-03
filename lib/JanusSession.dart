@@ -32,14 +32,13 @@ class JanusSession {
       if (transport is RestJanusTransport) {
         RestJanusTransport rest = (transport as RestJanusTransport);
         response = await rest.post(request);
-        if(response!=null){
+        if (response != null) {
           if (response.containsKey('janus') && response.containsKey('data')) {
             sessionId = response['data']['id'];
             rest.sessionId = sessionId;
           }
-        }
-        else{
-         throw "Janus Server not live or incorrect url/path specified";
+        } else {
+          throw "Janus Server not live or incorrect url/path specified";
         }
       } else if (transport is WebSocketJanusTransport) {
         WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
@@ -59,11 +58,14 @@ class JanusSession {
       throw "Connection to given url can't be established\n reason:-" +
           e.message;
     } catch (e) {
-      throw "Connection to given url can't be established\n reason:-"+e.toString() ;
+      throw "Connection to given url can't be established\n reason:-" +
+          e.toString();
     }
   }
 
   Future<JanusPlugin> attach(String pluginName) async {
+    JanusPlugin plugin;
+    int handleId;
     String transaction = getUuid().v4();
     Map<String, dynamic> request = {
       "janus": "attach",
@@ -73,7 +75,6 @@ class JanusSession {
     request["token"] = context.token;
     request["apisecret"] = context.apiSecret;
     request["session_id"] = sessionId;
-    int handleId;
     Map<String, dynamic> response;
     if (transport is RestJanusTransport) {
       print('using rest transport for creating plugin handle');
@@ -82,8 +83,6 @@ class JanusSession {
       if (response.containsKey('janus') && response.containsKey('data')) {
         handleId = response['data']['id'];
         rest.sessionId = sessionId;
-        rest.handleId = handleId;
-        print(rest.handleId);
       }
     } else if (transport is WebSocketJanusTransport) {
       print('using websocket transport for creating plugin handle');
@@ -96,11 +95,13 @@ class JanusSession {
           (element) => (parse(element)['transaction'] == transaction)));
       if (response.containsKey('janus') && response.containsKey('data')) {
         handleId = response['data']['id'] as int;
-        ws.handleId = handleId;
         print(response);
-        print(ws.handleId);
       }
     }
+    plugin =
+        JanusPlugin(transport: transport, context: context, handleId: handleId,session: this);
+    _pluginHandles[handleId] = plugin;
+    return plugin;
   }
 
   void dispose() {
@@ -116,7 +117,6 @@ class JanusSession {
           String transaction = getUuid().v4();
           Map<String, dynamic> response;
           if (transport is RestJanusTransport) {
-            print('using rest transport for keep alive ping');
             RestJanusTransport rest = (transport as RestJanusTransport);
             response = await rest.post({
               "janus": "keepalive",
@@ -125,9 +125,7 @@ class JanusSession {
               ...context.apiMap,
               ...context.tokenMap
             });
-            print(response);
           } else if (transport is WebSocketJanusTransport) {
-            print('using websocket transport for keep alive ping');
             WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
             if (!ws.isConnected) {
               ws.connect();
@@ -141,7 +139,6 @@ class JanusSession {
             }));
             response = parse(await ws.stream.firstWhere(
                 (element) => (parse(element)['transaction'] == transaction)));
-            print(response);
           }
         } catch (e) {
           timer.cancel();

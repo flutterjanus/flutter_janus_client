@@ -130,7 +130,7 @@ class Plugin {
 
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
   Future<void> handleRemoteJsep(data) async {
-    await webRTCHandle.pc
+    await webRTCHandle.peerConnection
         .setRemoteDescription(RTCSessionDescription(data["sdp"], data["type"]));
   }
 
@@ -155,10 +155,10 @@ class Plugin {
       };
     }
     if (_webRTCHandle != null) {
-      _webRTCHandle.myStream =
+      _webRTCHandle.localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      _webRTCHandle.pc.addStream(_webRTCHandle.myStream);
-      return _webRTCHandle.myStream;
+      _webRTCHandle.peerConnection.addStream(_webRTCHandle.localStream);
+      return _webRTCHandle.localStream;
     } else {
       print("error webrtchandle cant be null");
       return null;
@@ -166,12 +166,12 @@ class Plugin {
   }
 
   /// a utility method which can be used to switch camera of user device if it has more than one camera
-  switchCamera() async {
-    if (_webRTCHandle.myStream != null) {
-      final videoTrack = _webRTCHandle.myStream
+  Future<bool> switchCamera() async {
+    if (_webRTCHandle.localStream != null) {
+      final videoTrack = _webRTCHandle.localStream
           .getVideoTracks()
           .firstWhere((track) => track.kind == "video");
-      await videoTrack.switchCamera();
+      return await Helper.switchCamera(videoTrack);
     } else {
       throw "Media devices and stream not initialized,try calling initializeMediaDevices() ";
     }
@@ -197,7 +197,7 @@ class Plugin {
 
       if (_pluginHandles[handleId] != null) {
         if (_pluginHandles[handleId].onMessage != null) {
-          _pluginHandles[handleId].onMessage(json,jsep);
+          _pluginHandles[handleId].onMessage(json, jsep);
         }
       }
 
@@ -271,20 +271,20 @@ class Plugin {
   /// ends videocall,leaves videoroom and leaves audio room
   hangup() async {
     this.send(message: {"request": "leave"});
-    await _webRTCHandle.myStream.dispose();
-    await _webRTCHandle.pc.close();
+    await _webRTCHandle.localStream.dispose();
+    await _webRTCHandle.peerConnection.close();
     _context.destroy();
-    _webRTCHandle.pc = null;
+    _webRTCHandle.peerConnection = null;
   }
 
   /// Cleans Up everything related to individual plugin handle
   Future<void> destroy() async {
-    if (_webRTCHandle != null && _webRTCHandle.myStream != null) {
-      await _webRTCHandle.myStream.dispose();
+    if (_webRTCHandle != null && _webRTCHandle.localStream != null) {
+      await _webRTCHandle.localStream.dispose();
     }
 
-    if (_webRTCHandle.pc != null) {
-      await _webRTCHandle.pc.dispose();
+    if (_webRTCHandle.peerConnection != null) {
+      await _webRTCHandle.peerConnection.dispose();
     }
 
     if (_webSocketSink != null) {
@@ -308,8 +308,8 @@ class Plugin {
       };
       print(offerOptions);
       RTCSessionDescription offer =
-          await _webRTCHandle.pc.createOffer(offerOptions);
-      await _webRTCHandle.pc.setLocalDescription(offer);
+          await _webRTCHandle.peerConnection.createOffer(offerOptions);
+      await _webRTCHandle.peerConnection.setLocalDescription(offer);
       return offer;
     }
   }
@@ -327,13 +327,13 @@ class Plugin {
           };
         }
         RTCSessionDescription offer =
-            await _webRTCHandle.pc.createAnswer(offerOptions);
-        await _webRTCHandle.pc.setLocalDescription(offer);
+            await _webRTCHandle.peerConnection.createAnswer(offerOptions);
+        await _webRTCHandle.peerConnection.setLocalDescription(offer);
         return offer;
       } catch (e) {
         RTCSessionDescription offer =
-            await _webRTCHandle.pc.createAnswer(offerOptions);
-        await _webRTCHandle.pc.setLocalDescription(offer);
+            await _webRTCHandle.peerConnection.createAnswer(offerOptions);
+        await _webRTCHandle.peerConnection.setLocalDescription(offer);
         return offer;
       }
     }
@@ -344,7 +344,7 @@ class Plugin {
     print('using transrecievers in prepare transrecievers');
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
-    var transceivers = await _webRTCHandle.pc.transceivers;
+    var transceivers = await _webRTCHandle.peerConnection.transceivers;
     if (transceivers != null && transceivers.length > 0) {
       transceivers.forEach((t) {
         if ((t.sender != null &&
@@ -372,7 +372,7 @@ class Plugin {
     if (audioTransceiver != null && audioTransceiver.setDirection != null) {
       audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
     } else {
-      audioTransceiver = await _webRTCHandle.pc.addTransceiver(
+      audioTransceiver = await _webRTCHandle.peerConnection.addTransceiver(
           track: null,
           kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
           init: RTCRtpTransceiverInit(
@@ -384,7 +384,7 @@ class Plugin {
     if (videoTransceiver != null && videoTransceiver.setDirection != null) {
       videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
     } else {
-      videoTransceiver = await _webRTCHandle.pc.addTransceiver(
+      videoTransceiver = await _webRTCHandle.peerConnection.addTransceiver(
           track: null,
           kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
           init: RTCRtpTransceiverInit(
@@ -396,14 +396,14 @@ class Plugin {
   }
 
   Future<void> initDataChannel({RTCDataChannelInit rtcDataChannelInit}) async {
-    if (_webRTCHandle.pc != null) {
+    if (_webRTCHandle.peerConnection != null) {
       if (rtcDataChannelInit == null) {
         rtcDataChannelInit = RTCDataChannelInit();
         rtcDataChannelInit.ordered = true;
         rtcDataChannelInit.protocol = 'janus-protocol';
       }
       webRTCHandle.dataChannel[_context.dataChannelDefaultLabel] =
-          await webRTCHandle.pc.createDataChannel(
+          await webRTCHandle.peerConnection.createDataChannel(
               _context.dataChannelDefaultLabel, rtcDataChannelInit);
       if (webRTCHandle.dataChannel[_context.dataChannelDefaultLabel] != null) {
         webRTCHandle.dataChannel[_context.dataChannelDefaultLabel]
@@ -426,7 +426,7 @@ class Plugin {
   /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
   Future<void> sendData({@required String message}) async {
     if (message != null) {
-      if (_webRTCHandle.pc != null) {
+      if (_webRTCHandle.peerConnection != null) {
         print('before send RTCDataChannelMessage');
         return await webRTCHandle.dataChannel[_context.dataChannelDefaultLabel]
             .send(RTCDataChannelMessage(message));

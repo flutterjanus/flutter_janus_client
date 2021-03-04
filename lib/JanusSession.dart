@@ -99,8 +99,11 @@ class JanusSession {
       }
     }
     plugin =
-        JanusPlugin(transport: transport, context: context, handleId: handleId,session: this);
+        JanusPlugin(
+            plugin: pluginName,
+            transport: transport, context: context, handleId: handleId,session: this);
     _pluginHandles[handleId] = plugin;
+    await plugin.init();
     return plugin;
   }
 

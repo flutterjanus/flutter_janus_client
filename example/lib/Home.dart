@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 
-
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -12,7 +11,6 @@ class _HomeState extends State<Home> {
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-
   }
 
   @override
@@ -68,7 +66,14 @@ class _HomeState extends State<Home> {
               onTap: () {
                 Navigator.of(context).pushNamed("/sip_call");
               },
-            )
+            ),
+            Divider(),
+            ListTile(
+              title: Text("Video Room V2"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/video_room_v2");
+              },
+            ),
           ],
         ));
   }

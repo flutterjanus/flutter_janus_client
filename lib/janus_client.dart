@@ -297,11 +297,9 @@ class JanusClient {
 
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
-    WebRTCHandle webRTCHandle = WebRTCHandle(
-      iceServers: iceServers,
-    );
+    WebRTCHandle webRTCHandle = WebRTCHandle();
     webRTCHandle.dataChannel = {};
-    webRTCHandle.pc = peerConnection;
+    webRTCHandle.peerConnection = peerConnection;
     plugin.webRTCHandle = webRTCHandle;
     plugin.apiSecret = apiSecret;
     plugin.sessionId = _sessionId;
@@ -531,13 +529,13 @@ class JanusClient {
       debugPrint("Got a trickled candidate on session " + sessionId.toString());
       debugPrint(candidate.toString());
       var config = pluginHandle.webRTCHandle;
-      if (config.pc != null && !plugin.plugin.contains('textroom')) {
+      if (config.peerConnection != null && !plugin.plugin.contains('textroom')) {
         // Add candidate right now
         debugPrint("Adding remote candidate:" + candidate.toString());
         if (candidate.containsKey("sdpMid") &&
             candidate.containsKey("sdpMLineIndex") &&
             !pluginHandle.plugin.contains('textroom')) {
-          config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
+          config.peerConnection.addCandidate(RTCIceCandidate(candidate["candidate"],
               candidate["sdpMid"], candidate["sdpMLineIndex"]));
         }
       } else {

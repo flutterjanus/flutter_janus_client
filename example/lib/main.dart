@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:janus_client_example/Home.dart';
 import 'package:janus_client_example/TextRoom.dart';
 import 'package:janus_client_example/VideoRoom.dart';
+import 'package:janus_client_example/VideoRoom_V2.dart';
 import 'package:janus_client_example/streaming.dart';
 import 'package:janus_client_example/videoCall.dart';
 import 'package:janus_client_example/streaming_unified.dart';
@@ -24,6 +25,7 @@ class _MyAppState extends State<MyApp> {
       routes: {
         "/video_call": (c) => VideoCallExample(),
         "/video_room": (c) => VideoRoom(),
+        "/video_room_v2": (c) => VideoRoomV2(),
         "/streaming": (c) => Streaming(),
         "/audio_room": (c) => AudioRoom(),
         "/streaming_unified": (c) => StreamingUnified(),

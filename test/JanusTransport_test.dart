@@ -24,7 +24,6 @@ void main() {
         "transaction": "random for attaching plugin"
       };
       var response = await rest.post(request);
-      rest.handleId = response['data']['id'];
 
       expect(response['janus'], 'success');
     });
@@ -56,7 +55,6 @@ void main() {
       ws.sink.add(request);
       ws.stream.listen((event) {
         if (event['transaction'] == request['transaction']) {
-          rest.handleId = event['data']['id'];
           expect(event['janus'], 'success');
         }
       });

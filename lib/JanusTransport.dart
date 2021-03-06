@@ -1,9 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
-
 import 'package:janus_client/utils.dart';
 import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 abstract class JanusTransport {
@@ -68,7 +65,9 @@ class WebSocketJanusTransport extends JanusTransport {
   bool isConnected = false;
 
   void dispose() {
-    sink.close();
+    if (channel != null && sink != null) {
+      sink.close();
+    }
   }
 
   Future<dynamic> send(Map<String, dynamic> data, {int handleId}) async {
@@ -88,10 +87,8 @@ class WebSocketJanusTransport extends JanusTransport {
   void connect() {
     try {
       isConnected = true;
-      channel = IOWebSocketChannel.connect(url,
-          protocols: ['janus-protocol'],
-          pingInterval:
-              pingInterval != null ? pingInterval : Duration(seconds: 2));
+      channel = WebSocketChannel.connect(Uri.parse(url),
+          protocols: ['janus-protocol']);
     } catch (e) {
       print(e.toString());
       print('something went wrong');

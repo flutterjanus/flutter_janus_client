@@ -31,20 +31,24 @@ class JanusPlugin {
   Stream<MediaStream> localMediaStream;
   StreamController<MediaStream> _localMediaStreamController;
   int _pollingRetries = 0;
+  Timer pollingTimer;
   JanusWebRTCHandle webRTCHandle;
 
   //temporary variables
   StreamSubscription _wsStreamSubscription;
+  bool pollingActive;
 
   JanusPlugin(
-      {this.handleId,
-      this.context,
-      this.transport,
-      this.session,
-      this.plugin});
+      {this.handleId, this.context, this.transport, this.session, this.plugin});
 
-  _handleLongPolling({Duration delay}) async {
-    if (session.sessionId == null) return;
+  handlePolling() async {
+    // print('_handleLongPolling');
+    if (!pollingActive) return;
+    // print('should be called if polling active and request being sent');
+    if (session.sessionId == null) {
+      pollingActive = false;
+      return;
+    }
     try {
       var longpoll = transport.url +
           "/" +
@@ -59,13 +63,19 @@ class JanusPlugin {
         longpoll = longpoll + "&apisecret=" + context.apiSecret;
       List<dynamic> json = parse((await http.get(Uri.parse(longpoll))).body);
       json.forEach((element) {
-        _streamController.add(element);
+        if (!_streamController.isClosed) {
+          _streamController.add(element);
+        } else {
+          pollingActive = false;
+          // print('exiting polling');
+          return;
+        }
       });
-      await Future.delayed(delay)
-          .then((value) async => {await _handleLongPolling(delay: delay)});
       _pollingRetries = 0;
+      return;
     } on HttpException catch (e) {
       _pollingRetries++;
+      pollingActive = false;
       if (_pollingRetries > 2) {
         // Did we just lose the server? :-(
         print("Lost connection to the server (is it down?)");
@@ -73,12 +83,18 @@ class JanusPlugin {
       }
     } catch (e) {
       print(e);
+      pollingActive = false;
       print("fatal Exception");
       return;
     }
+    return;
   }
 
-  hangup() async {
+  Future<void> hangup() async {
+    if (pollingTimer != null) {
+      pollingTimer.cancel();
+    }
+
     this.send(data: {"request": "leave"});
     if (webRTCHandle != null) {
       if (webRTCHandle.localStream != null) {
@@ -136,7 +152,7 @@ class JanusPlugin {
     peerConnection.onAddStream = (mediaStream) {
       _localMediaStreamController.sink.add(mediaStream);
     };
-    peerConnection.onRemoveStream=(mediaStream) {
+    peerConnection.onRemoveStream = (mediaStream) {
       // _mediaStreamController.sink.add(mediaStream);
     };
     // get ice candidates and send to janus on this plugin handle
@@ -165,10 +181,16 @@ class JanusPlugin {
       }
     };
     webRTCHandle = JanusWebRTCHandle(peerConnection: peerConnection);
+    this.pollingActive = true;
     // Warning no code should be placed after code below in init function
     // depending on transport setup events and messages for session and plugin
     if (transport is RestJanusTransport) {
-      await _handleLongPolling(delay: Duration(milliseconds: 0));
+      pollingTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
+        if (!pollingActive) {
+          timer.cancel();
+        }
+        await handlePolling();
+      });
     } else if (transport is WebSocketJanusTransport) {
       _wsStreamSubscription =
           (transport as WebSocketJanusTransport).stream.listen((event) {
@@ -178,6 +200,10 @@ class JanusPlugin {
   }
 
   void dispose() {
+    this.pollingActive = false;
+    if (pollingTimer != null) {
+      pollingTimer.cancel();
+    }
     if (_streamController != null) {
       _streamController.close();
     }

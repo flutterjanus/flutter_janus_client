@@ -13,8 +13,10 @@ For more info visit
 
 
 
-**please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready**
+**please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready**  
 
+
+**Note:- Version 2 of flutter_janus_client is underway if you want to experience or play with latest api then you can switch to v2 branch**
 # Video Call Sample
 <a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
                                             width='300' height='600'></a>

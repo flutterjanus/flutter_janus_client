@@ -2,6 +2,10 @@
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 # janus_client
+This branch features brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events.  
+Definitely, It gonna be  easy to maintain and test.
+As of now VideoRoom works flawlessly support for other plugin are work in progress. 
+
 **all dependencies updated**  
 official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
 
@@ -20,15 +24,17 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
+**Supports WEB aswell**
+**Video Room Example Ready With V2  API**
 **Audio Bridge tested with raw ui**  
 **Streaming plugin now supports unified plan a.k.a multi-streaming support**
 
 ## status
 | Feature           | Support | Well Tested | Unified Plan |
 |-------------------|---------|-------------|--------------|
-| WebSocket         | Yes     | No          | -            |
-| Rest/Http API     | Yes     | No          | -            |
-| Video Room Plugin | Yes     | No          | wip          |
+| WebSocket         | Yes     | Yes         | -            |
+| Rest/Http API     | Yes     | Yes         | -            |
+| Video Room Plugin | Yes     | wip         | wip          |
 | Video Call Plugin | Yes     | No          | wip          |
 | Streaming Plugin  | Yes     | No          | Yes          |
 | Audio Room Plugin | Yes     | No          | wip          |
@@ -36,14 +42,5 @@ For more info visit
 | Text Room Plugin  | wip     | No          | wip          |
 
 # Getting Started
-[VideoRoom Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom.dart)  
+[VideoRoom_V2 Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom_V2.dart)  
 
-[VideoCall Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/videoCall.dart)  
-
-[Streaming Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming.dart)  
-
-[Streaming\(unified\) Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/streaming_unified.dart)  
-
-[Audio Room Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/audioRoom.dart)
-
-[Sip Call Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/sipCall.dart)

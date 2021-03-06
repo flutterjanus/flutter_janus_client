@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/Plugin.dart';
 import 'dart:async';
 
 class VideoRoomV2 extends StatefulWidget {
@@ -38,10 +37,6 @@ class _VideoRoomState extends State<VideoRoomV2> {
   }
 
   _newRemoteFeed(feed) async {
-    setState(() {
-      remoteRenderers[feed] = new RTCVideoRenderer();
-    });
-    await remoteRenderers[feed].initialize();
     print('remote plugin attached');
 
     await session.attach(JanusPlugins.VIDEO_ROOM).then((value) {
@@ -58,16 +53,12 @@ class _VideoRoomState extends State<VideoRoomV2> {
     };
     subscriberHandles[feed].webRTCHandle.peerConnection.onAddStream =
         (stream) async {
-
       print('remote stream recieved');
-      print(stream.getTracks().length.toString() + ' Tracks Found!');
-      if(!remoteRenderers[feed].renderVideo){
         setState(() {
           remoteRenderers[feed] = new RTCVideoRenderer();
         });
         await remoteRenderers[feed].initialize();
         remoteRenderers[feed].srcObject = stream;
-      }
 
     };
     subscriberHandles[feed].webRTCHandle.peerConnection.onRemoveStream =
@@ -75,13 +66,12 @@ class _VideoRoomState extends State<VideoRoomV2> {
 
       print('remote stream recieved');
       print(stream.getTracks().length.toString() + ' Tracks Found!');
-      if(!remoteRenderers[feed].renderVideo){
+
         setState(() {
           remoteRenderers[feed] = new RTCVideoRenderer();
         });
         await remoteRenderers[feed].initialize();
         remoteRenderers[feed].srcObject = stream;
-      }
 
     };
     await subscriberHandles[feed].send(data: register);
@@ -105,13 +95,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
           if (data != null) {
             if (data['videoroom'] == 'attached') {
               print('setting subscriber loop');
-              // var body = {"request": "start", "room": 1234};
-              // await subscriberHandles[feed].send(
-              //     data: body,
-              //     jsep: await subscriberHandles[feed].createAnswer(offerOptions:{
-              //       "offerToReceiveAudio": false,
-              //       "offerToReceiveVideo": false
-              //     }));
+
             }
           }
         }
@@ -145,9 +129,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
     print('got handleId');
     print(plugin.handleId);
     _localRenderer.srcObject = await plugin.initializeMediaDevices();
-    // plugin.localMediaStream.listen((event) {
-    //   _localRenderer.srcObject = event;
-    // });
+
     var register = {
       "request": "join",
       "ptype": "publisher",
@@ -189,6 +171,14 @@ class _VideoRoomState extends State<VideoRoomV2> {
       }
     });
   }
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    plugin.dispose();
+    session.dispose();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,6 +213,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
                   // element.value.srcObject = null;
                   await element.value.dispose();
                   remoteRenderers.remove(element.key);
+
                 });
               }),
           IconButton(
@@ -238,25 +229,29 @@ class _VideoRoomState extends State<VideoRoomV2> {
         ],
         title: const Text('janus_client'),
       ),
-      body: Stack(children: [
-        GridView.count(
-          crossAxisCount: 2,
-          children: [
-            RTCVideoView(
-              _localRenderer,
+      body:  GridView.count(
+        crossAxisCount: 2,
+        shrinkWrap: true,
+
+        childAspectRatio: 1,
+        crossAxisSpacing:30,
+        mainAxisSpacing: 30,
+        children: [
+
+          RTCVideoView(
+            _localRenderer,
+            mirror: true,
+            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+          ),
+          ...remoteRenderers.entries.map((e) {
+            return RTCVideoView(
+              e.value,
               mirror: true,
               objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-            ),
-            ...remoteRenderers.entries.map((e) {
-              return RTCVideoView(
-                e.value,
-                mirror: true,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-              );
-            }).toList()
-          ],
-        )
-      ]),
+            );
+          }).toList()
+        ],
+      )
     );
   }
 }

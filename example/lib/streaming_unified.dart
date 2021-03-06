@@ -3,6 +3,7 @@ import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/conf.dart';
 
 class StreamingUnified extends StatefulWidget {
   @override
@@ -10,16 +11,17 @@ class StreamingUnified extends StatefulWidget {
 }
 
 class _StreamingUnifiedState extends State<StreamingUnified> {
-  JanusClient janusClient = JanusClient(iceServers: [
-    RTCIceServer(
-        url: "turn:40.85.216.95:3478",
-        username: "onemandev",
-        credential: "SecureIt")
-  ], server: [
-    'https://janus.conf.meetecho.com/janus',
-    'wss://janus.conf.meetecho.com/ws',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt", isUnifiedPlan: true);
+  JanusClient janusClient = JanusClient(
+      iceServers: [
+        RTCIceServer(
+            url: "turn:40.85.216.95:3478",
+            username: "onemandev",
+            credential: "SecureIt")
+      ],
+      server: servers,
+      withCredentials: true,
+      apiSecret: "SecureIt",
+      isUnifiedPlan: true);
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
@@ -35,13 +37,7 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
     var body = {"request": "list"};
     publishVideo.send(
         message: body,
-        onSuccess: () {
-          print("listing");
-        },
-        onError: (e) {
-          print('got error in listing');
-          print(e);
-        });
+        );
   }
 
   @override
@@ -81,47 +77,49 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
               showDialog(
                   context: context,
                   barrierDismissible: false,
-                  child: StatefulBuilder(builder: (context, setstate) {
-                    _setState = setstate;
-                    _setState(() {
-                      streams = plugindata['data']['list'];
-                    });
+                  builder: (context) {
+                    return StatefulBuilder(builder: (context, setstate) {
+                      _setState = setstate;
+                      _setState(() {
+                        streams = plugindata['data']['list'];
+                      });
 
-                    return AlertDialog(
-                      title: Text("Choose Stream To Play"),
-                      content: Column(
-                        children: [
-                          DropdownButtonFormField(
-                              isExpanded: true,
-                              value: selectedStreamId,
-                              items: List.generate(
-                                  streams.length,
-                                  (index) => DropdownMenuItem(
-                                      value: streams[index]['id'],
-                                      child:
-                                          Text(streams[index]['description']))),
-                              onChanged: (v) {
-                                _setState(() {
-                                  selectedStreamId = v;
+                      return AlertDialog(
+                        title: Text("Choose Stream To Play"),
+                        content: Column(
+                          children: [
+                            DropdownButtonFormField(
+                                isExpanded: true,
+                                value: selectedStreamId,
+                                items: List.generate(
+                                    streams.length,
+                                    (index) => DropdownMenuItem(
+                                        value: streams[index]['id'],
+                                        child: Text(
+                                            streams[index]['description']))),
+                                onChanged: (v) {
+                                  _setState(() {
+                                    selectedStreamId = v;
+                                  });
+                                }),
+                            RaisedButton(
+                              color: Colors.green,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                publishVideo.send(message: {
+                                  "request": "watch",
+                                  "id": selectedStreamId,
+                                  "offer_audio": true,
+                                  "offer_video": true,
                                 });
-                              }),
-                          RaisedButton(
-                            color: Colors.green,
-                            textColor: Colors.white,
-                            onPressed: () {
-                              publishVideo.send(message: {
-                                "request": "watch",
-                                "id": selectedStreamId,
-                                "offer_audio": true,
-                                "offer_video": true,
-                              });
-                            },
-                            child: Text("Play"),
-                          )
-                        ],
-                      ),
-                    );
-                  }));
+                              },
+                              child: Text("Play"),
+                            )
+                          ],
+                        ),
+                      );
+                    });
+                  });
             }
 
             if (jsep != null) {
@@ -186,9 +184,10 @@ class _StreamingUnifiedState extends State<StreamingUnified> {
                           onPressed: () {
                             publishVideo.send(
                                 message: {"request": "stop"},
-                                onSuccess: () async {
-                                  await cleanUpAndBack();
-                                });
+                                );
+                            // onSuccess: () async {
+                            //   await cleanUpAndBack();
+                            // }
                           })),
                   padding: EdgeInsets.all(10),
                 ),

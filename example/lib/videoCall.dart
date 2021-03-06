@@ -3,6 +3,7 @@ import 'package:janus_client/Plugin.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:janus_client/utils.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/conf.dart';
 
 class VideoCallExample extends StatefulWidget {
   @override
@@ -19,10 +20,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
         url: "turn:40.85.216.95:3478",
         username: "onemandev",
         credential: "SecureIt")
-  ], server: [
-    'wss://janus.conf.meetecho.com/ws',
-    'wss://janus.onemandev.tech/janus/websocket',
-  ], withCredentials: true, apiSecret: "SecureIt");
+  ], server: servers, withCredentials: true, apiSecret: "SecureIt");
   Plugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
@@ -47,13 +45,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     publishVideo.send(
         message: body,
         jsep: offerToCall,
-        onSuccess: () {
-          print("Calling");
-        },
-        onError: (e) {
-          print('got error in calling');
-          print(e);
-        });
+        );
     nameController.text = "";
   }
 
@@ -61,54 +53,57 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        child: AlertDialog(
-          title: Text("Register As"),
-          content: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: "Your Name"),
-                controller: nameController,
-              ),
-              RaisedButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                onPressed: () {
-                  registerUser(nameController.text);
-                },
-                child: Text("Proceed"),
-              )
-            ],
-          ),
-        ));
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Register As"),
+            content: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(labelText: "Your Name"),
+                  controller: nameController,
+                ),
+                RaisedButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    registerUser(nameController.text);
+                  },
+                  child: Text("Proceed"),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   makeCallDialog() {
     showDialog(
         context: context,
         barrierDismissible: false,
-        child: AlertDialog(
-          title: Text("Call Registered User or wait for user to call you"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                decoration: InputDecoration(
-                    labelText: "Name Of Registered User to call"),
-                controller: nameController,
-              ),
-              RaisedButton(
-                color: Colors.green,
-                textColor: Colors.white,
-                onPressed: () {
-                  makeCall();
-
-                },
-                child: Text("Call"),
-              )
-            ],
-          ),
-        ));
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Call Registered User or wait for user to call you"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(
+                      labelText: "Name Of Registered User to call"),
+                  controller: nameController,
+                ),
+                RaisedButton(
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  onPressed: () {
+                    makeCall();
+                  },
+                  child: Text("Call"),
+                )
+              ],
+            ),
+          );
+        });
   }
 
   @override
@@ -140,11 +135,11 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   var peer = result["username"];
                   if (peer != null) {
                     debugPrint("Call started!");
-                  } else {
-                  }
+                  } else {}
                   // Video call can start
-                  if (jsep != null){ publishVideo.handleRemoteJsep(jsep);
-                  Navigator.of(context).pop();
+                  if (jsep != null) {
+                    publishVideo.handleRemoteJsep(jsep);
+                    Navigator.of(context).pop();
                   }
                 } else if (event == 'incomingcall') {
                   Navigator.pop(context);
@@ -154,8 +149,9 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   _localRenderer.srcObject =
                       await publishVideo.initializeMediaDevices();
 
-                  if (jsep != null) {publishVideo.handleRemoteJsep(jsep);
-                  Navigator.of(context).pop();
+                  if (jsep != null) {
+                    publishVideo.handleRemoteJsep(jsep);
+                    Navigator.of(context).pop();
                   }
                   // Notify user
                   var offer = await publishVideo.createAnswer();
@@ -163,9 +159,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                   publishVideo.send(
                       message: body,
                       jsep: offer,
-                      onSuccess: () {
-                        print('call connected');
-                      });
+                      );
                   // print(publishVideo.webRTCHandle.pc.);
                 } else if (event == 'hangup') {
                   await destroy();
@@ -185,18 +179,19 @@ class _VideoCallExampleState extends State<VideoCallExample> {
   registerUser(userName) {
     if (publishVideo != null) {
       publishVideo.send(
-          message: {"request": "register", "username": userName},
-          onSuccess: () {
-            print("User registered");
-            nameController.text = "";
-            Navigator.pop(context);
-            makeCallDialog();
-          },
-          onError: (error) {
-            print(error);
-          });
+          message: {"request": "register", "username": userName});
+    //   onSuccess: () {
+    //     print("User registered");
+    //     nameController.text = "";
+    //     Navigator.pop(context);
+    //     makeCallDialog();
+    //   },
+    // onError: (error) {
+    // print(error);
+    // }
     }
   }
+
   destroy() async {
     await publishVideo.destroy();
     janusClient.destroy();
@@ -206,6 +201,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
     }
     Navigator.of(context).pop();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,8 +252,7 @@ class _VideoCallExampleState extends State<VideoCallExample> {
                     onPressed: () {
                       publishVideo.send(
                           message: {'request': 'hangup'},
-                          onSuccess: () async {
-                          });
+                      );
                     })),
             padding: EdgeInsets.all(10),
           ),

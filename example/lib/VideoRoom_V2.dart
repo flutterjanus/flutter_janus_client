@@ -124,7 +124,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
     print('got handleId');
     print(plugin.handleId);
     _localRenderer.srcObject =
-        await plugin.initializeMediaDevices(mediaConstraints: {'audio': true});
+        await plugin.initializeMediaDevices();
 
     var register = {
       "request": "join",
@@ -171,7 +171,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
             if (data['videoroom'] == 'joined') {
               print('user joined configuring video stream');
               myId = data['id'];
-              var publish = {"request": "publish", "bitrate": 20000};
+              var publish = {"request": "publish", "bitrate": 1000000};
               RTCSessionDescription offer = await plugin.createOffer(
                   offerToReceiveAudio: true, offerToReceiveVideo: true);
               print(await plugin.send(data: publish, jsep: offer));

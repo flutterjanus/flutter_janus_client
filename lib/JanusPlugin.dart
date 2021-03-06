@@ -260,17 +260,19 @@ class JanusPlugin {
     if (mediaConstraints == null) {
       mediaConstraints = {
         "audio": true,
-        "video": {
-          "mandatory": {
-            "minWidth":
-                '1280', // Provide your own width, height and frame rate here
-            "minHeight": '720',
-            "minFrameRate": '60',
-          },
-          "facingMode": "user",
-          "optional": [],
-        }
+        "video":true
       };
+
+    //   {
+    //     "mandatory": {
+    // "minWidth":
+    // '1280', // Provide your own width, height and frame rate here
+    // "minHeight": '720',
+    // "minFrameRate": '60',
+    // },
+    // "facingMode": "user",
+    // "optional": [],
+    // }
     }
     if (webRTCHandle != null) {
       webRTCHandle.localStream =

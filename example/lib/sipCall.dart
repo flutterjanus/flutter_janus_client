@@ -118,8 +118,8 @@ class _SipCallState extends State<SipCall> {
 
   call(phone) async {
     try {
-      RTCSessionDescription offer =
-          await pluginHandle.createOffer(offerToReceiveVideo: false);
+      RTCSessionDescription offer = await pluginHandle.createOffer(
+          offerToReceiveVideo: false, offerToReceiveAudio: true);
       // [sip-server] value need to be replaced
       var call = {"request": "call", "uri": "sip:" + phone + "@[sip-server]"};
       pluginHandle.send(message: call, jsep: offer);

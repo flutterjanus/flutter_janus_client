@@ -111,6 +111,11 @@ class JanusClient {
   }
 
   /*
+  * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
+  * */
+  String get dataChannelDefaultLabel => "JanusDataChannel";
+
+  /*
   * private method for posting data to janus by using http client
   * */
   Future<dynamic> _postRestClient(bod, {int handleId}) async {
@@ -120,9 +125,9 @@ class JanusClient {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    var response =
-        (await http.post(_currentJanusUri + suffixUrl, body: stringify(bod)))
-            .body;
+    var response = (await http.post(Uri.parse(_currentJanusUri + suffixUrl),
+            body: stringify(bod)))
+        .body;
     print(response);
     return parse(response);
   }
@@ -137,7 +142,8 @@ class JanusClient {
     } else if (_sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$_sessionId/$handleId";
     }
-    return parse((await http.get(_currentJanusUri + suffixUrl)).body);
+    return parse(
+        (await http.get(Uri.parse(_currentJanusUri + suffixUrl))).body);
   }
 
   /*private method that tries to establish rest connection with janus server,
@@ -285,11 +291,8 @@ class JanusClient {
 
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
-    WebRTCHandle webRTCHandle = WebRTCHandle(
-      iceServers: iceServers,
-    );
+    WebRTCHandle webRTCHandle = WebRTCHandle(peerConnection: peerConnection);
     webRTCHandle.dataChannel = {};
-    webRTCHandle.pc = peerConnection;
     plugin.webRTCHandle = webRTCHandle;
     plugin.apiSecret = apiSecret;
     plugin.sessionId = _sessionId;
@@ -315,7 +318,7 @@ class JanusClient {
         plugin.onRemoteTrack(event.streams[0], event.track, mid, true);
         if (event.track.onEnded == null) return;
 
-        if (webRTCHandle.pc.receivers != null) {
+        if (webRTCHandle.peerConnection.receivers != null) {
           var receiverStreams = null;
           // if(event.track.kind == "audio" && webRTCHandle.pc.receivers.first.track["audio"]) {
           //   receiverStreams = event.receiver.createEncodedAudioStreams();
@@ -535,12 +538,12 @@ class JanusClient {
       debugPrint("Got a trickled candidate on session " + sessionId.toString());
       debugPrint(candidate.toString());
       var config = pluginHandle.webRTCHandle;
-      if (config.pc != null) {
+      if (config.peerConnection != null) {
         // Add candidate right now
         debugPrint("Adding remote candidate:" + candidate.toString());
         if (candidate.containsKey("sdpMid") &&
             candidate.containsKey("sdpMLineIndex")) {
-          config.pc.addCandidate(RTCIceCandidate(candidate["candidate"],
+          config.peerConnection.addCandidate(RTCIceCandidate(candidate["candidate"],
               candidate["sdpMid"], candidate["sdpMLineIndex"]));
         }
       } else {

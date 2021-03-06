@@ -166,7 +166,7 @@ class _AudioRoomState extends State<AudioRoom> {
                 }
                 if (event == 'joined') {
                   RTCSessionDescription offer = await pluginHandle.createOffer(
-                      offerOptions: {"offerToReceiveVideo": false});
+                      offerToReceiveVideo: false,offerToReceiveAudio: true);
                   var publish = {"request": "configure", "muted": false};
                   pluginHandle.send(message: publish, jsep: offer);
                 }

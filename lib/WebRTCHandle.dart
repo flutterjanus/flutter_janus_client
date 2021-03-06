@@ -19,7 +19,7 @@ class WebRTCHandle {
   dynamic mediaConstraints;
   RTCPeerConnection pc;
 
-  Map<dynamic, RTCDataChannel> dataChannel = {};
+  Map<String, RTCDataChannel> dataChannel = {};
   bool trickle;
   bool iceDone;
   Map<dynamic, dynamic> volume;

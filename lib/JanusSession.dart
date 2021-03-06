@@ -80,6 +80,7 @@ class JanusSession {
       print('using rest transport for creating plugin handle');
       RestJanusTransport rest = (transport as RestJanusTransport);
       response = await rest.post(request);
+      print(response);
       if (response.containsKey('janus') && response.containsKey('data')) {
         handleId = response['data']['id'];
         rest.sessionId = sessionId;

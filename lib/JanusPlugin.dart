@@ -25,11 +25,15 @@ class JanusPlugin {
   JanusSession session;
   Stream<dynamic> events;
   Stream<dynamic> messages;
+  Stream<RemoteTrack> remoteTrack;
+  Stream<MediaStream> remoteStream;
+  Stream<MediaStream> localStream;
+  StreamController<MediaStream> _localStreamController;
+  StreamController<RemoteTrack> _remoteTrackStreamController;
+  StreamController<MediaStream> _remoteStreamController;
   StreamController<dynamic> _streamController;
   StreamController<dynamic> _messagesStreamController;
 
-  Stream<MediaStream> localMediaStream;
-  StreamController<MediaStream> _localMediaStreamController;
   int _pollingRetries = 0;
   Timer pollingTimer;
   JanusWebRTCHandle webRTCHandle;
@@ -114,12 +118,19 @@ class JanusPlugin {
     //source and stream for session level events
     _streamController = StreamController<dynamic>();
     events = _streamController.stream.asBroadcastStream();
-    //source and stream for localMediaStreams
-    _localMediaStreamController = StreamController<MediaStream>();
-    localMediaStream = _localMediaStreamController.stream.asBroadcastStream();
+    //source and stream for localStream
+    _localStreamController = StreamController<MediaStream>();
+    localStream = _localStreamController.stream.asBroadcastStream();
     //source and stream for plugin level events
     _messagesStreamController = StreamController<dynamic>();
     messages = _messagesStreamController.stream.asBroadcastStream();
+
+    // remote track for unified plan support
+    _remoteTrackStreamController = StreamController<RemoteTrack>();
+    remoteTrack = _remoteTrackStreamController.stream.asBroadcastStream();
+    // remote MediaStream plan-b
+    _remoteStreamController = StreamController<MediaStream>();
+    remoteStream = _remoteStreamController.stream.asBroadcastStream();
 
     //filter and only send events for this handleId
     events.where((event) {
@@ -140,20 +151,66 @@ class JanusPlugin {
           ? context.iceServers.map((e) => e.toMap()).toList()
           : []
     };
-    configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
     if (context.isUnifiedPlan) {
       configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
+    } else {
+      configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
     }
-
+    print('peer connection configuration');
+    print(configuration);
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
+    if (context.isUnifiedPlan) {
+      peerConnection.onTrack = (RTCTrackEvent event) async {
+        if (event.streams == null || event.transceiver == null) return;
+        var mid =
+            event.transceiver != null ? event.transceiver.mid : event.track.id;
 
-    // source for onLocalStream
+        _remoteTrackStreamController.add(RemoteTrack(
+            stream: event.streams.where((element) => element != null).first,
+            track: event.track,
+            mid: mid,
+            flowing: true));
+        if (event.track != null) {
+          // if (event.track != null && event.track.onEnded == null) return;
+          event.track.onEnded = () async {
+            if (webRTCHandle.remoteStream != null) {
+              webRTCHandle.remoteStream.removeTrack(event.track);
+              var mid = event.track.id;
+              var transceiver = (await peerConnection.transceivers).firstWhere(
+                  (element) => element.receiver.track == event.track);
+              mid = transceiver.mid;
+              _remoteTrackStreamController.add(RemoteTrack(
+                  stream:
+                      event.streams.where((element) => element != null).first,
+                  track: event.track,
+                  mid: mid,
+                  flowing: false));
+            }
+          };
+
+          event.track.onMute = () async {
+            if (webRTCHandle.remoteStream != null) {
+              webRTCHandle.remoteStream.removeTrack(event.track);
+              var mid = event.track.id;
+              var transceiver = (await peerConnection.transceivers).firstWhere(
+                  (element) => element.receiver.track == event.track);
+              mid = transceiver.mid;
+              _remoteTrackStreamController.add(RemoteTrack(
+                  stream:
+                      event.streams.where((element) => element != null).first,
+                  track: event.track,
+                  mid: mid,
+                  flowing: false));
+            }
+          };
+        }
+      };
+    }
+
+    // source for onRemoteStream
     peerConnection.onAddStream = (mediaStream) {
-      _localMediaStreamController.sink.add(mediaStream);
-    };
-    peerConnection.onRemoveStream = (mediaStream) {
-      // _mediaStreamController.sink.add(mediaStream);
+      _remoteStreamController.sink.add(mediaStream);
     };
     // get ice candidates and send to janus on this plugin handle
     peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
@@ -207,11 +264,17 @@ class JanusPlugin {
     if (_streamController != null) {
       _streamController.close();
     }
+    if (_remoteStreamController != null) {
+      _remoteStreamController.close();
+    }
     if (_messagesStreamController != null) {
       _messagesStreamController.close();
     }
-    if (_localMediaStreamController != null) {
-      _localMediaStreamController.close();
+    if (_localStreamController != null) {
+      _localStreamController.close();
+    }
+    if (_remoteTrackStreamController != null) {
+      _remoteTrackStreamController.close();
     }
     if (_wsStreamSubscription != null) {
       _wsStreamSubscription.cancel();
@@ -258,26 +321,36 @@ class JanusPlugin {
   Future<MediaStream> initializeMediaDevices(
       {Map<String, dynamic> mediaConstraints}) async {
     if (mediaConstraints == null) {
+      List<MediaDeviceInfo> audioDevices = await Helper.audiooutputs;
+      List<MediaDeviceInfo> videoDevices = await Helper.cameras;
       mediaConstraints = {
-        "audio": true,
-        "video":true
+        "audio": audioDevices.length > 0,
+        "video": videoDevices.length > 0
       };
 
-    //   {
-    //     "mandatory": {
-    // "minWidth":
-    // '1280', // Provide your own width, height and frame rate here
-    // "minHeight": '720',
-    // "minFrameRate": '60',
-    // },
-    // "facingMode": "user",
-    // "optional": [],
-    // }
+      //   {
+      //     "mandatory": {
+      // "minWidth":
+      // '1280', // Provide your own width, height and frame rate here
+      // "minHeight": '720',
+      // "minFrameRate": '60',
+      // },
+      // "facingMode": "user",
+      // "optional": [],
+      // }
     }
     if (webRTCHandle != null) {
       webRTCHandle.localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      webRTCHandle.peerConnection.addStream(webRTCHandle.localStream);
+      if (context.isUnifiedPlan) {
+        webRTCHandle.localStream.getTracks().forEach((element) {
+          webRTCHandle.peerConnection
+              .addTrack(element, webRTCHandle.localStream);
+        });
+      } else {
+        _localStreamController.sink.add(webRTCHandle.localStream);
+        await webRTCHandle.peerConnection.addStream(webRTCHandle.localStream);
+      }
       return webRTCHandle.localStream;
     } else {
       print("error webrtchandle cant be null");
@@ -302,42 +375,40 @@ class JanusPlugin {
       bool offerToReceiveVideo = true}) async {
     if (context.isUnifiedPlan) {
       await prepareTranscievers(true);
-    } else {
-      var offerOptions = {
-        "offerToReceiveAudio": offerToReceiveAudio,
-        "offerToReceiveVideo": offerToReceiveVideo
-      };
-      // print(offerOptions);
-      RTCSessionDescription offer =
-          await webRTCHandle.peerConnection.createOffer(offerOptions);
-      await webRTCHandle.peerConnection.setLocalDescription(offer);
-      return offer;
     }
+    var offerOptions = {
+      "offerToReceiveAudio": offerToReceiveAudio,
+      "offerToReceiveVideo": offerToReceiveVideo
+    };
+    RTCSessionDescription offer =
+        await webRTCHandle.peerConnection.createOffer(offerOptions);
+    await webRTCHandle.peerConnection.setLocalDescription(offer);
+    return offer;
   }
 
-  Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
+  Future<RTCSessionDescription> createAnswer(
+      {bool offerToReceiveAudio = true,
+      bool offerToReceiveVideo = true}) async {
     if (context.isUnifiedPlan) {
       print('using transrecievers');
       await prepareTranscievers(false);
-    } else {
-      try {
-        if (offerOptions == null) {
-          offerOptions = {
-            "offerToReceiveAudio": true,
-            "offerToReceiveVideo": true
-          };
-        }
-        RTCSessionDescription offer =
-            await webRTCHandle.peerConnection.createAnswer(offerOptions);
-        await webRTCHandle.peerConnection.setLocalDescription(offer);
-        return offer;
-      } catch (e) {
-        RTCSessionDescription offer =
-            await webRTCHandle.peerConnection.createAnswer(offerOptions);
-        await webRTCHandle.peerConnection.setLocalDescription(offer);
-      }
     }
-//    handling kstable exception most ugly way but currently there's no other workaround, it just works
+    var offerOptions = {
+      "offerToReceiveAudio": offerToReceiveAudio,
+      "offerToReceiveVideo": offerToReceiveVideo
+    };
+    try {
+      RTCSessionDescription offer =
+          await webRTCHandle.peerConnection.createAnswer(offerOptions);
+      await webRTCHandle.peerConnection.setLocalDescription(offer);
+      return offer;
+    } catch (e) {
+      //    handling kstable exception most ugly way but currently there's no other workaround, it just works
+      RTCSessionDescription offer =
+          await webRTCHandle.peerConnection.createAnswer(offerOptions);
+      await webRTCHandle.peerConnection.setLocalDescription(offer);
+      return offer;
+    }
   }
 
   Future<void> initDataChannel({RTCDataChannelInit rtcDataChannelInit}) async {
@@ -389,6 +460,7 @@ class JanusPlugin {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
     var transceivers = await webRTCHandle.peerConnection.transceivers;
+    print(transceivers);
     if (transceivers != null && transceivers.length > 0) {
       transceivers.forEach((t) {
         if ((t.sender != null &&
@@ -414,7 +486,7 @@ class JanusPlugin {
       });
     }
     if (audioTransceiver != null && audioTransceiver.setDirection != null) {
-      audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+      await audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
     } else {
       audioTransceiver = await webRTCHandle.peerConnection.addTransceiver(
           track: null,
@@ -423,10 +495,10 @@ class JanusPlugin {
               direction: offer
                   ? TransceiverDirection.SendOnly
                   : TransceiverDirection.RecvOnly,
-              streams: new List()));
+              streams: []));
     }
     if (videoTransceiver != null && videoTransceiver.setDirection != null) {
-      videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+      await videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
     } else {
       videoTransceiver = await webRTCHandle.peerConnection.addTransceiver(
           track: null,
@@ -435,7 +507,7 @@ class JanusPlugin {
               direction: offer
                   ? TransceiverDirection.SendOnly
                   : TransceiverDirection.RecvOnly,
-              streams: new List()));
+              streams: []));
     }
   }
 

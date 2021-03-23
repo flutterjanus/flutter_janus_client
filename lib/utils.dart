@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:math' as Math;
 import 'dart:convert' as conv;
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';
 
 class RTCIceServer {
@@ -68,6 +69,77 @@ class RTCIceServer {
   }
 
 //</editor-fold>
+}
+
+class RemoteTrack{
+  MediaStream stream;
+  MediaStreamTrack track;
+  String mid;
+  bool flowing;
+
+//<editor-fold desc="Data Methods" defaultstate="collapsed">
+
+  RemoteTrack({
+    @required this.stream,
+    @required this.track,
+    @required this.mid,
+    @required this.flowing,
+  });
+
+  RemoteTrack copyWith({
+    MediaStream stream,
+    MediaStreamTrack track,
+    String mid,
+    bool flowing,
+  }) {
+    return new RemoteTrack(
+      stream: stream ?? this.stream,
+      track: track ?? this.track,
+      mid: mid ?? this.mid,
+      flowing: flowing ?? this.flowing,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'RemoteTrack{stream: $stream, track: $track, mid: $mid, flowing: $flowing}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RemoteTrack &&
+          runtimeType == other.runtimeType &&
+          stream == other.stream &&
+          track == other.track &&
+          mid == other.mid &&
+          flowing == other.flowing);
+
+  @override
+  int get hashCode =>
+      stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
+
+  factory RemoteTrack.fromMap(Map<String, dynamic> map) {
+    return new RemoteTrack(
+      stream: map['stream'] as MediaStream,
+      track: map['track'] as MediaStreamTrack,
+      mid: map['mid'] as String,
+      flowing: map['flowing'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    // ignore: unnecessary_cast
+    return {
+      'stream': this.stream,
+      'track': this.track,
+      'mid': this.mid,
+      'flowing': this.flowing,
+    } as Map<String, dynamic>;
+  }
+
+//</editor-fold>
+
 }
 
 Uuid getUuid(){

@@ -22,9 +22,9 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
-**Audio Bridge example ready with V2 API**
-**Supports WEB aswell**
-**Video Room Example ready with V2  API**
+- Audio Bridge example ready with V2 API
+- Supports WEB aswell
+- Video Room Example ready with V2  API
 
 ## status
 | Feature           | Support | Well Tested | Unified Plan |

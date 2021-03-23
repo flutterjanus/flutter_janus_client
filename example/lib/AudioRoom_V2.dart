@@ -144,9 +144,9 @@ class _AudioRoomState extends State<AudioRoomV2> {
       _remoteRenderer.srcObject = event;
     });
     pluginHandle.messages.listen((msg) async {
-      if (msg['plugindata'] != null) {
-        if (msg['plugindata']['data'] != null) {
-          var data = msg['plugindata']['data'];
+      if (msg.event['plugindata'] != null) {
+        if (msg.event['plugindata']['data'] != null) {
+          var data = msg.event['plugindata']['data'];
           if (data['audiobridge'] == 'joined') {
             RTCSessionDescription offer = await pluginHandle.createOffer(
                 offerToReceiveVideo: false, offerToReceiveAudio: true);
@@ -164,11 +164,11 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       talking: element['talking']);
                 }).toList();
                 temp.forEach((element) {
-                  var existingIndex=participants.indexWhere((eleme) => eleme.id==element.id);
-                  if(existingIndex>-1){
-                    participants[existingIndex]=element;
-                  }
-                  else{
+                  var existingIndex = participants
+                      .indexWhere((eleme) => eleme.id == element.id);
+                  if (existingIndex > -1) {
+                    participants[existingIndex] = element;
+                  } else {
                     participants.add(element);
                   }
                 });
@@ -188,11 +188,11 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       talking: element['talking']);
                 }).toList();
                 temp.forEach((element) {
-                  var existingIndex=participants.indexWhere((eleme) => eleme.id==element.id);
-                  if(existingIndex>-1){
-                    participants[existingIndex]=element;
-                  }
-                  else{
+                  var existingIndex = participants
+                      .indexWhere((eleme) => eleme.id == element.id);
+                  if (existingIndex > -1) {
+                    participants[existingIndex] = element;
+                  } else {
                     participants.add(element);
                   }
                 });
@@ -207,34 +207,10 @@ class _AudioRoomState extends State<AudioRoomV2> {
           }
         }
       }
-      if (msg['jsep'] != null) {
+      if (msg.jsep != null) {
         print('got remote jsep');
-        await pluginHandle.handleRemoteJsep(msg['jsep']);
+        await pluginHandle.handleRemoteJsep(msg.jsep);
       }
-      //     var event = msg["audiobridge"];
-      //     if (event != null && event == 'joined' || event == 'event') {
-      //       var participant = msg['participants'];
-      //       var data = msg['data'];
-      //       if (data != null) {
-
-      //       } else {
-
-      //       }
-      //       if (event == 'joined') {
-
-      //       }
-      //     }
-      //
-      //     if (msg['jsep'] != null) {
-      //       debugPrint('handling jsep');
-      //
-      //     }
-      //
-      //
-      //   }
-      // }
-
-      print(msg);
     });
   }
 

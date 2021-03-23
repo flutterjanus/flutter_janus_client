@@ -6,6 +6,61 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';
 
+class EventMessage{
+  dynamic event;
+  RTCSessionDescription jsep;
+
+//<editor-fold desc="Data Methods" defaultstate="collapsed">
+
+  EventMessage({
+    @required this.event,
+    @required this.jsep,
+  });
+
+  EventMessage copyWith({
+    dynamic event,
+    RTCSessionDescription jsep,
+  }) {
+    return new EventMessage(
+      event: event ?? this.event,
+      jsep: jsep ?? this.jsep,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'EventMessage{event: $event, jsep: $jsep}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventMessage &&
+          runtimeType == other.runtimeType &&
+          event == other.event &&
+          jsep == other.jsep);
+
+  @override
+  int get hashCode => event.hashCode ^ jsep.hashCode;
+
+  factory EventMessage.fromMap(Map<String, dynamic> map) {
+    return new EventMessage(
+      event: map['event'] as dynamic,
+      jsep: map['jsep'] as RTCSessionDescription,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    // ignore: unnecessary_cast
+    return {
+      'event': this.event,
+      'jsep': this.jsep,
+    } as Map<String, dynamic>;
+  }
+
+//</editor-fold>
+
+}
 class RTCIceServer {
   String username;
   String credential;

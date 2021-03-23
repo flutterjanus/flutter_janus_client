@@ -96,16 +96,16 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     subscriberHandle.messages.listen((msg) async {
       print('subscriber event');
       print(msg);
-      if (msg['janus'] == 'event') {
-        if (msg['jsep'] != null) {
-          await subscriberHandle.handleRemoteJsep(msg['jsep']);
+      if (msg.event['janus'] == 'event') {
+        if (msg.jsep != null) {
+          await subscriberHandle.handleRemoteJsep(msg.jsep);
           var body = {"request": "start", "room": 1234};
           await subscriberHandle.send(
               data: body,
               jsep: await subscriberHandle.createAnswer(
                   offerToReceiveAudio: false, offerToReceiveVideo: false));
         }
-        var pluginData = msg['plugindata'];
+        var pluginData = msg.event['plugindata'];
         if (pluginData != null) {
           Map<String, dynamic> data = pluginData['data'];
           if (data != null) {
@@ -154,12 +154,12 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
       print('on message');
       print(msg);
 
-      if (msg['janus'] == 'event') {
-        if (msg['jsep'] != null) {
+      if (msg.event['janus'] == 'event') {
+        if (msg.jsep != null) {
           print('handling sdp');
           // await plugin.handleRemoteJsep(msg['jsep']);
         }
-        var pluginData = msg['plugindata'];
+        var pluginData = msg.event['plugindata'];
         if (pluginData != null) {
           var data = pluginData['data'];
           if (data != null) {

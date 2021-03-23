@@ -17,17 +17,14 @@ For more info visit
 
 
 
-**please note:-Although all features are working as expected but testing of api is still not complete please consider testing out this plugin so that this plugin can be production ready**
-
 # Video Call Sample
 <a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
                                             width='300' height='600'></a>
 
 ## News & Updates
+**Audio Bridge example ready with V2 API**
 **Supports WEB aswell**
-**Video Room Example Ready With V2  API**
-**Audio Bridge tested with raw ui**  
-**Streaming plugin now supports unified plan a.k.a multi-streaming support**
+**Video Room Example ready with V2  API**
 
 ## status
 | Feature           | Support | Well Tested | Unified Plan |
@@ -42,5 +39,6 @@ For more info visit
 | Text Room Plugin  | wip     | No          | wip          |
 
 # Getting Started
-[VideoRoom_V2 Example](https://github.com/shivanshtalwar0/flutter_janus_client/blob/master/example/lib/VideoRoom_V2.dart)  
+[VideoRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoRoom_V2.dart)
+[AudioRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/AudioRoom_V2.dart)  
 

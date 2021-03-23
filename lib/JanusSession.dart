@@ -99,18 +99,24 @@ class JanusSession {
         print(response);
       }
     }
-    plugin =
-        JanusPlugin(
-            plugin: pluginName,
-            transport: transport, context: context, handleId: handleId,session: this);
+    plugin = JanusPlugin(
+        plugin: pluginName,
+        transport: transport,
+        context: context,
+        handleId: handleId,
+        session: this);
     _pluginHandles[handleId] = plugin;
     await plugin.init();
     return plugin;
   }
 
   void dispose() {
-    _keepAliveTimer.cancel();
-    transport.dispose();
+    if (_keepAliveTimer != null) {
+      _keepAliveTimer.cancel();
+    }
+    if (transport != null) {
+      transport.dispose();
+    }
   }
 
   _keepAlive() {

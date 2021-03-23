@@ -68,10 +68,23 @@ class _HomeState extends State<Home> {
               },
             ),
             Divider(),
+
+            ListTile(
+              title: Text("Audio Room V2"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/audio_room_v2");
+              },
+            ),
             ListTile(
               title: Text("Video Room V2"),
               onTap: () {
                 Navigator.of(context).pushNamed("/video_room_v2");
+              },
+            ),
+            ListTile(
+              title: Text("Video Room V2 Unified"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/video_room_v2_unified");
               },
             ),
           ],

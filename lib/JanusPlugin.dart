@@ -24,7 +24,7 @@ class JanusPlugin {
   JanusTransport transport;
   JanusSession session;
   Stream<dynamic> events;
-  Stream<dynamic> messages;
+  Stream<EventMessage> messages;
   Stream<RemoteTrack> remoteTrack;
   Stream<MediaStream> remoteStream;
   Stream<MediaStream> localStream;
@@ -32,7 +32,7 @@ class JanusPlugin {
   StreamController<RemoteTrack> _remoteTrackStreamController;
   StreamController<MediaStream> _remoteStreamController;
   StreamController<dynamic> _streamController;
-  StreamController<dynamic> _messagesStreamController;
+  StreamController<EventMessage> _messagesStreamController;
 
   int _pollingRetries = 0;
   Timer pollingTimer;
@@ -142,7 +142,15 @@ class JanusPlugin {
         return false;
       }
     }).listen((event) {
-      _messagesStreamController.sink.add(event);
+      var jsep = event['jsep'];
+      if (jsep) {
+        _messagesStreamController.sink.add(EventMessage(
+            event: event,
+            jsep: RTCSessionDescription(jsep['sdp'], jsep['type'])));
+      } else {
+        _messagesStreamController.sink
+            .add(EventMessage(event: event, jsep: null));
+      }
     });
 
     // initializing WebRTC Handle

@@ -143,7 +143,7 @@ class JanusPlugin {
       }
     }).listen((event) {
       var jsep = event['jsep'];
-      if (jsep) {
+      if (jsep != null) {
         _messagesStreamController.sink.add(EventMessage(
             event: event,
             jsep: RTCSessionDescription(jsep['sdp'], jsep['type'])));

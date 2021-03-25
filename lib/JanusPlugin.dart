@@ -122,7 +122,7 @@ class JanusPlugin {
     _localStreamController = StreamController<MediaStream>();
     localStream = _localStreamController.stream.asBroadcastStream();
     //source and stream for plugin level events
-    _messagesStreamController = StreamController<dynamic>();
+    _messagesStreamController = StreamController<EventMessage>();
     messages = _messagesStreamController.stream.asBroadcastStream();
 
     // remote track for unified plan support

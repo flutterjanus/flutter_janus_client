@@ -197,6 +197,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
                             print(message);
 
                             await textRoom.sendData(stringify(message));
+                            nameController.clear();
                           },
                           icon: Icon(
                             Icons.send,

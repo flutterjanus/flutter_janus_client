@@ -48,7 +48,6 @@ class JanusClient {
   IOWebSocketChannel _webSocketChannel;
   Stream<dynamic> _webSocketStream;
   WebSocketSink _webSocketSink;
-  http.Client _httpClient;
 
   get isConnected => _connected;
 
@@ -129,19 +128,6 @@ class JanusClient {
     return parse(response);
   }
 
-  /*
-  * private method for get data to janus by using http client
-  * */
-  Future<dynamic> _getRestClient(bod, {int handleId}) async {
-    var suffixUrl = '';
-    if (_sessionId != null && handleId == null) {
-      suffixUrl = suffixUrl + "/$_sessionId";
-    } else if (_sessionId != null && handleId != null) {
-      suffixUrl = suffixUrl + "/$_sessionId/$handleId";
-    }
-    return parse(
-        (await http.get(Uri.parse(_currentJanusUri + suffixUrl))).body);
-  }
 
   /*private method that tries to establish rest connection with janus server,
    along with setting up keepLive Timer which forces janus to keep session live unless explicitly closed by destroy()*/
@@ -473,7 +459,7 @@ class JanusClient {
       });
       _pollingRetries = 0;
       _eventHandler(plugin);
-    } on HttpException catch (e) {
+    } on HttpException catch (_) {
       //   print('bloody exception');
       //   print(e);
       _pollingRetries++;

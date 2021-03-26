@@ -25,6 +25,8 @@ class JanusPlugin {
   JanusSession session;
   Stream<dynamic> events;
   Stream<EventMessage> messages;
+  Stream<RTCDataChannelMessage> data;
+  Stream<RTCDataChannelState> onData;
   Stream<RemoteTrack> remoteTrack;
   Stream<MediaStream> remoteStream;
   Stream<MediaStream> localStream;
@@ -33,6 +35,8 @@ class JanusPlugin {
   StreamController<MediaStream> _remoteStreamController;
   StreamController<dynamic> _streamController;
   StreamController<EventMessage> _messagesStreamController;
+  StreamController<RTCDataChannelMessage> _dataStreamController;
+  StreamController<RTCDataChannelState> _onDataStreamController;
 
   int _pollingRetries = 0;
   Timer pollingTimer;
@@ -44,72 +48,6 @@ class JanusPlugin {
 
   JanusPlugin(
       {this.handleId, this.context, this.transport, this.session, this.plugin});
-
-  handlePolling() async {
-    // print('_handleLongPolling');
-    if (!pollingActive) return;
-    // print('should be called if polling active and request being sent');
-    if (session.sessionId == null) {
-      pollingActive = false;
-      return;
-    }
-    try {
-      var longpoll = transport.url +
-          "/" +
-          session.sessionId.toString() +
-          "?rid=" +
-          new DateTime.now().millisecondsSinceEpoch.toString();
-      if (context.maxEvent != null)
-        longpoll = longpoll + "&maxev=" + context.maxEvent.toString();
-      if (context.token != null)
-        longpoll = longpoll + "&token=" + context.token;
-      if (context.apiSecret != null)
-        longpoll = longpoll + "&apisecret=" + context.apiSecret;
-      List<dynamic> json = parse((await http.get(Uri.parse(longpoll))).body);
-      json.forEach((element) {
-        if (!_streamController.isClosed) {
-          _streamController.add(element);
-        } else {
-          pollingActive = false;
-          // print('exiting polling');
-          return;
-        }
-      });
-      _pollingRetries = 0;
-      return;
-    } on HttpException catch (_) {
-      _pollingRetries++;
-      pollingActive = false;
-      if (_pollingRetries > 2) {
-        // Did we just lose the server? :-(
-        print("Lost connection to the server (is it down?)");
-        return;
-      }
-    } catch (e) {
-      print(e);
-      pollingActive = false;
-      print("fatal Exception");
-      return;
-    }
-    return;
-  }
-
-  Future<void> hangup() async {
-    if (pollingTimer != null) {
-      pollingTimer.cancel();
-    }
-
-    this.send(data: {"request": "leave"});
-    if (webRTCHandle != null) {
-      if (webRTCHandle.localStream != null) {
-        await webRTCHandle.localStream.dispose();
-      }
-      if (webRTCHandle.peerConnection != null) {
-        await webRTCHandle.peerConnection.close();
-      }
-    }
-    dispose();
-  }
 
   Future<void> init() async {
     if (webRTCHandle != null) {
@@ -131,6 +69,14 @@ class JanusPlugin {
     // remote MediaStream plan-b
     _remoteStreamController = StreamController<MediaStream>();
     remoteStream = _remoteStreamController.stream.asBroadcastStream();
+
+    // data channel stream contoller
+    _dataStreamController = StreamController<RTCDataChannelMessage>();
+    data = _dataStreamController.stream.asBroadcastStream();
+
+    // data channel state stream contoller
+    _onDataStreamController = StreamController<RTCDataChannelState>();
+    onData = _onDataStreamController.stream.asBroadcastStream();
 
     //filter and only send events for this handleId
     events.where((event) {
@@ -264,6 +210,72 @@ class JanusPlugin {
     }
   }
 
+  handlePolling() async {
+    // print('_handleLongPolling');
+    if (!pollingActive) return;
+    // print('should be called if polling active and request being sent');
+    if (session.sessionId == null) {
+      pollingActive = false;
+      return;
+    }
+    try {
+      var longpoll = transport.url +
+          "/" +
+          session.sessionId.toString() +
+          "?rid=" +
+          new DateTime.now().millisecondsSinceEpoch.toString();
+      if (context.maxEvent != null)
+        longpoll = longpoll + "&maxev=" + context.maxEvent.toString();
+      if (context.token != null)
+        longpoll = longpoll + "&token=" + context.token;
+      if (context.apiSecret != null)
+        longpoll = longpoll + "&apisecret=" + context.apiSecret;
+      List<dynamic> json = parse((await http.get(Uri.parse(longpoll))).body);
+      json.forEach((element) {
+        if (!_streamController.isClosed) {
+          _streamController.add(element);
+        } else {
+          pollingActive = false;
+          // print('exiting polling');
+          return;
+        }
+      });
+      _pollingRetries = 0;
+      return;
+    } on HttpException catch (_) {
+      _pollingRetries++;
+      pollingActive = false;
+      if (_pollingRetries > 2) {
+        // Did we just lose the server? :-(
+        print("Lost connection to the server (is it down?)");
+        return;
+      }
+    } catch (e) {
+      print(e);
+      pollingActive = false;
+      print("fatal Exception");
+      return;
+    }
+    return;
+  }
+
+  Future<void> hangup() async {
+    if (pollingTimer != null) {
+      pollingTimer.cancel();
+    }
+
+    this.send(data: {"request": "leave"});
+    if (webRTCHandle != null) {
+      if (webRTCHandle.localStream != null) {
+        await webRTCHandle.localStream.dispose();
+      }
+      if (webRTCHandle.peerConnection != null) {
+        await webRTCHandle.peerConnection.close();
+      }
+    }
+    dispose();
+  }
+
   void dispose() {
     this.pollingActive = false;
     if (pollingTimer != null) {
@@ -284,8 +296,46 @@ class JanusPlugin {
     if (_remoteTrackStreamController != null) {
       _remoteTrackStreamController.close();
     }
+    if (_dataStreamController != null) {
+      _dataStreamController.close();
+    }
+    if (_onDataStreamController != null) {
+      _onDataStreamController.close();
+    }
     if (_wsStreamSubscription != null) {
       _wsStreamSubscription.cancel();
+    }
+  }
+
+  Future<void> initDataChannel({RTCDataChannelInit rtcDataChannelInit}) async {
+    if (webRTCHandle.peerConnection != null) {
+      if (webRTCHandle.dataChannel[context.dataChannelDefaultLabel] != null)
+        return;
+      if (rtcDataChannelInit == null) {
+        rtcDataChannelInit = RTCDataChannelInit();
+        rtcDataChannelInit.ordered = true;
+        rtcDataChannelInit.protocol = 'janus-protocol';
+      }
+      webRTCHandle.dataChannel[context.dataChannelDefaultLabel] =
+          await webRTCHandle.peerConnection.createDataChannel(
+              context.dataChannelDefaultLabel, rtcDataChannelInit);
+      if (webRTCHandle.dataChannel[context.dataChannelDefaultLabel] != null) {
+        webRTCHandle.dataChannel[context.dataChannelDefaultLabel]
+            .onDataChannelState = (state) {
+          if (!_onDataStreamController.isClosed) {
+            _onDataStreamController.sink.add(state);
+          }
+        };
+        webRTCHandle.dataChannel[context.dataChannelDefaultLabel].onMessage =
+            (RTCDataChannelMessage message) {
+          if (!_dataStreamController.isClosed) {
+            _dataStreamController.sink.add(message);
+          }
+        };
+      }
+    } else {
+      throw Exception(
+          "You Must Initialize Peer Connection before even attempting data channel creation!");
     }
   }
 
@@ -418,32 +468,6 @@ class JanusPlugin {
     }
   }
 
-  Future<void> initDataChannel({RTCDataChannelInit rtcDataChannelInit}) async {
-    if (webRTCHandle.peerConnection != null) {
-      if (rtcDataChannelInit == null) {
-        rtcDataChannelInit = RTCDataChannelInit();
-        rtcDataChannelInit.ordered = true;
-        rtcDataChannelInit.protocol = 'janus-protocol';
-      }
-      webRTCHandle.dataChannel[context.dataChannelDefaultLabel] =
-          await webRTCHandle.peerConnection.createDataChannel(
-              context.dataChannelDefaultLabel, rtcDataChannelInit);
-      if (webRTCHandle.dataChannel[context.dataChannelDefaultLabel] != null) {
-        webRTCHandle.dataChannel[context.dataChannelDefaultLabel]
-            .onDataChannelState = (state) {
-          // onDataOpen(state);
-        };
-        webRTCHandle.dataChannel[context.dataChannelDefaultLabel].onMessage =
-            (RTCDataChannelMessage message) {
-          // onData(message);
-        };
-      }
-    } else {
-      throw Exception(
-          "You Must Initialize Peer Connection before even attempting data channel creation!");
-    }
-  }
-
   /// Send text message on existing text room using data channel with same label as specified during initDataChannel() method call.
   ///
   /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
@@ -451,11 +475,18 @@ class JanusPlugin {
     if (message != null) {
       if (webRTCHandle.peerConnection != null) {
         print('before send RTCDataChannelMessage');
-        return await webRTCHandle.dataChannel[context.dataChannelDefaultLabel]
-            .send(RTCDataChannelMessage(message));
+        if (webRTCHandle.dataChannel[context.dataChannelDefaultLabel] == null) {
+          throw Exception(
+              "You Must  call initDataChannel method! before you can send any data channel message");
+        }
+        RTCDataChannel dataChannel =
+            webRTCHandle.dataChannel[context.dataChannelDefaultLabel];
+        if (dataChannel.state == RTCDataChannelState.RTCDataChannelOpen) {
+          return await dataChannel.send(RTCDataChannelMessage(message));
+        }
       } else {
         throw Exception(
-            "You Must Initialize Peer Connection before even attempting data channel creation or call initDataChannel method!");
+            "You Must Initialize Peer Connection followed by initDataChannel()");
       }
     } else {
       throw Exception("message must be provided!");
@@ -517,6 +548,4 @@ class JanusPlugin {
               streams: []));
     }
   }
-
-  void data() {}
 }

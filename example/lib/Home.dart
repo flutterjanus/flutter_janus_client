@@ -12,11 +12,7 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
   }
 
-  @override
-  Future<void> initState() async {
-    // TODO: implement initState
-    super.initState();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +63,12 @@ class _HomeState extends State<Home> {
               },
             ),
             Divider(),
-
+            ListTile(
+              title: Text("Text Room V2"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/text_room_v2");
+              },
+            ),
             ListTile(
               title: Text("Audio Room V2"),
               onTap: () {

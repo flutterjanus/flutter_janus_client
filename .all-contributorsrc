@@ -28,6 +28,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "LifeNow",
+      "name": "Eugene",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18676202?v=4",
+      "profile": "https://github.com/LifeNow",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

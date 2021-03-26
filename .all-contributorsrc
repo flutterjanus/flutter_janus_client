@@ -19,6 +19,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "kzawadi",
+      "name": "Kelvin Zawadi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12481289?v=4",
+      "profile": "https://github.com/kzawadi",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7

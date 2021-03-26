@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:janus_client/JanusPlugin.dart';
 import 'package:janus_client/JanusTransport.dart';
 import 'package:janus_client/JanusClient.dart';
@@ -13,7 +11,6 @@ class JanusSession {
   JanusTransport transport;
   JanusClient context;
   int sessionId;
-  Map<String, Function> _transactions = {};
   Timer _keepAliveTimer;
   Map<int, JanusPlugin> _pluginHandles = {};
 

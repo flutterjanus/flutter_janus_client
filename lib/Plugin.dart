@@ -301,42 +301,40 @@ class Plugin {
       bool offerToReceiveVideo = true}) async {
     if (_context.isUnifiedPlan) {
       await prepareTranscievers(true);
-    } else {
-      var offerOptions = {
-        "offerToReceiveAudio": offerToReceiveAudio,
-        "offerToReceiveVideo": offerToReceiveVideo
-      };
-      print(offerOptions);
-      RTCSessionDescription offer =
-          await _webRTCHandle.peerConnection.createOffer(offerOptions);
-      await _webRTCHandle.peerConnection.setLocalDescription(offer);
-      return offer;
     }
+    var offerOptions = {
+      "offerToReceiveAudio": offerToReceiveAudio,
+      "offerToReceiveVideo": offerToReceiveVideo
+    };
+    RTCSessionDescription offer =
+        await _webRTCHandle.peerConnection.createOffer(offerOptions);
+    await _webRTCHandle.peerConnection.setLocalDescription(offer);
+    return offer;
   }
 
   Future<RTCSessionDescription> createAnswer({dynamic offerOptions}) async {
     if (_context.isUnifiedPlan) {
       print('using transrecievers');
       await prepareTranscievers(false);
-    } else {
-      try {
-        if (offerOptions == null) {
-          offerOptions = {
-            "offerToReceiveAudio": true,
-            "offerToReceiveVideo": true
-          };
-        }
-        RTCSessionDescription offer =
-            await _webRTCHandle.peerConnection.createAnswer(offerOptions);
-        await _webRTCHandle.peerConnection.setLocalDescription(offer);
-        return offer;
-      } catch (e) {
-        RTCSessionDescription offer =
-            await _webRTCHandle.peerConnection.createAnswer(offerOptions);
-        await _webRTCHandle.peerConnection.setLocalDescription(offer);
-        return offer;
-      }
     }
+    try {
+      if (offerOptions == null) {
+        offerOptions = {
+          "offerToReceiveAudio": true,
+          "offerToReceiveVideo": true
+        };
+      }
+      RTCSessionDescription offer =
+          await _webRTCHandle.peerConnection.createAnswer(offerOptions);
+      await _webRTCHandle.peerConnection.setLocalDescription(offer);
+      return offer;
+    } catch (e) {
+      RTCSessionDescription offer =
+          await _webRTCHandle.peerConnection.createAnswer(offerOptions);
+      await _webRTCHandle.peerConnection.setLocalDescription(offer);
+      return offer;
+    }
+
 //    handling kstable exception most ugly way but currently there's no other workaround, it just works
   }
 
@@ -379,7 +377,7 @@ class Plugin {
               direction: offer
                   ? TransceiverDirection.SendOnly
                   : TransceiverDirection.RecvOnly,
-              streams: new List()));
+              streams: []));
     }
     if (videoTransceiver != null && videoTransceiver.setDirection != null) {
       videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
@@ -391,7 +389,7 @@ class Plugin {
               direction: offer
                   ? TransceiverDirection.SendOnly
                   : TransceiverDirection.RecvOnly,
-              streams: new List()));
+              streams: []));
     }
   }
 

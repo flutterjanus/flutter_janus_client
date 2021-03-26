@@ -77,7 +77,7 @@ class JanusPlugin {
       });
       _pollingRetries = 0;
       return;
-    } on HttpException catch (e) {
+    } on HttpException catch (_) {
       _pollingRetries++;
       pollingActive = false;
       if (_pollingRetries > 2) {

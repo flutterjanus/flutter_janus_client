@@ -318,9 +318,8 @@ class JanusPlugin {
   }
 
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
-  Future<void> handleRemoteJsep(data) async {
-    await webRTCHandle.peerConnection
-        .setRemoteDescription(RTCSessionDescription(data["sdp"], data["type"]));
+  Future<void> handleRemoteJsep(RTCSessionDescription data) async {
+    await webRTCHandle.peerConnection.setRemoteDescription(data);
   }
 
   /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client

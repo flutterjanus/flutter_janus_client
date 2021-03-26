@@ -15,10 +15,10 @@ dependencies:
   flutter_webrtc:
     git: https://github.com/flutter-webrtc/flutter-webrtc.git
   path_provider: ^2.0.1
-  http: ^0.13.0
+  http: ^0.13.1
   web_socket_channel: ^2.0.0
   stream_channel: ^2.1.0
-  uuid: ^3.0.1
+  uuid: ^3.0.2
 
 
 

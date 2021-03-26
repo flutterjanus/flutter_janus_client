@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client/JanusClient.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -14,7 +13,7 @@ class _HomeState extends State<Home> {
   }
 
   @override
-  Future<void> initState() {
+  Future<void> initState() async {
     // TODO: implement initState
     super.initState();
   }

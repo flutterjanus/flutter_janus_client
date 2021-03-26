@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:janus_client/JanusSession.dart';
 import 'package:janus_client/JanusTransport.dart';
 import 'package:janus_client/janus_client.dart';
-import 'package:uuid/uuid.dart';
 export 'shelf.dart';
 
 class JanusClient {
@@ -10,13 +9,10 @@ class JanusClient {
   String apiSecret;
   String token;
   bool withCredentials;
-  int _pollingRetries = 0;
   int maxEvent;
-  Timer _keepAliveTimer;
   List<RTCIceServer> iceServers = [];
   int refreshInterval;
   bool isUnifiedPlan;
-  Uuid _uuid = Uuid();
 
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label

@@ -25,6 +25,8 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
+- VideoCall example ready with V2 API
+- Streaming example ready with V2 API
 - TextRoom example ready with V2 API
 - Audio Bridge example ready with V2 API
 - Supports WEB aswell
@@ -48,7 +50,9 @@ For more info visit
 
 [AudioRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/AudioRoom_V2.dart)   
   
-[TextRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/TextRoom_V2.dart)  
+[TextRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/TextRoom_V2.dart)
+[Streaming_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/Streaming_V2.dart)  
+[VideoCall_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoCall_V2.dart)  
 
 
 ## Contributors ✨

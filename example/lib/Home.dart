@@ -12,13 +12,11 @@ class _HomeState extends State<Home> {
     super.didChangeDependencies();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Janus Client Menu")),
-        body: Column(
+        body: ListView(
           children: [
             ListTile(
               title: Text("Video Call Example"),
@@ -79,6 +77,18 @@ class _HomeState extends State<Home> {
               title: Text("Video Room V2"),
               onTap: () {
                 Navigator.of(context).pushNamed("/video_room_v2");
+              },
+            ),
+            ListTile(
+              title: Text("Video Call V2"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/video_call_v2");
+              },
+            ),
+            ListTile(
+              title: Text("Streaming V2"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/streaming_v2");
               },
             ),
             ListTile(

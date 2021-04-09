@@ -1,3 +1,7 @@
+## 2.0.0-beta
+* features brand new api
+* simplified development using stream api
+
 ## 0.0.4
 * Streaming Support added   
 * bug in send method fixed for rest api

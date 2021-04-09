@@ -7,3 +7,4 @@
 build/
 .idea
 janus_client.iml
+.vscode

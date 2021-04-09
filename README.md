@@ -7,7 +7,6 @@
 # janus_client
 This branch features brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events.  
 Definitely, It gonna be  easy to maintain and test.
-As of now VideoRoom works flawlessly support for other plugin are work in progress. 
 
 **all dependencies updated**  
 official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.

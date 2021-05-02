@@ -476,7 +476,7 @@ class JanusClient {
       if (apiSecret != null) longpoll = longpoll + "&apisecret=" + apiSecret;
       print(longpoll);
       print("polling active");
-      var json = parse((await http.get(longpoll)).body);
+      var json = parse((await http.get(Uri.parse(longpoll))).body);
       (json as List<dynamic>).forEach((element) {
         _handleEvent(plugin, element);
       });

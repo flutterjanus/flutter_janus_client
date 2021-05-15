@@ -263,20 +263,11 @@ class JanusPlugin {
     if (pollingTimer != null) {
       pollingTimer.cancel();
     }
-
     this.send(data: {"request": "leave"});
-    if (webRTCHandle != null) {
-      if (webRTCHandle.localStream != null) {
-        await webRTCHandle.localStream.dispose();
-      }
-      if (webRTCHandle.peerConnection != null) {
-        await webRTCHandle.peerConnection.close();
-      }
-    }
     dispose();
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     this.pollingActive = false;
     if (pollingTimer != null) {
       pollingTimer.cancel();
@@ -304,6 +295,12 @@ class JanusPlugin {
     }
     if (_wsStreamSubscription != null) {
       _wsStreamSubscription.cancel();
+    }
+    if (webRTCHandle != null) {
+      await webRTCHandle.peerConnection.close();
+      await webRTCHandle.remoteStream?.dispose();
+      await webRTCHandle.localStream?.dispose();
+      await webRTCHandle.peerConnection?.dispose();
     }
   }
 
@@ -384,17 +381,6 @@ class JanusPlugin {
         "audio": audioDevices.length > 0,
         "video": videoDevices.length > 0
       };
-
-      //   {
-      //     "mandatory": {
-      // "minWidth":
-      // '1280', // Provide your own width, height and frame rate here
-      // "minHeight": '720',
-      // "minFrameRate": '60',
-      // },
-      // "facingMode": "user",
-      // "optional": [],
-      // }
     }
     if (webRTCHandle != null) {
       webRTCHandle.localStream =
@@ -417,12 +403,21 @@ class JanusPlugin {
 
   /// a utility method which can be used to switch camera of user device if it has more than one camera
   Future<bool> switchCamera() async {
+    var videoTrack;
     if (webRTCHandle.localStream != null) {
-      final videoTrack = webRTCHandle.localStream
+      videoTrack = webRTCHandle.localStream
           .getVideoTracks()
           .firstWhere((track) => track.kind == "video");
       return await Helper.switchCamera(videoTrack);
     } else {
+      if (webRTCHandle.peerConnection.getLocalStreams().length > 0) {
+        videoTrack = webRTCHandle.peerConnection
+            .getLocalStreams()
+            .first
+            .getVideoTracks()
+            .firstWhere((track) => track.kind == "video");
+        return await Helper.switchCamera(videoTrack);
+      }
       throw "Media devices and stream not initialized,try calling initializeMediaDevices() ";
     }
   }
@@ -498,54 +493,59 @@ class JanusPlugin {
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
     var transceivers = await webRTCHandle.peerConnection.transceivers;
-    print(transceivers);
-    if (transceivers != null && transceivers.length > 0) {
-      transceivers.forEach((t) {
-        if ((t.sender != null &&
-                t.sender.track != null &&
-                t.sender.track.kind == "audio") ||
-            (t.receiver != null &&
-                t.receiver.track != null &&
-                t.receiver.track.kind == "audio")) {
-          if (audioTransceiver == null) {
-            audioTransceiver = t;
-          }
-        }
-        if ((t.sender != null &&
-                t.sender.track != null &&
-                t.sender.track.kind == "video") ||
-            (t.receiver != null &&
-                t.receiver.track != null &&
-                t.receiver.track.kind == "video")) {
-          if (videoTransceiver == null) {
-            videoTransceiver = t;
-          }
-        }
-      });
-    }
-    if (audioTransceiver != null && audioTransceiver.setDirection != null) {
-      await audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    } else {
-      audioTransceiver = await webRTCHandle.peerConnection.addTransceiver(
-          track: null,
-          kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-          init: RTCRtpTransceiverInit(
-              direction: offer
-                  ? TransceiverDirection.SendOnly
-                  : TransceiverDirection.RecvOnly,
-              streams: []));
-    }
-    if (videoTransceiver != null && videoTransceiver.setDirection != null) {
-      await videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    } else {
-      videoTransceiver = await webRTCHandle.peerConnection.addTransceiver(
-          track: null,
-          kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-          init: RTCRtpTransceiverInit(
-              direction: offer
-                  ? TransceiverDirection.SendOnly
-                  : TransceiverDirection.RecvOnly,
-              streams: []));
-    }
+    transceivers.forEach((element) {
+      print('____________User Track_______________');
+      print(element.sender.track.toString());
+      print(element.receiver.track.toString());
+    });
+
+    //   if (transceivers != null && transceivers.length > 0) {
+    //     transceivers.forEach((t) {
+    //       if ((t.sender != null &&
+    //               t.sender.track != null &&
+    //               t.sender.track.kind == "audio") ||
+    //           (t.receiver != null &&
+    //               t.receiver.track != null &&
+    //               t.receiver.track.kind == "audio")) {
+    //         if (audioTransceiver == null) {
+    //           audioTransceiver = t;
+    //         }
+    //       }
+    //       if ((t.sender != null &&
+    //               t.sender.track != null &&
+    //               t.sender.track.kind == "video") ||
+    //           (t.receiver != null &&
+    //               t.receiver.track != null &&
+    //               t.receiver.track.kind == "video")) {
+    //         if (videoTransceiver == null) {
+    //           videoTransceiver = t;
+    //         }
+    //       }
+    //     });
+    //   }
+    //   if (audioTransceiver != null && audioTransceiver.setDirection != null) {
+    //     await audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+    //   } else {
+    //     audioTransceiver = await webRTCHandle.peerConnection.addTransceiver(
+    //         track: null,
+    //         kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+    //         init: RTCRtpTransceiverInit(
+    //             direction: offer
+    //                 ? TransceiverDirection.SendOnly
+    //                 : TransceiverDirection.RecvOnly,
+    //             streams: []));
+    //   }
+    //   if (videoTransceiver != null && videoTransceiver.setDirection != null) {
+    //     await videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+    //   } else {
+    //     videoTransceiver = await webRTCHandle.peerConnection.addTransceiver(
+    //         track: null,
+    //         kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+    //         init: RTCRtpTransceiverInit(
+    //             direction: offer
+    //                 ? TransceiverDirection.SendOnly
+    //                 : TransceiverDirection.RecvOnly,
+    //             streams: []));
+    //   }
   }
 }

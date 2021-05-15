@@ -273,8 +273,6 @@ class Plugin {
     this.send(message: {"request": "leave"});
     await _webRTCHandle.localStream.dispose();
     await _webRTCHandle.peerConnection.close();
-    _context.destroy();
-    _webRTCHandle.peerConnection = null;
   }
 
   /// Cleans Up everything related to individual plugin handle

@@ -123,7 +123,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
       rest =
           RestJanusTransport(url: 'https://unified-janus.onemandev.tech/rest');
       ws = WebSocketJanusTransport(
-          url: 'wss://unified-janus.onemandev.tech/websocket');
+          url: 'wss://master-janus.onemandev.tech/websocket');
       j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [
         RTCIceServer(
             url: "stun:stun1.l.google.com:19302", username: "", credential: "")
@@ -153,48 +153,6 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     plugin.messages.listen((msg) async {
       print('on message');
       print(msg);
-
-      if (msg.event['janus'] == 'event') {
-        if (msg.jsep != null) {
-          print('handling sdp');
-          // await plugin.handleRemoteJsep(msg['jsep']);
-        }
-        var pluginData = msg.event['plugindata'];
-        if (pluginData != null) {
-          var data = pluginData['data'];
-          if (data != null) {
-            if (data["publishers"] != null) {
-              List<dynamic> list = data["publishers"];
-              print('got publihers');
-              print(list);
-              list.forEach((element) {
-                _newRemoteFeed(element['id']);
-              });
-            }
-            // if (data['videoroom'] == 'event' &&
-            //     data.containsKey('unpublished')) {
-            //   print('recieved unpublishing event on subscriber handle');
-            //   if (subscriberHandles.containsKey(data['unpublished'])) {
-            //     subscriberHandles[data['unpublished']].dispose();
-            //     subscriberHandles.remove(data['unpublished']);
-            //   }
-            //   if (remoteRenderers.containsKey(data['unpublished'])) {
-            //     remoteRenderers[data['unpublished']].srcObject = null;
-            //     remoteRenderers[data['unpublished']].dispose();
-            //     remoteRenderers.remove(data['unpublished']);
-            //   }
-            // }
-            // if (data['videoroom'] == 'joined') {
-            //   print('user joined configuring video stream');
-            //   myId = data['id'];
-            //   var publish = {"request": "publish", "bitrate": 1000000};
-            //   RTCSessionDescription offer = await plugin.createOffer(
-            //       offerToReceiveAudio: true, offerToReceiveVideo: true);
-            //   print(await plugin.send(data: publish, jsep: offer));
-            // }
-          }
-        }
-      }
     });
   }
 

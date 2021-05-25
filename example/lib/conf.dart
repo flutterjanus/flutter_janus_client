@@ -13,5 +13,5 @@ Map<String, String> servermap = {
   'onemandev_master_ws': 'wss://master-janus.onemandev.tech/websocket',
   'onemandev_master_rest': 'https://master-janus.onemandev.tech/rest',
   'onemandev_unified_rest': 'https://unified-janus.onemandev.tech/rest',
-  'onemandec_unified_ws': 'wss://unified-janus.onemandev.tech/websocket'
+  'onemandev_unified_ws': 'wss://unified-janus.onemandev.tech/websocket'
 };

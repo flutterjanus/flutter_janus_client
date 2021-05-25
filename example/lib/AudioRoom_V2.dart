@@ -121,8 +121,8 @@ class _AudioRoomState extends State<AudioRoomV2> {
   }
 
   Future<void> initPlatformState() async {
-    rest = RestJanusTransport(url: servermap['onemandev_master_rest']);
-    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    rest = RestJanusTransport(url: servermap['onemandev_master_ws']);
+    ws = WebSocketJanusTransport(url: servermap['onemandev_master_ws']);
     j = JanusClient(
         withCredentials: true,
         apiSecret: "SecureIt",
@@ -144,14 +144,22 @@ class _AudioRoomState extends State<AudioRoomV2> {
       _remoteRenderer.srcObject = event;
     });
     pluginHandle.messages.listen((msg) async {
+      print(msg.event);
       if (msg.event['plugindata'] != null) {
         if (msg.event['plugindata']['data'] != null) {
           var data = msg.event['plugindata']['data'];
           if (data['audiobridge'] == 'joined') {
             RTCSessionDescription offer = await pluginHandle.createOffer(
-                offerToReceiveVideo: false, offerToReceiveAudio: true);
+                videoRecv: false,
+                audioRecv: true,
+                videoSend: false,
+                audioSend: false);
             var publish = {"request": "configure"};
             await pluginHandle.send(data: publish, jsep: offer);
+            data = (await pluginHandle.send(data: {
+              'request': 'listparticipants',
+              'room': 1234
+            }))['plugindata']['data'];
             var participant = data['participants'];
             if (participant is List && participant != null) {
               setState(() {
@@ -174,6 +182,12 @@ class _AudioRoomState extends State<AudioRoomV2> {
                 });
               });
             }
+          }
+          if (data['audiobridge'] == 'talking') {
+            updateTalkingId(data, true);
+          }
+          if (data['audiobridge'] == 'stopped-talking') {
+            updateTalkingId(data, false);
           }
           if (data['audiobridge'] == 'event') {
             var participant = data['participants'];
@@ -211,6 +225,14 @@ class _AudioRoomState extends State<AudioRoomV2> {
         print('got remote jsep');
         await pluginHandle.handleRemoteJsep(msg.jsep);
       }
+    });
+  }
+
+  updateTalkingId(data, talking) {
+    int talkingIndex =
+        participants.indexWhere((element) => element.id == data['id']);
+    setState(() {
+      participants[talkingIndex].talking = talking;
     });
   }
 
@@ -255,18 +277,20 @@ class _AudioRoomState extends State<AudioRoomV2> {
           top: 5,
           start: 5,
           textDirection: TextDirection.ltr,
-          child: SizedBox(
-              height: 200,
-              width: 200,
-              child: RTCVideoView(
-                _remoteRenderer,
-              )),
+          child: Opacity(
+              opacity: 0,
+              child: SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: RTCVideoView(
+                    _remoteRenderer,
+                  ))),
         ),
         Container(
             child: GridView.builder(
                 itemCount: participants.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
+                    crossAxisCount: 3, crossAxisSpacing: 10),
                 itemBuilder: (context, index) {
                   return Container(
                     color: Colors.green,
@@ -275,6 +299,12 @@ class _AudioRoomState extends State<AudioRoomV2> {
                         Text(participants[index].display),
                         Icon(
                           participants[index].muted ? Icons.mic_off : Icons.mic,
+                          color: Colors.white,
+                        ),
+                        Icon(
+                          participants[index].talking
+                              ? Icons.volume_up_sharp
+                              : Icons.volume_mute_sharp,
                           color: Colors.white,
                         )
                       ],

@@ -386,8 +386,10 @@ class JanusPlugin {
       webRTCHandle.localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
       if (context.isUnifiedPlan) {
-        webRTCHandle.localStream.getTracks().forEach((element) {
-          webRTCHandle.peerConnection
+        webRTCHandle.localStream.getTracks().forEach((element) async {
+          print('adding track in peerconnection');
+          print(element.toString());
+          await webRTCHandle.peerConnection
               .addTrack(element, webRTCHandle.localStream);
         });
       } else {
@@ -423,15 +425,25 @@ class JanusPlugin {
   }
 
   Future<RTCSessionDescription> createOffer(
-      {bool offerToReceiveAudio = true,
-      bool offerToReceiveVideo = true}) async {
+      {bool audioRecv: true,
+      bool videoRecv: true,
+      bool audioSend: true,
+      bool videoSend: true}) async {
+    var offerOptions = null;
     if (context.isUnifiedPlan) {
-      await prepareTranscievers(true);
+      await prepareTranscievers(
+          audioRecv: audioRecv,
+          audioSend: audioSend,
+          videoRecv: videoRecv,
+          videoSend: videoSend);
     }
-    var offerOptions = {
-      "offerToReceiveAudio": offerToReceiveAudio,
-      "offerToReceiveVideo": offerToReceiveVideo
-    };
+    else {
+      offerOptions = {
+        "offerToReceiveAudio": audioRecv,
+        "offerToReceiveVideo": videoRecv
+      };
+    }
+
     RTCSessionDescription offer =
         await webRTCHandle.peerConnection.createOffer(offerOptions);
     await webRTCHandle.peerConnection.setLocalDescription(offer);
@@ -439,16 +451,24 @@ class JanusPlugin {
   }
 
   Future<RTCSessionDescription> createAnswer(
-      {bool offerToReceiveAudio = true,
-      bool offerToReceiveVideo = true}) async {
+      {bool audioRecv: true,
+      bool videoRecv: true,
+      bool audioSend: true,
+      bool videoSend: true}) async {
+    var offerOptions = null;
     if (context.isUnifiedPlan) {
-      print('using transrecievers');
-      await prepareTranscievers(false);
+      await prepareTranscievers(
+          audioRecv: audioRecv,
+          audioSend: audioSend,
+          videoRecv: videoRecv,
+          videoSend: videoSend);
     }
-    var offerOptions = {
-      "offerToReceiveAudio": offerToReceiveAudio,
-      "offerToReceiveVideo": offerToReceiveVideo
-    };
+    else {
+      offerOptions = {
+        "offerToReceiveAudio": audioRecv,
+        "offerToReceiveVideo": videoRecv
+      };
+    }
     try {
       RTCSessionDescription offer =
           await webRTCHandle.peerConnection.createAnswer(offerOptions);
@@ -488,64 +508,108 @@ class JanusPlugin {
     }
   }
 
-  Future prepareTranscievers(bool offer) async {
+  Future prepareTranscievers(
+      {bool audioRecv: false,
+      bool videoRecv: false,
+      bool audioSend: true,
+      bool videoSend: true}) async {
     print('using transrecievers in prepare transrecievers');
     RTCRtpTransceiver audioTransceiver;
     RTCRtpTransceiver videoTransceiver;
-    var transceivers = await webRTCHandle.peerConnection.transceivers;
-    transceivers.forEach((element) {
-      print('____________User Track_______________');
-      print(element.sender.track.toString());
-      print(element.receiver.track.toString());
-    });
+    List<RTCRtpTransceiver> transceivers =
+        await webRTCHandle.peerConnection.transceivers;
+    if (transceivers != null && transceivers.length > 0) {
+      transceivers.forEach((t) {
+        if ((t.sender != null &&
+                t.sender.track != null &&
+                t.sender.track.kind == "audio") ||
+            (t.receiver != null &&
+                t.receiver.track != null &&
+                t.receiver.track.kind == "audio")) {
+          if (audioTransceiver != null) {
+            audioTransceiver = t;
+          }
+        }
+        if ((t.sender != null &&
+                t.sender.track != null &&
+                t.sender.track.kind == "video") ||
+            (t.receiver != null &&
+                t.receiver.track != null &&
+                t.receiver.track.kind == "video")) {
+          if (videoTransceiver != null) {
+            videoTransceiver = t;
+          }
+        }
+      });
+    }
 
-    //   if (transceivers != null && transceivers.length > 0) {
-    //     transceivers.forEach((t) {
-    //       if ((t.sender != null &&
-    //               t.sender.track != null &&
-    //               t.sender.track.kind == "audio") ||
-    //           (t.receiver != null &&
-    //               t.receiver.track != null &&
-    //               t.receiver.track.kind == "audio")) {
-    //         if (audioTransceiver == null) {
-    //           audioTransceiver = t;
-    //         }
-    //       }
-    //       if ((t.sender != null &&
-    //               t.sender.track != null &&
-    //               t.sender.track.kind == "video") ||
-    //           (t.receiver != null &&
-    //               t.receiver.track != null &&
-    //               t.receiver.track.kind == "video")) {
-    //         if (videoTransceiver == null) {
-    //           videoTransceiver = t;
-    //         }
-    //       }
-    //     });
-    //   }
-    //   if (audioTransceiver != null && audioTransceiver.setDirection != null) {
-    //     await audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    //   } else {
-    //     audioTransceiver = await webRTCHandle.peerConnection.addTransceiver(
-    //         track: null,
-    //         kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
-    //         init: RTCRtpTransceiverInit(
-    //             direction: offer
-    //                 ? TransceiverDirection.SendOnly
-    //                 : TransceiverDirection.RecvOnly,
-    //             streams: []));
-    //   }
-    //   if (videoTransceiver != null && videoTransceiver.setDirection != null) {
-    //     await videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
-    //   } else {
-    //     videoTransceiver = await webRTCHandle.peerConnection.addTransceiver(
-    //         track: null,
-    //         kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-    //         init: RTCRtpTransceiverInit(
-    //             direction: offer
-    //                 ? TransceiverDirection.SendOnly
-    //                 : TransceiverDirection.RecvOnly,
-    //             streams: []));
-    //   }
+    if (!audioSend && !audioRecv) {
+      // Audio disabled: have we removed it?
+      if (audioTransceiver != null) {
+        audioTransceiver.setDirection(TransceiverDirection.Inactive);
+        print("Setting audio transceiver to inactive:" +
+            audioTransceiver.toString());
+      }
+    } else {
+      // Take care of audio m-line
+      if (audioSend && audioRecv) {
+        if (audioTransceiver != null) {
+          audioTransceiver.setDirection(TransceiverDirection.SendRecv);
+          print("Setting audio transceiver to sendrecv:" +
+              audioTransceiver.toString());
+        }
+      } else if (audioSend && !audioRecv) {
+        if (audioTransceiver != null) {
+          audioTransceiver.setDirection(TransceiverDirection.SendOnly);
+          print("Setting audio transceiver to sendonly:" +
+              audioTransceiver.toString());
+        }
+      } else if (!audioSend && audioRecv) {
+        if (audioTransceiver != null) {
+          audioTransceiver.setDirection(TransceiverDirection.RecvOnly);
+          print("Setting audio transceiver to recvonly:" +
+              audioTransceiver.toString());
+        } else {
+          // In theory, this is the only case where we might not have a transceiver yet
+          audioTransceiver = await webRTCHandle.peerConnection.addTransceiver(
+              kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+              init: RTCRtpTransceiverInit(
+                  direction: TransceiverDirection.RecvOnly));
+          print("Adding recvonly audio transceiver:" +
+              audioTransceiver.toString());
+        }
+      }
+    }
+    if (!videoSend && !videoRecv) {
+      // Video disabled: have we removed it?
+      if (videoTransceiver != null) {
+        videoTransceiver.setDirection(TransceiverDirection.Inactive);
+        // Janus.log("Setting video transceiver to inactive:", videoTransceiver);
+      }
+    } else {
+      // Take care of video m-line
+      if (videoSend && videoRecv) {
+        if (videoTransceiver != null) {
+          videoTransceiver.setDirection(TransceiverDirection.SendRecv);
+          // Janus.log("Setting video transceiver to sendrecv:", videoTransceiver);
+        }
+      } else if (videoSend && !videoRecv) {
+        if (videoTransceiver != null) {
+          videoTransceiver.setDirection(TransceiverDirection.SendOnly);
+          // Janus.log("Setting video transceiver to sendonly:", videoTransceiver);
+        }
+      } else if (!videoSend && videoRecv) {
+        if (videoTransceiver != null) {
+          videoTransceiver.setDirection(TransceiverDirection.RecvOnly);
+          // Janus.log("Setting video transceiver to recvonly:", videoTransceiver);
+        } else {
+          // In theory, this is the only case where we might not have a transceiver yet
+          videoTransceiver = await webRTCHandle.peerConnection.addTransceiver(
+              kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
+              init: RTCRtpTransceiverInit(
+                  direction: TransceiverDirection.RecvOnly));
+        }
+      }
+    }
   }
 }

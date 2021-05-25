@@ -54,7 +54,10 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
         var body = {"request": "ack"};
         await textRoom.initDataChannel();
         RTCSessionDescription answer = await textRoom.createAnswer(
-            offerToReceiveAudio: false, offerToReceiveVideo: false);
+            audioSend: false,
+            videoSend: false,
+            videoRecv: false,
+            audioRecv: false);
         await textRoom.send(
           data: body,
           jsep: answer,

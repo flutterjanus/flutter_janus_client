@@ -77,7 +77,10 @@ class _VideoRoomState extends State<VideoRoomV2> {
           await subscriberHandles[feed].send(
               data: body,
               jsep: await subscriberHandles[feed].createAnswer(
-                  offerToReceiveAudio: false, offerToReceiveVideo: false));
+                  audioRecv: false,
+                  videoRecv: false,
+                  audioSend: true,
+                  videoSend: true));
         }
         var pluginData = msg.event['plugindata'];
         if (pluginData != null) {
@@ -158,29 +161,39 @@ class _VideoRoomState extends State<VideoRoomV2> {
               });
             }
             if (data['videoroom'] == 'event' &&
-                data.containsKey('unpublished')) {
+                    data.containsKey('unpublished') ||
+                data.containsKey('leaving')) {
               print('recieved unpublishing event on subscriber handle');
-              if (remoteRenderers.containsKey(data['unpublished'])) {
-                if (remoteRenderers[data['unpublished']] != null) {
-                  remoteRenderers[data['unpublished']].srcObject = null;
-                  setState(() {
-                    remoteRenderers.remove(data['unpublished']);
-                  });
-                  await remoteRenderers[data['unpublished']]?.dispose();
-                }
+              int leaving = data['leaving'];
+              int unpublished = data['unpublished'];
+              if (remoteRenderers.containsKey(unpublished)) {
+                RTCVideoRenderer renderer;
+                setState(() {
+                  renderer = remoteRenderers.remove(unpublished);
+                });
+                renderer.srcObject = null;
+              }
+              if (remoteRenderers.containsKey(leaving)) {
+                RTCVideoRenderer renderer;
+                setState(() {
+                  renderer = remoteRenderers.remove(leaving);
+                });
+                renderer.srcObject = null;
               }
               if (subscriberHandles.containsKey(data['unpublished'])) {
                 await subscriberHandles[data['unpublished']].dispose();
-                subscriberHandles.remove(data['unpublishWiqed']);
+                subscriberHandles.remove(data['unpublished']);
               }
-
             }
             if (data['videoroom'] == 'joined') {
               print('user joined configuring video stream');
               myId = data['id'];
               var publish = {"request": "publish", "bitrate": 10000000};
               RTCSessionDescription offer = await plugin.createOffer(
-                  offerToReceiveAudio: true, offerToReceiveVideo: true);
+                  videoRecv: true,
+                  audioRecv: true,
+                  videoSend: false,
+                  audioSend: false);
               print(await plugin.send(data: publish, jsep: offer));
             }
           }
@@ -199,6 +212,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
     if (session != null) {
       session.dispose();
     }
+    cleanUpResources();
   }
 
   callEnd() async {
@@ -216,6 +230,10 @@ class _VideoRoomState extends State<VideoRoomV2> {
     if (plugin != null) {
       plugin.dispose();
     }
+    cleanUpResources();
+  }
+
+  cleanUpResources() {
     subscriberHandles.entries.forEach((element) async {
       if (element.value != null) {
         await element.value.hangup();
@@ -223,11 +241,14 @@ class _VideoRoomState extends State<VideoRoomV2> {
         subscriberHandles.remove(element.key);
       }
     });
+    remoteRenderers.forEach((key, value) {});
     remoteRenderers.entries.forEach((element) async {
       if (element.value != null) {
-        element.value.srcObject = null;
+        try {
+          element.value.srcObject = null;
+          remoteRenderers.remove(element.key);
+        } catch (e) {}
         await element.value?.dispose();
-        remoteRenderers.remove(element.key);
       }
     });
   }

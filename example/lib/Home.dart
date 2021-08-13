@@ -18,48 +18,6 @@ class _HomeState extends State<Home> {
         appBar: AppBar(title: Text("Janus Client Menu")),
         body: ListView(
           children: [
-            ListTile(
-              title: Text("Video Call Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/video_call");
-              },
-            ),
-            ListTile(
-              title: Text("Text Room Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/text_room");
-              },
-            ),
-            ListTile(
-              title: Text("Video Room Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/video_room");
-              },
-            ),
-            ListTile(
-              title: Text("Audio Room Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/audio_room");
-              },
-            ),
-            ListTile(
-              title: Text("Streaming Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/streaming");
-              },
-            ),
-            ListTile(
-              title: Text("Streaming Unified Example (MultiStream Support)"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/streaming_unified");
-              },
-            ),
-            ListTile(
-              title: Text("Sip Call Example"),
-              onTap: () {
-                Navigator.of(context).pushNamed("/sip_call");
-              },
-            ),
             Divider(),
             ListTile(
               title: Text("Text Room V2"),

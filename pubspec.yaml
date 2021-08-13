@@ -18,6 +18,7 @@ dependencies:
   web_socket_channel: ^2.1.0
   stream_channel: ^2.1.0
   uuid: ^3.0.4
+  logging: ^1.0.1
 
 
 

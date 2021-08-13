@@ -74,16 +74,20 @@ class JanusSession {
     request["session_id"] = sessionId;
     Map<String, dynamic> response;
     if (transport is RestJanusTransport) {
-      print('using rest transport for creating plugin handle');
+      context.logger.info('using rest transport for creating plugin handle');
       RestJanusTransport rest = (transport as RestJanusTransport);
       response = await rest.post(request);
-      print(response);
-      if (response.containsKey('janus') && response.containsKey('data')) {
+      if (response != null &&
+          response.containsKey('janus') &&
+          response.containsKey('data')) {
         handleId = response['data']['id'];
         rest.sessionId = sessionId;
+      } else {
+        throw "Network error or janus server not running";
       }
     } else if (transport is WebSocketJanusTransport) {
-      print('using websocket transport for creating plugin handle');
+      context.logger
+          .info('using web socket transport for creating plugin handle');
       WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
       if (!ws.isConnected) {
         ws.connect();
@@ -93,7 +97,7 @@ class JanusSession {
           (element) => (parse(element)['transaction'] == transaction)));
       if (response.containsKey('janus') && response.containsKey('data')) {
         handleId = response['data']['id'] as int;
-        print(response);
+        context.logger.fine(response);
       }
     }
     plugin = JanusPlugin(
@@ -118,13 +122,14 @@ class JanusSession {
 
   _keepAlive() {
     if (sessionId != null) {
-      Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
-        this._keepAliveTimer = timer;
+      this._keepAliveTimer =
+          Timer.periodic(Duration(seconds: refreshInterval), (timer) async {
         try {
           String transaction = getUuid().v4();
           Map<String, dynamic> response;
           if (transport is RestJanusTransport) {
             RestJanusTransport rest = (transport as RestJanusTransport);
+            context.logger.info("keep alive using RestTransport");
             response = await rest.post({
               "janus": "keepalive",
               "session_id": sessionId,
@@ -132,9 +137,13 @@ class JanusSession {
               ...context.apiMap,
               ...context.tokenMap
             });
+            context.logger.fine(response);
           } else if (transport is WebSocketJanusTransport) {
+            context.logger.info("keep alive using WebSocketTransport");
             WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
             if (!ws.isConnected) {
+              context.logger.fine(
+                  "not connected trying to establish connection to webSocket");
               ws.connect();
             }
             ws.sink.add(stringify({
@@ -144,8 +153,10 @@ class JanusSession {
               ...context.apiMap,
               ...context.tokenMap
             }));
+            context.logger.fine("keepalive request sent to webSocket");
             response = parse(await ws.stream.firstWhere(
                 (element) => (parse(element)['transaction'] == transaction)));
+            context.logger.fine(response);
           }
         } catch (e) {
           timer.cancel();

@@ -19,12 +19,12 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   TextEditingController nameController = TextEditingController();
 
   initializeClient() async {
-    rest = RestJanusTransport(url: servermap['onemandev_master_rest']);
+    rest = RestJanusTransport(url: servermap['janus_rest']);
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     janusClient = JanusClient(
         withCredentials: true,
         apiSecret: "SecureIt",
-        transport: ws,
+        transport: rest,
         iceServers: [
           RTCIceServer(
               url: "stun:stun1.l.google.com:19302",
@@ -36,13 +36,17 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   }
 
   leave() async {
-    await textRoom.sendData(stringify({"request": "leave"}));
-    setState(() {
-      userNameDisplayMap = {};
-      textMessages = [];
-    });
-    textRoom.dispose();
-    session.dispose();
+    try {
+      await textRoom.sendData(stringify({"request": "leave"}));
+      setState(() {
+        userNameDisplayMap = {};
+        textMessages = [];
+      });
+      textRoom.dispose();
+      session.dispose();
+    } catch (e) {
+      print('no connection skipping');
+    }
   }
 
   setup() async {
@@ -117,6 +121,13 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
     });
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    this.textRoom.dispose();
+    this.session.dispose();
+  }
   @override
   void initState() {
     // TODO: implement initState

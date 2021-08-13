@@ -110,22 +110,21 @@ class JanusPlugin {
     } else {
       configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
     }
-    print('peer connection configuration');
-    print(configuration);
+    context.logger.fine('peer connection configuration');
+    context.logger.fine(configuration);
     RTCPeerConnection peerConnection =
         await createPeerConnection(configuration, {});
     if (context.isUnifiedPlan) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
-        print('onTrack called with event');
-        print(event.toString());
-
+        context.logger.fine('onTrack called with event');
+        context.logger.fine(event.toString());
         if(event.receiver!=null){
           event.receiver.track.onUnMute=(){
             try {
               _remoteTrackStreamController
                   .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: true));
             } catch (e) {
-              print(e);
+              context.logger.fine(e);
             }
           };
           event.receiver.track.onMute=(){
@@ -133,7 +132,7 @@ class JanusPlugin {
               _remoteTrackStreamController
                   .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: false));
             } catch (e) {
-              print(e);
+              context.logger.fine(e);
             }
           };
           event.receiver.track.onEnded=(){
@@ -141,13 +140,13 @@ class JanusPlugin {
               _remoteTrackStreamController
                   .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: false));
             } catch (e) {
-              print(e);
+              context.logger.fine(e);
             }
           };
         }
 
 
-        print("Handling Remote Track");
+        context.logger.fine("Handling Remote Track");
         if (event.streams == null) return;
         _remoteStreamController.add(event.streams[0]);
         if (event.track == null) return;
@@ -158,12 +157,12 @@ class JanusPlugin {
           _remoteTrackStreamController
               .add(RemoteTrack(track: event.track, mid: mid, flowing: true));
         } catch (e) {
-          print(e);
+          context.logger.fine(e);
         }
         if (event.track.onEnded != null) return;
-        print("Adding onended callback to track:" + event.track.toString());
+        context.logger.fine("Adding onended callback to track:" + event.track.toString());
         event.track.onEnded = () async {
-          print("Remote track removed:");
+          context.logger.fine("Remote track removed:");
           var mid = event.track.id;
           if (context.isUnifiedPlan) {
             var transceiver =
@@ -180,8 +179,8 @@ class JanusPlugin {
           // }
         };
         event.track.onMute = () async {
-          print("Remote track muted:" + event.track.toString());
-          print("Removing remote track");
+          context.logger.fine("Remote track muted:" + event.track.toString());
+          context.logger.fine("Removing remote track");
           var mid = event.track.id;
           if (context.isUnifiedPlan) {
             var transceiver =
@@ -197,7 +196,7 @@ class JanusPlugin {
           }
         };
         event.track.onUnMute = () async {
-          print("Remote track flowing again:" + event.track.toString());
+          context.logger.fine("Remote track flowing again:" + event.track.toString());
           try {
             // Notify the application the track is back
             var mid = event.track.id;
@@ -301,13 +300,13 @@ class JanusPlugin {
       pollingActive = false;
       if (_pollingRetries > 2) {
         // Did we just lose the server? :-(
-        print("Lost connection to the server (is it down?)");
+        context.logger.severe("Lost connection to the server (is it down?)");
         return;
       }
     } catch (e) {
       print(e);
       pollingActive = false;
-      print("fatal Exception");
+      context.logger.severe("fatal Exception");
       return;
     }
     return;
@@ -402,7 +401,8 @@ class JanusPlugin {
       if (context.token != null) request["token"] = context.token;
       if (context.apiSecret != null) request["apisecret"] = context.apiSecret;
       if (jsep != null) {
-        print(jsep.toMap());
+        context.logger.fine("sending jsep");
+        context.logger.fine(jsep.toMap());
         request["jsep"] = jsep.toMap();
       }
       if (transport is RestJanusTransport) {
@@ -441,8 +441,8 @@ class JanusPlugin {
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
       if (context.isUnifiedPlan) {
         webRTCHandle.localStream.getTracks().forEach((element) async {
-          print('adding track in peerconnection');
-          print(element.toString());
+          context.logger.fine('adding track in peerconnection');
+          context.logger.fine(element.toString());
           await webRTCHandle.peerConnection
               .addTrack(element, webRTCHandle.localStream);
         });
@@ -452,7 +452,7 @@ class JanusPlugin {
       }
       return webRTCHandle.localStream;
     } else {
-      print("error webrtchandle cant be null");
+      context.logger.severe("error webrtchandle cant be null");
       return null;
     }
   }

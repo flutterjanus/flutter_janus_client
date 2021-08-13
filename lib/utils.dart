@@ -134,7 +134,7 @@ class RemoteTrack{
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
   RemoteTrack({
-    @required this.stream,
+   this.stream,
     @required this.track,
     @required this.mid,
     @required this.flowing,

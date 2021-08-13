@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:janus_client/JanusSession.dart';
 import 'package:janus_client/JanusTransport.dart';
-import 'package:janus_client/janus_client.dart';
+import 'package:janus_client/utils.dart';
 export 'shelf.dart';
 
 class JanusClient {

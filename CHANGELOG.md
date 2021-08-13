@@ -1,3 +1,6 @@
+## 2.0.1-beta
+* fixed issue #37
+* introduced logger support for better plugin level log control
 ## 2.0.0-beta
 * features brand new api
 * simplified development using stream api

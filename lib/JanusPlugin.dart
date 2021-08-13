@@ -116,49 +116,103 @@ class JanusPlugin {
         await createPeerConnection(configuration, {});
     if (context.isUnifiedPlan) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
-        if (event.streams == null || event.transceiver == null) return;
-        var mid =
-            event.transceiver != null ? event.transceiver.mid : event.track.id;
+        print('onTrack called with event');
+        print(event.toString());
 
-        _remoteTrackStreamController.add(RemoteTrack(
-            stream: event.streams.where((element) => element != null).first,
-            track: event.track,
-            mid: mid,
-            flowing: true));
-        if (event.track != null) {
-          // if (event.track != null && event.track.onEnded == null) return;
-          event.track.onEnded = () async {
-            if (webRTCHandle.remoteStream != null) {
-              webRTCHandle.remoteStream.removeTrack(event.track);
-              var mid = event.track.id;
-              var transceiver = (await peerConnection.transceivers).firstWhere(
-                  (element) => element.receiver.track == event.track);
-              mid = transceiver.mid;
-              _remoteTrackStreamController.add(RemoteTrack(
-                  stream:
-                      event.streams.where((element) => element != null).first,
-                  track: event.track,
-                  mid: mid,
-                  flowing: false));
+        if(event.receiver!=null){
+          event.receiver.track.onUnMute=(){
+            try {
+              _remoteTrackStreamController
+                  .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: true));
+            } catch (e) {
+              print(e);
             }
           };
-
-          event.track.onMute = () async {
-            if (webRTCHandle.remoteStream != null) {
-              webRTCHandle.remoteStream.removeTrack(event.track);
-              var mid = event.track.id;
-              var transceiver = (await peerConnection.transceivers).firstWhere(
-                  (element) => element.receiver.track == event.track);
-              mid = transceiver.mid;
-              _remoteTrackStreamController.add(RemoteTrack(
-                  stream:
-                      event.streams.where((element) => element != null).first,
-                  track: event.track,
-                  mid: mid,
-                  flowing: false));
+          event.receiver.track.onMute=(){
+            try {
+              _remoteTrackStreamController
+                  .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: false));
+            } catch (e) {
+              print(e);
+            }
+          };
+          event.receiver.track.onEnded=(){
+            try {
+              _remoteTrackStreamController
+                  .add(RemoteTrack(track: event.receiver.track, mid: event.receiver.track.id, flowing: false));
+            } catch (e) {
+              print(e);
             }
           };
         }
+
+
+        print("Handling Remote Track");
+        if (event.streams == null) return;
+        _remoteStreamController.add(event.streams[0]);
+        if (event.track == null) return;
+        // Notify about the new track event
+        var mid =
+            event.transceiver != null ? event.transceiver.mid : event.track.id;
+        try {
+          _remoteTrackStreamController
+              .add(RemoteTrack(track: event.track, mid: mid, flowing: true));
+        } catch (e) {
+          print(e);
+        }
+        if (event.track.onEnded != null) return;
+        print("Adding onended callback to track:" + event.track.toString());
+        event.track.onEnded = () async {
+          print("Remote track removed:");
+          var mid = event.track.id;
+          if (context.isUnifiedPlan) {
+            var transceiver =
+                (await webRTCHandle.peerConnection.getTransceivers())
+                    .firstWhere((t) => t.receiver.track == event.track);
+            mid = transceiver.mid;
+          }
+          try {
+            _remoteTrackStreamController
+                .add(RemoteTrack(track: event.track, mid: mid, flowing: false));
+          } catch (e) {
+            print(e);
+          }
+          // }
+        };
+        event.track.onMute = () async {
+          print("Remote track muted:" + event.track.toString());
+          print("Removing remote track");
+          var mid = event.track.id;
+          if (context.isUnifiedPlan) {
+            var transceiver =
+                (await webRTCHandle.peerConnection.getTransceivers())
+                    .firstWhere((t) => t.receiver.track == event.track);
+            mid = transceiver.mid;
+          }
+          try {
+            _remoteTrackStreamController
+                .add(RemoteTrack(track: event.track, mid: mid, flowing: false));
+          } catch (e) {
+            print(e);
+          }
+        };
+        event.track.onUnMute = () async {
+          print("Remote track flowing again:" + event.track.toString());
+          try {
+            // Notify the application the track is back
+            var mid = event.track.id;
+            if (context.isUnifiedPlan) {
+              var transceiver =
+                  (await webRTCHandle.peerConnection.getTransceivers())
+                      .firstWhere((t) => t.receiver.track == event.track);
+              mid = transceiver.mid;
+            }
+            _remoteTrackStreamController
+                .add(RemoteTrack(track: event.track, mid: mid, flowing: true));
+          } catch (e) {
+            print(e);
+          }
+         };
       };
     }
 
@@ -436,8 +490,7 @@ class JanusPlugin {
           audioSend: audioSend,
           videoRecv: videoRecv,
           videoSend: videoSend);
-    }
-    else {
+    } else {
       offerOptions = {
         "offerToReceiveAudio": audioRecv,
         "offerToReceiveVideo": videoRecv
@@ -462,8 +515,7 @@ class JanusPlugin {
           audioSend: audioSend,
           videoRecv: videoRecv,
           videoSend: videoSend);
-    }
-    else {
+    } else {
       offerOptions = {
         "offerToReceiveAudio": audioRecv,
         "offerToReceiveVideo": videoRecv

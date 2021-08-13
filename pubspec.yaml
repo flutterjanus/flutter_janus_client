@@ -12,10 +12,10 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.6.3
-  path_provider: ^2.0.1
-  http: ^0.13.1
-  web_socket_channel: ^2.0.0
+  flutter_webrtc: ^0.6.5
+  path_provider: ^2.0.2
+  http: ^0.13.3
+  web_socket_channel: ^2.1.0
   stream_channel: ^2.1.0
   uuid: ^3.0.4
 
@@ -27,8 +27,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  test: ^1.16.4
-
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -46,6 +44,11 @@ flutter:
         pluginClass: JanusClientPlugin
       ios:
         pluginClass: JanusClientPlugin
+
+      web:
+        pluginClass: HelloPlugin
+        fileName: hello_web.dart
+
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

@@ -48,27 +48,3 @@ class JanusClient {
     return session;
   }
 }
-
-/*
-*
-* JanusClient client=JanusClient(
-* url:[],
-*
-* );
-*
-* JanusSession session=client.createSession()
-*
-* Plugin plugin=session.attach(Plugins.VideoRoom)
-* plugin.send();
-* plugin.data();
-* plugin.peerConnection.addStream()
-* plugin.onMessage
-* plugin.onData
-* plugin.data
-* plugin.message
-*
-*
-*
-*
-*
-* */

@@ -41,7 +41,7 @@ class _StreamingState extends State<StreamingV2> {
   initJanusClient() async {
     setState(() {
       rest =
-          RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
+          RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
         RTCIceServer(

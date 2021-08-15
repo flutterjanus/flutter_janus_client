@@ -30,7 +30,7 @@ void main() {
   });
 
   test('Create a new Session', () async {
-    ws.sink.add({"janus": "create", "transaction": "wscreatesession"});
+    ws.sink!.add({"janus": "create", "transaction": "wscreatesession"});
     ws.stream.listen((event) {
       print(event);
       if (event['transaction'] == 'wscreatesession') {
@@ -52,7 +52,7 @@ void main() {
         "plugin": "janus.plugin.videoroom",
         "transaction": "random for attaching plugin"
       };
-      ws.sink.add(request);
+      ws.sink!.add(request);
       ws.stream.listen((event) {
         if (event['transaction'] == request['transaction']) {
           expect(event['janus'], 'success');

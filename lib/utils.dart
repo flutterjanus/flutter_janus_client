@@ -7,18 +7,18 @@ import 'package:uuid/uuid.dart';
 
 class EventMessage{
   dynamic event;
-  RTCSessionDescription jsep;
+  RTCSessionDescription? jsep;
 
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
   EventMessage({
-    @required this.event,
-    @required this.jsep,
+    required this.event,
+    required this.jsep,
   });
 
   EventMessage copyWith({
     dynamic event,
-    RTCSessionDescription jsep,
+    RTCSessionDescription? jsep,
   }) {
     return new EventMessage(
       event: event ?? this.event,
@@ -45,7 +45,7 @@ class EventMessage{
   factory EventMessage.fromMap(Map<String, dynamic> map) {
     return new EventMessage(
       event: map['event'] as dynamic,
-      jsep: map['jsep'] as RTCSessionDescription,
+      jsep: map['jsep'] as RTCSessionDescription?,
     );
   }
 
@@ -61,16 +61,16 @@ class EventMessage{
 
 }
 class RTCIceServer {
-  String username;
-  String credential;
-  String url;
+  String? username;
+  String? credential;
+  String? url;
 
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
   RTCIceServer({
-    @required this.username,
-    @required this.credential,
-    @required this.url,
+    required this.username,
+    required this.credential,
+    required this.url,
   });
 
   @override
@@ -95,9 +95,9 @@ class RTCIceServer {
   }
 
   RTCIceServer copyWith({
-    String username,
-    String credential,
-    String url,
+    String? username,
+    String? credential,
+    String? url,
   }) {
     return new RTCIceServer(
       username: username ?? this.username,
@@ -116,9 +116,9 @@ class RTCIceServer {
 
   factory RTCIceServer.fromMap(Map<String, dynamic> map) {
     return new RTCIceServer(
-      username: map['username'] as String,
-      credential: map['credential'] as String,
-      url: map['url'] as String,
+      username: map['username'] as String?,
+      credential: map['credential'] as String?,
+      url: map['url'] as String?,
     );
   }
 
@@ -126,25 +126,25 @@ class RTCIceServer {
 }
 
 class RemoteTrack{
-  MediaStream stream;
-  MediaStreamTrack track;
-  String mid;
-  bool flowing;
+  MediaStream? stream;
+  MediaStreamTrack? track;
+  String? mid;
+  bool? flowing;
 
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
   RemoteTrack({
    this.stream,
-    @required this.track,
-    @required this.mid,
-    @required this.flowing,
+    required this.track,
+    required this.mid,
+    required this.flowing,
   });
 
   RemoteTrack copyWith({
-    MediaStream stream,
-    MediaStreamTrack track,
-    String mid,
-    bool flowing,
+    MediaStream? stream,
+    MediaStreamTrack? track,
+    String? mid,
+    bool? flowing,
   }) {
     return new RemoteTrack(
       stream: stream ?? this.stream,
@@ -175,10 +175,10 @@ class RemoteTrack{
 
   factory RemoteTrack.fromMap(Map<String, dynamic> map) {
     return new RemoteTrack(
-      stream: map['stream'] as MediaStream,
-      track: map['track'] as MediaStreamTrack,
-      mid: map['mid'] as String,
-      flowing: map['flowing'] as bool,
+      stream: map['stream'] as MediaStream?,
+      track: map['track'] as MediaStreamTrack?,
+      mid: map['mid'] as String?,
+      flowing: map['flowing'] as bool?,
     );
   }
 

@@ -7,16 +7,16 @@ import 'package:logging/logging.dart';
 export 'shelf.dart';
 
 class JanusClient {
-  JanusTransport transport;
-  String apiSecret;
-  String token;
+  JanusTransport? transport;
+  String? apiSecret;
+  String? token;
   bool withCredentials;
   int maxEvent;
-  List<RTCIceServer> iceServers = [];
+  List<RTCIceServer>? iceServers = [];
   int refreshInterval;
   bool isUnifiedPlan;
   String loggerName;
-  Logger logger;
+  late Logger logger;
   Level loggerLevel;
 
   /*

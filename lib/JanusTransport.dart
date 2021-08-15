@@ -4,8 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 abstract class JanusTransport {
-  String url;
-  int sessionId;
+  String? url;
+  int? sessionId;
 
   JanusTransport({this.url});
 
@@ -13,12 +13,12 @@ abstract class JanusTransport {
 }
 
 class RestJanusTransport extends JanusTransport {
-  RestJanusTransport({String url}) : super(url: url);
+  RestJanusTransport({String? url}) : super(url: url);
 
   /*
   * method for posting data to janus by using http client
   * */
-  Future<dynamic> post(body, {int handleId}) async {
+  Future<dynamic> post(body, {int? handleId}) async {
     var suffixUrl = '';
     if (sessionId != null && handleId == null) {
       suffixUrl = suffixUrl + "/$sessionId";
@@ -27,7 +27,7 @@ class RestJanusTransport extends JanusTransport {
     }
     try {
       var response =
-          (await http.post(Uri.parse(url + suffixUrl), body: stringify(body)))
+          (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body)))
               .body;
       return parse(response);
     } on JsonCyclicError {
@@ -49,7 +49,7 @@ class RestJanusTransport extends JanusTransport {
     } else if (sessionId != null && handleId != null) {
       suffixUrl = suffixUrl + "/$sessionId/$handleId";
     }
-    return parse((await http.get(Uri.parse(url + suffixUrl))).body);
+    return parse((await http.get(Uri.parse(url! + suffixUrl))).body);
   }
 
   @override
@@ -57,26 +57,26 @@ class RestJanusTransport extends JanusTransport {
 }
 
 class WebSocketJanusTransport extends JanusTransport {
-  WebSocketJanusTransport({String url, this.pingInterval}) : super(url: url);
-  WebSocketChannel channel;
-  Duration pingInterval;
-  WebSocketSink sink;
-  Stream stream;
+  WebSocketJanusTransport({String? url, this.pingInterval}) : super(url: url);
+  WebSocketChannel? channel;
+  Duration? pingInterval;
+  WebSocketSink? sink;
+  late Stream stream;
   bool isConnected = false;
 
   void dispose() {
     if (channel != null && sink != null) {
-      sink.close();
+      sink!.close();
     }
   }
 
-  Future<dynamic> send(Map<String, dynamic> data, {int handleId}) async {
+  Future<dynamic> send(Map<String, dynamic> data, {int? handleId}) async {
     if (data['transaction'] != null) {
       data['session_id'] = sessionId;
       if (handleId != null) {
         data['handle_id'] = handleId;
       }
-      sink.add(stringify(data));
+      sink!.add(stringify(data));
       return parse(await stream.firstWhere(
           (element) => (parse(element)['transaction'] == data['transaction'])));
     } else {
@@ -87,7 +87,7 @@ class WebSocketJanusTransport extends JanusTransport {
   void connect() {
     try {
       isConnected = true;
-      channel = WebSocketChannel.connect(Uri.parse(url),
+      channel = WebSocketChannel.connect(Uri.parse(url!),
           protocols: ['janus-protocol']);
     } catch (e) {
       print(e.toString());
@@ -95,7 +95,7 @@ class WebSocketJanusTransport extends JanusTransport {
       isConnected = false;
       dispose();
     }
-    sink = channel.sink;
-    stream = channel.stream.asBroadcastStream();
+    sink = channel!.sink;
+    stream = channel!.stream.asBroadcastStream();
   }
 }

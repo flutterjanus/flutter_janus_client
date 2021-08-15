@@ -243,12 +243,12 @@ class JanusPlugin {
         //checking and posting using websocket if in available
         if (transport is RestJanusTransport) {
           RestJanusTransport rest = (transport as RestJanusTransport);
-          response = await (rest.post(request, handleId: handleId)
-              as FutureOr<Map<String, dynamic>?>);
+          response = (await rest.post(request, handleId: handleId))
+              as Map<String, dynamic>;
         } else if (transport is WebSocketJanusTransport) {
           WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
-          response = await (ws.send(request, handleId: handleId)
-              as FutureOr<Map<String, dynamic>?>);
+          response = (await ws.send(request, handleId: handleId))
+              as Map<String, dynamic>;
         }
         _streamController!.sink.add(response);
       }

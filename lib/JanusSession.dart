@@ -132,13 +132,13 @@ class JanusSession {
           if (transport is RestJanusTransport) {
             RestJanusTransport rest = (transport as RestJanusTransport);
             context!.logger.info("keep alive using RestTransport");
-            response = await (rest.post({
+            response = (await rest.post({
               "janus": "keepalive",
               "session_id": sessionId,
               "transaction": transaction,
               ...context!.apiMap,
               ...context!.tokenMap
-            }) as FutureOr<Map<String, dynamic>?>);
+            })) as Map<String, dynamic>;
             context!.logger.fine(response);
           } else if (transport is WebSocketJanusTransport) {
             context!.logger.info("keep alive using WebSocketTransport");

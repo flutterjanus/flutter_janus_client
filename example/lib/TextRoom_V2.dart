@@ -24,7 +24,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
     janusClient = JanusClient(
         withCredentials: true,
         apiSecret: "SecureIt",
-        transport: rest,
+        transport: ws,
         iceServers: [
           RTCIceServer(
               url: "stun:stun1.l.google.com:19302",

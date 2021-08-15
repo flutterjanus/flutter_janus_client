@@ -24,6 +24,7 @@ For more info visit
                                             width='300' height='600'></a>
 
 ## News & Updates
+- Supports null-safety
 - VideoCall example ready with V2 API
 - Streaming example ready with V2 API
 - TextRoom example ready with V2 API
@@ -32,16 +33,16 @@ For more info visit
 - Video Room Example ready with V2  API
 
 ## status
-| Feature           | Support | Well Tested | Unified Plan |
-|-------------------|---------|-------------|--------------|
-| WebSocket         | Yes     | Yes         | -            |
-| Rest/Http API     | Yes     | Yes         | -            |
-| Video Room Plugin | Yes     | wip         | wip          |
-| Video Call Plugin | Yes     | No          | wip          |
-| Streaming Plugin  | Yes     | No          | Yes          |
-| Audio Room Plugin | Yes     | No          | wip          |
-| Sip Plugin        | Yes     | No          | No           |
-| Text Room Plugin  | Yes     | No          | wip          |
+| Feature           | Support | Well Tested | Unified Plan | Example |
+|-------------------|---------|-------------|--------------|---------|
+| WebSocket         | Yes     | Yes         | -            | Yes     |
+| Rest/Http API     | Yes     | Yes         | -            | Yes     |
+| Video Room Plugin | Yes     | wip         | wip          | Yes     |
+| Video Call Plugin | Yes     | No          | wip          | Yes     |
+| Streaming Plugin  | Yes     | No          | wip          | Yes     |
+| Audio Room Plugin | Yes     | No          | wip          | Yes     |
+| Sip Plugin        | Yes     | No          | No           | No      |
+| Text Room Plugin  | Yes     | No          | wip          | Yes     |
 
 # Getting Started
 [VideoRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoRoom_V2.dart)  

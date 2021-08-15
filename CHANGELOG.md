@@ -1,4 +1,4 @@
-## 2.0.2-beta
+## 2.1.0-beta
 * supports null safety
 ## 2.0.1-beta
 * fixed issue #37

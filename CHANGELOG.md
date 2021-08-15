@@ -1,3 +1,6 @@
+## 2.1.1-beta
+* fixes and improvements due to null safety
+* web demo setup using github pages
 ## 2.1.0-beta
 * supports null safety
 ## 2.0.1-beta

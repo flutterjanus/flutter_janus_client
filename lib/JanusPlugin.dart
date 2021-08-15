@@ -118,33 +118,38 @@ class JanusPlugin {
       peerConnection.onTrack = (RTCTrackEvent event) async {
         context!.logger.fine('onTrack called with event');
         context!.logger.fine(event.toString());
-        if(event.receiver!=null){
-          event.receiver!.track!.onUnMute=(){
+        if (event.receiver != null) {
+          event.receiver!.track!.onUnMute = () {
             try {
-              _remoteTrackStreamController!
-                  .add(RemoteTrack(track: event.receiver!.track, mid: event.receiver!.track!.id, flowing: true));
+              _remoteTrackStreamController!.add(RemoteTrack(
+                  track: event.receiver!.track,
+                  mid: event.receiver!.track!.id,
+                  flowing: true));
             } catch (e) {
               context!.logger.fine(e);
             }
           };
-          event.receiver!.track!.onMute=(){
+          event.receiver!.track!.onMute = () {
             try {
-              _remoteTrackStreamController!
-                  .add(RemoteTrack(track: event.receiver!.track, mid: event.receiver!.track!.id, flowing: false));
+              _remoteTrackStreamController!.add(RemoteTrack(
+                  track: event.receiver!.track,
+                  mid: event.receiver!.track!.id,
+                  flowing: false));
             } catch (e) {
               context!.logger.fine(e);
             }
           };
-          event.receiver!.track!.onEnded=(){
+          event.receiver!.track!.onEnded = () {
             try {
-              _remoteTrackStreamController!
-                  .add(RemoteTrack(track: event.receiver!.track, mid: event.receiver!.track!.id, flowing: false));
+              _remoteTrackStreamController!.add(RemoteTrack(
+                  track: event.receiver!.track,
+                  mid: event.receiver!.track!.id,
+                  flowing: false));
             } catch (e) {
               context!.logger.fine(e);
             }
           };
         }
-
 
         context!.logger.fine("Handling Remote Track");
         if (event.streams == null) return;
@@ -160,7 +165,8 @@ class JanusPlugin {
           context!.logger.fine(e);
         }
         if (event.track.onEnded != null) return;
-        context!.logger.fine("Adding onended callback to track:" + event.track.toString());
+        context!.logger
+            .fine("Adding onended callback to track:" + event.track.toString());
         event.track.onEnded = () async {
           context!.logger.fine("Remote track removed:");
           var mid = event.track.id;
@@ -196,7 +202,8 @@ class JanusPlugin {
           }
         };
         event.track.onUnMute = () async {
-          context!.logger.fine("Remote track flowing again:" + event.track.toString());
+          context!.logger
+              .fine("Remote track flowing again:" + event.track.toString());
           try {
             // Notify the application the track is back
             var mid = event.track.id;
@@ -211,7 +218,7 @@ class JanusPlugin {
           } catch (e) {
             print(e);
           }
-         };
+        };
       };
     }
 
@@ -236,10 +243,12 @@ class JanusPlugin {
         //checking and posting using websocket if in available
         if (transport is RestJanusTransport) {
           RestJanusTransport rest = (transport as RestJanusTransport);
-          response = await (rest.post(request, handleId: handleId) as FutureOr<Map<String, dynamic>?>);
+          response = (await rest.post(request, handleId: handleId))
+              as Map<String, dynamic>;
         } else if (transport is WebSocketJanusTransport) {
           WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
-          response = await (ws.send(request, handleId: handleId) as FutureOr<Map<String, dynamic>?>);
+          response = (await ws.send(request, handleId: handleId))
+              as Map<String, dynamic>;
         }
         _streamController!.sink.add(response);
       }
@@ -407,10 +416,11 @@ class JanusPlugin {
       }
       if (transport is RestJanusTransport) {
         RestJanusTransport rest = (transport as RestJanusTransport);
-        response = await (rest.post(request, handleId: handleId) as FutureOr<Map<String, dynamic>?>);
+        response = (await rest.post(request, handleId: handleId))
+            as Map<String, dynamic>;
       } else if (transport is WebSocketJanusTransport) {
         WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
-        response = await (ws.send(request, handleId: handleId) as FutureOr<Map<String, dynamic>?>);
+        response = await ws.send(request, handleId: handleId);
       }
       return response;
     } catch (e) {
@@ -448,7 +458,8 @@ class JanusPlugin {
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);
-        await webRTCHandle!.peerConnection!.addStream(webRTCHandle!.localStream!);
+        await webRTCHandle!.peerConnection!
+            .addStream(webRTCHandle!.localStream!);
       }
       return webRTCHandle!.localStream;
     } else {
@@ -542,7 +553,8 @@ class JanusPlugin {
     if (message != null) {
       if (webRTCHandle!.peerConnection != null) {
         print('before send RTCDataChannelMessage');
-        if (webRTCHandle!.dataChannel[context!.dataChannelDefaultLabel] == null) {
+        if (webRTCHandle!.dataChannel[context!.dataChannelDefaultLabel] ==
+            null) {
           throw Exception(
               "You Must  call initDataChannel method! before you can send any data channel message");
         }

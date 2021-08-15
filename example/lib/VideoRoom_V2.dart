@@ -99,7 +99,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
     await initRenderers();
     setState(() {
       rest = RestJanusTransport(url: servermap['janus_rest']);
-      ws = WebSocketJanusTransport(url: servermap['onemandev_master_ws']);
+      ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
         RTCIceServer(
             url: "stun:stun1.l.google.com:19302", username: "", credential: "")

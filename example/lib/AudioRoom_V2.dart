@@ -121,8 +121,8 @@ class _AudioRoomState extends State<AudioRoomV2> {
   }
 
   Future<void> initPlatformState() async {
-    rest = RestJanusTransport(url: servermap['onemandev_master_ws']);
-    ws = WebSocketJanusTransport(url: servermap['onemandev_master_ws']);
+    rest = RestJanusTransport(url: servermap['janus_rest']);
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     j = JanusClient(
         withCredentials: true,
         apiSecret: "SecureIt",

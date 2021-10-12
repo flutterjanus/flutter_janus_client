@@ -450,6 +450,7 @@ class JanusPlugin {
       webRTCHandle!.localStream =
           await navigator.mediaDevices.getUserMedia(mediaConstraints);
       if (context!.isUnifiedPlan) {
+        context!.logger.fine('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
           context!.logger.fine('adding track in peerconnection');
           context!.logger.fine(element.toString());

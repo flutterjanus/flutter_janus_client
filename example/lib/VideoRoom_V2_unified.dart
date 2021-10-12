@@ -56,22 +56,22 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
         var streams = s;
         for (var i in streams) {
           var stream = i;
-          if (stream['disabled']!=null) {
+          if (stream['disabled'] != null) {
             // Janus.log("Disabled stream:", stream);
             // TODO Skipping for now, we should unsubscribe
             continue;
           }
-          if (subscriptions[stream['id']]!=null &&
-              subscriptions[stream['id']][stream['mid']]!=null) {
+          if (subscriptions[stream['id']] != null &&
+              subscriptions[stream['id']][stream['mid']] != null) {
             print(
                 "Already subscribed to stream, skipping:" + stream.toString());
             continue;
           }
           // Find an empty slot in the UI for each new source
-          if (feedStreams[stream['id']]['slot']==null) {
+          if (feedStreams[stream['id']]['slot'] == null) {
             var slot;
             for (var i = 1; i < 6; i++) {
-              if (feeds[i]==null) {
+              if (feeds[i] == null) {
                 slot = i;
                 feeds[slot] = stream['id'];
                 feedStreams[stream['id']]['slot'] = slot;
@@ -84,7 +84,8 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
             'feed': stream['id'], // This is mandatory
             'mid': stream['mid'] // This is optional (all streams, if missing)
           });
-          if (subscriptions[stream['id']]==null) subscriptions[stream['id']] = {};
+          if (subscriptions[stream['id']] == null)
+            subscriptions[stream['id']] = {};
           subscriptions[stream['id']][stream['mid']] = true;
         }
       }
@@ -145,10 +146,10 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     remoteFeed.messages.listen((even) async {
       var event = even.event["videoroom"];
       // Janus.debug("Event: " + event);
-      if (event!=null) {
+      if (event != null) {
         if (event == "attached") {
           // creatingFeed = false;
-          // Janus.log("Successfully attached to feed in room " + msg["room"]);
+          print("Successfully attached to feed in room " + event["room"]);
         } else if (event == "event") {
           // Check if we got an event on a simulcast-related event from this publisher
           // var mid = msg["mid"];
@@ -171,7 +172,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
           // What has just happened?
         }
       }
-      if (even.event["streams"]!=null) {
+      if (even.event["streams"] != null) {
         // Update map of subscriptions by mid
         for (var i in even.event["streams"]) {
           var mid = even.event["streams"][i]["mid"];
@@ -183,19 +184,26 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
           // }
         }
       }
-      if (even.jsep!=null) {
+      if (even.jsep != null) {
         print('handle jsep for subscriber');
         remoteFeed.handleRemoteJsep(even.jsep);
         var jsep =
             await remoteFeed.createAnswer(audioSend: false, videoSend: false);
         var body = {'request': "start", 'room': myRoom};
-        await remoteFeed.send(data:body, jsep: jsep);
+        await remoteFeed.send(data: body, jsep: jsep);
       }
     });
-    remoteFeed.remoteTrack.listen((event) {
+    remoteFeed.remoteTrack.listen((event) async {
+      print('remote track found');
       print(event.toMap());
+      setState(() {
+        remoteRenderers.putIfAbsent(99, () => new RTCVideoRenderer());
+      });
+      await remoteRenderers[99].initialize();
+      MediaStream mediaStream = await createLocalMediaStream('test');
+      mediaStream.addTrack(event.track);
+      remoteRenderers[99].srcObject = mediaStream;
     });
-
   }
 
   Future<void> initPlatformState() async {
@@ -210,19 +218,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     var sess = await j.createSession();
     session = sess;
     plugin = await session.attach(JanusPlugins.VIDEO_ROOM);
-    final mediaConstraints = <String, dynamic>{
-      'audio': false,
-      'video': {
-        'mandatory': {
-          'minWidth':
-              '1280', // Provide your own width, height and frame rate here
-          'minHeight': '720',
-          'minFrameRate': '30',
-        },
-        'facingMode': 'user',
-        'optional': [],
-      }
-    };
+    final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
     var stream =
         await plugin.initializeMediaDevices(mediaConstraints: mediaConstraints);
     setState(() {

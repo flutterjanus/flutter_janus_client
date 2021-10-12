@@ -37,7 +37,7 @@ For more info visit
 |-------------------|---------|-------------|--------------|---------|
 | WebSocket         | Yes     | Yes         | -            | Yes     |
 | Rest/Http API     | Yes     | Yes         | -            | Yes     |
-| Video Room Plugin | Yes     | wip         | wip          | Yes     |
+| Video Room Plugin | Yes     | partially tested         | wip          | Yes     |
 | Video Call Plugin | Yes     | No          | wip          | Yes     |
 | Streaming Plugin  | Yes     | No          | wip          | Yes     |
 | Audio Room Plugin | Yes     | No          | wip          | Yes     |

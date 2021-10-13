@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:janus_client_example/AudioRoom_V2.dart';
 import 'package:janus_client_example/Home.dart';
 import 'package:janus_client_example/Streaming_V2.dart';
+import 'package:janus_client_example/Streaming_V2_unified.dart';
 import 'package:janus_client_example/TextRoom_V2.dart';
 import 'package:janus_client_example/VideoCall_V2.dart';
 
 import 'package:janus_client_example/VideoRoom_V2.dart';
-
 
 import 'VideoRoom_V2_unified.dart';
 
@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
         "/audio_room_v2": (c) => AudioRoomV2(),
         "/text_room_v2": (c) => TextRoomV2Example(),
         "/streaming_v2": (c) => StreamingV2(),
+        "/streaming_v2_unified": (c) => StreamingV2Unified(),
         "/": (c) => Home()
       },
     );

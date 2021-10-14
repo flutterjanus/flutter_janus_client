@@ -37,12 +37,12 @@ For more info visit
 |-------------------|---------|-------------|--------------|---------|
 | WebSocket         | Yes     | Yes         | -            | Yes     |
 | Rest/Http API     | Yes     | Yes         | -            | Yes     |
-| Video Room Plugin | Yes     | wip         | wip          | Yes     |
+| Video Room Plugin | Yes     | partially tested         | Yes          | Yes     |
 | Video Call Plugin | Yes     | No          | wip          | Yes     |
 | Streaming Plugin  | Yes     | No          | wip          | Yes     |
 | Audio Room Plugin | Yes     | No          | wip          | Yes     |
-| Sip Plugin        | Yes     | No          | No           | No      |
-| Text Room Plugin  | Yes     | No          | wip          | Yes     |
+| Sip Plugin        | Yes     | No          | -           | No      |
+| Text Room Plugin  | Yes     | No          | -          | Yes     |
 
 # Getting Started
 [VideoRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoRoom_V2.dart)  

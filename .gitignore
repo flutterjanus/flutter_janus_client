@@ -4,7 +4,6 @@
 .packages
 .pub/
 
-build/
 .idea
 janus_client.iml
 .vscode

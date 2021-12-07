@@ -82,4 +82,18 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     if (pin != null) payload['pin'] = pin;
     return (await this.send(data: payload));
   }
+
+  Future<VideoRoomListResponse?> getRooms() async {
+    var payload = {"request": "list"};
+    Map data = await this.send(data: payload);
+    if (data.containsKey('janus') &&
+        data['janus'] == 'success' &&
+        data.containsKey('plugindata')) {
+      var dat = data['plugindata']['data'];
+      // print(dat);
+      return VideoRoomListResponse.fromJson(dat);
+    } else {
+      return null;
+    }
+  }
 }

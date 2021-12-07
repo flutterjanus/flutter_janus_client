@@ -28,8 +28,7 @@ class JanusSession {
       Map<String, dynamic>? response;
       if (transport is RestJanusTransport) {
         RestJanusTransport rest = (transport as RestJanusTransport);
-        response =
-        (await rest.post(request)) as Map<String, dynamic>;
+        response = (await rest.post(request)) as Map<String, dynamic>;
         if (response != null) {
           if (response.containsKey('janus') && response.containsKey('data')) {
             sessionId = response['data']['id'];
@@ -61,7 +60,7 @@ class JanusSession {
     }
   }
 
-  Future<JanusPlugin> attach(String pluginName) async {
+  Future<T> attach<T extends JanusPlugin>(String pluginName) async {
     JanusPlugin plugin;
     int? handleId;
     String transaction = getUuid().v4();
@@ -102,15 +101,28 @@ class JanusSession {
         context!.logger.fine(response);
       }
     }
-    plugin = JanusPlugin(
-        plugin: pluginName,
-        transport: transport,
-        context: context,
-        handleId: handleId,
-        session: this);
+    switch (pluginName) {
+      case JanusPlugins.VIDEO_ROOM:
+        plugin = JanusVideoRoomPlugin(
+            plugin: pluginName,
+            transport: transport,
+            context: context,
+            handleId: handleId,
+            session: this);
+        break;
+      default:
+        plugin = JanusPlugin(
+            plugin: pluginName,
+            transport: transport,
+            context: context,
+            handleId: handleId,
+            session: this);
+        break;
+    }
+
     _pluginHandles[handleId] = plugin;
     await plugin.init();
-    return plugin;
+    return plugin as T;
   }
 
   void dispose() {

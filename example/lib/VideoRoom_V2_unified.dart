@@ -18,8 +18,8 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
   RestJanusTransport rest;
   WebSocketJanusTransport ws;
   JanusSession session;
-  JanusPlugin plugin;
-  JanusPlugin remoteFeed;
+  JanusVideoRoomPlugin plugin;
+  JanusVideoRoomPlugin remoteFeed;
   int myId;
   int myRoom = 1234;
   dynamic feedStreams = {};
@@ -217,7 +217,8 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     });
     var sess = await j.createSession();
     session = sess;
-    plugin = await session.attach(JanusPlugins.VIDEO_ROOM);
+    plugin = await session.attach<JanusVideoRoomPlugin>(JanusPlugins.VIDEO_ROOM);
+    plugin.init();
     final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
     var stream =
         await plugin.initializeMediaDevices(mediaConstraints: mediaConstraints);

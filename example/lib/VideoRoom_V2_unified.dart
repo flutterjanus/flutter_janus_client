@@ -219,9 +219,9 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     session = sess;
     plugin = await session.attach<JanusVideoRoomPlugin>(JanusPlugins.VIDEO_ROOM);
     plugin.init();
-    (await plugin.getRooms()).list.forEach((element) {
-      print(element.toJson());
-    });
+    // (await plugin.getRoomParticipants(1234)).participants.forEach((element) {
+    //   print(element.toJson());
+    // });
     final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
     var stream =
         await plugin.initializeMediaDevices(mediaConstraints: mediaConstraints);

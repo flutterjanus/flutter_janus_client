@@ -1,13 +1,7 @@
 import 'package:janus_client/JanusClient.dart';
 
 class JanusVideoRoomPlugin extends JanusPlugin {
-  JanusVideoRoomPlugin({handleId, context, transport, session, plugin})
-      : super(
-            context: context,
-            handleId: handleId,
-            plugin: plugin,
-            session: session,
-            transport: transport);
+  JanusVideoRoomPlugin({handleId, context, transport, session, plugin}) : super(context: context, handleId: handleId, plugin: plugin, session: session, transport: transport);
 
   /// You can check whether a room exists using the exists
   Future<dynamic> exists(int roomId) async {
@@ -49,33 +43,14 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// Used to destroy an existing video room, whether created dynamically or statically
-  Future<dynamic> destroyRoom(int roomId,
-      {String? secret, bool? permanent}) async {
-    var payload = {
-      "request": "destroy",
-      "room": roomId,
-      if (secret != null) "secret": secret,
-      if (permanent != null) "permanent": permanent
-    };
+  Future<dynamic> destroyRoom(int roomId, {String? secret, bool? permanent}) async {
+    var payload = {"request": "destroy", "room": roomId, if (secret != null) "secret": secret, if (permanent != null) "permanent": permanent};
     return (await this.send(data: payload));
   }
 
   ///  Used to create a new video room
-  Future<dynamic> createRoom(int roomId,
-      {bool permanent = false,
-      String? pin,
-      Map<String, dynamic>? extras,
-      List<String>? allowed,
-      String? isPrivate,
-      String description = '',
-      String? secret}) async {
-    var payload = {
-      "request": "create",
-      "room": roomId,
-      "permanent": permanent,
-      "description": description,
-      ...?extras
-    };
+  Future<dynamic> createRoom(int roomId, {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
+    var payload = {"request": "create", "room": roomId, "permanent": permanent, "description": description, ...?extras};
     if (allowed != null) payload["allowed"] = allowed;
     if (isPrivate != null) payload["is_private"] = isPrivate;
     if (secret != null) payload['secret'] = secret;
@@ -83,17 +58,31 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     return (await this.send(data: payload));
   }
 
-  Future<VideoRoomListResponse?> getRooms() async {
-    var payload = {"request": "list"};
+  /// get list of participants in a existing video room
+  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(int roomId) async {
+    var payload = {"request": "listparticipants", "room": roomId};
     Map data = await this.send(data: payload);
-    if (data.containsKey('janus') &&
-        data['janus'] == 'success' &&
-        data.containsKey('plugindata')) {
+    return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(data,VideoRoomListParticipantsResponse.fromJson);
+  }
+  // prevent duplication
+  T? _getPluginDataFromPayload<T>(dynamic data,T Function(dynamic) fromJson){
+    if (data.containsKey('janus') && data['janus'] == 'success' && data.containsKey('plugindata')) {
       var dat = data['plugindata']['data'];
-      // print(dat);
-      return VideoRoomListResponse.fromJson(dat);
+      return dat;
     } else {
       return null;
     }
+  }
+
+  /// get list of all rooms
+  Future<VideoRoomListResponse?> getRooms() async {
+    var payload = {"request": "list"};
+    Map data = await this.send(data: payload);
+    return _getPluginDataFromPayload<VideoRoomListResponse>(data,VideoRoomListResponse.fromJson);
+  }
+
+  Future<dynamic> joinPublisher(int roomId, {int? id, String? token, String? displayName}) async {
+    var payload = {"request": "join", "ptype": "publisher", "room": roomId, if (id != null) "id": id, if (displayName != null) "display": displayName, if (token != null) "token": token};
+
   }
 }

@@ -3,9 +3,6 @@ import 'dart:io';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:http/http.dart' as http;
 import 'package:janus_client/JanusClient.dart';
-import 'package:janus_client/JanusSession.dart';
-import 'package:janus_client/JanusTransport.dart';
-import 'package:janus_client/utils.dart';
 import 'package:collection/collection.dart';
 
 abstract class JanusPlugins {
@@ -51,7 +48,7 @@ class JanusPlugin {
   JanusPlugin(
       {this.handleId, this.context, this.transport, this.session, this.plugin});
 
-  /// used internally for initializing plugin, exposed only to be called via JanusSession attach method.
+  /// used internally for initializing plugin, exposed only to be called via [JanusSession] attach method.
   /// `not useful for external operations`
   Future<void> init() async {
     if (!_initialized) {

@@ -6,12 +6,12 @@ import 'dart:async';
 
 import 'package:janus_client_example/conf.dart';
 
-class VideoRoomV2Unified extends StatefulWidget {
+class TypedVideoRoomV2Unified extends StatefulWidget {
   @override
   _VideoRoomState createState() => _VideoRoomState();
 }
 
-class _VideoRoomState extends State<VideoRoomV2Unified> {
+class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   JanusClient j;
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   Map<int, RTCVideoRenderer> remoteRenderers = {};
@@ -188,7 +188,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
         print('handle jsep for subscriber');
         remoteFeed.handleRemoteJsep(even.jsep);
         var jsep =
-            await remoteFeed.createAnswer(audioSend: false, videoSend: false);
+        await remoteFeed.createAnswer(audioSend: false, videoSend: false);
         var body = {'request': "start", 'room': myRoom};
         await remoteFeed.send(data: body, jsep: jsep);
       }
@@ -223,98 +223,98 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     // (await plugin.getRoomParticipants(1234)).participants.forEach((element) {
     //   print(element.toJson());
     // });
-    final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
-    var stream =
-        await plugin.initializeMediaDevices(mediaConstraints: mediaConstraints);
-    setState(() {
-      remoteRenderers[0] = new RTCVideoRenderer();
-    });
-    await remoteRenderers[0].initialize();
-    setState(() {
-      remoteRenderers[0].srcObject = stream;
-    });
-
-    var register = {
-      "request": "join",
-      "ptype": "publisher",
-      "room": 1234,
-      "display": "Shivansh" + randomString()
-    };
-    print('got response');
-    print(await plugin.send(data: register));
-    plugin.messages.listen((msg) async {
-      print('on message');
-      print(msg);
-
-      if (msg.event['janus'] == 'event') {
-        if (msg.jsep != null) {
-          print('handling sdp');
-          await plugin.handleRemoteJsep(msg.jsep);
-        }
-        var pluginData = msg.event['plugindata'];
-        if (pluginData != null) {
-          var data = pluginData['data'];
-          if (data != null) {
-            if (data["publishers"] != null) {
-              List<dynamic> list = data["publishers"];
-              var sources = [];
-              for (var f in list) {
-                print(f);
-                var id = f["id"];
-                var display = f["display"];
-                var streams = f["streams"];
-                for (var i in streams) {
-                  var stream = i;
-                  i["id"] = id;
-                  i["display"] = display;
-                }
-                feedStreams[id] = {id: id, display: display, streams: streams};
-                if (sources != null) sources = [];
-                sources.add(streams);
-              }
-              if (sources != null) subscribeTo(sources);
-            }
-            if (data['videoroom'] == 'event' &&
-                    data.containsKey('unpublished') ||
-                data.containsKey('leaving')) {
-              print('recieved unpublishing event on subscriber handle');
-              int leaving = data['leaving'];
-              int unpublished = data['unpublished'];
-              if (remoteRenderers.containsKey(unpublished)) {
-                RTCVideoRenderer renderer;
-                setState(() {
-                  renderer = remoteRenderers.remove(unpublished);
-                });
-                renderer.srcObject = null;
-              }
-              if (remoteRenderers.containsKey(leaving)) {
-                RTCVideoRenderer renderer;
-                setState(() {
-                  renderer = remoteRenderers.remove(leaving);
-                });
-                renderer.srcObject = null;
-              }
-            }
-            if (data['videoroom'] == 'joined') {
-              print('user joined configuring video stream');
-              myId = data['id'];
-              var publish = {
-                "request": "configure",
-                "bitrate": 10000000,
-                'video': true,
-                'audio': true
-              };
-              RTCSessionDescription offer = await plugin.createOffer(
-                  videoRecv: false,
-                  audioRecv: false,
-                  videoSend: true,
-                  audioSend: true);
-              print(await plugin.send(data: publish, jsep: offer));
-            }
-          }
-        }
-      }
-    });
+    // final mediaConstraints = <String, dynamic>{'audio': true, 'video': true};
+    // var stream =
+    // await plugin.initializeMediaDevices(mediaConstraints: mediaConstraints);
+    // setState(() {
+    //   remoteRenderers[0] = new RTCVideoRenderer();
+    // });
+    // await remoteRenderers[0].initialize();
+    // setState(() {
+    //   remoteRenderers[0].srcObject = stream;
+    // });
+    //
+    // var register = {
+    //   "request": "join",
+    //   "ptype": "publisher",
+    //   "room": 1234,
+    //   "display": "Shivansh" + randomString()
+    // };
+    // print('got response');
+    // print(await plugin.send(data: register));
+    // plugin.messages.listen((msg) async {
+    //   print('on message');
+    //   print(msg);
+    //
+    //   if (msg.event['janus'] == 'event') {
+    //     if (msg.jsep != null) {
+    //       print('handling sdp');
+    //       await plugin.handleRemoteJsep(msg.jsep);
+    //     }
+    //     var pluginData = msg.event['plugindata'];
+    //     if (pluginData != null) {
+    //       var data = pluginData['data'];
+    //       if (data != null) {
+    //         if (data["publishers"] != null) {
+    //           List<dynamic> list = data["publishers"];
+    //           var sources = [];
+    //           for (var f in list) {
+    //             print(f);
+    //             var id = f["id"];
+    //             var display = f["display"];
+    //             var streams = f["streams"];
+    //             for (var i in streams) {
+    //               var stream = i;
+    //               i["id"] = id;
+    //               i["display"] = display;
+    //             }
+    //             feedStreams[id] = {id: id, display: display, streams: streams};
+    //             if (sources != null) sources = [];
+    //             sources.add(streams);
+    //           }
+    //           if (sources != null) subscribeTo(sources);
+    //         }
+    //         if (data['videoroom'] == 'event' &&
+    //             data.containsKey('unpublished') ||
+    //             data.containsKey('leaving')) {
+    //           print('recieved unpublishing event on subscriber handle');
+    //           int leaving = data['leaving'];
+    //           int unpublished = data['unpublished'];
+    //           if (remoteRenderers.containsKey(unpublished)) {
+    //             RTCVideoRenderer renderer;
+    //             setState(() {
+    //               renderer = remoteRenderers.remove(unpublished);
+    //             });
+    //             renderer.srcObject = null;
+    //           }
+    //           if (remoteRenderers.containsKey(leaving)) {
+    //             RTCVideoRenderer renderer;
+    //             setState(() {
+    //               renderer = remoteRenderers.remove(leaving);
+    //             });
+    //             renderer.srcObject = null;
+    //           }
+    //         }
+    //         if (data['videoroom'] == 'joined') {
+    //           print('user joined configuring video stream');
+    //           myId = data['id'];
+    //           var publish = {
+    //             "request": "configure",
+    //             "bitrate": 10000000,
+    //             'video': true,
+    //             'audio': true
+    //           };
+    //           RTCSessionDescription offer = await plugin.createOffer(
+    //               videoRecv: false,
+    //               audioRecv: false,
+    //               videoSend: true,
+    //               audioSend: true);
+    //           print(await plugin.send(data: publish, jsep: offer));
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
   }
 
   @override
@@ -397,7 +397,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
         ),
         body: GridView.builder(
             gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemCount: remoteRenderers.entries.toList().length,
             itemBuilder: (context, index) {
               return RTCVideoView(remoteRenderers.entries.toList()[index].value,

@@ -10,11 +10,11 @@ class StreamingV2Unified extends StatefulWidget {
 }
 
 class _StreamingState extends State<StreamingV2Unified> {
-  JanusClient j;
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  JanusSession session;
-  JanusPlugin plugin;
+  late JanusClient j;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
+  late JanusSession session;
+  late JanusPlugin plugin;
   Map<int, JanusPlugin> subscriberHandles = {};
 
   Map<String, RTCVideoRenderer> _remoteRenderers = {};
@@ -22,9 +22,9 @@ class _StreamingState extends State<StreamingV2Unified> {
   Map<String, MediaStream> mediaStreams = {};
 
   List<StreamingItem> streams = [];
-  int selectedStreamId;
+  late int selectedStreamId;
   bool _loader = true;
-  StateSetter _setState;
+  late StateSetter _setState;
 
   getStreamListing() {
     var body = {"request": "list"};
@@ -52,42 +52,44 @@ class _StreamingState extends State<StreamingV2Unified> {
     print('got handleId');
     print(plugin.handleId);
 
-    plugin.remoteTrack.listen((event) async {
+    plugin.remoteTrack?.listen((event) async {
       print('remote track found');
       // if (event != null) {
-      if (event.track.kind == "video" &&event.flowing && !event.track.muted) {
-        MediaStream temp =
-        await createLocalMediaStream("mediaStream_" + event.mid);
-        setState(() {
-          _remoteRenderers[event.mid] = RTCVideoRenderer();
-        });
-        await _remoteRenderers[event.mid].initialize();
-        setState(() {
-          mediaStreams["mediaStream_" + event.mid] = temp;
-        });
-        mediaStreams["mediaStream_" + event.mid].addTrack(event.track);
-        _remoteRenderers[event.mid].srcObject =
-        mediaStreams["mediaStream_" + event.mid];
-      }
-      if (event.track.kind == "audio" && event.flowing) {
-        MediaStream temp =
-        await createLocalMediaStream("mediaStream_" + event.mid);
-        setState(() {
-          _audioRenderers[event.mid] = RTCVideoRenderer();
-        });
-        await _audioRenderers[event.mid].initialize();
-        setState(() {
-          mediaStreams["mediaStream_" + event.mid] = temp;
-        });
-        mediaStreams["mediaStream_" + event.mid].addTrack(event.track);
-        _audioRenderers[event.mid].srcObject =
-        mediaStreams["mediaStream_" + event.mid];
-        // await _remoteRenderer.initialize();
+      if(event.flowing!=null
+          &&event.track!=null
+          &&event.mid!=null&&
+          event.track?.muted!=null){
+        if (event.track!.kind == "video" && event.flowing! && !event.track!.muted!) {
+          MediaStream temp = await createLocalMediaStream("mediaStream_" + event.mid!);
+          setState(() {
+            _remoteRenderers[event.mid!] = RTCVideoRenderer();
+          });
+          await _remoteRenderers[event.mid]?.initialize();
+          setState(() {
+            mediaStreams["mediaStream_" + event.mid!] = temp;
+          });
+          mediaStreams["mediaStream_" + event.mid!]?.addTrack(event.track!);
+          _remoteRenderers[event.mid]?.srcObject = mediaStreams["mediaStream_" + event.mid!];
+        }
+        if (event.track!.kind == "audio" && event.flowing!) {
+          MediaStream temp = await createLocalMediaStream("mediaStream_" + event.mid!);
+          setState(() {
+            _audioRenderers[event.mid!] = RTCVideoRenderer();
+          });
+          await _audioRenderers[event.mid]?.initialize();
+          setState(() {
+            mediaStreams["mediaStream_" + event.mid!] = temp;
+          });
+          mediaStreams["mediaStream_" + event.mid!]?.addTrack(event.track!);
+          _audioRenderers[event.mid]?.srcObject = mediaStreams["mediaStream_" + event.mid!];
+          // await _remoteRenderer.initialize();
+        }
+
       }
 
       // }
     });
-    plugin.messages.listen((even) async {
+    plugin.messages?.listen((even) async {
       print('got onmsg');
       print(even);
       var pluginData = even.event['plugindata'];
@@ -96,8 +98,7 @@ class _StreamingState extends State<StreamingV2Unified> {
         if (data != null) {
           var msg = data;
           if (msg['streaming'] != null && msg['result'] != null) {
-            if (msg['streaming'] == 'event' &&
-                msg['result']['status'] == 'stopping') {
+            if (msg['streaming'] == 'event' && msg['result']['status'] == 'stopping') {
               await this.destroy();
             }
           }
@@ -109,27 +110,23 @@ class _StreamingState extends State<StreamingV2Unified> {
                   return StatefulBuilder(builder: (context, setstate) {
                     _setState = setstate;
                     _setState(() {
-                      streams = (data['list'] as List<dynamic>)
-                          .map((e) => StreamingItem.fromMap(e))
-                          .toList();
+                      streams = (data['list'] as List<dynamic>).map((e) => StreamingItem.fromMap(e)).toList();
                     });
 
                     return AlertDialog(
                       title: Text("Choose Stream To Play"),
                       content: Column(
                         children: [
-                          DropdownButtonFormField(
+                          DropdownButtonFormField<int>(
                               isExpanded: true,
                               value: selectedStreamId,
-                              items: List.generate(
-                                  streams.length,
-                                  (index) => DropdownMenuItem(
-                                      value: streams[index].id,
-                                      child: Text(streams[index].description))),
+                              items: List.generate(streams.length, (index) => DropdownMenuItem(value: streams[index].id, child: Text(streams[index].description))),
                               onChanged: (v) {
-                                _setState(() {
-                                  selectedStreamId = v;
-                                });
+                                if (v != null) {
+                                  _setState(() {
+                                    selectedStreamId = v;
+                                  });
+                                }
                               }),
                           RaisedButton(
                             color: Colors.green,
@@ -155,16 +152,14 @@ class _StreamingState extends State<StreamingV2Unified> {
       }
 
       if (even.jsep != null) {
-        var stereo = (even.jsep.sdp.indexOf("stereo=1") != -1);
-        if (stereo && even.jsep.sdp.indexOf("stereo=1") == -1) {
+        var stereo = (even.jsep?.sdp?.indexOf("stereo=1") != -1);
+        if (stereo && even.jsep?.sdp?.indexOf("stereo=1") == -1) {
           // Make sure that our offer contains stereo too
-          even.jsep.sdp = even.jsep.sdp
-              .replaceAll("useinbandfec=1", "useinbandfec=1;stereo=1");
+          even.jsep?.sdp = even.jsep?.sdp?.replaceAll("useinbandfec=1", "useinbandfec=1;stereo=1");
         }
         debugPrint("Handling SDP as well..." + even.jsep.toString());
-        await plugin.handleRemoteJsep(even.jsep);
-        RTCSessionDescription answer = await plugin.createAnswer(
-            audioSend: false, videoSend: false, videoRecv: true, audioRecv: true);
+        await plugin.handleRemoteJsep(even.jsep!);
+        RTCSessionDescription answer = await plugin.createAnswer(audioSend: false, videoSend: false, videoRecv: true, audioRecv: true);
         plugin.send(data: {"request": "start"}, jsep: answer);
         Navigator.of(context).pop();
         setState(() {
@@ -199,13 +194,12 @@ class _StreamingState extends State<StreamingV2Unified> {
           children: [
             ..._audioRenderers.values
                 .map((e) => Expanded(
-              child: RTCVideoView(
-                e,
-                mirror:false,
-                objectFit:
-                RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
-              ),
-            ))
+                      child: RTCVideoView(
+                        e,
+                        mirror: false,
+                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                      ),
+                    ))
                 .toList()
           ],
         ),
@@ -215,9 +209,8 @@ class _StreamingState extends State<StreamingV2Unified> {
                 .map((e) => Expanded(
                       child: RTCVideoView(
                         e,
-                        mirror:false,
-                        objectFit:
-                            RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                        mirror: false,
+                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       ),
                     ))
                 .toList()
@@ -251,11 +244,7 @@ class _StreamingState extends State<StreamingV2Unified> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(),
-                    Padding(padding: EdgeInsets.all(10)),
-                    Text("Fetching Available Streams..")
-                  ],
+                  children: [CircularProgressIndicator(), Padding(padding: EdgeInsets.all(10)), Text("Fetching Available Streams..")],
                 ),
               )
             : Padding(padding: EdgeInsets.zero),

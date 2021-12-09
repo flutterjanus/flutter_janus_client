@@ -12,15 +12,15 @@ class TypedVideoRoomV2Unified extends StatefulWidget {
 }
 
 class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
-  JanusClient j;
+  late JanusClient j;
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   Map<int, RTCVideoRenderer> remoteRenderers = {};
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  JanusSession session;
-  JanusVideoRoomPlugin plugin;
-  JanusVideoRoomPlugin remoteFeed;
-  int myId;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
+  late JanusSession session;
+  late JanusVideoRoomPlugin plugin;
+  late JanusVideoRoomPlugin remoteFeed;
+  late int myId;
   int myRoom = 1234;
   dynamic feedStreams = {};
   dynamic subscriptions = {};
@@ -143,7 +143,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     };
     print('sending subscribe request');
     await remoteFeed.send(data: subscribe);
-    remoteFeed.messages.listen((even) async {
+    remoteFeed.messages?.listen((even) async {
       var event = even.event["videoroom"];
       // Janus.debug("Event: " + event);
       if (event != null) {
@@ -186,23 +186,23 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       }
       if (even.jsep != null) {
         print('handle jsep for subscriber');
-        remoteFeed.handleRemoteJsep(even.jsep);
+        remoteFeed.handleRemoteJsep(even.jsep!);
         var jsep =
         await remoteFeed.createAnswer(audioSend: false, videoSend: false);
         var body = {'request': "start", 'room': myRoom};
         await remoteFeed.send(data: body, jsep: jsep);
       }
     });
-    remoteFeed.remoteTrack.listen((event) async {
+    remoteFeed.remoteTrack?.listen((event) async {
       print('remote track found');
       print(event.toMap());
       setState(() {
         remoteRenderers.putIfAbsent(99, () => new RTCVideoRenderer());
       });
-      await remoteRenderers[99].initialize();
+      await remoteRenderers[99]?.initialize();
       MediaStream mediaStream = await createLocalMediaStream('test');
-      mediaStream.addTrack(event.track);
-      remoteRenderers[99].srcObject = mediaStream;
+      mediaStream.addTrack(event.track!);
+      remoteRenderers[99]?.srcObject = mediaStream;
     });
   }
 

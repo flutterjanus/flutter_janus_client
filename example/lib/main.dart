@@ -26,8 +26,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       routes: {
         "/video_call_v2": (c) => VideoCallV2Example(),
-        "/video_room_v2": (c) => VideoRoomV2(),
-        "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
+        // "/video_room_v2": (c) => VideoRoomV2(),
+        // "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
         "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
         "/audio_room_v2": (c) => AudioRoomV2(),
         "/text_room_v2": (c) => TextRoomV2Example(),

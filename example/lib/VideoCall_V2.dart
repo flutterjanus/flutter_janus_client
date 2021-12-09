@@ -9,15 +9,15 @@ class VideoCallV2Example extends StatefulWidget {
 }
 
 class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
-  JanusClient j;
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  JanusSession session;
-  JanusPlugin publishVideo;
+  late JanusClient j;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
+  late JanusSession session;
+  late JanusPlugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-  MediaStream myStream;
+  late MediaStream myStream;
 
   makeCall() async {
     await _localRenderer.initialize();
@@ -112,10 +112,10 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     });
     session = await j.createSession();
     publishVideo = await session.attach(JanusPlugins.VIDEO_CALL);
-    publishVideo.remoteStream.listen((event) {
+    publishVideo.remoteStream?.listen((event) {
       _remoteRenderer.srcObject = event;
     });
-    publishVideo.messages.listen((even) async {
+    publishVideo.messages?.listen((even) async {
       print(even);
       var pluginData = even.event['plugindata'];
       if (pluginData != null) {
@@ -136,7 +136,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 } else {}
                 // Video call can start
                 if (even.jsep != null) {
-                  publishVideo.handleRemoteJsep(even.jsep);
+                  publishVideo.handleRemoteJsep(even.jsep!);
                   Navigator.of(context).pop();
                 }
               } else if (event == 'incomingcall') {
@@ -160,7 +160,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 });
 
                 if (even.jsep != null) {
-                  await publishVideo.handleRemoteJsep(even.jsep);
+                  await publishVideo.handleRemoteJsep(even.jsep!);
                   Navigator.of(context).pop();
                 }
                 // Notify user

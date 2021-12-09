@@ -9,13 +9,13 @@ class TextRoomV2Example extends StatefulWidget {
 }
 
 class _TextRoomExampleState extends State<TextRoomV2Example> {
-  JanusClient janusClient;
-  JanusSession session;
-  JanusPlugin textRoom;
+  late JanusClient janusClient;
+  late JanusSession session;
+  late JanusPlugin textRoom;
   List<dynamic> textMessages = [];
   Map<String, String> userNameDisplayMap = {};
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
   TextEditingController nameController = TextEditingController();
 
   initializeClient() async {
@@ -52,9 +52,9 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   setup() async {
     var body = {"request": "setup"};
     await textRoom.send(data: body);
-    textRoom.messages.listen((event) async {
+    textRoom.messages?.listen((event) async {
       if (event.jsep != null) {
-        await textRoom.handleRemoteJsep(event.jsep);
+        await textRoom.handleRemoteJsep(event.jsep!);
         var body = {"request": "ack"};
         await textRoom.initDataChannel();
         RTCSessionDescription answer = await textRoom.createAnswer(
@@ -68,7 +68,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
         );
       }
     });
-    textRoom.onData.listen((event) async {
+    textRoom.onData?.listen((event) async {
       if (RTCDataChannelState.RTCDataChannelOpen == event) {
         print('data channel open trying register');
         var register = {
@@ -82,7 +82,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
       }
     });
 
-    textRoom.data.listen((event) {
+    textRoom.data?.listen((event) {
       print('recieved message from data channel');
       dynamic data = parse(event.text);
       print(data);
@@ -174,7 +174,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
                 return ListTile(
                   title: Text(
                       userNameDisplayMap[textMessages[index]['from']] != null
-                          ? userNameDisplayMap[textMessages[index]['from']]
+                          ? userNameDisplayMap[textMessages[index]['from']]!
                           : ''),
                   subtitle: Text(textMessages[index]['text'] != null
                       ? textMessages[index]['text']

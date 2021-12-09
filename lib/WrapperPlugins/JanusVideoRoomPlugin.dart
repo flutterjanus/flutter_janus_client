@@ -62,10 +62,11 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   Future<VideoRoomListParticipantsResponse?> getRoomParticipants(int roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
     Map data = await this.send(data: payload);
-    return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(data,VideoRoomListParticipantsResponse.fromJson);
+    return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(data, VideoRoomListParticipantsResponse.fromJson);
   }
+
   // prevent duplication
-  T? _getPluginDataFromPayload<T>(dynamic data,T Function(dynamic) fromJson){
+  T? _getPluginDataFromPayload<T>(dynamic data, T Function(dynamic) fromJson) {
     if (data.containsKey('janus') && data['janus'] == 'success' && data.containsKey('plugindata')) {
       var dat = data['plugindata']['data'];
       return dat;
@@ -78,11 +79,20 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   Future<VideoRoomListResponse?> getRooms() async {
     var payload = {"request": "list"};
     Map data = await this.send(data: payload);
-    return _getPluginDataFromPayload<VideoRoomListResponse>(data,VideoRoomListResponse.fromJson);
+    return _getPluginDataFromPayload<VideoRoomListResponse>(data, VideoRoomListResponse.fromJson);
   }
 
-  Future<dynamic> joinPublisher(int roomId, {int? id, String? token, String? displayName}) async {
-    var payload = {"request": "join", "ptype": "publisher", "room": roomId, if (id != null) "id": id, if (displayName != null) "display": displayName, if (token != null) "token": token};
-
+  Future<PublisherJoinedResponse?> joinPublisher(int roomId, {int? id, String? token, String? displayName, bool? notifyJoining}) async {
+    var payload = {
+      "request": "join",
+      "ptype": "publisher",
+      "room": roomId,
+      if (id != null) "id": id,
+      if (displayName != null) "display": displayName,
+      if (token != null) "token": token,
+      if (notifyJoining != null) "notify_joining": true
+    };
+    Map data = await this.send(data: payload);
+    return _getPluginDataFromPayload<PublisherJoinedResponse>(data, PublisherJoinedResponse.fromJson);
   }
 }

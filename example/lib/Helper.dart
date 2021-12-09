@@ -10,12 +10,12 @@ String streamingItemToMap(List<StreamingItem> data) => json.encode(List<dynamic>
 
 class StreamingItem {
   StreamingItem({
-    this.id,
-    this.type,
-    this.description,
-    this.metadata,
-    this.enabled,
-    this.media,
+    required this.id,
+    required this.type,
+    required this.description,
+    required this.metadata,
+    required this.enabled,
+    required this.media,
   });
 
   int id;
@@ -26,12 +26,12 @@ class StreamingItem {
   List<Media> media;
 
   StreamingItem copyWith({
-    int id,
-    String type,
-    String description,
-    String metadata,
-    bool enabled,
-    List<Media> media,
+    int? id,
+    String? type,
+    String? description,
+    String? metadata,
+    bool? enabled,
+    List<Media>? media,
   }) =>
       StreamingItem(
         id: id ?? this.id,
@@ -48,7 +48,7 @@ class StreamingItem {
     description: json["description"],
     metadata: json["metadata"],
     enabled: json["enabled"],
-    media: json["media"] == null ? null : List<Media>.from(json["media"].map((x) => Media.fromMap(x))),
+    media: json["media"] == null ? [] : (json["media"] as List).map((x) => Media.fromMap(x)).toList(),
   );
 
   Map<String, dynamic> toMap() => {
@@ -63,10 +63,10 @@ class StreamingItem {
 
 class Media {
   Media({
-    this.mid,
-    this.type,
-    this.label,
-    this.ageMs,
+    required this.mid,
+    required this.type,
+    required this.label,
+    required this.ageMs,
   });
 
   String mid;
@@ -75,10 +75,10 @@ class Media {
   int ageMs;
 
   Media copyWith({
-    String mid,
-    String type,
-    String label,
-    int ageMs,
+    String? mid,
+    String? type,
+    String? label,
+    int? ageMs,
   }) =>
       Media(
         mid: mid ?? this.mid,

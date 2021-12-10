@@ -32,7 +32,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
               credential: "")
         ]);
     session = await janusClient.createSession();
-    textRoom = await session.attach(JanusPlugins.TEXT_ROOM);
+    textRoom = await session.attach<JanusTextRoomPlugin>();
   }
 
   leave() async {

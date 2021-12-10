@@ -50,7 +50,7 @@ class _StreamingState extends State<StreamingV2> {
     });
     session = await j.createSession();
     print(session.sessionId);
-    plugin = await session.attach(JanusPlugins.STREAMING);
+    plugin = await session.attach<JanusStreamingPlugin>();
     await this.getStreamListing();
     print('got handleId');
     print(plugin.handleId);

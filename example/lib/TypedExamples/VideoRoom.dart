@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:janus_client/utils.dart';
@@ -99,7 +101,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       return;
     }
     print('creating remoteFeed');
-    remoteFeed = await session.attach(JanusPlugins.VIDEO_ROOM);
+    remoteFeed = await session.attach<JanusVideoRoomPlugin>();
     var subscription = [];
     for (var s in sources) {
       var streams = s;
@@ -217,9 +219,15 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     });
     var sess = await j.createSession();
     session = sess;
-    plugin = await session.attach<JanusVideoRoomPlugin>(JanusPlugins.VIDEO_ROOM);
-    plugin.init();
-    plugin.joinPublisher(1234);
+    JanusVideoRoomPlugin plugi = await session.attach<JanusVideoRoomPlugin>();
+    await plugi.joinPublisher(1234,displayName: "Shivansh",);
+    // plugi.joinRoom(1234,display: "Shivansh");
+    // plugi.messages?.listen((event) {
+    //   print(jsonEncode(event.event));
+    // });
+    plugi.typedMessages?.listen((event) {
+      print(event.event.plugindata?.data);
+    });
     // (await plugin.getRoomParticipants(1234)).participants.forEach((element) {
     //   print(element.toJson());
     // });
@@ -338,7 +346,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     if (_localRenderer != null) {
       _localRenderer.srcObject = null;
       try {
-        await _localRenderer?.dispose();
+        await _localRenderer.dispose();
       } catch (e) {}
     }
 

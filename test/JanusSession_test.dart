@@ -12,8 +12,8 @@ void main() async{
   // RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
   JanusSession session=await j.createSession();
   print(session.sessionId);
-  JanusVideoRoomPlugin plugin=await session.attach<JanusVideoRoomPlugin>(JanusPlugins.VIDEO_ROOM);
-  print(await plugin.joinPublisher(1234));
+  JanusVideoRoomPlugin plugin=await session.attach<JanusVideoRoomPlugin>();
+  // print(await plugin.joinPublisher(1234));
 
   // group('RestJanusTransport', () {
   //   // test('Create a new Session', () async {

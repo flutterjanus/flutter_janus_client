@@ -50,13 +50,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
-  dart_webrtc:
-    dependency: transitive
-    description:
-      name: dart_webrtc
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   fake_async:
     dependency: transitive
     description:
@@ -99,7 +92,7 @@ packages:
       name: flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.8.0"
+    version: "0.7.1"
   http:
     dependency: "direct main"
     description:
@@ -294,13 +287,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
-  webrtc_interface:
-    dependency: transitive
-    description:
-      name: webrtc_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.1"
   win32:
     dependency: transitive
     description:
@@ -316,5 +302,5 @@ packages:
     source: hosted
     version: "0.2.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.15.0 <3.0.0"
   flutter: ">=2.5.0"

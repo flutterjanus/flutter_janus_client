@@ -1,7 +1,7 @@
 import 'package:janus_client/JanusClient.dart';
 
 class JanusVideoRoomPlugin extends JanusPlugin {
-  JanusVideoRoomPlugin({handleId, context, transport, session, plugin}) : super(context: context, handleId: handleId, plugin: plugin, session: session, transport: transport);
+  JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
 
   /// You can check whether a room exists using the exists
   Future<dynamic> exists(int roomId) async {
@@ -23,10 +23,12 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       String? newFirFreq,
       int? newPublisher,
       bool? newLockRecord,
+      Map? extras,
       bool? permanent}) async {
     var payload = {
       "request": "edit",
       "room": roomId,
+      ...?extras,
       if (secret != null) "secret": secret,
       if (newDescription != null) "new_description": newDescription,
       if (newSecret != null) "new_secret": newSecret,
@@ -82,7 +84,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     return _getPluginDataFromPayload<VideoRoomListResponse>(data, VideoRoomListResponse.fromJson);
   }
 
-  Future<PublisherJoinedResponse?> joinPublisher(int roomId, {int? id, String? token, String? displayName, bool? notifyJoining}) async {
+  Future<void> joinPublisher(int roomId, {int? id, String? token, String? displayName}) async {
     var payload = {
       "request": "join",
       "ptype": "publisher",
@@ -90,9 +92,8 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       if (id != null) "id": id,
       if (displayName != null) "display": displayName,
       if (token != null) "token": token,
-      if (notifyJoining != null) "notify_joining": true
     };
     Map data = await this.send(data: payload);
-    return _getPluginDataFromPayload<PublisherJoinedResponse>(data, PublisherJoinedResponse.fromJson);
+    _getPluginDataFromPayload<PublisherJoinedResponse>(data, PublisherJoinedResponse.fromJson);
   }
 }

@@ -111,7 +111,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
       ]);
     });
     session = await j.createSession();
-    publishVideo = await session.attach(JanusPlugins.VIDEO_CALL);
+    publishVideo = await session.attach<JanusVideoCallPlugin>();
     publishVideo.remoteStream?.listen((event) {
       _remoteRenderer.srcObject = event;
     });

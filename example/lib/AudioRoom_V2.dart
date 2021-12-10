@@ -121,7 +121,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
               credential: "")
         ]);
     session = await j.createSession();
-    pluginHandle = await session.attach(JanusPlugins.AUDIO_BRIDGE);
+    pluginHandle = await session.attach<JanusAudioBridgePlugin>();
     await pluginHandle.initializeMediaDevices(
         mediaConstraints: {"audio": true, "video": false});
 

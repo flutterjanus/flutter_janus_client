@@ -49,7 +49,9 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     await initRenderers();
     setState(() {
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+      j = JanusClient(
+          loggerLevel: Level.OFF,
+          transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     });
     var sess = await j.createSession();
     session = sess;
@@ -67,6 +69,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         (await plugin.publishMedia(bitrate: 2000000));
       }
       if(data is VideoRoomNewPublisherEvent){
+        print('got new publishers');
+        print(data.publishers.toString());
         // data.publishers[0].streams[0].
       }
       await plugin.handleRemoteJsep(event.jsep);

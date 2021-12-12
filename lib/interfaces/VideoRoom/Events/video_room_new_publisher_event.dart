@@ -97,7 +97,7 @@ class Streams {
   }
   String? type;
   int? mindex;
-  int? mid;
+  String? mid;
   bool? disabled;
   String? codec;
   String? description;

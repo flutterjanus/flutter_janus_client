@@ -5,11 +5,11 @@
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 # janus_client
-This branch features brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events.  
-Definitely, It gonna be  easy to maintain and test.
+This branch features development updates and fixes for brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events therefore it is easy
+to work with and test.
 
 **all dependencies updated**  
-official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
+official janus plugin for flutter, can be considered as improved port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
 
 
 ## what is janus?
@@ -21,9 +21,12 @@ For more info visit
 
 # Video Call Sample
 <a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
-                                            width='300' height='600'></a>
+
 
 ## News & Updates
+- examples updated with null safety and latest dart constraints
+- introduced plugin specific wrapper classes with respective operation methods for rich development experience 
+- introduced typed events (Class Based Events) for brilliant auto completion support for IDE  
 - Supports null-safety
 - VideoCall example ready with V2 API
 - Streaming example ready with V2 API

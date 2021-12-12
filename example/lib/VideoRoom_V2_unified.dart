@@ -175,7 +175,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
       }
       if (even.jsep != null) {
         print('handle jsep for subscriber');
-        remoteFeed.handleRemoteJsep(even.jsep);
+        await remoteFeed.handleRemoteJsep(even.jsep);
         var jsep = await remoteFeed.createAnswer(audioSend: false, videoSend: false);
         var body = {'request': "start", 'room': myRoom};
         await remoteFeed.send(data: body, jsep: jsep);

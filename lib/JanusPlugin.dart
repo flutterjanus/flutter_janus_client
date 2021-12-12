@@ -392,7 +392,7 @@ class JanusPlugin {
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
   Future<void> handleRemoteJsep(RTCSessionDescription? data) async {
     if (data != null) {
-      await webRTCHandle!.peerConnection!.setRemoteDescription(data);
+      await webRTCHandle?.peerConnection?.setRemoteDescription(data);
     }
   }
 
@@ -449,11 +449,8 @@ class JanusPlugin {
     if (context!.isUnifiedPlan) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
-    } else {
-      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
-
-    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions);
+    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions??{});
     await webRTCHandle!.peerConnection!.setLocalDescription(offer);
     return offer;
   }
@@ -461,21 +458,37 @@ class JanusPlugin {
   /// This method is used to create webrtc answer, sets local description on internal PeerConnection object
   /// It supports both style of answer creation that is plan-b and unified.
   Future<RTCSessionDescription> createAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
-    dynamic offerOptions = null;
+    dynamic offerOptions;
     if (context!.isUnifiedPlan) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
     try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions);
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
     } catch (e) {
       //    handling kstable exception most ugly way but currently there's no other workaround, it just works
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions);
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
+    }
+  }
+
+  Future<RTCSessionDescription?> createNullableAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
+    dynamic offerOptions;
+    if (context!.isUnifiedPlan) {
+      await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
+    } else {
+      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
+    }
+    try {
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
+      await webRTCHandle!.peerConnection!.setLocalDescription(offer);
+      return offer;
+    } catch (e) {
+      return null;
     }
   }
 

@@ -52,3 +52,11 @@ class VideoRoomEvent{
 
 //</editor-fold>
 }
+
+class BaseStream{
+  int? mindex;
+  String? mid;
+  String? type;
+
+
+}

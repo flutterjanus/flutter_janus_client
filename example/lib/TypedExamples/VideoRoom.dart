@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:janus_client_example/Helper.dart';
 import 'dart:async';
 
 import 'package:janus_client_example/conf.dart';
@@ -18,7 +19,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   late JanusVideoRoomPlugin plugin;
-  late JanusVideoRoomPlugin remoteFeed;
+  JanusVideoRoomPlugin? remoteHandle;
   late int myId;
   int myRoom = 1234;
   dynamic feedStreams = {};
@@ -45,16 +46,38 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     await _localRenderer.initialize();
   }
 
+  subscribeTo(List<Map<String, dynamic>> sources) async {
+    if (remoteHandle != null) {
+      return;
+    }
+    remoteHandle = await session.attach<JanusVideoRoomPlugin>();
+    print(sources);
+    var streams=(sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
+    var start=await remoteHandle?.joinSubscriber(1234, streams:streams);
+    remoteHandle?.typedMessages?.listen((event) async{
+      Object data=event.event.plugindata?.data;
+      if(data is VideoRoomAttachedEvent){
+        print('Attached event');
+        print(data.streams);
+        // data.streams[0].
+      }
+      if(event.jsep!=null){
+        await remoteHandle?.handleRemoteJsep(event.jsep);
+        await start!();
+
+      }
+    });
+    remoteHandle?.remoteTrack?.listen((event) {
+      print('recieved remote track'+event.track.toString());
+    });
+    return;
+  }
+
   Future<void> joinRoom() async {
     await initRenderers();
-    setState(() {
-      ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(
-          transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
-    });
-    var sess = await j.createSession();
-    session = sess;
-
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+    session = await j.createSession();
     plugin = await session.attach<JanusVideoRoomPlugin>();
     MediaStream? stream = await plugin.initializeMediaDevices(mediaConstraints: {"video": true, "audio": true});
     _localRenderer.srcObject = stream;
@@ -65,13 +88,20 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     plugin.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
-        (await plugin.publishMedia(bitrate: 2000000));
+        (await plugin.publishMedia());
+        List<Map<String, dynamic>> publisherStreams = [];
+        for (Publishers publisher in data.publishers ?? []) {
+          for (Streams stream in publisher.streams ?? []) {
+            // print(stream);
+            publisherStreams.add({"feed": publisher.id, ...stream.toJson()});
+          }
+        }
+        subscribeTo(publisherStreams);
       }
-      if(data is VideoRoomNewPublisherEvent){
+      if (data is VideoRoomNewPublisherEvent) {
         print('got new publishers');
-        print(data.publishers.toString());
       }
-      if(data is VideoRoomLeavingEvent){
+      if (data is VideoRoomLeavingEvent) {
         print('publisher is leaving');
         print(data.leaving);
       }
@@ -83,30 +113,20 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    if (plugin != null) {
-      plugin.dispose();
-    }
-    if (session != null) {
-      session.dispose();
-    }
+    plugin.dispose();
+    session.dispose();
     cleanUpResources();
   }
 
   callEnd() async {
-    if (plugin != null) {
-      await plugin.hangup();
-    }
+    await plugin.hangup();
 
-    if (_localRenderer != null) {
-      _localRenderer.srcObject = null;
-      try {
-        await _localRenderer.dispose();
-      } catch (e) {}
-    }
+    _localRenderer.srcObject = null;
+    try {
+      await _localRenderer.dispose();
+    } catch (e) {}
 
-    if (plugin != null) {
-      plugin.dispose();
-    }
+    plugin.dispose();
     cleanUpResources();
   }
 

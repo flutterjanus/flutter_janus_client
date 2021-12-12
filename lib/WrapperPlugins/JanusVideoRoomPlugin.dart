@@ -98,6 +98,26 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     Map data = await this.send(data: payload);
   }
 
+  Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(int roomId,
+      {List<PublisherStream>? streams, int? privateId, int? feedId}) async {
+    Future<void> start({audioRecv = true, audioSend = false, videoRecv = true, videoSend = false}) async {
+      var payload = {"request": "start", 'room': roomId};
+      RTCSessionDescription? offer = await this.createNullableAnswer(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
+      if (offer != null) await this.send(data: payload, jsep: offer);
+    }
+
+    var payload = {
+      "request": "join",
+      "room": roomId,
+      "ptype": "subscriber",
+      if (feedId != null) "feed": feedId,
+      if (privateId != null) "private_id": privateId,
+      if (streams != null) "streams": (streams).map((e) => e.toMap()).toList(),
+    };
+    Map data = await this.send(data: payload);
+    return start;
+  }
+
   Future<void> publishMedia(
       {String? audioCodec,
       String? videCodec,
@@ -141,8 +161,11 @@ class JanusVideoRoomPlugin extends JanusPlugin {
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['leaving'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' && typedEvent.event.plugindata?.data['streams'] != null) {
+          typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
         }
-        if(typedEvent.jsep!=null){
+        if (typedEvent.jsep != null) {
           typedMessagesSink?.add(typedEvent);
         }
       });

@@ -91,36 +91,3 @@ class Publishers {
   }
 }
 
-// class Streams {
-//   Streams({
-//     this.type,
-//     this.mindex,
-//     this.mid,
-//     this.codec,
-//     this.talking,
-//   });
-//
-//   Streams.fromJson(dynamic json) {
-//     type = json['type'];
-//     mindex = json['mindex'];
-//     mid = json['mid'];
-//     codec = json['codec'];
-//     talking = json['talking'];
-//   }
-//
-//   String? type;
-//   int? mindex;
-//   String? mid;
-//   String? codec;
-//   bool? talking;
-//
-//   Map<String, dynamic> toJson() {
-//     final map = <String, dynamic>{};
-//     map['type'] = type;
-//     map['mindex'] = mindex;
-//     map['mid'] = mid;
-//     map['codec'] = codec;
-//     map['talking'] = talking;
-//     return map;
-//   }
-// }

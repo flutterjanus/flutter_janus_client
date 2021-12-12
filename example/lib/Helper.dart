@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:janus_client/JanusClient.dart';
+
 List<StreamingItem> streamingItemFromMap(String str) => List<StreamingItem>.from(json.decode(str).map((x) => StreamingItem.fromMap(x)));
 
 String streamingItemToMap(List<StreamingItem> data) => json.encode(List<dynamic>.from(data.map((x) => x.toMap())));

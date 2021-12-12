@@ -61,6 +61,7 @@ class JanusSession {
     Map<String, dynamic>? response;
     if (T == JanusVideoRoomPlugin) {
       plugin = JanusVideoRoomPlugin(transport: transport, context: context, handleId: handleId, session: this);
+
     } else if (T == JanusVideoCallPlugin) {
       plugin = JanusVideoCallPlugin(transport: transport, context: context, handleId: handleId, session: this);
     } else if (T == JanusStreamingPlugin) {
@@ -106,6 +107,7 @@ class JanusSession {
     plugin.handleId = handleId;
     _pluginHandles[handleId] = plugin;
     await plugin.init();
+    plugin.onCreate();
     return plugin as T;
   }
 

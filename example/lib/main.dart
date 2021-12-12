@@ -5,9 +5,7 @@ import 'package:janus_client_example/Streaming_V2.dart';
 import 'package:janus_client_example/Streaming_V2_unified.dart';
 import 'package:janus_client_example/TextRoom_V2.dart';
 import 'package:janus_client_example/VideoCall_V2.dart';
-
 import 'package:janus_client_example/VideoRoom_V2.dart';
-
 import 'TypedExamples/VideoRoom.dart';
 import 'VideoRoom_V2_unified.dart';
 
@@ -26,8 +24,8 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       routes: {
         "/video_call_v2": (c) => VideoCallV2Example(),
-        // "/video_room_v2": (c) => VideoRoomV2(),
-        // "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
+        "/video_room_v2": (c) => VideoRoomV2(),
+        "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
         "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
         "/audio_room_v2": (c) => AudioRoomV2(),
         "/text_room_v2": (c) => TextRoomV2Example(),

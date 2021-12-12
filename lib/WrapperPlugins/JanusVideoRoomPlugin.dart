@@ -1,4 +1,6 @@
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/interfaces/VideoRoom/Events/video_room_new_publisher_event.dart';
 
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
@@ -94,6 +96,47 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       if (token != null) "token": token,
     };
     Map data = await this.send(data: payload);
-    _getPluginDataFromPayload<PublisherJoinedResponse>(data, PublisherJoinedResponse.fromJson);
+  }
+
+  Future<void> publishMedia(
+      {String? audioCodec,
+      String? videCodec,
+      int? bitrate,
+      bool? record,
+      String? filename,
+      String? newDisplayName,
+      int? audioLevelAverage,
+      int? audioActivePackets,
+      List<Map<String, String>>? descriptions}) async {
+    var payload = {
+      "request": "publish",
+      if (audioCodec != null) "audiocodec": audioCodec,
+      if (videCodec != null) "videocodec": videCodec,
+      if (bitrate != null) "bitrate": bitrate,
+      if (record != null) "record": record,
+      if (filename != null) "filename": filename,
+      if (newDisplayName != null) "display": newDisplayName,
+      if (audioLevelAverage != null) "audio_level_average": audioLevelAverage,
+      if (audioActivePackets != null) "audio_active_packets": audioActivePackets,
+      if (descriptions != null) "descriptions": descriptions
+    };
+    RTCSessionDescription offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+    Map data = await this.send(data: payload, jsep: offer);
+  }
+
+  @override
+  void onCreate() {
+    // TODO: implement onCreate
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      if (typedEvent.event.plugindata?.data != null) {
+        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
+          typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
+          typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
+        }
+        typedMessagesSink?.add(typedEvent);
+      }
+    });
   }
 }

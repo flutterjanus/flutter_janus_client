@@ -16,6 +16,7 @@ abstract class JanusPlugins {
 }
 
 class JanusPlugin {
+  void onCreate() {}
   int? handleId;
   JanusClient? context;
   String? plugin;
@@ -38,6 +39,8 @@ class JanusPlugin {
   StreamController<TypedEvent>? _typedMessagesStreamController;
   StreamController<RTCDataChannelMessage>? _dataStreamController;
   StreamController<RTCDataChannelState>? _onDataStreamController;
+
+  StreamSink? get typedMessagesSink => _typedMessagesStreamController?.sink;
 
   int _pollingRetries = 0;
   Timer? _pollingTimer;
@@ -86,7 +89,7 @@ class JanusPlugin {
     }
   }
 
-  void _handleTransportInitialization(){
+  void _handleTransportInitialization() {
     if (transport is RestJanusTransport) {
       _pollingTimer = Timer.periodic(Duration(seconds: 1), (timer) async {
         if (!pollingActive) {
@@ -101,7 +104,7 @@ class JanusPlugin {
     }
   }
 
-  void _initStreamControllersAndStreams(){
+  void _initStreamControllersAndStreams() {
     //source and stream for session level events
     _streamController = StreamController<dynamic>();
     events = _streamController!.stream.asBroadcastStream();
@@ -132,7 +135,7 @@ class JanusPlugin {
     onData = _onDataStreamController!.stream.asBroadcastStream();
   }
 
-  void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection){
+  void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection) {
     if (context!.isUnifiedPlan) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
         context!.logger.fine('onTrack called with event');
@@ -217,7 +220,7 @@ class JanusPlugin {
     };
   }
 
-  void _handleIceCandidatesSending(RTCPeerConnection peerConnection){
+  void _handleIceCandidatesSending(RTCPeerConnection peerConnection) {
     // get ice candidates and send to janus on this plugin handle
     peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
       Map<String, dynamic>? response;
@@ -259,11 +262,6 @@ class JanusPlugin {
         _messagesStreamController!.sink.add(EventMessage(event: event, jsep: null));
       }
     });
-    messages?.listen((event) {
-      TypedEvent typedEvent=TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event),jsep: event.jsep);
-      _typedMessagesStreamController?.sink.add(typedEvent);
-    });
-    // _typedMessagesStreamController.sink.add(event)
   }
 
   _handlePolling() async {
@@ -392,8 +390,10 @@ class JanusPlugin {
   }
 
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
-  Future<void> handleRemoteJsep(RTCSessionDescription data) async {
-    await webRTCHandle!.peerConnection!.setRemoteDescription(data);
+  Future<void> handleRemoteJsep(RTCSessionDescription? data) async {
+    if (data != null) {
+      await webRTCHandle!.peerConnection!.setRemoteDescription(data);
+    }
   }
 
   /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
@@ -448,6 +448,7 @@ class JanusPlugin {
     dynamic offerOptions = null;
     if (context!.isUnifiedPlan) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
+      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }

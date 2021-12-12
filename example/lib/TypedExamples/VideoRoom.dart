@@ -50,7 +50,6 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     setState(() {
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(
-          loggerLevel: Level.OFF,
           transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     });
     var sess = await j.createSession();
@@ -71,7 +70,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       if(data is VideoRoomNewPublisherEvent){
         print('got new publishers');
         print(data.publishers.toString());
-        // data.publishers[0].streams[0].
+      }
+      if(data is VideoRoomLeavingEvent){
+        print('publisher is leaving');
+        print(data.leaving);
       }
       await plugin.handleRemoteJsep(event.jsep);
     });

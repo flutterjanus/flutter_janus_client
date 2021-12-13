@@ -47,7 +47,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   subscribeTo(List<Map<String, dynamic>> sources) async {
+    if(sources.length==0) return;
     if (remoteHandle != null) {
+      var streams=(sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
+      await remoteHandle?.subscribeToStreams(streams);
       return;
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
@@ -58,7 +61,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       Object data=event.event.plugindata?.data;
       if(data is VideoRoomAttachedEvent){
         print('Attached event');
-        print(data.streams);
+        // print(data.streams.);
         // data.streams[0].
       }
       if(event.jsep!=null){
@@ -69,6 +72,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     });
     remoteHandle?.remoteTrack?.listen((event) {
       print('recieved remote track'+event.track.toString());
+
+
     });
     return;
   }
@@ -88,18 +93,37 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     plugin.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
-        (await plugin.publishMedia());
+        (await plugin.publishMedia(bitrate: 3000000));
         List<Map<String, dynamic>> publisherStreams = [];
         for (Publishers publisher in data.publishers ?? []) {
           for (Streams stream in publisher.streams ?? []) {
             // print(stream);
+            feedStreams[publisher.id]={
+              "id":publisher.id,
+              "display":publisher.display,
+              "streams":publisher.streams
+            };
             publisherStreams.add({"feed": publisher.id, ...stream.toJson()});
           }
         }
         subscribeTo(publisherStreams);
       }
       if (data is VideoRoomNewPublisherEvent) {
+        List<Map<String, dynamic>> publisherStreams = [];
+        for (Publishers publisher in data.publishers ?? []) {
+          feedStreams[publisher.id]={
+            "id":publisher.id,
+            "display":publisher.display,
+            "streams":publisher.streams
+          };
+          for (Streams stream in publisher.streams ?? []) {
+            // print(stream);
+            publisherStreams.add({"feed": publisher.id, ...stream.toJson()});
+          }
+        }
         print('got new publishers');
+        print(publisherStreams);
+        subscribeTo(publisherStreams);
       }
       if (data is VideoRoomLeavingEvent) {
         print('publisher is leaving');

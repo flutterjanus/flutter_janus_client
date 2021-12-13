@@ -25,6 +25,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   dynamic feedStreams = {};
   dynamic subscriptions = {};
   dynamic feeds = {};
+  Map<String, int> subStreams = {};
+  Map<int, MediaStream?> mediaStreams = {};
 
   @override
   initState() {
@@ -47,33 +49,62 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   subscribeTo(List<Map<String, dynamic>> sources) async {
-    if(sources.length==0) return;
+    if (sources.length == 0) return;
+    var streams = (sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
+    // for (PublisherStream stream in streams) {
+    //   // removing duplicate subscriptions before any processing
+    //   if (subscriptions[stream.feed] != null && subscriptions[stream.feed][stream.mid]) {
+    //     streams.remove(stream);
+    //   }
+    // }
     if (remoteHandle != null) {
-      var streams=(sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
       await remoteHandle?.subscribeToStreams(streams);
       return;
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
     print(sources);
-    var streams=(sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
-    var start=await remoteHandle?.joinSubscriber(1234, streams:streams);
-    remoteHandle?.typedMessages?.listen((event) async{
-      Object data=event.event.plugindata?.data;
-      if(data is VideoRoomAttachedEvent){
+    var start = await remoteHandle?.joinSubscriber(1234, streams: streams);
+    remoteHandle?.typedMessages?.listen((event) async {
+      Object data = event.event.plugindata?.data;
+      if (data is VideoRoomAttachedEvent) {
         print('Attached event');
-        // print(data.streams.);
-        // data.streams[0].
+        data.streams?.forEach((element) {
+          if (element.mid != null && element.feedId != null) {
+            subStreams["janus" + element.mid!] = element.feedId!;
+          }
+          // to avoid duplicate subscriptions
+          if (subscriptions[element.feedId] == null) subscriptions[element.feedId] = {};
+          subscriptions[element.feedId][element.mid] = true;
+        });
+        print('substreams');
+        print(subStreams);
       }
-      if(event.jsep!=null){
+      if (event.jsep != null) {
         await remoteHandle?.handleRemoteJsep(event.jsep);
         await start!();
-
       }
     });
-    remoteHandle?.remoteTrack?.listen((event) {
-      print('recieved remote track'+event.track.toString());
-
-
+    remoteHandle?.remoteTrack?.listen((event) async {
+      // if (event.flowing!) {
+        String mid = event.mid!;
+        print(mid);
+        print(subStreams[mid]);
+        // if (subStreams[mid] != null) {
+          int feedId = subStreams[mid]!;
+          print('got feed id' + feedId.toString());
+          setState(() {
+            remoteRenderers.putIfAbsent(feedId, () => RTCVideoRenderer());
+          });
+          MediaStream mediaStream = await createLocalMediaStream('stream' + feedId.toString());
+          setState(() {
+            mediaStreams.putIfAbsent(feedId, () => mediaStream);
+          });
+          await remoteRenderers[feedId]?.initialize();
+          mediaStreams[feedId] = mediaStreams[feedId]?.clone();
+          mediaStreams[feedId]?.addTrack(event.track!);
+          remoteRenderers[feedId]?.srcObject = mediaStreams[feedId];
+        // }
+      // }
     });
     return;
   }
@@ -85,7 +116,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     session = await j.createSession();
     plugin = await session.attach<JanusVideoRoomPlugin>();
     MediaStream? stream = await plugin.initializeMediaDevices(mediaConstraints: {"video": true, "audio": true});
-    _localRenderer.srcObject = stream;
+    setState(() {
+      remoteRenderers[0] = RTCVideoRenderer();
+    });
+    await remoteRenderers[0]?.initialize();
+    remoteRenderers[0]?.srcObject = stream;
     await plugin.joinPublisher(
       1234,
       displayName: "Shivansh",
@@ -98,12 +133,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         for (Publishers publisher in data.publishers ?? []) {
           for (Streams stream in publisher.streams ?? []) {
             // print(stream);
-            feedStreams[publisher.id]={
-              "id":publisher.id,
-              "display":publisher.display,
-              "streams":publisher.streams
-            };
+            feedStreams[publisher.id] = {"id": publisher.id, "display": publisher.display, "streams": publisher.streams};
             publisherStreams.add({"feed": publisher.id, ...stream.toJson()});
+            if (publisher.id != null && stream.mid != null) {
+              subStreams["janus" + stream.mid!] = publisher.id!;
+            }
           }
         }
         subscribeTo(publisherStreams);
@@ -111,14 +145,13 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       if (data is VideoRoomNewPublisherEvent) {
         List<Map<String, dynamic>> publisherStreams = [];
         for (Publishers publisher in data.publishers ?? []) {
-          feedStreams[publisher.id]={
-            "id":publisher.id,
-            "display":publisher.display,
-            "streams":publisher.streams
-          };
+          feedStreams[publisher.id] = {"id": publisher.id, "display": publisher.display, "streams": publisher.streams};
           for (Streams stream in publisher.streams ?? []) {
             // print(stream);
             publisherStreams.add({"feed": publisher.id, ...stream.toJson()});
+            if (publisher.id != null && stream.mid != null) {
+              subStreams["janus" + stream.mid!] = publisher.id!;
+            }
           }
         }
         print('got new publishers');
@@ -194,7 +227,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
             itemCount: remoteRenderers.entries.toList().length,
             itemBuilder: (context, index) {
-              return RTCVideoView(remoteRenderers.entries.toList()[index].value, objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover, mirror: true);
+              return RTCVideoView(remoteRenderers.entries.toList()[index].value, filterQuality: FilterQuality.high, objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitCover, mirror: true);
             }));
   }
 }

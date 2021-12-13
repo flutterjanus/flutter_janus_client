@@ -98,6 +98,12 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     Map data = await this.send(data: payload);
   }
 
+  Future<void> subscribeToStreams(List<PublisherStream> streams)async{
+    if(streams.length>0){
+      var payload = {'request': "subscribe", 'streams': streams.map((e) => e.toMap()).toList()};
+      await this.send(data: payload);
+    }
+  }
   Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(int roomId,
       {List<PublisherStream>? streams, int? privateId, int? feedId}) async {
     Future<void> start({audioRecv = true, audioSend = false, videoRecv = true, videoSend = false}) async {

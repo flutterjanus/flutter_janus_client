@@ -1,6 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/JanusClient.dart';
-import 'package:janus_client/interfaces/VideoRoom/Events/video_room_new_publisher_event.dart';
 
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);

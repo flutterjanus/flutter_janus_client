@@ -9,7 +9,7 @@ This branch features brand new API(v2) which is more fun to work with since it u
 Definitely, It gonna be  easy to maintain and test.
 
 **all dependencies updated**  
-official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
+Feature rich janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
 
 
 ## what is janus?

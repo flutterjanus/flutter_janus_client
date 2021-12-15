@@ -4,7 +4,7 @@
 # janus_client
 **all dependencies updated**  
 <p style="color:grey;">
-official janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
+Feature rich janus plugin for flutter, can be considered as port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
 </p>
 
 <p style="color:red;font-weight:bold;">

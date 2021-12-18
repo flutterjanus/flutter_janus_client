@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_webrtc: ^0.8.0
-  path_provider: ^2.0.7
+  path_provider: ^2.0.8
   http: ^0.13.4
   web_socket_channel: ^2.1.0
   stream_channel: ^2.1.0

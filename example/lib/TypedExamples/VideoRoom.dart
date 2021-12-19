@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -13,7 +15,6 @@ class TypedVideoRoomV2Unified extends StatefulWidget {
 
 class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   late JanusClient j;
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   Map<int, RTCVideoRenderer> remoteRenderers = {};
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
@@ -21,31 +22,23 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   late JanusVideoRoomPlugin plugin;
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
+  MediaStream? myStream;
   int myRoom = 1234;
   Map<int, dynamic> feedStreams = {};
-  dynamic subscriptions = {};
-  dynamic feeds = {};
+  Map<int?,dynamic> subscriptions = {};
+  Map<int,dynamic> feeds = {};
   Map<String, int> subStreams = {};
   Map<int, MediaStream?> mediaStreams = {};
 
   @override
   initState() {
     super.initState();
-    initRenderers();
   }
 
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    await initRenderers();
-  }
-
-  initRenderers() async {
-    setState(() {
-      _localRenderer = RTCVideoRenderer();
-    });
-    await _localRenderer.initialize();
   }
 
   subscribeTo(List<Map<String, dynamic>> sources) async {
@@ -102,17 +95,16 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   Future<void> joinRoom() async {
-    await initRenderers();
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     session = await j.createSession();
     plugin = await session.attach<JanusVideoRoomPlugin>();
-    MediaStream? stream = await plugin.initializeMediaDevices(mediaConstraints: {"video": true, "audio": true});
+    myStream = await plugin.initializeMediaDevices(mediaConstraints: {"video": true, "audio": true});
     setState(() {
       remoteRenderers[0] = RTCVideoRenderer();
     });
     await remoteRenderers[0]?.initialize();
-    remoteRenderers[0]?.srcObject = stream;
+    remoteRenderers[0]?.srcObject = myStream;
     await plugin.joinPublisher(
       1234,
       displayName: "Shivansh",
@@ -164,24 +156,26 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     });
   }
 
-  void unSubscribeStream(int id) {
+  Future<void> unSubscribeStream(int id) async {
 // Unsubscribe from this publisher
     var feed = this.feedStreams[id];
     if (feed == null) return;
-    print("Feed " + id.toString() + " (" + feed["display"] + ") has left the room, detaching");
     this.feedStreams.remove(id);
     // Send an unsubscribe request
     this.remoteRenderers[id]?.srcObject = null;
     this.remoteRenderers[id]?.dispose();
     this.remoteRenderers.remove(id);
-    this.mediaStreams.remove(id);
+    MediaStream? streamRemoved=this.mediaStreams.remove(id);
+    streamRemoved?.getTracks().forEach((element) async{
+      await element.stop();
+    });
     var unsubscribe = {
       "request": "unsubscribe",
       "streams": [
         {feed: id}
       ]
     };
-    if (remoteHandle != null) remoteHandle?.send(data: {"message": unsubscribe});
+    if (remoteHandle != null) await remoteHandle?.send(data: {"message": unsubscribe});
     this.subscriptions.remove(id);
   }
 
@@ -191,18 +185,34 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     super.dispose();
     plugin.dispose();
     session.dispose();
-    cleanUpResources();
   }
 
   callEnd() async {
     await plugin.hangup();
-    _localRenderer.srcObject = null;
-    try {
-      await _localRenderer.dispose();
-    } catch (e) {}
-
-    plugin.dispose();
-    cleanUpResources();
+    for (int i = 0; i < feedStreams.keys.length; i++) {
+      await unSubscribeStream(feedStreams.keys.elementAt(i));
+    }
+    for (int i = 0; i < remoteRenderers.keys.length; i++) {
+      var value = remoteRenderers.entries.elementAt(i);
+      value.value.srcObject?.dispose();
+      value.value.srcObject = null;
+      await value.value.dispose();
+      remoteRenderers.remove(value.key);
+    }
+    subStreams.clear();
+    subscriptions.clear();
+    // stop all tracks and then dispose
+    myStream?.getTracks().forEach((element)async {
+     await element.stop();
+   });
+   await myStream?.dispose();
+    await remoteHandle?.dispose();
+    print(mediaStreams);
+    print(remoteRenderers);
+    print(feedStreams);
+    print(subStreams);
+    await plugin.dispose();
+    session.dispose();
   }
 
   cleanUpResources() {}

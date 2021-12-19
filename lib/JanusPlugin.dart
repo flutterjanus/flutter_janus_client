@@ -307,7 +307,7 @@ class JanusPlugin {
     if (_pollingTimer != null) {
       _pollingTimer!.cancel();
     }
-    this.send(data: {"request": "leave"});
+    await this.send(data: {"request": "leave"});
     dispose();
   }
 

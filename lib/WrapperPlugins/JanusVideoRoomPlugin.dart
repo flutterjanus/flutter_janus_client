@@ -3,12 +3,6 @@ import 'package:janus_client/JanusClient.dart';
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
 
-  /// You can check whether a room exists using the exists
-  Future<dynamic> exists(int roomId) async {
-    var payload = {"request": "exists", "room": roomId};
-    return (await this.send(data: payload));
-  }
-
   ///  This allows you to modify the room description, secret, pin and whether it's private or not:
   ///  you won't be able to modify other more static properties, like the room ID, the sampling rate,
   ///  the extensions-related stuff and so on

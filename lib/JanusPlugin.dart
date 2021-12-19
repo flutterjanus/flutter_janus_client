@@ -311,6 +311,12 @@ class JanusPlugin {
     dispose();
   }
 
+  /// You can check whether a room exists using the exists
+  Future<dynamic> exists(int roomId) async {
+    var payload = {"request": "exists", "room": roomId};
+    return (await this.send(data: payload));
+  }
+
   /// This function takes care of cleaning up all the internal stream controller and timers used to make janus_client compatible with streams and polling support
   ///
   Future<void> dispose() async {

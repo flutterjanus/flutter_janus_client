@@ -57,6 +57,4 @@ class BaseStream{
   int? mindex;
   String? mid;
   String? type;
-
-
 }

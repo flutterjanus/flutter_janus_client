@@ -1,6 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/JanusClient.dart';
-
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
 
@@ -157,22 +156,28 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
+         if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
           typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
+        }
+         else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['configured'] == "ok") {
+           typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
+           typedMessagesSink?.add(typedEvent);
+         }
+        else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['leaving'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' && typedEvent.event.plugindata?.data['streams'] != null) {
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' || typedEvent.event.plugindata?.data['streams'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
         }
-        if (typedEvent.jsep != null) {
-          typedMessagesSink?.add(typedEvent);
-        }
+        // if (typedEvent.jsep != null) {
+        //   typedEvent.jsep=event.jsep;
+        //   typedMessagesSink?.add(typedEvent);
+        // }
       });
     }
   }

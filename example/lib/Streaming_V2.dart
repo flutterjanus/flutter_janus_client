@@ -19,7 +19,7 @@ class _StreamingState extends State<StreamingV2> {
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
 
   List<dynamic> streams = [];
-  late int selectedStreamId;
+   int? selectedStreamId;
   bool _loader = true;
 
   late StateSetter _setState;

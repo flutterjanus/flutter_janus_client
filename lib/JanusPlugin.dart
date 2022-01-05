@@ -63,11 +63,11 @@ class JanusPlugin {
       }
       // initializing WebRTC Handle
       Map<String, dynamic> configuration = {"iceServers": context!.iceServers != null ? context!.iceServers!.map((e) => e.toMap()).toList() : []};
-      if (context!.isUnifiedPlan) {
+      // if (context!.isUnifiedPlan) {
         configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
-      } else {
-        configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
-      }
+      // } else {
+        // configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
+      // }
       context!.logger.fine('peer connection configuration');
       context!.logger.fine(configuration);
       // todo: initialize stream controllers and streams

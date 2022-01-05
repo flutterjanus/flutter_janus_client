@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -89,6 +91,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
   late MediaStream remoteStream;
   late MediaStream myStream;
   List<Participant> participants = [];
+  MediaStream? stream;
 
   @override
   void didChangeDependencies() async {
@@ -122,7 +125,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
         ]);
     session = await j.createSession();
     pluginHandle = await session.attach<JanusAudioBridgePlugin>();
-    await pluginHandle.initializeMediaDevices(
+    stream=await pluginHandle.initializeMediaDevices(
         mediaConstraints: {"audio": true, "video": false});
 
     var register = {"request": "join", "room": 1234, "display": 'shivansh'};
@@ -156,7 +159,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']);
+                      talking: element['talking']!=null?element['talking']:false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants
@@ -186,7 +189,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']);
+                      talking: element['talking']!=null?element['talking']:false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants
@@ -230,6 +233,9 @@ class _AudioRoomState extends State<AudioRoomV2> {
     await pluginHandle.send(data: {"request": "leave"});
     await pluginHandle.hangup();
     pluginHandle.dispose();
+    stream?.getTracks().forEach((element) {
+      element.stop();
+    });
     session.dispose();
   }
 

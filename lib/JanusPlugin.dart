@@ -387,6 +387,9 @@ class JanusPlugin {
         response = (await rest.post(request, handleId: handleId)) as Map<String, dynamic>;
       } else if (transport is WebSocketJanusTransport) {
         WebSocketJanusTransport ws = (transport as WebSocketJanusTransport);
+        if(!ws.isConnected){
+          return;
+        }
         response = await ws.send(request, handleId: handleId);
       }
       return response;

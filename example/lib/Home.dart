@@ -67,6 +67,12 @@ class _HomeState extends State<Home> {
                 Navigator.of(context).pushNamed("/typed_video_room_v2_unified");
               },
             ),
+            ListTile(
+              title: Text("Typed Streaming"),
+              onTap: () {
+                Navigator.of(context).pushNamed("/typed_streaming");
+              },
+            ),
           ],
         ));
   }

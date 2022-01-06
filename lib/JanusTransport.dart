@@ -67,6 +67,7 @@ class WebSocketJanusTransport extends JanusTransport {
   void dispose() {
     if (channel != null && sink != null) {
       sink!.close();
+      isConnected=false;
     }
   }
 
@@ -78,7 +79,7 @@ class WebSocketJanusTransport extends JanusTransport {
       }
       sink!.add(stringify(data));
       return parse(await stream.firstWhere(
-          (element) => (parse(element)['transaction'] == data['transaction'])));
+          (element) => (parse(element)['transaction'] == data['transaction']),orElse: ()=>{}));
     } else {
       throw "transaction key missing in body";
     }

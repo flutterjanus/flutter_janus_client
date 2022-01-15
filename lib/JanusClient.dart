@@ -10,6 +10,7 @@ class JanusClient {
   JanusTransport? transport;
   String? apiSecret;
   String? token;
+  late Duration _pollingInterval;
   bool withCredentials;
   int maxEvent;
   List<RTCIceServer>? iceServers = [];
@@ -18,6 +19,8 @@ class JanusClient {
   String loggerName;
   late Logger logger;
   Level loggerLevel;
+
+  Duration get pollingInterval=>_pollingInterval;
 
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
@@ -43,6 +46,7 @@ class JanusClient {
       this.apiSecret,
       this.isUnifiedPlan = false,
       this.token,
+      Duration? pollingInterval,
       this.loggerName = "JanusClient",
       this.maxEvent = 10,
       this.loggerLevel = Level.ALL,
@@ -52,13 +56,13 @@ class JanusClient {
     logger.onRecord.listen((event) {
       print(event);
     });
+    this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
   }
 
   Future<JanusSession> createSession() async {
     logger.info("Creating Session");
     logger.fine("fine message");
-    JanusSession session = JanusSession(
-        refreshInterval: refreshInterval, transport: transport, context: this);
+    JanusSession session = JanusSession(refreshInterval: refreshInterval, transport: transport, context: this);
     try {
       await session.create();
     } catch (e) {

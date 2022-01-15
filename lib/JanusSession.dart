@@ -21,7 +21,7 @@ class JanusSession {
       Map<String, dynamic>? response;
       if (transport is RestJanusTransport) {
         RestJanusTransport rest = (transport as RestJanusTransport);
-        response = (await rest.post(request)) as Map<String, dynamic>;
+        response = (await rest.post(request)) as Map<String, dynamic>?;
         if (response != null) {
           if (response.containsKey('janus') && response.containsKey('data')) {
             sessionId = response['data']['id'];

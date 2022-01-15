@@ -107,7 +107,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
         RTCIceServer(
-            url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
+            urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
       ]);
     });
     session = await j.createSession();

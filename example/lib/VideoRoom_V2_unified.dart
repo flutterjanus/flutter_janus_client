@@ -198,7 +198,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     await initRenderers();
     setState(() {
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(url: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+      j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     });
     var sess = await j.createSession();
     session = sess;

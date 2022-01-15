@@ -15,22 +15,12 @@ class _StreamingState extends State<TypedStreamingV2> {
   late JanusSession session;
   late JanusStreamingPlugin plugin;
   Map<int, JanusPlugin> subscriberHandles = {};
-
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-
   late List<StreamingMountPoint> streams;
    int? selectedStreamId;
   bool _loader = true;
-
   late StateSetter _setState;
   bool isPlaying=true;
-
-  @override
-  void didChangeDependencies() async {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-    await _remoteRenderer.initialize();
-  }
 
   showStreamSelectionDialog() async {
     return showDialog(
@@ -73,8 +63,13 @@ class _StreamingState extends State<TypedStreamingV2> {
     setState(() {
       rest = RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: ws, iceServers: [RTCIceServer(url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")]);
+      j = JanusClient(transport: ws, iceServers: [
+        RTCIceServer(username: '', credential: '', urls: 'stun:stun.l.google.com:19302'),
+      ],
+      pollingInterval: Duration(seconds: 3),
+      );
     });
+    await _remoteRenderer.initialize();
     session = await j.createSession();
     print(session.sessionId);
     plugin = await session.attach<JanusStreamingPlugin>();
@@ -117,9 +112,7 @@ class _StreamingState extends State<TypedStreamingV2> {
   }
 
   destroy() async {
-    await plugin.send(
-      data: {"request": "stop"},
-    );
+    await plugin.stopStream();
     _remoteRenderer.srcObject=null;
     await plugin.dispose();
     session.dispose();

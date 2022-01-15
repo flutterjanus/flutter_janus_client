@@ -44,8 +44,7 @@ class _StreamingState extends State<StreamingV2> {
           RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
-        RTCIceServer(
-            url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
+        RTCIceServer(username: '', credential: '', urls: 'stun:stun.l.google.com:19302')
       ]);
     });
     session = await j.createSession();

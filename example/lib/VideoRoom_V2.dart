@@ -99,7 +99,7 @@ class _VideoRoomState extends State<VideoRoomV2> {
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
         RTCIceServer(
-            url: "stun:stun1.l.google.com:19302", username: "", credential: "")
+            urls: "stun:stun1.l.google.com:19302", username: "", credential: "")
       ]);
     });
     var sess = await j.createSession();

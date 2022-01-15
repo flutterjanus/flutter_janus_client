@@ -11,30 +11,32 @@ import 'TypedExamples/VideoRoom.dart';
 import 'VideoRoom_V2_unified.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MaterialApp(
+    initialRoute: '/',
+    debugShowCheckedModeBanner: false,
+    routes: {
+      "/video_call_v2": (c) => VideoCallV2Example(),
+      "/video_room_v2": (c) => VideoRoomV2(),
+      "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
+      "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
+      "/typed_streaming": (c) => TypedStreamingV2(),
+      "/audio_room_v2": (c) => AudioRoomV2(),
+      "/text_room_v2": (c) => TextRoomV2Example(),
+      "/streaming_v2": (c) => StreamingV2(),
+      "/streaming_v2_unified": (c) => StreamingV2Unified(),
+      "/": (c) => Home()
+    },
+  ));
 }
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        "/video_call_v2": (c) => VideoCallV2Example(),
-        "/video_room_v2": (c) => VideoRoomV2(),
-        "/video_room_v2_unified": (c) => VideoRoomV2Unified(),
-        "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
-        "/typed_streaming": (c) => TypedStreamingV2(),
-        "/audio_room_v2": (c) => AudioRoomV2(),
-        "/text_room_v2": (c) => TextRoomV2Example(),
-        "/streaming_v2": (c) => StreamingV2(),
-        "/streaming_v2_unified": (c) => StreamingV2Unified(),
-        "/": (c) => Home()
-      },
-    );
-  }
-}
+// class MyApp extends StatefulWidget {
+//   @override
+//   _MyAppState createState() => _MyAppState();
+// }
+//
+// class _MyAppState extends State<MyApp> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return
+//   }
+// }

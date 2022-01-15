@@ -119,7 +119,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
         transport: ws,
         iceServers: [
           RTCIceServer(
-              url: "stun:stun1.l.google.com:19302",
+              urls: "stun:stun1.l.google.com:19302",
               username: "",
               credential: "")
         ]);

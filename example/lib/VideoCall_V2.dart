@@ -13,7 +13,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
   late JanusSession session;
-  late JanusPlugin publishVideo;
+  late JanusVideoCallPlugin publishVideo;
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
@@ -103,12 +103,13 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
   initJanusClient() async {
     setState(() {
       rest =
-          RestJanusTransport(url: servermap['janus_rest']);
+          RestJanusTransport(url: 'https://conference.unifynow.io:8089/janus');
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: ws, iceServers: [
+      j = JanusClient(transport: rest, iceServers: [
         RTCIceServer(
             urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
-      ]);
+      ],
+      pollingInterval: Duration(seconds: 10));
     });
     session = await j.createSession();
     publishVideo = await session.attach<JanusVideoCallPlugin>();
@@ -147,16 +148,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 _localRenderer.srcObject = await publishVideo
                     .initializeMediaDevices(mediaConstraints: {
                   "audio": true,
-                  "video": {
-                    "mandatory": {
-                      "minWidth": '1280',
-                      // Provide your own width, height and frame rate here
-                      "minHeight": '720',
-                      "minFrameRate": '60',
-                    },
-                    "facingMode": "user",
-                    "optional": [],
-                  }
+                  "video": true
                 });
 
                 if (even.jsep != null) {

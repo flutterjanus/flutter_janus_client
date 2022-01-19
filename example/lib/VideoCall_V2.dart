@@ -105,11 +105,12 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
       rest =
           RestJanusTransport(url: 'https://conference.unifynow.io:8089/janus');
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: rest, iceServers: [
+      j = JanusClient(transport: ws, iceServers: [
         RTCIceServer(
             urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
       ],
-      pollingInterval: Duration(seconds: 10));
+      usePlanB: true,
+      pollingInterval: Duration(seconds: 1));
     });
     session = await j.createSession();
     publishVideo = await session.attach<JanusVideoCallPlugin>();
@@ -142,28 +143,8 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 }
               } else if (event == 'incomingcall') {
                 debugPrint("Incoming call from " + result["username"] + "!");
-                var yourusername = result["username"];
-
-                await _localRenderer.initialize();
-                _localRenderer.srcObject = await publishVideo
-                    .initializeMediaDevices(mediaConstraints: {
-                  "audio": true,
-                  "video": true
-                });
-
-                if (even.jsep != null) {
-                  await publishVideo.handleRemoteJsep(even.jsep!);
-                  Navigator.of(context).pop();
-                }
-                // Notify user
-                var offer = await publishVideo.createAnswer();
-                var body = {"request": "accept"};
-                publishVideo.send(
-                  data: body,
-                  jsep: offer,
-                );
-
-                // print(publishVideo.webRTCHandle.pc.);
+                var caller = result["username"];
+                await showIncomingCallDialog(caller,even);
               } else if (event == 'hangup') {
                 await destroy();
               }
@@ -188,42 +169,49 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     // TODO: implement initState
     super.initState();
     initJanusClient();
-
-    // janusClient.connect(onSuccess: (sessionId) {
-    //   janusClient.attach(Plugin(
-    //       onRemoteStream: (remoteStream) {
-    //         _remoteRenderer.srcObject = remoteStream;
-    //       },
-    //       plugin: "janus.plugin.videocall",
-    //       onMessage: ,
-    //       onSuccess: (plugin) {
-    //         setState(() {
-    //           publishVideo = plugin;
-    //           registerDialog();
-    //         });
-    //       }));
-    // });
   }
 
   registerUser(userName) {
-    // if (publishVideo != null) {
     publishVideo.send(data: {"request": "register", "username": userName});
-    //   onSuccess: () {
-    //     print("User registered");
-    //     nameController.text = "";
-    //     Navigator.pop(context);
-    //     makeCallDialog();
-    //   },
-    // onError: (error) {
-    // print(error);
-    // }
-    // }
   }
 
   destroy() async {
     publishVideo.dispose();
     session.dispose();
     Navigator.of(context).pop();
+  }
+  Future<dynamic> showIncomingCallDialog(String caller,EventMessage event)async{
+    return showDialog(context: context, builder: (context){
+      return AlertDialog(title: Text('Incoming call from ${caller}'),
+      actions: [
+        ElevatedButton(onPressed: ()async{
+          await _localRenderer.initialize();
+          _localRenderer.srcObject = await publishVideo
+              .initializeMediaDevices(mediaConstraints: {
+            "audio": true,
+            "video": true
+          });
+
+          if (event.jsep != null) {
+            await publishVideo.handleRemoteJsep(event.jsep);
+            Navigator.of(context).pop();
+          }
+          // Notify user
+          var offer = await publishVideo.createAnswer();
+          var body = {"request": "accept"};
+          publishVideo.send(
+            data: body,
+            jsep: offer,
+          );
+          Navigator.of(context).pop();
+
+        }, child: Text('Accept')),
+        ElevatedButton(onPressed: ()async{
+          await publishVideo.hangup();
+        }, child: Text('Reject')),
+      ],
+      );
+    });
   }
 
   @override

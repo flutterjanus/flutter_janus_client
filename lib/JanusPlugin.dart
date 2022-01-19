@@ -63,11 +63,11 @@ class JanusPlugin {
       }
       // initializing WebRTC Handle
       Map<String, dynamic> configuration = {"iceServers": context.iceServers != null ? context.iceServers!.map((e) => e.toMap()).toList() : []};
-      // if (context.isUnifiedPlan) {
+      if (context.isUnifiedPlan&&!context.usePlanB) {
         configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
-      // } else {
-        // configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
-      // }
+      } else {
+        configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
+      }
       context.logger.fine('peer connection configuration');
       context.logger.fine(configuration);
       // todo: initialize stream controllers and streams
@@ -136,7 +136,7 @@ class JanusPlugin {
   }
 
   void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection) {
-    if (context.isUnifiedPlan) {
+    if (context.isUnifiedPlan&&!context.usePlanB) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
         context.logger.fine('onTrack called with event');
         context.logger.fine(event.toString());
@@ -168,7 +168,7 @@ class JanusPlugin {
         event.track.onEnded = () async {
           context.logger.fine("Remote track removed:");
           String? mid = event.track.id;
-          if (context.isUnifiedPlan) {
+          if (context.isUnifiedPlan&&!context.usePlanB) {
             RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
             mid = transceiver?.mid;
           }
@@ -184,7 +184,7 @@ class JanusPlugin {
           context.logger.fine("Remote track muted:" + event.track.toString());
           context.logger.fine("Removing remote track");
           var mid = event.track.id;
-          if (context.isUnifiedPlan) {
+          if (context.isUnifiedPlan&&!context.usePlanB) {
             RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
             mid = transceiver?.mid;
           }
@@ -201,7 +201,7 @@ class JanusPlugin {
           try {
             // Notify the application the track is back
             String? mid = event.track.id;
-            if (context.isUnifiedPlan) {
+            if (context.isUnifiedPlan&&!context.usePlanB) {
               RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
               mid = transceiver?.mid;
               if (mid != null) {
@@ -416,7 +416,7 @@ class JanusPlugin {
     }
     if (webRTCHandle != null) {
       webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      if (context.isUnifiedPlan) {
+      if (context.isUnifiedPlan&&!context.usePlanB) {
         context.logger.fine('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
           context.logger.fine('adding track in peerconnection');
@@ -455,7 +455,7 @@ class JanusPlugin {
   /// It supports both style of offer creation that is plan-b and unified.
   Future<RTCSessionDescription> createOffer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions = null;
-    if (context.isUnifiedPlan) {
+    if (context.isUnifiedPlan&&!context.usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
@@ -468,7 +468,7 @@ class JanusPlugin {
   /// It supports both style of answer creation that is plan-b and unified.
   Future<RTCSessionDescription> createAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions;
-    if (context.isUnifiedPlan) {
+    if (context.isUnifiedPlan&&!context.usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
@@ -487,7 +487,7 @@ class JanusPlugin {
 
   Future<RTCSessionDescription?> createNullableAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions;
-    if (context.isUnifiedPlan) {
+    if (context.isUnifiedPlan&&!context.usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};

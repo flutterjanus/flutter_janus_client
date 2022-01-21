@@ -3,7 +3,7 @@
 //     final streamingItem = streamingItemFromMap(jsonString);
 
 import 'dart:convert';
-
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/JanusClient.dart';
 
 List<StreamingItem> streamingItemFromMap(String str) => List<StreamingItem>.from(json.decode(str).map((x) => StreamingItem.fromMap(x)));
@@ -102,4 +102,45 @@ class Media {
     "label": label,
     "age_ms": ageMs,
   };
+}
+
+class RemoteStream {
+  late MediaStream audio;
+  late MediaStream video;
+  RTCVideoRenderer videoRenderer = RTCVideoRenderer();
+  RTCVideoRenderer audioRenderer = RTCVideoRenderer();
+  String id;
+
+ Future<void> dispose()async{
+    await stopAllTracksAndDispose(video);
+    await stopAllTracksAndDispose(audio);
+    videoRenderer.srcObject=null;
+    audioRenderer.srcObject=null;
+    await videoRenderer.dispose();
+    await audioRenderer.dispose();
+  }
+
+  RemoteStream(this.id);
+  createAudio()async{
+    audio = await createLocalMediaStream('audio_$id');
+  }
+  createVideo()async{
+    video = await createLocalMediaStream('video_$id');
+  }
+
+  Future<void> init() async {
+    await createAudio();
+    await createVideo();
+    await videoRenderer.initialize();
+    await audioRenderer.initialize();
+    audioRenderer.srcObject = audio;
+    videoRenderer.srcObject = video;
+  }
+}
+
+Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
+  stream?.getTracks().forEach((element) async {
+    await element.stop();
+  });
+  await stream?.dispose();
 }

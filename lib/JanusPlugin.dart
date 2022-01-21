@@ -303,18 +303,19 @@ class JanusPlugin {
     return;
   }
 
-  Future<void> hangup() async {
-    if (_pollingTimer != null) {
-      _pollingTimer!.cancel();
-    }
-    await this.send(data: {"request": "leave"});
-    dispose();
-  }
-
   /// You can check whether a room exists using the exists
   Future<dynamic> exists(int roomId) async {
     var payload = {"request": "exists", "room": roomId};
     return (await this.send(data: payload));
+  }
+
+  void _cancelPollingTimer(){
+    if (_pollingTimer != null) {
+      _pollingTimer!.cancel();
+    }
+  }
+  Future<void> hangup() async {
+    _cancelPollingTimer();
   }
 
   /// This function takes care of cleaning up all the internal stream controller and timers used to make janus_client compatible with streams and polling support

@@ -3,12 +3,12 @@ import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
 
-class VideoCallV2Example extends StatefulWidget {
+class TypedVideoCallV2Example extends StatefulWidget {
   @override
   _VideoCallV2ExampleState createState() => _VideoCallV2ExampleState();
 }
 
-class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
+class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   late JanusClient j;
   late WebSocketJanusTransport ws;
   late JanusSession session;

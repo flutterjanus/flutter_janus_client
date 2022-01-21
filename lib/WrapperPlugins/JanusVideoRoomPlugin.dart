@@ -142,6 +142,12 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     Map data = await this.send(data: payload, jsep: offer);
   }
 
+  Future<void> hangup() async {
+    await super.hangup();
+    await this.send(data: {"request": "leave"});
+    dispose();
+  }
+
   bool _onCreated = false;
 
   @override

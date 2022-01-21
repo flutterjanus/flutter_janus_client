@@ -25,16 +25,18 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   Map<int,dynamic> feeds = {};
   Map<String, int> subStreams = {};
   Map<int, MediaStream?> mediaStreams = {};
-
-  @override
-  initState() {
-    super.initState();
-  }
-
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
+    initialize();
+  }
+
+  initialize()async{
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+    session = await j.createSession();
+    plugin = await session.attach<JanusVideoRoomPlugin>();
   }
 
   subscribeTo(List<Map<String, dynamic>> sources) async {
@@ -91,10 +93,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   Future<void> joinRoom() async {
-    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
-    session = await j.createSession();
-    plugin = await session.attach<JanusVideoRoomPlugin>();
+
     myStream = await plugin.initializeMediaDevices(mediaConstraints: {"video": true, "audio": true});
     setState(() {
       remoteRenderers[0] = RTCVideoRenderer();

@@ -1,7 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client/JanusClient.dart';
-import 'package:janus_client/interfaces/Streaming/Events/StreamingPluginPreparingEvent.dart';
-
 class JanusStreamingPlugin extends JanusPlugin {
   JanusStreamingPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.STREAMING, session: session, transport: transport);
 
@@ -115,7 +113,7 @@ class JanusStreamingPlugin extends JanusPlugin {
       await send(data: {"request": "start"});
     }
     else{
-      RTCSessionDescription answer = await createAnswer();
+      RTCSessionDescription answer = await createAnswer(videoRecv: true,audioRecv: true,audioSend: false,videoSend: false);
       await send(data: {"request": "start"}, jsep: answer);
     }
   }

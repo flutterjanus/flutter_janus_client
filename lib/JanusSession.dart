@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:janus_client/WrapperPlugins/JanusSipPlugin.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -106,7 +107,13 @@ class JanusSession {
     }
     plugin.handleId = handleId;
     _pluginHandles[handleId] = plugin;
-    await plugin.init();
+    try{
+      await plugin.init();
+    }
+    on MissingPluginException
+    catch(e){
+     context?.logger.info('Platform exception: i believe you are trying in unit tests, platform specific api not accessible');
+    }
     plugin.onCreate();
     return plugin as T;
   }

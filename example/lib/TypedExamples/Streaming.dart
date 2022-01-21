@@ -2,31 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
+import 'package:janus_client_example/Helper.dart';
 
-class RemoteStream {
-  late MediaStream audio;
-  late MediaStream video;
-  RTCVideoRenderer videoRenderer = RTCVideoRenderer();
-  RTCVideoRenderer audioRenderer = RTCVideoRenderer();
-  String id;
-
-  RemoteStream(this.id);
-  createAudio()async{
-    audio = await createLocalMediaStream('audio_$id');
-  }
-  createVideo()async{
-    video = await createLocalMediaStream('video_$id');
-  }
-
-  Future<void> init() async {
-    await createAudio();
-    await createVideo();
-    await videoRenderer.initialize();
-    await audioRenderer.initialize();
-    audioRenderer.srcObject = audio;
-    videoRenderer.srcObject = video;
-  }
-}
 
 class TypedStreamingV2 extends StatefulWidget {
   @override

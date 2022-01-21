@@ -3,6 +3,8 @@ import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
 
+import '../Helper.dart';
+
 class TypedVideoCallV2Example extends StatefulWidget {
   @override
   _VideoCallV2ExampleState createState() => _VideoCallV2ExampleState();
@@ -277,17 +279,9 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   cleanUpWebRTCStuff() async {
-    Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
-      stream?.getTracks().forEach((element) async {
-        await element.stop();
-      });
-      await stream?.dispose();
-    }
-
     await stopAllTracksAndDispose(localStream);
     await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
-
     _localRenderer.srcObject = null;
     _remoteVideoRenderer.srcObject = null;
     _remoteAudioRenderer.srcObject = null;

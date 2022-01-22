@@ -229,6 +229,10 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   }
 
   bool _onCreated = false;
+  Future<void> hangup() async {
+    await super.hangup();
+    await this.send(data: {"request": "leave"});
+  }
 
   @override
   void onCreate() {

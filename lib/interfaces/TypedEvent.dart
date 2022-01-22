@@ -1,6 +1,6 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-class TypedEvent<T>{
+class TypedEvent<T> {
   T event;
   RTCSessionDescription? jsep;
 
@@ -55,7 +55,8 @@ class JanusEvent {
     this.sessionId,
     this.transaction,
     this.sender,
-    this.plugindata,});
+    this.plugindata,
+  });
 
   JanusEvent.fromJson(dynamic json) {
     janus = json['janus'];
@@ -64,11 +65,17 @@ class JanusEvent {
     sender = json['sender'];
     plugindata = json['plugindata'] != null ? Plugindata.fromJson(json['plugindata']) : null;
   }
+
   String? janus;
   int? sessionId;
   String? transaction;
   int? sender;
   Plugindata? plugindata;
+
+  @override
+  String toString() {
+    return 'JanusEvent{janus: $janus, sessionId: $sessionId, transaction: $transaction, sender: $sender, plugindata: $plugindata}';
+  }
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -81,18 +88,24 @@ class JanusEvent {
     }
     return map;
   }
-
 }
 
 class Plugindata {
   Plugindata({
     this.plugin,
-    this.data,});
+    this.data,
+  });
+
+  @override
+  String toString() {
+    return 'Plugindata{plugin: $plugin, data: $data}';
+  }
 
   Plugindata.fromJson(dynamic json) {
     plugin = json['plugin'];
     data = json['data'] != null ? json['data'] : null;
   }
+
   String? plugin;
   dynamic data;
 
@@ -104,5 +117,66 @@ class Plugindata {
     }
     return map;
   }
+}
 
+class JanusError {
+  int error_code;
+  String error;
+  String pluginName;
+
+  static throwErrorFromEvent(JanusEvent response){
+    if (response.plugindata?.data != null && (response.plugindata?.data as Map).containsKey('error')) {
+      throw JanusError.fromMap(response.plugindata?.data);
+    }
+  }
+
+//<editor-fold desc="Data Methods">
+
+  JanusError({
+    required this.error_code,
+    required this.error,
+    required this.pluginName,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is JanusError && runtimeType == other.runtimeType && error_code == other.error_code && error == other.error && pluginName == other.pluginName);
+
+  @override
+  int get hashCode => error_code.hashCode ^ error.hashCode ^ pluginName.hashCode;
+
+  @override
+  String toString() {
+    return 'JanusError{' + ' error_code: $error_code,' + ' error: $error,' + ' pluginName: $pluginName,' + '}';
+  }
+
+  JanusError copyWith({
+    int? error_code,
+    String? error,
+    String? pluginName,
+  }) {
+    return JanusError(
+      error_code: error_code ?? this.error_code,
+      error: error ?? this.error,
+      pluginName: pluginName ?? this.pluginName,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'error_code': this.error_code,
+      'error': this.error,
+      'pluginName': this.pluginName,
+    };
+  }
+
+  factory JanusError.fromMap(Map<String, dynamic> map) {
+    return JanusError(
+      error_code: map['error_code'] as int,
+      error: map['error'] as String,
+      pluginName: map.entries.where((element) => element.value == 'event').first.key,
+    );
+  }
+
+//</editor-fold>
 }

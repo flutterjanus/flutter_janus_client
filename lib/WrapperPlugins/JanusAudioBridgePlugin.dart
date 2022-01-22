@@ -76,6 +76,18 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     return AudioRoomCreatedResponse.fromJson(response.plugindata?.data);
   }
 
+  /// [editRoom]
+  ///
+  ///
+  ///Once a room has been created, you can still edit some (but not all) of its properties using the edit request. This allows you to modify the room description, secret, pin and whether it's private or not: you won't be able to modify other more static properties, like the room ID, the sampling rate, the extensions-related stuff and so on. If you're interested in changing the ACL, instead, check the allowed message.<br><br>
+  ///[room] : unique numeric ID of the room to edit<br>
+  ///[secret] : room secret, mandatory if configured<br>
+  ///[new_description] : new pretty name of the room, optional<br>
+  ///[new_secret] : new password required to edit/destroy the room, optional<br>
+  ///[new_pin] : new password required to join the room, optional<br>
+  ///[new_is_private] : true|false, whether the room should appear in a list request<br>
+  ///[permanent] : true|false, whether the room should be also removed from the config file, default=false
+  ///
   Future<dynamic> editRoom(int roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
     var payload = {
       "request": "edit",
@@ -92,6 +104,29 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     return AudioRoomCreatedResponse.fromJson(response.plugindata?.data);
   }
 
+  /// [joinRoom]
+  ///
+  /// you use a join request to join an audio room, and wait for the joined event; this event will also include a list of the other participants, if any;<br><br>
+  ///[room] : numeric ID of the room to join<br>
+  ///[id] : unique ID to assign to the participant; optional, assigned by the plugin if missing<br>
+  ///[group] : "group to assign to this participant (for forwarding purposes only; optional, mandatory if enabled in the room)<br>
+  ///[pin] : "password required to join the room, if any; optional<br>
+  ///[display] : "display name to have in the room; optional<br>
+  ///[token] : "invitation token, in case the room has an ACL; optional<br>
+  ///[muted] : true|false, whether to start unmuted or muted<br>
+  ///[codec] : "codec to use, among opus (default), pcma (A-Law) or pcmu (mu-Law)<br>
+  ///[prebuffer] : number of packets to buffer before decoding this participant (default=room value, or DEFAULT_PREBUFFERING)<br>
+  ///[bitrate] : bitrate to use for the Opus stream in bps; optional, default=0 (libopus decides)<br>
+  ///[quality] : 0-10, Opus-related complexity to use, the higher the value, the better the quality (but more CPU); optional, default is 4<br>
+  ///[expected_loss] : 0-20, a percentage of the expected loss (capped at 20%), only needed in case FEC is used; optional, default is 0 (FEC disabled even when negotiated) or the room default<br>
+  ///[volume] : percent value, <100 reduces volume, >100 increases volume; optional, default is 100 (no volume change)<br>
+  ///[spatial_position] : in case spatial audio is enabled for the room, panning of this participant (0=left, 50=center, 100=right)<br>
+  ///[secret] : "room management password; optional, if provided the user is an admin and can't be globally muted with mute_room<br>
+  ///[audio_level_average] : "if provided, overrides the room audio_level_average for this user; optional<br>
+  ///[audio_active_packets] : "if provided, overrides the room audio_active_packets for this user; optional<br>
+  ///[record] : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
+  ///[filename] : "basename of the file to record to, -audio.mjr will be added by the plugin<br>
+  ///
   Future<void> joinRoom(int roomId,
       {String? id,
       String? group,
@@ -191,6 +226,19 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     return RtpForwardStopped.fromJson(response.plugindata?.data);
   }
 
+  /// [kickParticipant]
+  ///
+  /// If you're the administrator of a room (that is, you created it and have access to the secret) you can kick out individual participant.
+  /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
+  /// [participantId] unique numeric ID of the participant.<br>
+  /// [secret] admin secret should be provided if configured.<br>
+  Future<dynamic> kickParticipant(int roomId, int participantId, {String? secret}) async {
+    var payload = {"request": "kick", "secret": secret, "room": roomId, "id": participantId}..removeWhere((key, value) => value == null);
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response.plugindata?.data;
+  }
+
   /// [rtpForward]
   ///
   /// You can add a new RTP forwarder for an existing room using the rtp_forward request.<br>
@@ -229,6 +277,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   }
 
   bool _onCreated = false;
+
   Future<void> hangup() async {
     await super.hangup();
     await this.send(data: {"request": "leave"});
@@ -243,6 +292,12 @@ class JanusAudioBridgePlugin extends JanusPlugin {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
         if (typedEvent.event.plugindata?.data["audiobridge"] == "joined") {
           typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["result"] == "ok") {
+          typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["leaving"] != null) {
+          typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
         }
       });

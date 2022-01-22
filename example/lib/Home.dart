@@ -44,6 +44,14 @@ class _HomeState extends State<Home> {
                   Navigator.of(context).pushNamed("/typed_video_call");
                 },
               ),
+              ListTile(
+                title: RichText(
+                  text: TextSpan(children: [TextSpan(text: "Typed Audio Bridge Unified"), TextSpan(text: "  New", style: TextStyle(color: Colors.green))]),
+                ),
+                onTap: () {
+                  Navigator.of(context).pushNamed("/typed_audio_bridge");
+                },
+              ),
             ],
           ),
         ));

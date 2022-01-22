@@ -62,7 +62,6 @@ class JanusSession {
     Map<String, dynamic>? response;
     if (T == JanusVideoRoomPlugin) {
       plugin = JanusVideoRoomPlugin(transport: transport, context: context, handleId: handleId, session: this);
-
     } else if (T == JanusVideoCallPlugin) {
       plugin = JanusVideoCallPlugin(transport: transport, context: context, handleId: handleId, session: this);
     } else if (T == JanusStreamingPlugin) {
@@ -81,6 +80,7 @@ class JanusSession {
       ''');
     }
     request.putIfAbsent("plugin", () => plugin.plugin);
+    context?.logger.fine(request);
     if (transport is RestJanusTransport) {
       context!.logger.info('using rest transport for creating plugin handle');
       RestJanusTransport rest = (transport as RestJanusTransport);

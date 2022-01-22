@@ -15,6 +15,7 @@ class JanusVideoCallPlugin extends JanusPlugin {
     const payload = {"request": "list"};
     await this.send(data: payload);
   }
+
   /// Register User / Call Participant
   ///
   ///    `sends request with payload as:  `
@@ -26,6 +27,7 @@ class JanusVideoCallPlugin extends JanusPlugin {
     var payload = {"request": "register", "username": userName};
     await this.send(data: payload);
   }
+
   /// Call other participant
   ///
   ///    `sends request with payload as:  `
@@ -40,16 +42,14 @@ class JanusVideoCallPlugin extends JanusPlugin {
   /// Since it is asynchronous request result can only be extracted from event messages
   ///
   ///
-  Future<void> call(String userName,{RTCSessionDescription? offer})async{
-    var payload={
-      "request" : "call",
-      "username" : userName
-    };
-    if(offer==null){
-      offer=await createOffer(audioSend: true,videoSend: true,audioRecv: true,videoRecv: true);
+  Future<void> call(String userName, {RTCSessionDescription? offer}) async {
+    var payload = {"request": "call", "username": userName};
+    if (offer == null) {
+      offer = await createOffer(audioSend: true, videoSend: true, audioRecv: true, videoRecv: true);
     }
-    await this.send(data: payload,jsep: offer);
+    await this.send(data: payload, jsep: offer);
   }
+
   /// Accept the incoming call
   ///
   ///    `sends request with payload as:  `
@@ -64,14 +64,12 @@ class JanusVideoCallPlugin extends JanusPlugin {
   /// Since it is asynchronous request result can only be extracted from event messages
   ///
   ///
-  Future<void> acceptCall({RTCSessionDescription? answer})async{
-    var payload={
-      "request" : "accept"
-    };
-    if(answer==null){
-      answer=await createAnswer(audioSend: true,videoSend: true,audioRecv: true,videoRecv: true);
+  Future<void> acceptCall({RTCSessionDescription? answer}) async {
+    var payload = {"request": "accept"};
+    if (answer == null) {
+      answer = await createAnswer(audioSend: true, videoSend: true, audioRecv: true, videoRecv: true);
     }
-    await this.send(data: payload,jsep: answer);
+    await this.send(data: payload, jsep: answer);
   }
 
   /// Hangup the  call
@@ -85,12 +83,9 @@ class JanusVideoCallPlugin extends JanusPlugin {
   ///
   Future<void> hangup() async {
     await super.hangup();
-    await this.send(data: {
-      "request" : "hangup"
-    });
+    await this.send(data: {"request": "hangup"});
     dispose();
   }
-
 
   bool _onCreated = false;
 
@@ -100,22 +95,37 @@ class JanusVideoCallPlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
-          typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['configured'] == "ok") {
-          typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
-          typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['leaving'] != null) {
-          typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' || typedEvent.event.plugindata?.data['streams'] != null) {
-          typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
+        if (typedEvent.event.plugindata?.data['videocall'] == 'event'
+            &&typedEvent.event.plugindata?.data['result']!=null
+            && typedEvent.event.plugindata?.data['result']['event'] == 'registered') {
+            typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
+            typedMessagesSink?.add(typedEvent);
+        }
+        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
+            &&typedEvent.event.plugindata?.data['result']!=null
+            && typedEvent.event.plugindata?.data['result']['event'] == 'calling') {
+          typedEvent.event.plugindata?.data = VideoCallCallingEvent.fromJson(typedEvent.event.plugindata?.data);
           typedMessagesSink?.add(typedEvent);
         }
+        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
+            &&typedEvent.event.plugindata?.data['result']!=null
+            && typedEvent.event.plugindata?.data['result']['event'] == 'incomingcall') {
+          typedEvent.event.plugindata?.data = VideoCallIncomingCallEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
+        }
+        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
+            &&typedEvent.event.plugindata?.data['result']!=null
+            && typedEvent.event.plugindata?.data['result']['event'] == 'accepted') {
+          typedEvent.event.plugindata?.data = VideoCallAcceptedEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
+        }
+        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
+            &&typedEvent.event.plugindata?.data['result']!=null
+            && typedEvent.event.plugindata?.data['result']['event'] == 'hangup') {
+          typedEvent.event.plugindata?.data = VideoCallHangupEvent.fromJson(typedEvent.event.plugindata?.data);
+          typedMessagesSink?.add(typedEvent);
+        }
+
       });
     }
   }

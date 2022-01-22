@@ -1,0 +1,114 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.example"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="30" />
+10    <!--
+11         Flutter needs it to communicate with the running application
+12         to allow setting breakpoints, to provide hot reload, etc.
+13    -->
+14    <uses-permission android:name="android.permission.INTERNET" />
+14-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/debug/AndroidManifest.xml:6:5-66
+14-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/debug/AndroidManifest.xml:6:22-64
+15
+16    <uses-feature android:name="android.hardware.camera" />
+16-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:3:5-60
+16-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:3:19-57
+17    <uses-feature android:name="android.hardware.camera.autofocus" />
+17-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:4:5-70
+17-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:4:19-67
+18
+19    <uses-permission android:name="android.permission.CAMERA" />
+19-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:5:5-65
+19-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:5:22-62
+20    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+20-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:6:5-71
+20-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:6:22-68
+21    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+21-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:7:5-79
+21-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:7:22-76
+22    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+22-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:8:5-79
+22-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:8:22-76
+23    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+23-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:9:5-80
+23-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:9:22-77
+24
+25    <application
+25-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:10:4-47:19
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.6.0] /Users/zopper/.gradle/caches/transforms-2/files-2.1/5f663b08eec19eef9a9d1af662d9025e/core-1.6.0/AndroidManifest.xml:24:18-86
+27        android:debuggable="true"
+28        android:icon="@mipmap/ic_launcher"
+28-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:12:9-43
+29        android:label="example" >
+29-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:11:9-32
+30        <activity
+30-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:13:9-41:20
+31            android:name="com.example.example.MainActivity"
+31-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:14:13-41
+32            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+32-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:17:13-163
+33            android:hardwareAccelerated="true"
+33-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:18:13-47
+34            android:launchMode="singleTop"
+34-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:15:13-43
+35            android:theme="@style/LaunchTheme"
+35-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:16:13-47
+36            android:windowSoftInputMode="adjustResize" >
+36-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:19:13-55
+37
+38            <!--
+39                 Specifies an Android theme to apply to this Activity as soon as
+40                 the Android process has started. This theme is visible to the user
+41                 while the Flutter UI initializes. After that, this theme continues
+42                 to determine the Window background behind the Flutter UI.
+43            -->
+44            <meta-data
+44-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:24:13-27:17
+45                android:name="io.flutter.embedding.android.NormalTheme"
+45-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:25:15-70
+46                android:resource="@style/NormalTheme" />
+46-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:26:15-52
+47            <!--
+48                 Displays an Android View that continues showing the launch screen
+49                 Drawable until Flutter paints its first frame, then this splash
+50                 screen fades out. A splash screen is useful to avoid any visual
+51                 gap between the end of Android's launch screen and the painting of
+52                 Flutter's first frame.
+53            -->
+54            <meta-data
+54-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:33:13-36:17
+55                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+55-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:34:15-79
+56                android:resource="@drawable/launch_background" />
+56-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:35:15-61
+57
+58            <intent-filter>
+58-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:37:13-40:29
+59                <action android:name="android.intent.action.MAIN" />
+59-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:38:17-68
+59-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:38:25-66
+60
+61                <category android:name="android.intent.category.LAUNCHER" />
+61-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:39:17-76
+61-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:39:27-74
+62            </intent-filter>
+63        </activity>
+64        <!--
+65             Don't delete the meta-data below.
+66             This is used by the Flutter tool to generate GeneratedPluginRegistrant.java
+67        -->
+68        <meta-data
+68-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:44:9-46:33
+69            android:name="flutterEmbedding"
+69-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:45:13-44
+70            android:value="2" />
+70-->/Users/zopper/Desktop/flutter_janus_client/example/android/app/src/main/AndroidManifest.xml:46:13-30
+71    </application>
+72
+73</manifest>

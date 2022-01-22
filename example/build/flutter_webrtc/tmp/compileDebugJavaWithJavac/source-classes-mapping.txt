@@ -1,0 +1,101 @@
+com/cloudwebrtc/webrtc/SurfaceTextureRenderer.java
+ com.cloudwebrtc.webrtc.SurfaceTextureRenderer
+com/cloudwebrtc/webrtc/utils/RTCAudioManager.java
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$1
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$2
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$AudioDevice
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$AudioManagerEvents
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$AudioManagerState
+ com.cloudwebrtc.webrtc.utils.RTCAudioManager$WiredHeadsetReceiver
+com/cloudwebrtc/webrtc/record/OutputAudioSamplesInterceptor.java
+ com.cloudwebrtc.webrtc.record.OutputAudioSamplesInterceptor
+com/cloudwebrtc/webrtc/utils/ConstraintsArray.java
+ com.cloudwebrtc.webrtc.utils.ConstraintsArray
+com/cloudwebrtc/webrtc/CameraEventsHandler.java
+ com.cloudwebrtc.webrtc.CameraEventsHandler
+com/cloudwebrtc/webrtc/utils/AnyThreadSink.java
+ com.cloudwebrtc.webrtc.utils.AnyThreadSink
+com/cloudwebrtc/webrtc/DataChannelObserver.java
+ com.cloudwebrtc.webrtc.DataChannelObserver
+ com.cloudwebrtc.webrtc.DataChannelObserver$1
+com/cloudwebrtc/webrtc/utils/PermissionUtils.java
+ com.cloudwebrtc.webrtc.utils.PermissionUtils
+ com.cloudwebrtc.webrtc.utils.PermissionUtils$1
+ com.cloudwebrtc.webrtc.utils.PermissionUtils$Callback
+ com.cloudwebrtc.webrtc.utils.PermissionUtils$RequestPermissionsFragment
+com/cloudwebrtc/webrtc/MethodCallHandlerImpl.java
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$1
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$2
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$3
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$4
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$5
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$6
+ com.cloudwebrtc.webrtc.MethodCallHandlerImpl$AudioManager
+com/cloudwebrtc/webrtc/utils/RTCBluetoothManager.java
+ com.cloudwebrtc.webrtc.utils.RTCBluetoothManager
+ com.cloudwebrtc.webrtc.utils.RTCBluetoothManager$1
+ com.cloudwebrtc.webrtc.utils.RTCBluetoothManager$BluetoothHeadsetBroadcastReceiver
+ com.cloudwebrtc.webrtc.utils.RTCBluetoothManager$BluetoothServiceListener
+ com.cloudwebrtc.webrtc.utils.RTCBluetoothManager$State
+com/cloudwebrtc/webrtc/utils/EglUtils.java
+ com.cloudwebrtc.webrtc.utils.EglUtils
+com/cloudwebrtc/webrtc/StateProvider.java
+ com.cloudwebrtc.webrtc.StateProvider
+com/cloudwebrtc/webrtc/record/VideoFileRenderer.java
+ com.cloudwebrtc.webrtc.record.VideoFileRenderer
+com/cloudwebrtc/webrtc/BuildConfig.java
+ com.cloudwebrtc.webrtc.BuildConfig
+com/cloudwebrtc/webrtc/record/AudioTrackInterceptor.java
+ com.cloudwebrtc.webrtc.record.AudioTrackInterceptor
+com/cloudwebrtc/webrtc/utils/Callback.java
+ com.cloudwebrtc.webrtc.utils.Callback
+com/cloudwebrtc/webrtc/utils/ConstraintsMap.java
+ com.cloudwebrtc.webrtc.utils.ConstraintsMap
+com/cloudwebrtc/webrtc/utils/MediaConstraintsUtils.java
+ com.cloudwebrtc.webrtc.utils.MediaConstraintsUtils
+ com.cloudwebrtc.webrtc.utils.MediaConstraintsUtils$1
+com/cloudwebrtc/webrtc/FlutterRTCVideoRenderer.java
+ com.cloudwebrtc.webrtc.FlutterRTCVideoRenderer
+ com.cloudwebrtc.webrtc.FlutterRTCVideoRenderer$1
+org/webrtc/audio/WebRtcAudioTrackUtils.java
+ org.webrtc.audio.WebRtcAudioTrackUtils
+com/cloudwebrtc/webrtc/utils/RTCProximitySensor.java
+ com.cloudwebrtc.webrtc.utils.RTCProximitySensor
+com/cloudwebrtc/webrtc/utils/AnyThreadResult.java
+ com.cloudwebrtc.webrtc.utils.AnyThreadResult
+com/cloudwebrtc/webrtc/utils/RTCUtils.java
+ com.cloudwebrtc.webrtc.utils.RTCUtils
+com/cloudwebrtc/webrtc/record/FrameCapturer.java
+ com.cloudwebrtc.webrtc.record.FrameCapturer
+com/cloudwebrtc/webrtc/OrientationAwareScreenCapturer.java
+ com.cloudwebrtc.webrtc.OrientationAwareScreenCapturer
+com/cloudwebrtc/webrtc/PeerConnectionObserver.java
+ com.cloudwebrtc.webrtc.PeerConnectionObserver
+ com.cloudwebrtc.webrtc.PeerConnectionObserver$1
+ com.cloudwebrtc.webrtc.PeerConnectionObserver$2
+com/cloudwebrtc/webrtc/record/AudioChannel.java
+ com.cloudwebrtc.webrtc.record.AudioChannel
+com/cloudwebrtc/webrtc/record/MediaRecorderImpl.java
+ com.cloudwebrtc.webrtc.record.MediaRecorderImpl
+com/cloudwebrtc/webrtc/GetUserMediaImpl.java
+ com.cloudwebrtc.webrtc.GetUserMediaImpl
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$1
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$2
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$3
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$3$1
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$4
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$5
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$IsCameraEnabled
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$NoSuchFieldWithNameException
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$ScreenRequestPermissionsFragment
+ com.cloudwebrtc.webrtc.GetUserMediaImpl$VideoCapturerInfo
+com/cloudwebrtc/webrtc/FlutterWebRTCPlugin.java
+ com.cloudwebrtc.webrtc.FlutterWebRTCPlugin
+ com.cloudwebrtc.webrtc.FlutterWebRTCPlugin$1
+ com.cloudwebrtc.webrtc.FlutterWebRTCPlugin$LifeCycleObserver
+com/cloudwebrtc/webrtc/utils/ObjectType.java
+ com.cloudwebrtc.webrtc.utils.ObjectType
+com/cloudwebrtc/webrtc/record/AudioSamplesInterceptor.java
+ com.cloudwebrtc.webrtc.record.AudioSamplesInterceptor

@@ -100,10 +100,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     j = JanusClient(withCredentials: true, isUnifiedPlan: true, apiSecret: "SecureIt", transport: ws, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     session = await j.createSession();
     pluginHandle = await session.attach<JanusAudioBridgePlugin>();
-    // MediaStream? stream = await pluginHandle.initializeMediaDevices(mediaConstraints: {"audio": true, "video": false});
-    // setState(() {
-    //   allStreams.putIfAbsent("0", () => stream);
-    // });
     pluginHandle.joinRoom(1234, display: "Shivansh");
     pluginHandle.remoteTrack?.listen((event) async {
       if (event.track != null && event.flowing == true && event.mid != null) {
@@ -200,9 +196,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     });
     await pluginHandle.hangup();
     pluginHandle.dispose();
-    // stream?.getTracks().forEach((element) {
-    //   element.stop();
-    // });
     session.dispose();
   }
 
@@ -219,7 +212,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
               onPressed: () async {
                 await this.initRenderers();
                 await this.initPlatformState();
-//                  -_localRenderer.
               }),
           IconButton(
               icon: Icon(

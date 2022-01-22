@@ -73,29 +73,19 @@ class Participant {
 //</editor-fold>
 }
 
-class AudioRoomV2 extends StatefulWidget {
+class TypedAudioRoomV2 extends StatefulWidget {
   @override
   _AudioRoomState createState() => _AudioRoomState();
 }
 
-class _AudioRoomState extends State<AudioRoomV2> {
+class _AudioRoomState extends State<TypedAudioRoomV2> {
   late JanusClient j;
-  RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
   late JanusSession session;
-  late JanusPlugin pluginHandle;
-  late RestJanusTransport rest;
+  late JanusAudioBridgePlugin pluginHandle;
   late WebSocketJanusTransport ws;
-  late MediaStream remoteStream;
-  late MediaStream myStream;
+  late Map<String, MediaStream?> allStreams = {};
+  late Map<String, RTCVideoRenderer> remoteRenderers = {};
   List<Participant> participants = [];
-  MediaStream? stream;
-
-  @override
-  void didChangeDependencies() async {
-    // TODO: implement didChangeDependencies
-    super.didChangeDependencies();
-  }
 
   @override
   void initState() {
@@ -103,33 +93,28 @@ class _AudioRoomState extends State<AudioRoomV2> {
     initRenderers();
   }
 
-  initRenderers() async {
-    await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
-  }
+  initRenderers() async {}
 
   Future<void> initPlatformState() async {
-    rest = RestJanusTransport(url: servermap['janus_rest']);
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(
-        withCredentials: true,
-        apiSecret: "SecureIt",
-        transport: ws,
-        iceServers: [
-          RTCIceServer(
-              urls: "stun:stun1.l.google.com:19302",
-              username: "",
-              credential: "")
-        ]);
+    j = JanusClient(withCredentials: true, isUnifiedPlan: true, apiSecret: "SecureIt", transport: ws, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     session = await j.createSession();
     pluginHandle = await session.attach<JanusAudioBridgePlugin>();
-    stream=await pluginHandle.initializeMediaDevices(
-        mediaConstraints: {"audio": true, "video": false});
-
-    var register = {"request": "join", "room": 1234, "display": 'shivansh'};
-    await pluginHandle.send(data: register);
-    pluginHandle.remoteStream?.listen((event) {
-      _remoteRenderer.srcObject = event;
+    pluginHandle.joinRoom(1234, display: "Shivansh");
+    pluginHandle.remoteTrack?.listen((event) async {
+      if (event.track != null && event.flowing == true && event.mid != null) {
+        setState(() {
+          remoteRenderers.putIfAbsent(event.mid!, () => RTCVideoRenderer());
+        });
+        await remoteRenderers[event.mid!]?.initialize();
+        MediaStream stream = await createLocalMediaStream(event.mid!);
+        setState(() {
+          allStreams.putIfAbsent(event.mid!, () => stream);
+        });
+        allStreams[event.mid!]?.addTrack(event.track!);
+        remoteRenderers[event.mid!]?.srcObject = allStreams[event.mid!];
+        print(remoteRenderers);
+      }
     });
     pluginHandle.messages?.listen((msg) async {
       print(msg.event);
@@ -137,31 +122,19 @@ class _AudioRoomState extends State<AudioRoomV2> {
         if (msg.event['plugindata']['data'] != null) {
           var data = msg.event['plugindata']['data'];
           if (data['audiobridge'] == 'joined') {
-            RTCSessionDescription offer = await pluginHandle.createOffer(
-                videoRecv: false,
-                audioRecv: true,
-                videoSend: false,
-                audioSend: false);
+            RTCSessionDescription offer = await pluginHandle.createOffer(videoRecv: false, audioRecv: true, videoSend: false, audioSend: true);
             var publish = {"request": "configure"};
             await pluginHandle.send(data: publish, jsep: offer);
-            data = (await pluginHandle.send(data: {
-              'request': 'listparticipants',
-              'room': 1234
-            }))['plugindata']['data'];
+            data = (await pluginHandle.send(data: {'request': 'listparticipants', 'room': 1234}))['plugindata']['data'];
             var participant = data['participants'];
             if (participant is List && participant != null) {
               setState(() {
                 var temp = participant.map((element) {
                   return Participant(
-                      id: element['id'],
-                      display: element['display'],
-                      setup: element['setup'],
-                      muted: element['muted'],
-                      talking: element['talking']!=null?element['talking']:false);
+                      id: element['id'], display: element['display'], setup: element['setup'], muted: element['muted'], talking: element['talking'] != null ? element['talking'] : false);
                 }).toList();
                 temp.forEach((element) {
-                  var existingIndex = participants
-                      .indexWhere((eleme) => eleme.id == element.id);
+                  var existingIndex = participants.indexWhere((eleme) => eleme.id == element.id);
                   if (existingIndex > -1) {
                     participants[existingIndex] = element;
                   } else {
@@ -183,15 +156,10 @@ class _AudioRoomState extends State<AudioRoomV2> {
               setState(() {
                 var temp = participant.map((element) {
                   return Participant(
-                      id: element['id'],
-                      display: element['display'],
-                      setup: element['setup'],
-                      muted: element['muted'],
-                      talking: element['talking']!=null?element['talking']:false);
+                      id: element['id'], display: element['display'], setup: element['setup'], muted: element['muted'], talking: element['talking'] != null ? element['talking'] : false);
                 }).toList();
                 temp.forEach((element) {
-                  var existingIndex = participants
-                      .indexWhere((eleme) => eleme.id == element.id);
+                  var existingIndex = participants.indexWhere((eleme) => eleme.id == element.id);
                   if (existingIndex > -1) {
                     participants[existingIndex] = element;
                   } else {
@@ -202,8 +170,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
             }
             if (data['leaving'] != null) {
               setState(() {
-                participants
-                    .removeWhere((element) => element.id == data['leaving']);
+                participants.removeWhere((element) => element.id == data['leaving']);
               });
             }
           }
@@ -217,8 +184,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
   }
 
   updateTalkingId(data, talking) {
-    int talkingIndex =
-        participants.indexWhere((element) => element.id == data['id']);
+    int talkingIndex = participants.indexWhere((element) => element.id == data['id']);
     setState(() {
       participants[talkingIndex].talking = talking;
     });
@@ -228,12 +194,8 @@ class _AudioRoomState extends State<AudioRoomV2> {
     setState(() {
       participants.removeWhere((element) => true);
     });
-    await pluginHandle.send(data: {"request": "leave"});
     await pluginHandle.hangup();
     pluginHandle.dispose();
-    stream?.getTracks().forEach((element) {
-      element.stop();
-    });
     session.dispose();
   }
 
@@ -250,7 +212,6 @@ class _AudioRoomState extends State<AudioRoomV2> {
               onPressed: () async {
                 await this.initRenderers();
                 await this.initPlatformState();
-//                  -_localRenderer.
               }),
           IconButton(
               icon: Icon(
@@ -264,24 +225,31 @@ class _AudioRoomState extends State<AudioRoomV2> {
         title: const Text('janus_client'),
       ),
       body: Stack(fit: StackFit.expand, children: [
-        Positioned.directional(
+        Positioned.fill(
           top: 5,
-          start: 5,
-          textDirection: TextDirection.ltr,
           child: Opacity(
               opacity: 0,
-              child: SizedBox(
-                  width: 50,
-                  height: 50,
-                  child: RTCVideoView(
-                    _remoteRenderer,
-                  ))),
+              child: ListView.builder(
+                  itemCount: remoteRenderers.entries.map((e) => e.value).length,
+                  itemBuilder: (context,index){
+                    var renderer=remoteRenderers.entries.map((e) => e.value).toList()[index];
+                  return Container(
+                    color: Colors.red,
+                      width: 50,
+                      height: 50,
+                      child: RTCVideoView(
+                        renderer,
+                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      ));
+                  }
+              )
+
+          ),
         ),
         Container(
             child: GridView.builder(
                 itemCount: participants.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3, crossAxisSpacing: 10),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 10),
                 itemBuilder: (context, index) {
                   return Container(
                     color: Colors.green,
@@ -293,9 +261,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
                           color: Colors.white,
                         ),
                         Icon(
-                          participants[index].talking
-                              ? Icons.volume_up_sharp
-                              : Icons.volume_mute_sharp,
+                          participants[index].talking ? Icons.volume_up_sharp : Icons.volume_mute_sharp,
                           color: Colors.white,
                         )
                       ],

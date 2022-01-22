@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
-
-class VideoCallV2Example extends StatefulWidget {
+import '../Helper.dart';
+class TypedVideoCallV2Example extends StatefulWidget {
   @override
   _VideoCallV2ExampleState createState() => _VideoCallV2ExampleState();
 }
 
-class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
+class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   late JanusClient j;
   late WebSocketJanusTransport ws;
   late JanusSession session;
@@ -20,6 +20,9 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
   MediaStream? localStream;
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
+  dynamic incomingDialog;
+  dynamic registerDialog;
+  dynamic callDialog;
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
@@ -36,8 +39,8 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     nameController.text = "";
   }
 
-  registerDialog() {
-    showDialog(
+  openRegisterDialog() async{
+    registerDialog=await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -64,8 +67,8 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
         });
   }
 
-  makeCallDialog() {
-    showDialog(
+  makeCallDialog() async{
+    callDialog=await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -125,44 +128,36 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
         _remoteAudioRenderer.srcObject = remoteAudioStream;
       }
     });
-
-    publishVideo.messages?.listen((even) async {
-      print(even);
-      var pluginData = even.event['plugindata'];
-      if (pluginData != null) {
-        var data = pluginData['data'];
-        if (data != null) {
-          var result = data["result"];
-          if (result != null) {
-            if (result["event"] != null) {
-              var event = result["event"];
-              if (event == 'registered') {
-                Navigator.of(context).pop();
-                nameController.clear();
-                makeCallDialog();
-              } else if (event == 'accepted') {
-                var peer = result["username"];
-                if (peer != null) {
-                  debugPrint("Call started!");
-                } else {}
-                // Video call can start
-                if (even.jsep != null) {
-                  publishVideo.handleRemoteJsep(even.jsep!);
-                  Navigator.of(context).pop();
-                }
-              } else if (event == 'incomingcall') {
-                debugPrint("Incoming call from " + result["username"] + "!");
-                var caller = result["username"];
-                await showIncomingCallDialog(caller, even);
-              } else if (event == 'hangup') {
-                await destroy();
-              }
-            }
-          }
-        }
+    publishVideo.typedMessages?.listen((even) async {
+      Object data = even.event.plugindata?.data;
+      if (data is VideoCallRegisteredEvent) {
+        Navigator.of(context).pop();
+        print(data.result?.username);
+        nameController.clear();
+        await makeCallDialog();
       }
+      if (data is VideoCallIncomingCallEvent) {
+        incomingDialog=await showIncomingCallDialog(data.result!.username!, even.jsep);
+      }
+      if(data is VideoCallAcceptedEvent){
+        // Navigator.of(context).pop();
+      }
+      if(data is VideoCallCallingEvent){
+        var dialog;
+        dialog=await showDialog(context: context, builder: (context)=>AlertDialog(
+          title: Text('Calling the peer..'),
+          actions: [ElevatedButton(onPressed: (){
+            Navigator.of(context, rootNavigator: true).pop(dialog);
+            Navigator.of(context, rootNavigator: true).pop(callDialog);
+          }, child: Text('Okay'))],
+        ));
+      }
+      if(data is VideoCallHangupEvent){
+        await destroy();
+      }
+      publishVideo.handleRemoteJsep(even.jsep);
     });
-    await registerDialog();
+    await openRegisterDialog();
   }
 
   @override
@@ -182,7 +177,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     Navigator.of(context).pop();
   }
 
-  Future<dynamic> showIncomingCallDialog(String caller, EventMessage event) async {
+  Future<dynamic> showIncomingCallDialog(String caller, RTCSessionDescription? jsep) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -192,17 +187,16 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
               ElevatedButton(
                   onPressed: () async {
                     await localMediaSetup();
-                    if (event.jsep != null) {
-                      await publishVideo.handleRemoteJsep(event.jsep);
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pop();
-                    }
-                    // Notify user
+                    await publishVideo.handleRemoteJsep(jsep);
+                    Navigator.of(context,rootNavigator: true).pop(incomingDialog);
+                    Navigator.of(context,rootNavigator: true).pop(callDialog);
                     await publishVideo.acceptCall();
                   },
                   child: Text('Accept')),
               ElevatedButton(
                   onPressed: () async {
+                    Navigator.of(context,rootNavigator: true).pop(incomingDialog);
+                    Navigator.of(context,rootNavigator: true).pop(callDialog);
                     await publishVideo.hangup();
                   },
                   child: Text('Reject')),
@@ -267,7 +261,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                     color: Colors.white,
                     onPressed: () async {
                       await publishVideo.hangup();
-                      await destroy();
+                      destroy();
                     })),
             padding: EdgeInsets.all(10),
           ),
@@ -276,18 +270,10 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     );
   }
 
-  cleanUpWebRTCStuff() async {
-    Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
-      stream?.getTracks().forEach((element) async {
-        await element.stop();
-      });
-      await stream?.dispose();
-    }
-
+  Future<void> cleanUpWebRTCStuff() async {
     await stopAllTracksAndDispose(localStream);
     await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
-
     _localRenderer.srcObject = null;
     _remoteVideoRenderer.srcObject = null;
     _remoteAudioRenderer.srcObject = null;

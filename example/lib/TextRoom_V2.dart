@@ -27,7 +27,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
         transport: ws,
         iceServers: [
           RTCIceServer(
-              url: "stun:stun1.l.google.com:19302",
+              urls: "stun:stun1.l.google.com:19302",
               username: "",
               credential: "")
         ]);

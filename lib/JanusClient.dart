@@ -10,14 +10,19 @@ class JanusClient {
   JanusTransport? transport;
   String? apiSecret;
   String? token;
+  late Duration _pollingInterval;
   bool withCredentials;
   int maxEvent;
   List<RTCIceServer>? iceServers = [];
   int refreshInterval;
   bool isUnifiedPlan;
   String loggerName;
+  late bool _usePlanB;
   late Logger logger;
   Level loggerLevel;
+
+  Duration get pollingInterval=>_pollingInterval;
+  bool get usePlanB=>_usePlanB;
 
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
@@ -36,29 +41,38 @@ class JanusClient {
           : {}
       : {};
 
+  /// JanusClient
+  ///
+  /// setting usePlanB forces creation of peer connection with plan-b sdb semantics,
+  /// and would cause isUnifiedPlan to have no effect on sdpSemantics config
   JanusClient(
       {this.transport,
       this.iceServers,
       this.refreshInterval = 50,
       this.apiSecret,
-      this.isUnifiedPlan = false,
+      this.isUnifiedPlan = true,
       this.token,
+        /// forces creation of peer connection with plan-b sdb semantics
+        @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.')
+        bool usePlanB=false,
+      Duration? pollingInterval,
       this.loggerName = "JanusClient",
       this.maxEvent = 10,
       this.loggerLevel = Level.ALL,
       this.withCredentials = false}) {
+    _usePlanB=usePlanB;
     logger = Logger.detached(this.loggerName);
     logger.level = this.loggerLevel;
     logger.onRecord.listen((event) {
       print(event);
     });
+    this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
   }
 
   Future<JanusSession> createSession() async {
     logger.info("Creating Session");
     logger.fine("fine message");
-    JanusSession session = JanusSession(
-        refreshInterval: refreshInterval, transport: transport, context: this);
+    JanusSession session = JanusSession(refreshInterval: refreshInterval, transport: transport, context: this);
     try {
       await session.create();
     } catch (e) {

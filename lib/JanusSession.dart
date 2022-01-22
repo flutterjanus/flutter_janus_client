@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:janus_client/JanusClient.dart';
 import 'package:janus_client/WrapperPlugins/JanusSipPlugin.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -21,7 +22,7 @@ class JanusSession {
       Map<String, dynamic>? response;
       if (transport is RestJanusTransport) {
         RestJanusTransport rest = (transport as RestJanusTransport);
-        response = (await rest.post(request)) as Map<String, dynamic>;
+        response = (await rest.post(request)) as Map<String, dynamic>?;
         if (response != null) {
           if (response.containsKey('janus') && response.containsKey('data')) {
             sessionId = response['data']['id'];
@@ -61,7 +62,6 @@ class JanusSession {
     Map<String, dynamic>? response;
     if (T == JanusVideoRoomPlugin) {
       plugin = JanusVideoRoomPlugin(transport: transport, context: context, handleId: handleId, session: this);
-
     } else if (T == JanusVideoCallPlugin) {
       plugin = JanusVideoCallPlugin(transport: transport, context: context, handleId: handleId, session: this);
     } else if (T == JanusStreamingPlugin) {
@@ -80,6 +80,7 @@ class JanusSession {
       ''');
     }
     request.putIfAbsent("plugin", () => plugin.plugin);
+    context?.logger.fine(request);
     if (transport is RestJanusTransport) {
       context!.logger.info('using rest transport for creating plugin handle');
       RestJanusTransport rest = (transport as RestJanusTransport);
@@ -106,7 +107,13 @@ class JanusSession {
     }
     plugin.handleId = handleId;
     _pluginHandles[handleId] = plugin;
-    await plugin.init();
+    try{
+      await plugin.init();
+    }
+    on MissingPluginException
+    catch(e){
+     context?.logger.info('Platform exception: i believe you are trying in unit tests, platform specific api not accessible');
+    }
     plugin.onCreate();
     return plugin as T;
   }

@@ -63,46 +63,37 @@ class EventMessage{
 class RTCIceServer {
   String? username;
   String? credential;
-  String? url;
+  String? urls;
 
-//<editor-fold desc="Data Methods" defaultstate="collapsed">
+//<editor-fold desc="Data Methods">
 
   RTCIceServer({
-    required this.username,
-    required this.credential,
-    required this.url,
+    this.username,
+    this.credential,
+    this.urls,
   });
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is RTCIceServer &&
-          runtimeType == other.runtimeType &&
-          username == other.username &&
-          credential == other.credential &&
-          url == other.url);
+      identical(this, other) || (other is RTCIceServer && runtimeType == other.runtimeType && username == other.username && credential == other.credential && urls == other.urls);
 
   @override
-  int get hashCode => username.hashCode ^ credential.hashCode ^ url.hashCode;
+  int get hashCode => username.hashCode ^ credential.hashCode ^ urls.hashCode;
 
   @override
   String toString() {
-    return 'RTCIceServer{' +
-        ' username: $username,' +
-        ' credential: $credential,' +
-        ' url: $url,' +
-        '}';
+    return 'RTCIceServer{' + ' username: $username,' + ' credential: $credential,' + ' urls: $urls,' + '}';
   }
 
   RTCIceServer copyWith({
     String? username,
     String? credential,
-    String? url,
+    String? urls,
   }) {
-    return new RTCIceServer(
+    return RTCIceServer(
       username: username ?? this.username,
       credential: credential ?? this.credential,
-      url: url ?? this.url,
+      urls: urls ?? this.urls,
     );
   }
 
@@ -110,15 +101,15 @@ class RTCIceServer {
     return {
       'username': this.username,
       'credential': this.credential,
-      'url': this.url,
+      'urls': this.urls,
     };
   }
 
   factory RTCIceServer.fromMap(Map<String, dynamic> map) {
-    return new RTCIceServer(
-      username: map['username'] as String?,
-      credential: map['credential'] as String?,
-      url: map['url'] as String?,
+    return RTCIceServer(
+      username: map['username'] as String,
+      credential: map['credential'] as String,
+      urls: map['urls'] as String,
     );
   }
 

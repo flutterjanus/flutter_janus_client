@@ -1,4 +1,4 @@
-import 'package:janus_client/interfaces/AudioBridge/Events/audio_bridge_event.dart';
+part of janus_client;
 
 class AudioBridgeJoinedEvent extends AudioBridgeEvent {
   AudioBridgeJoinedEvent({

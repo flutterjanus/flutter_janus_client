@@ -1,8 +1,6 @@
 // import 'package:test/test.dart';
 
-import 'package:janus_client/JanusClient.dart';
-import 'package:janus_client/JanusSession.dart';
-import 'package:janus_client/JanusTransport.dart';
+import 'package:janus_client/janus_client.dart';
 
 void main() async{
   WebSocketJanusTransport ws = WebSocketJanusTransport(

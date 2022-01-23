@@ -1,3 +1,4 @@
+part of janus_client;
 class AudioBridgeEvent{
   String? audiobridge;
   late int room;

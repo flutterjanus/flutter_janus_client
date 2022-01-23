@@ -1,4 +1,4 @@
-
+part of janus_client;
 class CreateMediaItem {
   CreateMediaItem({
       this.type, 

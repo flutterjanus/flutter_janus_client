@@ -15,7 +15,7 @@ class JanusSession {
   Future<void> create() async {
     try {
       String transaction = getUuid().v4();
-      Map<String, dynamic> request = {"janus": "create", "transaction": transaction, ..._context.tokenMap, ..._context.apiMap};
+      Map<String, dynamic> request = {"janus": "create", "transaction": transaction, ..._context._tokenMap, ..._context._apiMap};
       Map<String, dynamic>? response;
       if (_transport is RestJanusTransport) {
         RestJanusTransport rest = (_transport as RestJanusTransport);
@@ -131,7 +131,7 @@ class JanusSession {
           if (_transport is RestJanusTransport) {
             RestJanusTransport rest = (_transport as RestJanusTransport);
             _context._logger.info("keep alive using RestTransport");
-            response = (await rest.post({"janus": "keepalive", "session_id": sessionId, "transaction": transaction, ..._context.apiMap, ..._context.tokenMap})) as Map<String, dynamic>;
+            response = (await rest.post({"janus": "keepalive", "session_id": sessionId, "transaction": transaction, ..._context._apiMap, ..._context._tokenMap})) as Map<String, dynamic>;
             _context._logger.fine(response);
           } else if (_transport is WebSocketJanusTransport) {
             _context._logger.info("keep alive using WebSocketTransport");
@@ -140,7 +140,7 @@ class JanusSession {
               _context._logger.fine("not connected trying to establish connection to webSocket");
               ws.connect();
             }
-            ws.sink!.add(stringify({"janus": "keepalive", "session_id": sessionId, "transaction": transaction, ..._context.apiMap, ..._context.tokenMap}));
+            ws.sink!.add(stringify({"janus": "keepalive", "session_id": sessionId, "transaction": transaction, ..._context._apiMap, ..._context._tokenMap}));
             _context._logger.fine("keepalive request sent to webSocket");
             response = parse(await ws.stream.firstWhere((element) => (parse(element)['transaction'] == transaction)));
             _context._logger.fine(response);

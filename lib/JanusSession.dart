@@ -3,9 +3,11 @@ part of janus_client;
 class JanusSession {
   late JanusTransport _transport;
   late JanusClient _context;
-  int? sessionId;
+  int? _sessionId;
   Timer? _keepAliveTimer;
   Map<int?, JanusPlugin> _pluginHandles = {};
+
+  int? get sessionId=>_sessionId;
 
   JanusSession({int? refreshInterval, required JanusTransport transport, required JanusClient context}) {
     _context = context;
@@ -22,7 +24,7 @@ class JanusSession {
         response = (await rest.post(request)) as Map<String, dynamic>?;
         if (response != null) {
           if (response.containsKey('janus') && response.containsKey('data')) {
-            sessionId = response['data']['id'];
+            _sessionId = response['data']['id'];
             rest.sessionId = sessionId;
           }
         } else {
@@ -36,7 +38,7 @@ class JanusSession {
         ws.sink!.add(stringify(request));
         response = parse(await ws.stream.firstWhere((element) => (parse(element)['transaction'] == transaction)));
         if (response!.containsKey('janus') && response.containsKey('data')) {
-          sessionId = response['data']['id'] as int?;
+          _sessionId = response['data']['id'] as int?;
           ws.sessionId = sessionId;
         }
       }

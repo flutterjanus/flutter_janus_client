@@ -18,15 +18,15 @@ class JanusClient {
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
   * */
-  String get dataChannelDefaultLabel => "JanusDataChannel";
+  String get _dataChannelDefaultLabel => "JanusDataChannel";
 
-  dynamic get apiMap => _withCredentials
+  Map get _apiMap => _withCredentials
       ? _apiSecret != null
           ? {"apisecret": _apiSecret}
           : {}
       : {};
 
-  dynamic get tokenMap => _withCredentials
+  Map get _tokenMap => _withCredentials
       ? _token != null
           ? {"token": _token}
           : {}

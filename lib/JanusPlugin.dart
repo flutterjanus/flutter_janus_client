@@ -20,7 +20,7 @@ class JanusPlugin {
   String? plugin;
   bool _initialized = false;
 
-  late Stream<dynamic> events;
+  late Stream<dynamic> _events;
   Stream<EventMessage>? messages;
   Stream<TypedEvent<JanusEvent>>? typedMessages;
   Stream<RTCDataChannelMessage>? data;
@@ -110,7 +110,7 @@ class JanusPlugin {
   void _initStreamControllersAndStreams() {
     //source and stream for session level events
     _streamController = StreamController<dynamic>();
-    events = _streamController!.stream.asBroadcastStream();
+    _events = _streamController!.stream.asBroadcastStream();
     //source and stream for localStream
     _localStreamController = StreamController<MediaStream?>();
     localStream = _localStreamController!.stream.asBroadcastStream();
@@ -249,7 +249,7 @@ class JanusPlugin {
 
   void _handleEventMessageEmitter() {
     //filter and only send events for current handleId
-    events.where((event) {
+    _events.where((event) {
       Map<String, dynamic> result = event;
       if (result.containsKey('sender')) {
         if ((result['sender'] as int?) == handleId) return true;

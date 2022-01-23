@@ -1,43 +1,34 @@
-import 'dart:async';
-import 'package:janus_client/JanusSession.dart';
-import 'package:janus_client/JanusTransport.dart';
-import 'package:janus_client/utils.dart';
-import 'package:logging/logging.dart';
-
-export 'shelf.dart';
+part of janus_client;
 
 class JanusClient {
-  JanusTransport? transport;
-  String? apiSecret;
-  String? token;
+  late JanusTransport _transport;
+  String? _apiSecret;
+  String? _token;
   late Duration _pollingInterval;
-  bool withCredentials;
-  int maxEvent;
-  List<RTCIceServer>? iceServers = [];
-  int refreshInterval;
-  bool isUnifiedPlan;
-  String loggerName;
+  late bool _withCredentials;
+  late int _maxEvent;
+  late List<RTCIceServer>? _iceServers = [];
+  late int _refreshInterval;
+  late bool _isUnifiedPlan;
+  late String _loggerName;
   late bool _usePlanB;
-  late Logger logger;
-  Level loggerLevel;
-
-  Duration get pollingInterval=>_pollingInterval;
-  bool get usePlanB=>_usePlanB;
+  late Logger _logger;
+  late Level _loggerLevel;
 
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
   * */
   String get dataChannelDefaultLabel => "JanusDataChannel";
 
-  dynamic get apiMap => withCredentials
-      ? apiSecret != null
-          ? {"apisecret": apiSecret}
+  dynamic get apiMap => _withCredentials
+      ? _apiSecret != null
+          ? {"apisecret": _apiSecret}
           : {}
       : {};
 
-  dynamic get tokenMap => withCredentials
-      ? token != null
-          ? {"token": token}
+  dynamic get tokenMap => _withCredentials
+      ? _token != null
+          ? {"token": _token}
           : {}
       : {};
 
@@ -46,39 +37,51 @@ class JanusClient {
   /// setting usePlanB forces creation of peer connection with plan-b sdb semantics,
   /// and would cause isUnifiedPlan to have no effect on sdpSemantics config
   JanusClient(
-      {this.transport,
-      this.iceServers,
-      this.refreshInterval = 50,
-      this.apiSecret,
-      this.isUnifiedPlan = true,
-      this.token,
+      {required JanusTransport transport,
+        List<RTCIceServer>? iceServers,
+      int refreshInterval = 50,
+      String? apiSecret,
+      bool isUnifiedPlan = true,
+      String? token,
         /// forces creation of peer connection with plan-b sdb semantics
         @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.')
         bool usePlanB=false,
       Duration? pollingInterval,
-      this.loggerName = "JanusClient",
-      this.maxEvent = 10,
-      this.loggerLevel = Level.ALL,
-      this.withCredentials = false}) {
+      loggerName = "JanusClient",
+      maxEvent = 10,
+      loggerLevel = Level.ALL,
+      bool withCredentials = false}) {
+      _transport=transport;
+      _isUnifiedPlan=isUnifiedPlan;
+      _iceServers=iceServers;
+      _refreshInterval=refreshInterval;
+      _apiSecret=_apiSecret;
+      _loggerName=loggerName;
+      _maxEvent=maxEvent;
+      _loggerLevel=loggerLevel;
+      _withCredentials=withCredentials;
+      _isUnifiedPlan=isUnifiedPlan;
+      _token=token;
+      _pollingInterval=pollingInterval??Duration(seconds: 1);
     _usePlanB=usePlanB;
-    logger = Logger.detached(this.loggerName);
-    logger.level = this.loggerLevel;
-    logger.onRecord.listen((event) {
+    _logger = Logger.detached(_loggerName);
+    _logger.level = _loggerLevel;
+    _logger.onRecord.listen((event) {
       print(event);
     });
     this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
   }
 
   Future<JanusSession> createSession() async {
-    logger.info("Creating Session");
-    logger.fine("fine message");
-    JanusSession session = JanusSession(refreshInterval: refreshInterval, transport: transport, context: this);
+    _logger.info("Creating Session");
+    _logger.fine("fine message");
+    JanusSession session = JanusSession(refreshInterval: _refreshInterval, transport: _transport, context: this);
     try {
       await session.create();
     } catch (e) {
-      logger.severe(e);
+      _logger.severe(e);
     }
-    logger.info("Session Created");
+    _logger.info("Session Created");
     return session;
   }
 }

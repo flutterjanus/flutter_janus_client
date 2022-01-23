@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/janus_client.dart';
+
 
 class _MyHttpOverrides extends HttpOverrides {}
 

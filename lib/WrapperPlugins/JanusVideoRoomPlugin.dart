@@ -1,5 +1,5 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
+
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
 
@@ -90,12 +90,13 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     Map data = await this.send(data: payload);
   }
 
-  Future<void> subscribeToStreams(List<PublisherStream> streams)async{
-    if(streams.length>0){
+  Future<void> subscribeToStreams(List<PublisherStream> streams) async {
+    if (streams.length > 0) {
       var payload = {'request': "subscribe", 'streams': streams.map((e) => e.toMap()).toList()};
       await this.send(data: payload);
     }
   }
+
   Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(int roomId,
       {List<PublisherStream>? streams, int? privateId, int? feedId}) async {
     Future<void> start({audioRecv = true, audioSend = false, videoRecv = true, videoSend = false}) async {
@@ -155,23 +156,21 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-         if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
+        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
           typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        }
-         else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['configured'] == "ok") {
-           typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
-           typedMessagesSink?.add(typedEvent);
-         }
-        else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['configured'] == "ok") {
+          typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['leaving'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' || typedEvent.event.plugindata?.data['streams'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         }
         // if (typedEvent.jsep != null) {
         //   typedEvent.jsep=event.jsep;

@@ -1,6 +1,4 @@
-/// videoroom : "success"
-/// list : [{"room":1234,"description":"<Name of the room>","pin_required":false,"is_private":false,"max_publishers":20,"bitrate":12444,"bitrate_cap":3,"fir_freq":35,"require_pvtid":false,"require_e2ee":false,"notify_joining":false,"audiocodec":"","videocodec":"","opus_fec":false,"video_svc":false,"record":false,"rec_dir":"","lock_record":false,"num_participants":20,"audiolevel_ext":false,"audiolevel_event":true,"audio_active_packets":200,"audio_level_average":200,"videoorient_ext":false,"playoutdelay_ext":false,"transport_wide_cc_ext":false}]
-
+part of janus_client;
 class VideoRoomListResponse {
   VideoRoomListResponse({
       String? videoroom, 

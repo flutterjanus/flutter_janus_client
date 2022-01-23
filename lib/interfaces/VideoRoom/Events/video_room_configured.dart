@@ -1,5 +1,4 @@
-import 'package:janus_client/interfaces/interfaces.dart';
-
+part of janus_client;
 class VideoRoomConfigured extends VideoRoomEvent {
   VideoRoomConfigured({
     videoroom,

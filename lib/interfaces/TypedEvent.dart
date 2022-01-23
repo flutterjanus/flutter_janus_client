@@ -1,4 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
+part of janus_client;
 
 class TypedEvent<T> {
   T event;

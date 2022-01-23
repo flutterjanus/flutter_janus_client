@@ -1,4 +1,4 @@
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 
 class JanusEchoTestPlugin extends JanusPlugin {
   JanusEchoTestPlugin({handleId, context, transport, session}) : super(context: context,

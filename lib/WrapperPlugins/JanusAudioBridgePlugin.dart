@@ -1,5 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 
 class JanusAudioBridgePlugin extends JanusPlugin {
   JanusAudioBridgePlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.AUDIO_BRIDGE, session: session, transport: transport);
@@ -292,13 +291,13 @@ class JanusAudioBridgePlugin extends JanusPlugin {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
         if (typedEvent.event.plugindata?.data["audiobridge"] == "joined") {
           typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["result"] == "ok") {
           typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["leaving"] != null) {
           typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         }
       });
     }

@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:janus_client/utils.dart';
-import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/web_socket_channel.dart';
+part of janus_client;
 
 abstract class JanusTransport {
   String? url;

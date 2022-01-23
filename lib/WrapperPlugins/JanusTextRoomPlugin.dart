@@ -1,4 +1,4 @@
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 
 class JanusTextRoomPlugin extends JanusPlugin {
   JanusTextRoomPlugin({handleId, context, transport, session}) : super(context: context,

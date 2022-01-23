@@ -20,8 +20,6 @@ void main() async {
       await videoCallPlugin.getList();
       await videoCallPlugin.register('bcd');
       await videoCallPlugin.call('abc');
-      videoCallPlugin.hangup();
-      // videoCallPlugin.
       videoCallPlugin.messages?.listen((event) {
         print(event.event);
       });

@@ -345,20 +345,20 @@ class JanusPlugin {
   /// It is mainly used for Janus TextRoom and can be used for other plugins with data channel support
   Future<void> initDataChannel({RTCDataChannelInit? rtcDataChannelInit}) async {
     if (webRTCHandle!.peerConnection != null) {
-      if (webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel] != null) return;
+      if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) return;
       if (rtcDataChannelInit == null) {
         rtcDataChannelInit = RTCDataChannelInit();
         rtcDataChannelInit.ordered = true;
         rtcDataChannelInit.protocol = 'janus-protocol';
       }
-      webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel] = await webRTCHandle!.peerConnection!.createDataChannel(_context.dataChannelDefaultLabel, rtcDataChannelInit);
-      if (webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel] != null) {
-        webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel]!.onDataChannelState = (state) {
+      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] = await webRTCHandle!.peerConnection!.createDataChannel(_context._dataChannelDefaultLabel, rtcDataChannelInit);
+      if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) {
+        webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onDataChannelState = (state) {
           if (!_onDataStreamController!.isClosed) {
             _onDataStreamController!.sink.add(state);
           }
         };
-        webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel]!.onMessage = (RTCDataChannelMessage message) {
+        webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onMessage = (RTCDataChannelMessage message) {
           if (!_dataStreamController!.isClosed) {
             _dataStreamController!.sink.add(message);
           }
@@ -512,10 +512,10 @@ class JanusPlugin {
     if (message != null) {
       if (webRTCHandle!.peerConnection != null) {
         print('before send RTCDataChannelMessage');
-        if (webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel] == null) {
+        if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] == null) {
           throw Exception("You Must  call initDataChannel method! before you can send any data channel message");
         }
-        RTCDataChannel dataChannel = webRTCHandle!.dataChannel[_context.dataChannelDefaultLabel]!;
+        RTCDataChannel dataChannel = webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!;
         if (dataChannel.state == RTCDataChannelState.RTCDataChannelOpen) {
           return await dataChannel.send(RTCDataChannelMessage(message));
         }

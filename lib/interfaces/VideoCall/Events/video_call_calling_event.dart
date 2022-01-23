@@ -1,4 +1,4 @@
-import './events.dart';
+part of janus_client;
 class VideoCallCallingEvent extends VideoCallEvent {
   VideoCallCallingEvent.fromJson(dynamic json) {
     videocall = json['videocall'];

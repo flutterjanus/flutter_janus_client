@@ -1,5 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 
 class JanusVideoCallPlugin extends JanusPlugin {
   JanusVideoCallPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_CALL, session: session, transport: transport);
@@ -95,37 +94,30 @@ class JanusVideoCallPlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videocall'] == 'event'
-            &&typedEvent.event.plugindata?.data['result']!=null
-            && typedEvent.event.plugindata?.data['result']['event'] == 'registered') {
-            typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
-            typedMessagesSink?.add(typedEvent);
-        }
-        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
-            &&typedEvent.event.plugindata?.data['result']!=null
-            && typedEvent.event.plugindata?.data['result']['event'] == 'calling') {
+        if (typedEvent.event.plugindata?.data['videocall'] == 'event' && typedEvent.event.plugindata?.data['result'] != null && typedEvent.event.plugindata?.data['result']['event'] == 'registered') {
+          typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
+            typedEvent.event.plugindata?.data['result'] != null &&
+            typedEvent.event.plugindata?.data['result']['event'] == 'calling') {
           typedEvent.event.plugindata?.data = VideoCallCallingEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        }
-        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
-            &&typedEvent.event.plugindata?.data['result']!=null
-            && typedEvent.event.plugindata?.data['result']['event'] == 'incomingcall') {
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
+            typedEvent.event.plugindata?.data['result'] != null &&
+            typedEvent.event.plugindata?.data['result']['event'] == 'incomingcall') {
           typedEvent.event.plugindata?.data = VideoCallIncomingCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        }
-        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
-            &&typedEvent.event.plugindata?.data['result']!=null
-            && typedEvent.event.plugindata?.data['result']['event'] == 'accepted') {
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
+            typedEvent.event.plugindata?.data['result'] != null &&
+            typedEvent.event.plugindata?.data['result']['event'] == 'accepted') {
           typedEvent.event.plugindata?.data = VideoCallAcceptedEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
-        }
-        else if (typedEvent.event.plugindata?.data['videocall'] == 'event'
-            &&typedEvent.event.plugindata?.data['result']!=null
-            && typedEvent.event.plugindata?.data['result']['event'] == 'hangup') {
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
+            typedEvent.event.plugindata?.data['result'] != null &&
+            typedEvent.event.plugindata?.data['result']['event'] == 'hangup') {
           typedEvent.event.plugindata?.data = VideoCallHangupEvent.fromJson(typedEvent.event.plugindata?.data);
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         }
-
       });
     }
   }

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:janus_client/JanusTransport.dart';
+
 import 'dart:io';
+
+import 'package:janus_client/janus_client.dart';
 void main() {
   RestJanusTransport rest =
       RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');

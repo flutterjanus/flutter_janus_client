@@ -1,4 +1,4 @@
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 
 class JanusSipPlugin extends JanusPlugin {
   JanusSipPlugin({handleId, context, transport, session}) : super(context: context,

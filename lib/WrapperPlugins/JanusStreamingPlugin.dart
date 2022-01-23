@@ -1,5 +1,4 @@
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/JanusClient.dart';
+part of janus_client;
 class JanusStreamingPlugin extends JanusPlugin {
   JanusStreamingPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.STREAMING, session: session, transport: transport);
 
@@ -153,14 +152,14 @@ class JanusStreamingPlugin extends JanusPlugin {
             typedEvent.event.plugindata?.data["result"]['status']=='preparing'
         ) {
           typedEvent.event.plugindata?.data = StreamingPluginPreparingEvent();
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         }
         else if (typedEvent.event.plugindata?.data["streaming"] == "event"&&
             typedEvent.event.plugindata?.data["result"]!=null&&
             typedEvent.event.plugindata?.data["result"]['status']=='stopping'
         ) {
           typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
-          typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent);
         }
       });
     }

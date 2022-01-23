@@ -1,4 +1,4 @@
-import 'audio_bridge_event.dart';
+part of janus_client;
 
 class AudioBridgeLeavingEvent extends AudioBridgeEvent{
   AudioBridgeLeavingEvent({

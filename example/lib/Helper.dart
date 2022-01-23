@@ -4,7 +4,7 @@
 
 import 'dart:convert';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/janus_client.dart';
 
 List<StreamingItem> streamingItemFromMap(String str) => List<StreamingItem>.from(json.decode(str).map((x) => StreamingItem.fromMap(x)));
 

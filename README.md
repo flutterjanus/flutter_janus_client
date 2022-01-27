@@ -5,10 +5,6 @@
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 # janus_client
-This branch features  brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events therefore it is easy
-to work with and test.
-
-## About
 
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
@@ -40,6 +36,11 @@ it easily integrates into your flutter application and allows you to build webrt
 - Documentation of some remaining plugins
 - Polishing of examples
 - Unit Test cases for all plugins
+
+## Deprecated Api v1(0.0.x)
+If by any chance you are looking for (although you shouldn't) old api then you can switch to v1 branch,
+as it is very unstable and hard to maintain it was deprecated and will not recieve any fixes or feature updates.
+It is highly recommended you migrate your code to latest version that is 2.X.X (stable)
 
 ## Contributors ✨
 

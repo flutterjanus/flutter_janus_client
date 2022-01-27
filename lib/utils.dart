@@ -1,6 +1,17 @@
 part of janus_client;
 
-class EventMessage{
+class JanusWebRTCHandle {
+  MediaStream? remoteStream;
+  MediaStream? localStream;
+  RTCPeerConnection? peerConnection;
+  Map<String, RTCDataChannel> dataChannel = {};
+
+  JanusWebRTCHandle({
+    this.peerConnection,
+  });
+}
+
+class EventMessage {
   dynamic event;
   RTCSessionDescription? jsep;
 
@@ -27,12 +38,7 @@ class EventMessage{
   }
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is EventMessage &&
-          runtimeType == other.runtimeType &&
-          event == other.event &&
-          jsep == other.jsep);
+  bool operator ==(Object other) => identical(this, other) || (other is EventMessage && runtimeType == other.runtimeType && event == other.event && jsep == other.jsep);
 
   @override
   int get hashCode => event.hashCode ^ jsep.hashCode;
@@ -55,6 +61,7 @@ class EventMessage{
 //</editor-fold>
 
 }
+
 class RTCIceServer {
   String? username;
   String? credential;
@@ -111,7 +118,7 @@ class RTCIceServer {
 //</editor-fold>
 }
 
-class RemoteTrack{
+class RemoteTrack {
   MediaStream? stream;
   MediaStreamTrack? track;
   String? mid;
@@ -120,7 +127,7 @@ class RemoteTrack{
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
   RemoteTrack({
-   this.stream,
+    this.stream,
     required this.track,
     required this.mid,
     required this.flowing,
@@ -147,17 +154,10 @@ class RemoteTrack{
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is RemoteTrack &&
-          runtimeType == other.runtimeType &&
-          stream == other.stream &&
-          track == other.track &&
-          mid == other.mid &&
-          flowing == other.flowing);
+      identical(this, other) || (other is RemoteTrack && runtimeType == other.runtimeType && stream == other.stream && track == other.track && mid == other.mid && flowing == other.flowing);
 
   @override
-  int get hashCode =>
-      stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
+  int get hashCode => stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
 
   factory RemoteTrack.fromMap(Map<String, dynamic> map) {
     return new RemoteTrack(
@@ -182,9 +182,10 @@ class RemoteTrack{
 
 }
 
-Uuid getUuid(){
+Uuid getUuid() {
   return Uuid();
 }
+
 stringify(dynamic) {
   JsonEncoder encoder = JsonEncoder();
   return '${encoder.convert(dynamic)}';
@@ -195,11 +196,17 @@ parse(dynamic) {
   return jsonDecoder.convert(dynamic);
 }
 
-randomString({int len=10, String charSet='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
+randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
   var randomString = '';
   for (var i = 0; i < len; i++) {
-    var randomPoz = (Math.Random().nextInt(charSet.length-1)).floor();
+    var randomPoz = (Math.Random().nextInt(charSet.length - 1)).floor();
     randomString += charSet.substring(randomPoz, randomPoz + 1);
   }
-  return randomString+Timeline.now.toString();
+  return randomString + Timeline.now.toString();
+}
+Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
+  stream?.getTracks().forEach((element) async {
+    await element.stop();
+  });
+  await stream?.dispose();
 }

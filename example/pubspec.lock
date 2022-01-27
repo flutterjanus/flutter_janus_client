@@ -95,6 +95,11 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_web_plugins:
+    dependency: transitive
+    description: flutter
+    source: sdk
+    version: "0.0.0"
   flutter_webrtc:
     dependency: transitive
     description:
@@ -122,7 +127,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.1.1-beta"
+    version: "2.2.0"
   js:
     dependency: transitive
     description:

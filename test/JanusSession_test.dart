@@ -1,8 +1,6 @@
 // import 'package:test/test.dart';
 
-import 'package:janus_client/JanusClient.dart';
-import 'package:janus_client/JanusSession.dart';
-import 'package:janus_client/JanusTransport.dart';
+import 'package:janus_client/janus_client.dart';
 
 void main() async{
   WebSocketJanusTransport ws = WebSocketJanusTransport(
@@ -12,6 +10,8 @@ void main() async{
   // RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
   JanusSession session=await j.createSession();
   print(session.sessionId);
+  JanusVideoRoomPlugin plugin=await session.attach<JanusVideoRoomPlugin>();
+  // print(await plugin.joinPublisher(1234));
 
   // group('RestJanusTransport', () {
   //   // test('Create a new Session', () async {

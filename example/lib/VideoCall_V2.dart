@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
 
@@ -9,29 +9,30 @@ class VideoCallV2Example extends StatefulWidget {
 }
 
 class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
-  JanusClient j;
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  JanusSession session;
-  JanusPlugin publishVideo;
+  late JanusClient j;
+  late WebSocketJanusTransport ws;
+  late JanusSession session;
+  late JanusVideoCallPlugin publishVideo;
   TextEditingController nameController = TextEditingController();
-  RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
-  RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-  MediaStream myStream;
+  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
+  RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
+  RTCVideoRenderer _remoteAudioRenderer = RTCVideoRenderer();
+  MediaStream? localStream;
+  MediaStream? remoteVideoStream;
+  MediaStream? remoteAudioStream;
+
+  Future<void> localMediaSetup() async {
+    await _localRenderer.initialize();
+    MediaStream? temp = await publishVideo.initializeMediaDevices(mediaConstraints: {"audio": true, "video": true});
+    setState(() {
+      localStream = temp;
+    });
+    _localRenderer.srcObject = localStream;
+  }
 
   makeCall() async {
-    await _localRenderer.initialize();
-    _localRenderer.srcObject =
-        await publishVideo.initializeMediaDevices(mediaConstraints: {
-      "audio": true,
-      "video": true
-    });
-    RTCSessionDescription offerToCall = await publishVideo.createOffer();
-    var body = {"request": "call", "username": nameController.text};
-    publishVideo.send(
-      data: body,
-      jsep: offerToCall,
-    );
+    await localMediaSetup();
+    await publishVideo.call(nameController.text);
     nameController.text = "";
   }
 
@@ -74,8 +75,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(
-                      labelText: "Name Of Registered User to call"),
+                  decoration: InputDecoration(labelText: "Name Of Registered User to call"),
                   controller: nameController,
                 ),
                 RaisedButton(
@@ -97,25 +97,36 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _localRenderer.initialize();
-    await _remoteRenderer.initialize();
+    await _remoteVideoRenderer.initialize();
   }
 
   initJanusClient() async {
-    setState(() {
-      rest =
-          RestJanusTransport(url: servermap['janus_rest']);
-      ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(transport: ws, iceServers: [
-        RTCIceServer(
-            url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
-      ]);
-    });
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    j = JanusClient(transport: ws, iceServers: [RTCIceServer(urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")], isUnifiedPlan: true);
     session = await j.createSession();
-    publishVideo = await session.attach(JanusPlugins.VIDEO_CALL);
-    publishVideo.remoteStream.listen((event) {
-      _remoteRenderer.srcObject = event;
+    publishVideo = await session.attach<JanusVideoCallPlugin>();
+    await _remoteVideoRenderer.initialize();
+    await _remoteAudioRenderer.initialize();
+    MediaStream? tempVideo = await createLocalMediaStream('remoteVideoStream');
+    setState(() {
+      remoteVideoStream = tempVideo;
     });
-    publishVideo.messages.listen((even) async {
+    MediaStream? tempAudio = await createLocalMediaStream('remoteAudioStream');
+    setState(() {
+      remoteAudioStream = tempAudio;
+    });
+    publishVideo.remoteTrack?.listen((event) async {
+      if (event.track != null && event.track?.kind == 'video' && event.flowing == true) {
+        remoteVideoStream?.addTrack(event.track!);
+        _remoteVideoRenderer.srcObject = remoteVideoStream;
+      }
+      if (event.track != null && event.track?.kind == 'audio' && event.flowing == true) {
+        remoteAudioStream?.addTrack(event.track!);
+        _remoteAudioRenderer.srcObject = remoteAudioStream;
+      }
+    });
+
+    publishVideo.messages?.listen((even) async {
       print(even);
       var pluginData = even.event['plugindata'];
       if (pluginData != null) {
@@ -136,42 +147,13 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 } else {}
                 // Video call can start
                 if (even.jsep != null) {
-                  publishVideo.handleRemoteJsep(even.jsep);
+                  publishVideo.handleRemoteJsep(even.jsep!);
                   Navigator.of(context).pop();
                 }
               } else if (event == 'incomingcall') {
                 debugPrint("Incoming call from " + result["username"] + "!");
-                var yourusername = result["username"];
-
-                await _localRenderer.initialize();
-                _localRenderer.srcObject = await publishVideo
-                    .initializeMediaDevices(mediaConstraints: {
-                  "audio": true,
-                  "video": {
-                    "mandatory": {
-                      "minWidth": '1280',
-                      // Provide your own width, height and frame rate here
-                      "minHeight": '720',
-                      "minFrameRate": '60',
-                    },
-                    "facingMode": "user",
-                    "optional": [],
-                  }
-                });
-
-                if (even.jsep != null) {
-                  await publishVideo.handleRemoteJsep(even.jsep);
-                  Navigator.of(context).pop();
-                }
-                // Notify user
-                var offer = await publishVideo.createAnswer();
-                var body = {"request": "accept"};
-                publishVideo.send(
-                  data: body,
-                  jsep: offer,
-                );
-
-                // print(publishVideo.webRTCHandle.pc.);
+                var caller = result["username"];
+                await showIncomingCallDialog(caller, even);
               } else if (event == 'hangup') {
                 await destroy();
               }
@@ -184,54 +166,49 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
   }
 
   @override
-  void deactivate() {
-    // TODO: implement deactivate
-    super.deactivate();
-    _remoteRenderer.dispose();
-    _localRenderer.dispose();
-  }
-
-  @override
   void initState() {
     // TODO: implement initState
     super.initState();
     initJanusClient();
-
-    // janusClient.connect(onSuccess: (sessionId) {
-    //   janusClient.attach(Plugin(
-    //       onRemoteStream: (remoteStream) {
-    //         _remoteRenderer.srcObject = remoteStream;
-    //       },
-    //       plugin: "janus.plugin.videocall",
-    //       onMessage: ,
-    //       onSuccess: (plugin) {
-    //         setState(() {
-    //           publishVideo = plugin;
-    //           registerDialog();
-    //         });
-    //       }));
-    // });
   }
 
-  registerUser(userName) {
-    // if (publishVideo != null) {
-    publishVideo.send(data: {"request": "register", "username": userName});
-    //   onSuccess: () {
-    //     print("User registered");
-    //     nameController.text = "";
-    //     Navigator.pop(context);
-    //     makeCallDialog();
-    //   },
-    // onError: (error) {
-    // print(error);
-    // }
-    // }
+  Future<void> registerUser(userName) async {
+    await publishVideo.register(userName);
   }
 
   destroy() async {
     publishVideo.dispose();
     session.dispose();
     Navigator.of(context).pop();
+  }
+
+  Future<dynamic> showIncomingCallDialog(String caller, EventMessage event) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Incoming call from ${caller}'),
+            actions: [
+              ElevatedButton(
+                  onPressed: () async {
+                    await localMediaSetup();
+                    if (event.jsep != null) {
+                      await publishVideo.handleRemoteJsep(event.jsep);
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pop();
+                    }
+                    // Notify user
+                    await publishVideo.acceptCall();
+                  },
+                  child: Text('Accept')),
+              ElevatedButton(
+                  onPressed: () async {
+                    await publishVideo.hangup();
+                  },
+                  child: Text('Reject')),
+            ],
+          );
+        });
   }
 
   @override
@@ -241,24 +218,30 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
         Column(
           children: [
             Expanded(
-              flex: 1,
-              child: RTCVideoView(
-                _remoteRenderer,
-                mirror: true,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+              child: Stack(
+                children: [
+                  RTCVideoView(
+                    _remoteAudioRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  ),
+                  RTCVideoView(
+                    _remoteVideoRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  )
+                ],
               ),
             ),
             Expanded(
                 flex: 1,
                 child: Container(
-              decoration:
-                  BoxDecoration(boxShadow: [BoxShadow(color: Colors.black45)]),
-              child: RTCVideoView(
-                _localRenderer,
-                mirror: true,
-                objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-              ),
-            ))
+                  child: RTCVideoView(
+                    _localRenderer,
+                    mirror: true,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  ),
+                ))
           ],
         ),
         Align(
@@ -282,10 +265,9 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                 child: IconButton(
                     icon: Icon(Icons.call_end),
                     color: Colors.white,
-                    onPressed: () {
-                      publishVideo.send(
-                        data: {'request': 'hangup'},
-                      );
+                    onPressed: () async {
+                      await publishVideo.hangup();
+                      await destroy();
                     })),
             padding: EdgeInsets.all(10),
           ),
@@ -294,9 +276,29 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
     );
   }
 
+  cleanUpWebRTCStuff() async {
+    Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
+      stream?.getTracks().forEach((element) async {
+        await element.stop();
+      });
+      await stream?.dispose();
+    }
+
+    await stopAllTracksAndDispose(localStream);
+    await stopAllTracksAndDispose(remoteAudioStream);
+    await stopAllTracksAndDispose(remoteVideoStream);
+
+    _localRenderer.srcObject = null;
+    _remoteVideoRenderer.srcObject = null;
+    _remoteAudioRenderer.srcObject = null;
+    _remoteAudioRenderer.dispose();
+    _localRenderer.dispose();
+    _remoteVideoRenderer.dispose();
+  }
+
   @override
   void dispose() async {
-    // TODO: implement dispose
     super.dispose();
+    cleanUpWebRTCStuff();
   }
 }

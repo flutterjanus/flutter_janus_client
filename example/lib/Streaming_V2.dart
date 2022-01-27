@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
 
@@ -9,20 +9,20 @@ class StreamingV2 extends StatefulWidget {
 }
 
 class _StreamingState extends State<StreamingV2> {
-  JanusClient j;
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  JanusSession session;
-  JanusPlugin plugin;
+  late JanusClient j;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
+  late JanusSession session;
+  late JanusPlugin plugin;
   Map<int, JanusPlugin> subscriberHandles = {};
 
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
 
   List<dynamic> streams = [];
-  int selectedStreamId;
+   int? selectedStreamId;
   bool _loader = true;
 
-  StateSetter _setState;
+  late StateSetter _setState;
 
   getStreamListing() {
     var body = {"request": "list"};
@@ -44,22 +44,19 @@ class _StreamingState extends State<StreamingV2> {
           RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       j = JanusClient(transport: ws, iceServers: [
-        RTCIceServer(
-            url: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")
+        RTCIceServer(username: '', credential: '', urls: 'stun:stun.l.google.com:19302')
       ]);
     });
     session = await j.createSession();
     print(session.sessionId);
-    plugin = await session.attach(JanusPlugins.STREAMING);
+    plugin = await session.attach<JanusStreamingPlugin>();
     await this.getStreamListing();
     print('got handleId');
     print(plugin.handleId);
-    plugin.remoteStream.listen((event) {
-      if (event != null) {
-        _remoteRenderer.srcObject = event;
-      }
+    plugin.remoteStream?.listen((event) {
+      _remoteRenderer.srcObject = event;
     });
-    plugin.messages.listen((even) async {
+    plugin.messages?.listen((even) async {
       print('got onmsg');
       print(even);
       var pluginData = even.event['plugindata'];
@@ -88,7 +85,7 @@ class _StreamingState extends State<StreamingV2> {
                       title: Text("Choose Stream To Play"),
                       content: Column(
                         children: [
-                          DropdownButtonFormField(
+                          DropdownButtonFormField<int>(
                               isExpanded: true,
                               value: selectedStreamId,
                               items: List.generate(
@@ -98,9 +95,11 @@ class _StreamingState extends State<StreamingV2> {
                                       child:
                                           Text(streams[index]['description']))),
                               onChanged: (v) {
-                                _setState(() {
-                                  selectedStreamId = v;
-                                });
+                                if(v!=null){
+                                  _setState(() {
+                                    selectedStreamId = v;
+                                  });
+                                }
                               }),
                           RaisedButton(
                             color: Colors.green,
@@ -126,7 +125,7 @@ class _StreamingState extends State<StreamingV2> {
 
       if (even.jsep != null) {
         debugPrint("Handling SDP as well..." + even.jsep.toString());
-        await plugin.handleRemoteJsep(even.jsep);
+        await plugin.handleRemoteJsep(even.jsep!);
         RTCSessionDescription answer = await plugin.createAnswer();
         plugin.send(data: {"request": "start"}, jsep: answer);
         Navigator.of(context).pop();

@@ -4,7 +4,7 @@ version: 2.1.1-beta
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
-  sdk: '>=2.14.0 <3.0.0'
+  sdk: '>=2.15.0 <3.0.0'
   flutter: ">=1.10.0"
 
 dependencies:
@@ -12,8 +12,9 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.6.10+hotfix.1
-  path_provider: ^2.0.5
+  flutter_webrtc: 0.8.1
+#    path: '../flutter-webrtc'
+  path_provider: ^2.0.8
   http: ^0.13.4
   web_socket_channel: ^2.1.0
   stream_channel: ^2.1.0

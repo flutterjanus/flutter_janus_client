@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client/JanusClient.dart';
+import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'dart:async';
 import 'package:janus_client_example/conf.dart';
@@ -11,24 +11,37 @@ class Participant {
   bool muted;
   bool talking;
 
-//<editor-fold desc="Data Methods" defaultstate="collapsed">
+//<editor-fold desc="Data Methods">
 
   Participant({
-    @required this.id,
-    @required this.display,
-    @required this.setup,
-    @required this.muted,
-    @required this.talking,
+    required this.id,
+    required this.display,
+    required this.setup,
+    required this.muted,
+    required this.talking,
   });
 
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Participant && runtimeType == other.runtimeType && id == other.id && display == other.display && setup == other.setup && muted == other.muted && talking == other.talking);
+
+  @override
+  int get hashCode => id.hashCode ^ display.hashCode ^ setup.hashCode ^ muted.hashCode ^ talking.hashCode;
+
+  @override
+  String toString() {
+    return 'Participant{' + ' id: $id,' + ' display: $display,' + ' setup: $setup,' + ' muted: $muted,' + ' talking: $talking,' + '}';
+  }
+
   Participant copyWith({
-    num id,
-    String display,
-    bool setup,
-    bool muted,
-    bool talking,
+    num? id,
+    String? display,
+    bool? setup,
+    bool? muted,
+    bool? talking,
   }) {
-    return new Participant(
+    return Participant(
       id: id ?? this.id,
       display: display ?? this.display,
       setup: setup ?? this.setup,
@@ -37,32 +50,18 @@ class Participant {
     );
   }
 
-  @override
-  String toString() {
-    return 'Participant{id: $id, display: $display, setup: $setup, muted: $muted, talking: $talking}';
+  Map<String, dynamic> toMap() {
+    return {
+      'id': this.id,
+      'display': this.display,
+      'setup': this.setup,
+      'muted': this.muted,
+      'talking': this.talking,
+    };
   }
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Participant &&
-          runtimeType == other.runtimeType &&
-          id == other.id &&
-          display == other.display &&
-          setup == other.setup &&
-          muted == other.muted &&
-          talking == other.talking);
-
-  @override
-  int get hashCode =>
-      id.hashCode ^
-      display.hashCode ^
-      setup.hashCode ^
-      muted.hashCode ^
-      talking.hashCode;
-
   factory Participant.fromMap(Map<String, dynamic> map) {
-    return new Participant(
+    return Participant(
       id: map['id'] as num,
       display: map['display'] as String,
       setup: map['setup'] as bool,
@@ -71,19 +70,7 @@ class Participant {
     );
   }
 
-  Map<String, dynamic> toMap() {
-    // ignore: unnecessary_cast
-    return {
-      'id': this.id,
-      'display': this.display,
-      'setup': this.setup,
-      'muted': this.muted,
-      'talking': this.talking,
-    } as Map<String, dynamic>;
-  }
-
 //</editor-fold>
-
 }
 
 class AudioRoomV2 extends StatefulWidget {
@@ -92,16 +79,17 @@ class AudioRoomV2 extends StatefulWidget {
 }
 
 class _AudioRoomState extends State<AudioRoomV2> {
-  JanusClient j;
+  late JanusClient j;
   RTCVideoRenderer _localRenderer = new RTCVideoRenderer();
   RTCVideoRenderer _remoteRenderer = new RTCVideoRenderer();
-  JanusSession session;
-  JanusPlugin pluginHandle;
-  RestJanusTransport rest;
-  WebSocketJanusTransport ws;
-  MediaStream remoteStream;
-  MediaStream myStream;
+  late JanusSession session;
+  late JanusPlugin pluginHandle;
+  late RestJanusTransport rest;
+  late WebSocketJanusTransport ws;
+  late MediaStream remoteStream;
+  late MediaStream myStream;
   List<Participant> participants = [];
+  MediaStream? stream;
 
   @override
   void didChangeDependencies() async {
@@ -129,21 +117,21 @@ class _AudioRoomState extends State<AudioRoomV2> {
         transport: ws,
         iceServers: [
           RTCIceServer(
-              url: "stun:stun1.l.google.com:19302",
+              urls: "stun:stun1.l.google.com:19302",
               username: "",
               credential: "")
         ]);
     session = await j.createSession();
-    pluginHandle = await session.attach(JanusPlugins.AUDIO_BRIDGE);
-    await pluginHandle.initializeMediaDevices(
+    pluginHandle = await session.attach<JanusAudioBridgePlugin>();
+    stream=await pluginHandle.initializeMediaDevices(
         mediaConstraints: {"audio": true, "video": false});
 
     var register = {"request": "join", "room": 1234, "display": 'shivansh'};
     await pluginHandle.send(data: register);
-    pluginHandle.remoteStream.listen((event) {
+    pluginHandle.remoteStream?.listen((event) {
       _remoteRenderer.srcObject = event;
     });
-    pluginHandle.messages.listen((msg) async {
+    pluginHandle.messages?.listen((msg) async {
       print(msg.event);
       if (msg.event['plugindata'] != null) {
         if (msg.event['plugindata']['data'] != null) {
@@ -169,7 +157,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']);
+                      talking: element['talking']!=null?element['talking']:false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants
@@ -199,7 +187,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']);
+                      talking: element['talking']!=null?element['talking']:false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants
@@ -223,7 +211,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
       }
       if (msg.jsep != null) {
         print('got remote jsep');
-        await pluginHandle.handleRemoteJsep(msg.jsep);
+        await pluginHandle.handleRemoteJsep(msg.jsep!);
       }
     });
   }
@@ -243,6 +231,9 @@ class _AudioRoomState extends State<AudioRoomV2> {
     await pluginHandle.send(data: {"request": "leave"});
     await pluginHandle.hangup();
     pluginHandle.dispose();
+    stream?.getTracks().forEach((element) {
+      element.stop();
+    });
     session.dispose();
   }
 

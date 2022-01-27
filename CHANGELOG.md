@@ -1,3 +1,15 @@
+## 2.1.1-beta
+* fixes and improvements due to null safety
+* web demo setup using github pages
+## 2.1.0-beta
+* supports null safety
+## 2.0.1-beta
+* fixed issue #37
+* introduced logger support for better plugin level log control
+## 2.0.0-beta
+* features brand new api
+* simplified development using stream api
+
 ## 0.0.4
 * Streaming Support added   
 * bug in send method fixed for rest api

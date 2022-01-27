@@ -1,6 +1,6 @@
-# janus_client_example
+# example
 
-Demonstrates how to use the janus_client plugin.
+A new Flutter project.
 
 ## Getting Started
 

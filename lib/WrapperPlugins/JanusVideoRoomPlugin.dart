@@ -172,10 +172,6 @@ class JanusVideoRoomPlugin extends JanusPlugin {
           typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         }
-        // if (typedEvent.jsep != null) {
-        //   typedEvent.jsep=event.jsep;
-        //   typedMessagesSink?.add(typedEvent);
-        // }
       });
     }
   }

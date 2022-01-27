@@ -138,9 +138,3 @@ class RemoteStream {
   }
 }
 
-Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
-  stream?.getTracks().forEach((element) async {
-    await element.stop();
-  });
-  await stream?.dispose();
-}

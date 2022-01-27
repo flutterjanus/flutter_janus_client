@@ -20,6 +20,7 @@ dependencies:
   stream_channel: ^2.1.0
   uuid: ^3.0.5
   logging: ^1.0.2
+  collection: ^1.15.0
 
 
 

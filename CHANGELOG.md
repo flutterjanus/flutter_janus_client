@@ -1,3 +1,9 @@
+## 2.2.0
+* All major plugins fully support unified plan
+* Typed examples updated with null safety and latest dart constraints
+* Introduced plugin specific wrapper classes with respective operation methods for rich development experience
+* Introduced typed events (Class Based Events) for brilliant auto completion support for IDE
+* Supports null-safety
 ## 2.1.1-beta
 * fixes and improvements due to null safety
 * web demo setup using github pages

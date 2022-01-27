@@ -1,64 +1,46 @@
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)  
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
 # janus_client
-This branch features development updates and fixes for brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events therefore it is easy
-to work with and test.
 
-**all dependencies updated**  
-official janus plugin for flutter, can be considered as improved port of janusJs . It can be used to bring WebRTC wonders to your flutter application, So Dive Straight in.
+It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
+it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
 
-
-## what is janus?
-The Janus WebRTC Server has been conceived as a general purpose server. As such, it doesn't provide any functionality per se other than implementing the means to set up a WebRTC media communication with a browser, exchanging JSON messages with it, and relaying RTP/RTCP and messages between browsers and the server-side application logic they're attached to. Any specific feature/application needs to be implemented in server side plugins, that browsers can then contact via the Janus core to take advantage of the functionality they provide. Example of such plugins can be implementations of applications like echo tests, conference bridges, media recorders, SIP gateways and the like.
-For more info visit  
-[Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/)
-
-
-
-# Video Call Sample
-<a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
+## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/)
 
 
 ## News & Updates
-- examples updated with null safety and latest dart constraints
-- introduced plugin specific wrapper classes with respective operation methods for rich development experience 
-- introduced typed events (Class Based Events) for brilliant auto completion support for IDE  
+- All major plugins fully support unified plan
+- Typed examples updated with null safety and latest dart constraints
+- Introduced plugin specific wrapper classes with respective operation methods for rich development experience
+- Introduced typed events (Class Based Events) for brilliant auto completion support for IDE
 - Supports null-safety
-- VideoCall example ready with V2 API
-- Streaming example ready with V2 API
-- TextRoom example ready with V2 API
-- Audio Bridge example ready with V2 API
-- Supports WEB aswell
-- Video Room Example ready with V2  API
 
-## status
+## Status
 | Feature           | Support | Well Tested | Unified Plan | Example |
 |-------------------|---------|-------------|--------------|---------|
 | WebSocket         | Yes     | Yes         | -            | Yes     |
 | Rest/Http API     | Yes     | Yes         | -            | Yes     |
-| Video Room Plugin | Yes     | partially tested         | Yes          | Yes     |
-| Video Call Plugin | Yes     | No          | wip          | Yes     |
-| Streaming Plugin  | Yes     | No          | wip          | Yes     |
-| Audio Room Plugin | Yes     | No          | wip          | Yes     |
+| Video Room Plugin | Yes     | No         | Yes          | Yes     |
+| Video Call Plugin | Yes     | No          | Yes          | Yes     |
+| Streaming Plugin  | Yes     | No          | Yes          | Yes     |
+| Audio Room Plugin | Yes     | No          | Yes          | Yes     |
 | Sip Plugin        | Yes     | No          | -           | No      |
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 
-# Getting Started
-[VideoRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoRoom_V2.dart)  
 
+## Todo
+- Documentation of some remaining plugins
+- Polishing of examples
+- Unit Test cases for all plugins
 
-[AudioRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/AudioRoom_V2.dart)   
-  
-[TextRoom_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/TextRoom_V2.dart)  
-
-[Streaming_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/Streaming_V2.dart)  
-  
-[VideoCall_V2 Example](https://github.com/flutterjanus/flutter_janus_client/blob/v2/example/lib/VideoCall_V2.dart)  
-
+## Deprecated Api v1(0.0.x)
+If by any chance you are looking for (although you shouldn't) old api then you can switch to v1 branch,
+as it is very unstable and hard to maintain it was deprecated and will not recieve any fixes or feature updates.
+It is highly recommended you migrate your code to latest version that is 2.X.X (stable)
 
 ## Contributors ✨
 

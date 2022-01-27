@@ -1,6 +1,6 @@
 name: janus_client
 description: janus gateway client for dart
-version: 2.1.1-beta
+version: 2.2.0
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: 0.8.1
+  flutter_webrtc: ^0.8.1
 #    path: '../flutter-webrtc'
   path_provider: ^2.0.8
   http: ^0.13.4
@@ -20,6 +20,7 @@ dependencies:
   stream_channel: ^2.1.0
   uuid: ^3.0.5
   logging: ^1.0.2
+  collection: ^1.15.0
 
 
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
-import '../Helper.dart';
+
 class TypedVideoCallV2Example extends StatefulWidget {
   @override
   _VideoCallV2ExampleState createState() => _VideoCallV2ExampleState();
@@ -16,7 +16,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
-  RTCVideoRenderer _remoteAudioRenderer = RTCVideoRenderer();
   MediaStream? localStream;
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
@@ -39,8 +38,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     nameController.text = "";
   }
 
-  openRegisterDialog() async{
-    registerDialog=await showDialog(
+  openRegisterDialog() async {
+    registerDialog = await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -67,8 +66,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         });
   }
 
-  makeCallDialog() async{
-    callDialog=await showDialog(
+  makeCallDialog() async {
+    callDialog = await showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -109,23 +108,15 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     session = await j.createSession();
     publishVideo = await session.attach<JanusVideoCallPlugin>();
     await _remoteVideoRenderer.initialize();
-    await _remoteAudioRenderer.initialize();
     MediaStream? tempVideo = await createLocalMediaStream('remoteVideoStream');
     setState(() {
       remoteVideoStream = tempVideo;
     });
-    MediaStream? tempAudio = await createLocalMediaStream('remoteAudioStream');
-    setState(() {
-      remoteAudioStream = tempAudio;
-    });
     publishVideo.remoteTrack?.listen((event) async {
-      if (event.track != null && event.track?.kind == 'video' && event.flowing == true) {
+      if (event.track != null && event.flowing == true) {
         remoteVideoStream?.addTrack(event.track!);
         _remoteVideoRenderer.srcObject = remoteVideoStream;
-      }
-      if (event.track != null && event.track?.kind == 'audio' && event.flowing == true) {
-        remoteAudioStream?.addTrack(event.track!);
-        _remoteAudioRenderer.srcObject = remoteAudioStream;
+        _remoteVideoRenderer.muted = false;
       }
     });
     publishVideo.typedMessages?.listen((even) async {
@@ -137,22 +128,28 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         await makeCallDialog();
       }
       if (data is VideoCallIncomingCallEvent) {
-        incomingDialog=await showIncomingCallDialog(data.result!.username!, even.jsep);
+        incomingDialog = await showIncomingCallDialog(data.result!.username!, even.jsep);
       }
-      if(data is VideoCallAcceptedEvent){
+      if (data is VideoCallAcceptedEvent) {
         // Navigator.of(context).pop();
       }
-      if(data is VideoCallCallingEvent){
+      if (data is VideoCallCallingEvent) {
         var dialog;
-        dialog=await showDialog(context: context, builder: (context)=>AlertDialog(
-          title: Text('Calling the peer..'),
-          actions: [ElevatedButton(onPressed: (){
-            Navigator.of(context, rootNavigator: true).pop(dialog);
-            Navigator.of(context, rootNavigator: true).pop(callDialog);
-          }, child: Text('Okay'))],
-        ));
+        dialog = await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: Text('Calling the peer..'),
+                  actions: [
+                    ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context, rootNavigator: true).pop(dialog);
+                          Navigator.of(context, rootNavigator: true).pop(callDialog);
+                        },
+                        child: Text('Okay'))
+                  ],
+                ));
       }
-      if(data is VideoCallHangupEvent){
+      if (data is VideoCallHangupEvent) {
         await destroy();
       }
       publishVideo.handleRemoteJsep(even.jsep);
@@ -188,15 +185,15 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    Navigator.of(context,rootNavigator: true).pop(incomingDialog);
-                    Navigator.of(context,rootNavigator: true).pop(callDialog);
+                    Navigator.of(context, rootNavigator: true).pop(incomingDialog);
+                    Navigator.of(context, rootNavigator: true).pop(callDialog);
                     await publishVideo.acceptCall();
                   },
                   child: Text('Accept')),
               ElevatedButton(
                   onPressed: () async {
-                    Navigator.of(context,rootNavigator: true).pop(incomingDialog);
-                    Navigator.of(context,rootNavigator: true).pop(callDialog);
+                    Navigator.of(context, rootNavigator: true).pop(incomingDialog);
+                    Navigator.of(context, rootNavigator: true).pop(callDialog);
                     await publishVideo.hangup();
                   },
                   child: Text('Reject')),
@@ -214,11 +211,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             Expanded(
               child: Stack(
                 children: [
-                  RTCVideoView(
-                    _remoteAudioRenderer,
-                    mirror: true,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  ),
                   RTCVideoView(
                     _remoteVideoRenderer,
                     mirror: true,
@@ -276,8 +268,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     await stopAllTracksAndDispose(remoteVideoStream);
     _localRenderer.srcObject = null;
     _remoteVideoRenderer.srcObject = null;
-    _remoteAudioRenderer.srcObject = null;
-    _remoteAudioRenderer.dispose();
     _localRenderer.dispose();
     _remoteVideoRenderer.dispose();
   }

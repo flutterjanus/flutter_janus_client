@@ -1,4 +1,4 @@
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)  
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -8,45 +8,42 @@
 This branch features  brand new API(v2) which is more fun to work with since it uses Stream API for exposing plugin level messages and events therefore it is easy
 to work with and test.
 
-##About  
+## About
 
-It is feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
+It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
 
-# [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/)
-coz, "we believe in what we can see" and nothing brings more satisfaction as working demo of the project.  
-
+## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/)
 
 ## what is janus?
 The Janus WebRTC Server has been conceived as a general purpose server. As such, it doesn't provide any functionality per se other than implementing the means to set up a WebRTC media communication with a browser, exchanging JSON messages with it, and relaying RTP/RTCP and messages between browsers and the server-side application logic they're attached to. Any specific feature/application needs to be implemented in server side plugins, that browsers can then contact via the Janus core to take advantage of the functionality they provide. Example of such plugins can be implementations of applications like echo tests, conference bridges, media recorders, SIP gateways and the like.
 For more info visit  
 [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/)
 
-
-
-# Video Call Sample
-<a href='https://youtu.be/wRo5nd7JnB4'><img src='https://github.com/shivanshtalwar0/flutter_janus_client/raw/master/samples/videocall_preview.jpg' 
-
-
 ## News & Updates
-- typed examples updated with null safety and latest dart constraints
-- introduced plugin specific wrapper classes with respective operation methods for rich development experience 
-- introduced typed events (Class Based Events) for brilliant auto completion support for IDE  
+- All major plugins fully support unified plan
+- Typed examples updated with null safety and latest dart constraints
+- Introduced plugin specific wrapper classes with respective operation methods for rich development experience
+- Introduced typed events (Class Based Events) for brilliant auto completion support for IDE
 - Supports null-safety
 
-## status
+## Status
 | Feature           | Support | Well Tested | Unified Plan | Example |
 |-------------------|---------|-------------|--------------|---------|
 | WebSocket         | Yes     | Yes         | -            | Yes     |
 | Rest/Http API     | Yes     | Yes         | -            | Yes     |
-| Video Room Plugin | Yes     | partially tested         | Yes          | Yes     |
-| Video Call Plugin | Yes     | No          | wip          | Yes     |
-| Streaming Plugin  | Yes     | No          | wip          | Yes     |
-| Audio Room Plugin | Yes     | No          | wip          | Yes     |
+| Video Room Plugin | Yes     | No         | Yes          | Yes     |
+| Video Call Plugin | Yes     | No          | Yes          | Yes     |
+| Streaming Plugin  | Yes     | No          | Yes          | Yes     |
+| Audio Room Plugin | Yes     | No          | Yes          | Yes     |
 | Sip Plugin        | Yes     | No          | -           | No      |
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 
 
+## Todo
+- Documentation of some remaining plugins
+- Polishing of examples
+- Unit Test cases for all plugins
 
 ## Contributors ✨
 

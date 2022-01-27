@@ -1,0 +1,61 @@
+{
+  "projectName": "flutter_janus_client",
+  "projectOwner": "flutterjanus",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "shivanshtalwar0",
+      "name": "Shivansh Talwar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26632663?v=4",
+      "profile": "https://github.com/shivanshtalwar0",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "kzawadi",
+      "name": "Kelvin Zawadi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/12481289?v=4",
+      "profile": "https://github.com/kzawadi",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "LifeNow",
+      "name": "Eugene",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18676202?v=4",
+      "profile": "https://github.com/LifeNow",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "igala",
+      "name": "Igal Avraham",
+      "avatar_url": "https://avatars.githubusercontent.com/u/454390?v=4",
+      "profile": "https://github.com/igala",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "vigikaran",
+      "name": "Vigikaran",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9039584?v=4",
+      "profile": "http://vigikaran.me/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

@@ -1,51 +1,101 @@
-import 'dart:convert';
-import 'dart:developer';
-import 'dart:math' as Math;
-import 'package:flutter/cupertino.dart';
+part of janus_client;
 
-class RTCIceServer {
-  String username;
-  String credential;
-  String url;
+class JanusWebRTCHandle {
+  MediaStream? remoteStream;
+  MediaStream? localStream;
+  RTCPeerConnection? peerConnection;
+  Map<String, RTCDataChannel> dataChannel = {};
+
+  JanusWebRTCHandle({
+    this.peerConnection,
+  });
+}
+
+class EventMessage {
+  dynamic event;
+  RTCSessionDescription? jsep;
 
 //<editor-fold desc="Data Methods" defaultstate="collapsed">
 
+  EventMessage({
+    required this.event,
+    required this.jsep,
+  });
+
+  EventMessage copyWith({
+    dynamic event,
+    RTCSessionDescription? jsep,
+  }) {
+    return new EventMessage(
+      event: event ?? this.event,
+      jsep: jsep ?? this.jsep,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'EventMessage{event: $event, jsep: $jsep}';
+  }
+
+  @override
+  bool operator ==(Object other) => identical(this, other) || (other is EventMessage && runtimeType == other.runtimeType && event == other.event && jsep == other.jsep);
+
+  @override
+  int get hashCode => event.hashCode ^ jsep.hashCode;
+
+  factory EventMessage.fromMap(Map<String, dynamic> map) {
+    return new EventMessage(
+      event: map['event'] as dynamic,
+      jsep: map['jsep'] as RTCSessionDescription?,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    // ignore: unnecessary_cast
+    return {
+      'event': this.event,
+      'jsep': this.jsep,
+    } as Map<String, dynamic>;
+  }
+
+//</editor-fold>
+
+}
+
+class RTCIceServer {
+  String? username;
+  String? credential;
+  String? urls;
+
+//<editor-fold desc="Data Methods">
+
   RTCIceServer({
-    @required this.username,
-    @required this.credential,
-    @required this.url,
+    this.username,
+    this.credential,
+    this.urls,
   });
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is RTCIceServer &&
-          runtimeType == other.runtimeType &&
-          username == other.username &&
-          credential == other.credential &&
-          url == other.url);
+      identical(this, other) || (other is RTCIceServer && runtimeType == other.runtimeType && username == other.username && credential == other.credential && urls == other.urls);
 
   @override
-  int get hashCode => username.hashCode ^ credential.hashCode ^ url.hashCode;
+  int get hashCode => username.hashCode ^ credential.hashCode ^ urls.hashCode;
 
   @override
   String toString() {
-    return 'RTCIceServer{' +
-        ' username: $username,' +
-        ' credential: $credential,' +
-        ' url: $url,' +
-        '}';
+    return 'RTCIceServer{' + ' username: $username,' + ' credential: $credential,' + ' urls: $urls,' + '}';
   }
 
   RTCIceServer copyWith({
-    String username,
-    String credential,
-    String url,
+    String? username,
+    String? credential,
+    String? urls,
   }) {
-    return new RTCIceServer(
+    return RTCIceServer(
       username: username ?? this.username,
       credential: credential ?? this.credential,
-      url: url ?? this.url,
+      urls: urls ?? this.urls,
     );
   }
 
@@ -53,19 +103,87 @@ class RTCIceServer {
     return {
       'username': this.username,
       'credential': this.credential,
-      'url': this.url,
+      'urls': this.urls,
     };
   }
 
   factory RTCIceServer.fromMap(Map<String, dynamic> map) {
-    return new RTCIceServer(
+    return RTCIceServer(
       username: map['username'] as String,
       credential: map['credential'] as String,
-      url: map['url'] as String,
+      urls: map['urls'] as String,
     );
   }
 
 //</editor-fold>
+}
+
+class RemoteTrack {
+  MediaStream? stream;
+  MediaStreamTrack? track;
+  String? mid;
+  bool? flowing;
+
+//<editor-fold desc="Data Methods" defaultstate="collapsed">
+
+  RemoteTrack({
+    this.stream,
+    required this.track,
+    required this.mid,
+    required this.flowing,
+  });
+
+  RemoteTrack copyWith({
+    MediaStream? stream,
+    MediaStreamTrack? track,
+    String? mid,
+    bool? flowing,
+  }) {
+    return new RemoteTrack(
+      stream: stream ?? this.stream,
+      track: track ?? this.track,
+      mid: mid ?? this.mid,
+      flowing: flowing ?? this.flowing,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'RemoteTrack{stream: $stream, track: $track, mid: $mid, flowing: $flowing}';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || (other is RemoteTrack && runtimeType == other.runtimeType && stream == other.stream && track == other.track && mid == other.mid && flowing == other.flowing);
+
+  @override
+  int get hashCode => stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
+
+  factory RemoteTrack.fromMap(Map<String, dynamic> map) {
+    return new RemoteTrack(
+      stream: map['stream'] as MediaStream?,
+      track: map['track'] as MediaStreamTrack?,
+      mid: map['mid'] as String?,
+      flowing: map['flowing'] as bool?,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    // ignore: unnecessary_cast
+    return {
+      'stream': this.stream,
+      'track': this.track,
+      'mid': this.mid,
+      'flowing': this.flowing,
+    } as Map<String, dynamic>;
+  }
+
+//</editor-fold>
+
+}
+
+Uuid getUuid() {
+  return Uuid();
 }
 
 stringify(dynamic) {
@@ -78,14 +196,17 @@ parse(dynamic) {
   return jsonDecoder.convert(dynamic);
 }
 
-randomString(
-    {int len = 10,
-    String charSet =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
+randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
   var randomString = '';
   for (var i = 0; i < len; i++) {
     var randomPoz = (Math.Random().nextInt(charSet.length - 1)).floor();
     randomString += charSet.substring(randomPoz, randomPoz + 1);
   }
   return randomString + Timeline.now.toString();
+}
+Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
+  stream?.getTracks().forEach((element) async {
+    await element.stop();
+  });
+  await stream?.dispose();
 }

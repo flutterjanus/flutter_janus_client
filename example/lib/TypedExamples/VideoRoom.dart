@@ -83,9 +83,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
             remoteStreams.putIfAbsent(feedId, () => temp);
           });
         }
-        if (event.track != null  && event.flowing == true) {
+        if (event.track != null && event.flowing == true) {
           remoteStreams[feedId]?.video.addTrack(event.track!);
           remoteStreams[feedId]?.videoRenderer.srcObject = remoteStreams[feedId]?.video;
+          remoteStreams[feedId]?.videoRenderer.muted = false;
         }
       }
     });
@@ -173,12 +174,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   @override
-  void dispose() async{
+  void dispose() async {
     super.dispose();
     await remoteHandle?.dispose();
     await plugin.dispose();
     session.dispose();
-
   }
 
   callEnd() async {
@@ -186,11 +186,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     for (int i = 0; i < feedStreams.keys.length; i++) {
       await unSubscribeStream(feedStreams.keys.elementAt(i));
     }
-    remoteStreams.forEach((key, value) async{
+    remoteStreams.forEach((key, value) async {
       value.dispose();
     });
     setState(() {
-      remoteStreams={};
+      remoteStreams = {};
     });
     subStreams.clear();
     subscriptions.clear();

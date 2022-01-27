@@ -1,4 +1,5 @@
 part of janus_client;
+
 class JanusStreamingPlugin extends JanusPlugin {
   JanusStreamingPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.STREAMING, session: session, transport: transport);
 
@@ -106,34 +107,30 @@ class JanusStreamingPlugin extends JanusPlugin {
     };
     await this.send(data: payload);
   }
+
   /// start stream if watch request is successfully completed
-  Future<void> startStream()async{
-    if(webRTCHandle?.peerConnection?.iceConnectionState==RTCIceConnectionState.RTCIceConnectionStateConnected){
+  Future<void> startStream() async {
+    if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
       await send(data: {"request": "start"});
-    }
-    else{
-      RTCSessionDescription answer = await createAnswer(videoRecv: true,audioRecv: true,audioSend: false,videoSend: false);
+    } else {
+      RTCSessionDescription answer = await createAnswer(videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
       await send(data: {"request": "start"}, jsep: answer);
     }
   }
+
   /// temporarily stop media delivery
-  Future<void> pauseStream()async{
-    await send(data:   {
-      "request" : "pause"
-    });
+  Future<void> pauseStream() async {
+    await send(data: {"request": "pause"});
   }
+
   /// stop the media flow entirely
-  Future<void> stopStream()async{
-    await send(data:   {
-      "request" : "stop"
-    });
+  Future<void> stopStream() async {
+    await send(data: {"request": "stop"});
   }
+
   /// switch to different streaming mount point
-  Future<void> switchStream(int id)async{
-    await send(data: {
-    "request" : "switch",
-    "id" :id
-    });
+  Future<void> switchStream(int id) async {
+    await send(data: {"request": "switch", "id": id});
   }
 
   bool _onCreated = false;
@@ -145,24 +142,16 @@ class JanusStreamingPlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data["streaming"] == "event"
-            &&
-            typedEvent.event.plugindata?.data["result"]!=null
-            &&
-            typedEvent.event.plugindata?.data["result"]['status']=='preparing'
-        ) {
+        if (typedEvent.event.plugindata?.data["streaming"] == "event" && typedEvent.event.plugindata?.data["result"] != null && typedEvent.event.plugindata?.data["result"]['status'] == 'preparing') {
           typedEvent.event.plugindata?.data = StreamingPluginPreparingEvent();
           _typedMessagesSink?.add(typedEvent);
-        }
-        else if (typedEvent.event.plugindata?.data["streaming"] == "event"&&
-            typedEvent.event.plugindata?.data["result"]!=null&&
-            typedEvent.event.plugindata?.data["result"]['status']=='stopping'
-        ) {
+        } else if (typedEvent.event.plugindata?.data["streaming"] == "event" &&
+            typedEvent.event.plugindata?.data["result"] != null &&
+            typedEvent.event.plugindata?.data["result"]['status'] == 'stopping') {
           typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
           _typedMessagesSink?.add(typedEvent);
         }
       });
     }
   }
-
 }

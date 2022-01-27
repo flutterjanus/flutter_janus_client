@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client_example/conf.dart';
 import 'package:janus_client_example/Helper.dart';
-
+import 'package:janus_client_example/conf.dart';
 
 class TypedStreamingV2 extends StatefulWidget {
   @override
@@ -16,12 +15,16 @@ class _StreamingState extends State<TypedStreamingV2> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   late JanusStreamingPlugin plugin;
-  Map<int, RemoteStream> remoteStreams = {};
+  Map<String, RTCVideoRenderer> remoteVideoRenderers = {};
+  Map<String, MediaStream> remoteVideoStreams = {};
+  Map<String, MediaStream> remoteAudioStreams = {};
+  Map<String, RTCVideoRenderer> remoteAudioRenderers = {};
   late List<StreamingMountPoint> streams;
   int? selectedStreamId;
   bool _loader = true;
   late StateSetter _setState;
   bool isPlaying = true;
+  bool isMuted = false;
 
   showStreamSelectionDialog() async {
     return showDialog(
@@ -38,13 +41,12 @@ class _StreamingState extends State<TypedStreamingV2> {
                       isExpanded: true,
                       value: selectedStreamId,
                       items: List.generate(streams.length, (index) => DropdownMenuItem(value: streams[index].id, child: Text(streams[index].description ?? ''))),
-                      onChanged: (v) async{
+                      onChanged: (v) async {
                         print(v);
                         if (v != null) {
                           _setState(() {
                             selectedStreamId = v;
                           });
-
                         }
                       }),
                   ElevatedButton(
@@ -80,28 +82,29 @@ class _StreamingState extends State<TypedStreamingV2> {
       streams = streamList;
     });
     showStreamSelectionDialog();
-    plugin.remoteTrack?.listen((event) async{
-      if(remoteStreams[selectedStreamId!]==null){
-        RemoteStream temp=RemoteStream(selectedStreamId.toString());
-        await temp.init();
+    plugin.remoteTrack?.listen((event) async {
+      if (event.track != null && event.flowing == true && event.track?.kind == 'audio') {
+        MediaStream temp = await createLocalMediaStream(event.track!.id!);
         setState(() {
-          remoteStreams.putIfAbsent(selectedStreamId!, () =>temp);
+          remoteAudioRenderers.putIfAbsent(event.track!.id!, () => RTCVideoRenderer());
+          remoteAudioRenderers[event.track!.id!]?.initialize();
+          remoteAudioStreams.putIfAbsent(event.track!.id!, () => temp);
         });
+        remoteAudioStreams[event.track!.id!]?.addTrack(event.track!);
+        remoteAudioRenderers[event.track!.id!]?.srcObject = remoteAudioStreams[event.track!.id!];
+        remoteAudioRenderers[event.track!.id!]?.muted = false;
       }
-      if(event.track!=null&&event.track?.kind=='audio'){
-        await remoteStreams[selectedStreamId!]?.createAudio();
-        await remoteStreams[selectedStreamId!]?.audio.addTrack(event.track!);
-        setState(() {
-          remoteStreams[selectedStreamId!]?.audioRenderer.srcObject=remoteStreams[selectedStreamId!]?.audio;
-        });
-      }
-      if(event.track!=null&&event.track?.kind=='video'&&event.flowing==true){
-        await remoteStreams[selectedStreamId!]?.createVideo();
-        await remoteStreams[selectedStreamId!]?.video.addTrack(event.track!);
-        setState(() {
-          remoteStreams[selectedStreamId!]?.videoRenderer.srcObject=remoteStreams[selectedStreamId!]?.video;
-        });
 
+      if (event.track != null && event.flowing == true && event.track?.kind == 'video') {
+        MediaStream temp = await createLocalMediaStream(event.track!.id!);
+        setState(() {
+          remoteVideoRenderers.putIfAbsent(event.track!.id!, () => RTCVideoRenderer());
+          remoteVideoRenderers[event.track!.id!]?.initialize();
+          remoteVideoStreams.putIfAbsent(event.track!.id!, () => temp);
+        });
+        remoteVideoStreams[event.track!.id!]?.addTrack(event.track!);
+        remoteVideoRenderers[event.track!.id!]?.srcObject = remoteVideoStreams[event.track!.id!];
+        remoteVideoRenderers[event.track!.id!]?.muted = false;
       }
     });
     plugin.typedMessages?.listen((event) async {
@@ -120,12 +123,6 @@ class _StreamingState extends State<TypedStreamingV2> {
     });
   }
 
-  @override
-  void deactivate() {
-    // TODO: implement deactivate
-    super.deactivate();
-    destroy();
-  }
 
   @override
   void initState() {
@@ -134,7 +131,24 @@ class _StreamingState extends State<TypedStreamingV2> {
     initJanusClient();
   }
 
+  cleanUpWebRTCStuff(){
+    remoteAudioStreams.forEach((key, value) {
+      stopAllTracksAndDispose(value);
+    });
+    remoteVideoStreams.forEach((key, value) {
+      stopAllTracksAndDispose(value);
+    });
+    remoteAudioRenderers.forEach((key, value) async{
+      value.srcObject=null;
+      await value.dispose();
+    });
+    remoteVideoRenderers.forEach((key, value) async{
+      value.srcObject=null;
+      await value.dispose();
+    });
+  }
   destroy() async {
+    cleanUpWebRTCStuff();
     await plugin.stopStream();
     await plugin.dispose();
     session.dispose();
@@ -144,25 +158,23 @@ class _StreamingState extends State<TypedStreamingV2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
+        ...remoteAudioRenderers.entries.map((e) => e.value).map((e) => RTCVideoView(e)).toList(),
         Column(
           children: [
             Expanded(
-                child: ListView(
-              children: remoteStreams.entries
-                  .map((data) => SizedBox(
-                    width: double.infinity,
-                    height: 500,
-                    child: Stack(children: [
-                          RTCVideoView(
-                            data.value.audioRenderer,
-                            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                          ),
-                          RTCVideoView(
-                            data.value.videoRenderer,
-                            objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                          ),
-                        ]),
-                  ))
+                child: GridView.count(
+              crossAxisCount: 1,
+              childAspectRatio: MediaQuery.of(context).size.width
+                  / (MediaQuery.of(context).size.height / (remoteVideoRenderers.length > 0 ? remoteVideoRenderers.length : 1)),
+              mainAxisSpacing: 0,
+              crossAxisSpacing: 5,
+              shrinkWrap: true,
+              children: remoteVideoRenderers.entries
+                  .map((e) => e.value)
+                  .map((e) => RTCVideoView(
+                        e,
+                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      ))
                   .toList(),
             )),
           ],
@@ -182,8 +194,30 @@ class _StreamingState extends State<TypedStreamingV2> {
                               icon: Icon(Icons.stop),
                               color: Colors.white,
                               onPressed: () {
-                                destroy();
                                 Navigator.of(context).pop();
+                              })),
+                      padding: EdgeInsets.all(10),
+                    ),
+                    Padding(
+                      child: CircleAvatar(
+                          backgroundColor: Colors.grey,
+                          radius: 30,
+                          child: IconButton(
+                              icon: Icon(isMuted ? Icons.volume_off : Icons.volume_up),
+                              color: Colors.white,
+                              onPressed: () {
+                                if (isMuted) {
+                                  setState(() {
+                                    isMuted = false;
+                                  });
+                                } else {
+                                  setState(() {
+                                    isMuted = true;
+                                  });
+                                }
+                                remoteAudioRenderers.forEach((key, value) {
+                                  value.muted=isMuted;
+                                });
                               })),
                       padding: EdgeInsets.all(10),
                     ),
@@ -231,7 +265,7 @@ class _StreamingState extends State<TypedStreamingV2> {
   @override
   void dispose() async {
     // TODO: implement dispose
-    destroy();
     super.dispose();
+    destroy();
   }
 }

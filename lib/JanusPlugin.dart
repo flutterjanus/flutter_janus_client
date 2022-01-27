@@ -1,6 +1,5 @@
 part of janus_client;
 
-
 abstract class JanusPlugins {
   static const VIDEO_ROOM = "janus.plugin.videoroom";
   static const AUDIO_BRIDGE = "janus.plugin.audiobridge";
@@ -47,12 +46,10 @@ class JanusPlugin {
   StreamSubscription? _wsStreamSubscription;
   late bool pollingActive;
 
-  JanusPlugin({this.handleId, required JanusClient context, required JanusTransport transport,
-    required JanusSession
-    session, this.plugin}){
-    _context=context;
-    _session=session;
-    _transport=transport;
+  JanusPlugin({this.handleId, required JanusClient context, required JanusTransport transport, required JanusSession session, this.plugin}) {
+    _context = context;
+    _session = session;
+    _transport = transport;
   }
 
   /// used internally for initializing plugin, exposed only to be called via [JanusSession] attach method.
@@ -66,7 +63,7 @@ class JanusPlugin {
       }
       // initializing WebRTC Handle
       Map<String, dynamic> configuration = {"iceServers": _context._iceServers != null ? _context._iceServers!.map((e) => e.toMap()).toList() : []};
-      if (_context._isUnifiedPlan&&!_context._usePlanB) {
+      if (_context._isUnifiedPlan && !_context._usePlanB) {
         configuration.putIfAbsent('sdpSemantics', () => 'unified-plan');
       } else {
         configuration.putIfAbsent('sdpSemantics', () => 'plan-b');
@@ -139,7 +136,7 @@ class JanusPlugin {
   }
 
   void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection) {
-    if (_context._isUnifiedPlan&&!_context._usePlanB) {
+    if (_context._isUnifiedPlan && !_context._usePlanB) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
         _context._logger.fine('onTrack called with event');
         _context._logger.fine(event.toString());
@@ -171,7 +168,7 @@ class JanusPlugin {
         event.track.onEnded = () async {
           _context._logger.fine("Remote track removed:");
           String? mid = event.track.id;
-          if (_context._isUnifiedPlan&&!_context._usePlanB) {
+          if (_context._isUnifiedPlan && !_context._usePlanB) {
             RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
             mid = transceiver?.mid;
           }
@@ -187,7 +184,7 @@ class JanusPlugin {
           _context._logger.fine("Remote track muted:" + event.track.toString());
           _context._logger.fine("Removing remote track");
           var mid = event.track.id;
-          if (_context._isUnifiedPlan&&!_context._usePlanB) {
+          if (_context._isUnifiedPlan && !_context._usePlanB) {
             RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
             mid = transceiver?.mid;
           }
@@ -204,7 +201,7 @@ class JanusPlugin {
           try {
             // Notify the application the track is back
             String? mid = event.track.id;
-            if (_context._isUnifiedPlan&&!_context._usePlanB) {
+            if (_context._isUnifiedPlan && !_context._usePlanB) {
               RTCRtpTransceiver? transceiver = (await webRTCHandle!.peerConnection!.getTransceivers()).firstWhereOrNull((t) => t.receiver.track == event.track);
               mid = transceiver?.mid;
               if (mid != null) {
@@ -312,11 +309,12 @@ class JanusPlugin {
     return (await this.send(data: payload));
   }
 
-  void _cancelPollingTimer(){
+  void _cancelPollingTimer() {
     if (_pollingTimer != null) {
       _pollingTimer!.cancel();
     }
   }
+
   Future<void> hangup() async {
     _cancelPollingTimer();
   }
@@ -335,6 +333,7 @@ class JanusPlugin {
     _dataStreamController?.close();
     _onDataStreamController?.close();
     _wsStreamSubscription?.cancel();
+    await stopAllTracksAndDispose(webRTCHandle?.localStream);
     await webRTCHandle?.peerConnection?.close();
     await webRTCHandle?.remoteStream?.dispose();
     await webRTCHandle?.localStream?.dispose();
@@ -391,7 +390,7 @@ class JanusPlugin {
         response = (await rest.post(request, handleId: handleId)) as Map<String, dynamic>;
       } else if (_transport is WebSocketJanusTransport) {
         WebSocketJanusTransport ws = (_transport as WebSocketJanusTransport);
-        if(!ws.isConnected){
+        if (!ws.isConnected) {
           return;
         }
         response = await ws.send(request, handleId: handleId);
@@ -420,7 +419,7 @@ class JanusPlugin {
     }
     if (webRTCHandle != null) {
       webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      if (_context._isUnifiedPlan&&!_context._usePlanB) {
+      if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.fine('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
           _context._logger.fine('adding track in peerconnection');
@@ -459,11 +458,11 @@ class JanusPlugin {
   /// It supports both style of offer creation that is plan-b and unified.
   Future<RTCSessionDescription> createOffer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions = null;
-    if (_context._isUnifiedPlan&&!_context._usePlanB) {
+    if (_context._isUnifiedPlan && !_context._usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
-    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions??{});
+    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions ?? {});
     await webRTCHandle!.peerConnection!.setLocalDescription(offer);
     return offer;
   }
@@ -472,18 +471,18 @@ class JanusPlugin {
   /// It supports both style of answer creation that is plan-b and unified.
   Future<RTCSessionDescription> createAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions;
-    if (_context._isUnifiedPlan&&!_context._usePlanB) {
+    if (_context._isUnifiedPlan && !_context._usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
     try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
     } catch (e) {
       //    handling kstable exception most ugly way but currently there's no other workaround, it just works
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
     }
@@ -491,13 +490,13 @@ class JanusPlugin {
 
   Future<RTCSessionDescription?> createNullableAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
     dynamic offerOptions;
-    if (_context._isUnifiedPlan&&!_context._usePlanB) {
+    if (_context._isUnifiedPlan && !_context._usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
     } else {
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     }
     try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions??{});
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
     } catch (e) {

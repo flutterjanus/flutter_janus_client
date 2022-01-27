@@ -181,7 +181,9 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[record] : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
   ///[filename] : basename of the file to record to, -audio.mjr will be added by the plugin<br>
   ///[group] : new group to assign to this participant, if enabled in the room (for forwarding purposes)<br>
-  Future<void> configure({bool? muted, String? display, int? prebuffer, int? quality, int? volume, int? spatial_position, bool? record, String? filename, String? group}) async {
+  ///[offer]: provide your own webrtc offer by default sends with audiosendrecv only
+  Future<void> configure(
+      {bool? muted, String? display, int? prebuffer, int? quality, int? volume, int? spatial_position, bool? record, String? filename, String? group, RTCSessionDescription? offer}) async {
     var payload = {
       "request": "configure",
       "muted": muted,
@@ -194,7 +196,9 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       "filename": filename,
       "group": group
     }..removeWhere((key, value) => value == null);
-    RTCSessionDescription? offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: false);
+    if (offer == null) {
+      offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    }
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
@@ -275,6 +279,20 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     return RtpForwarderCreated.fromJson(response.plugindata?.data);
   }
 
+  /// [listParticipants]
+  ///
+  /// To get a list of the participants in a specific room of [roomId]
+  ///
+  Future<List<AudioBridgeParticipants>> listParticipants(int roomId) async {
+    var payload = {
+      "request": "listparticipants",
+      "room": roomId,
+    }..removeWhere((key, value) => value == null);
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return (response.plugindata?.data['participants'] as List<dynamic>).map((e) => AudioBridgeParticipants.fromJson(e)).toList();
+  }
+
   bool _onCreated = false;
 
   Future<void> hangup() async {
@@ -289,8 +307,13 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       _onCreated = true;
       messages?.listen((event) {
         TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+        print(typedEvent.event.plugindata?.data);
         if (typedEvent.event.plugindata?.data["audiobridge"] == "joined") {
+          print('hell');
           typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["participants"] != null) {
+          typedEvent.event.plugindata?.data = AudioBridgeNewParticipantsEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data["audiobridge"] == "event" && typedEvent.event.plugindata?.data["result"] == "ok") {
           typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(typedEvent.event.plugindata?.data);

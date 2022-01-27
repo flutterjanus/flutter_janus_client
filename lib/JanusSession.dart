@@ -7,7 +7,7 @@ class JanusSession {
   Timer? _keepAliveTimer;
   Map<int?, JanusPlugin> _pluginHandles = {};
 
-  int? get sessionId=>_sessionId;
+  int? get sessionId => _sessionId;
 
   JanusSession({int? refreshInterval, required JanusTransport transport, required JanusClient context}) {
     _context = context;

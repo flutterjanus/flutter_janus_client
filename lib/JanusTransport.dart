@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:janus_client/utils.dart';
-import 'package:http/http.dart' as http;
-import 'package:web_socket_channel/web_socket_channel.dart';
+part of janus_client;
 
 abstract class JanusTransport {
   String? url;
@@ -26,9 +23,7 @@ class RestJanusTransport extends JanusTransport {
       suffixUrl = suffixUrl + "/$sessionId/$handleId";
     }
     try {
-      var response =
-          (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body)))
-              .body;
+      var response = (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body))).body;
       return parse(response);
     } on JsonCyclicError {
       return null;
@@ -67,6 +62,7 @@ class WebSocketJanusTransport extends JanusTransport {
   void dispose() {
     if (channel != null && sink != null) {
       sink!.close();
+      isConnected = false;
     }
   }
 
@@ -77,8 +73,7 @@ class WebSocketJanusTransport extends JanusTransport {
         data['handle_id'] = handleId;
       }
       sink!.add(stringify(data));
-      return parse(await stream.firstWhere(
-          (element) => (parse(element)['transaction'] == data['transaction'])));
+      return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == data['transaction']), orElse: () => {}));
     } else {
       throw "transaction key missing in body";
     }
@@ -87,8 +82,7 @@ class WebSocketJanusTransport extends JanusTransport {
   void connect() {
     try {
       isConnected = true;
-      channel = WebSocketChannel.connect(Uri.parse(url!),
-          protocols: ['janus-protocol']);
+      channel = WebSocketChannel.connect(Uri.parse(url!), protocols: ['janus-protocol']);
     } catch (e) {
       print(e.toString());
       print('something went wrong');

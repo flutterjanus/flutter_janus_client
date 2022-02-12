@@ -11,7 +11,7 @@ class TextRoomV2Example extends StatefulWidget {
 class _TextRoomExampleState extends State<TextRoomV2Example> {
   late JanusClient janusClient;
   late JanusSession session;
-  late JanusPlugin textRoom;
+  late JanusTextRoomPlugin textRoom;
   List<dynamic> textMessages = [];
   Map<String, String> userNameDisplayMap = {};
   late RestJanusTransport rest;
@@ -132,13 +132,14 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    initializeClient();
   }
 
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-    await initializeClient();
+
   }
 
   @override

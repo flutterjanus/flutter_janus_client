@@ -3,12 +3,12 @@ import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
 
-class TextRoomV2Example extends StatefulWidget {
+class TypedTextRoom extends StatefulWidget {
   @override
   _TextRoomExampleState createState() => _TextRoomExampleState();
 }
 
-class _TextRoomExampleState extends State<TextRoomV2Example> {
+class _TextRoomExampleState extends State<TypedTextRoom> {
   late JanusClient janusClient;
   late JanusSession session;
   late JanusTextRoomPlugin textRoom;
@@ -17,6 +17,8 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
   TextEditingController nameController = TextEditingController();
+  ScrollController controller = ScrollController();
+  FocusNode focusNode=FocusNode();
 
   initializeClient() async {
     rest = RestJanusTransport(url: servermap['janus_rest']);
@@ -37,7 +39,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
 
   leave() async {
     try {
-      await textRoom.sendData(stringify({"request": "leave"}));
+      await textRoom.leaveRoom(1234);
       setState(() {
         userNameDisplayMap = {};
         textMessages = [];
@@ -50,35 +52,10 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
   }
 
   setup() async {
-    var body = {"request": "setup"};
-    await textRoom.send(data: body);
-    textRoom.messages?.listen((event) async {
-      if (event.jsep != null) {
-        await textRoom.handleRemoteJsep(event.jsep!);
-        var body = {"request": "ack"};
-        await textRoom.initDataChannel();
-        RTCSessionDescription answer = await textRoom.createAnswer(
-            audioSend: false,
-            videoSend: false,
-            videoRecv: false,
-            audioRecv: false);
-        await textRoom.send(
-          data: body,
-          jsep: answer,
-        );
-      }
-    });
+    await textRoom.setup();
     textRoom.onData?.listen((event) async {
       if (RTCDataChannelState.RTCDataChannelOpen == event) {
-        print('data channel open trying register');
-        var register = {
-          'textroom': "join",
-          'transaction': randomString(),
-          'room': 1234,
-          'username': randomString(),
-          'display': "Shivansh"
-        };
-        await textRoom.sendData(stringify(register));
+        await textRoom.joinRoom(1234, "shivansh", display: "shivansh");
       }
     });
 
@@ -128,6 +105,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
     this.textRoom.dispose();
     this.session.dispose();
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -135,11 +113,17 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
     initializeClient();
   }
 
+  Future<void> sendMessage() async {
+    await textRoom.sendMessage(1234, nameController.text);
+    controller.jumpTo(controller.position.maxScrollExtent);
+    nameController.text='';
+
+  }
+
   @override
   void didChangeDependencies() async {
     // TODO: implement didChangeDependencies
     super.didChangeDependencies();
-
   }
 
   @override
@@ -154,7 +138,6 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
                 ),
                 onPressed: () async {
                   await setup();
-//                  -_localRenderer.
                 }),
             IconButton(
                 icon: Icon(
@@ -171,6 +154,7 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
           children: [
             Expanded(
                 child: ListView.builder(
+              controller: controller,
               itemBuilder: (context, index) {
                 return ListTile(
                   title: Text(
@@ -185,15 +169,22 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
               itemCount: textMessages.length,
             )),
             Container(
-                padding: EdgeInsets.all(10),
-                color: Colors.grey,
+              height: 60,
+                padding: EdgeInsets.only(left: 20,right: 20,top: 5,),
+                color: Colors.grey.shade300,
                 child: Row(
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     Flexible(
-                      child: TextField(
+                      child: TextFormField(
+                        onFieldSubmitted: (b)async{
+                          await sendMessage();
+                        },
                         controller: nameController,
+                        cursorHeight: 24,
                         decoration: InputDecoration.collapsed(
                             hintText: "Type Your Message"),
+                        focusNode: focusNode,
                       ),
                       fit: FlexFit.loose,
                       flex: 20,
@@ -203,22 +194,13 @@ class _TextRoomExampleState extends State<TextRoomV2Example> {
                         fit: FlexFit.tight,
                         child: IconButton(
                           onPressed: () async {
-                            var message = {
-                              'transaction': randomString(),
-                              "textroom": "message",
-                              "room": 1234,
-                              "text": nameController.text,
-                            };
-                            print(message);
-
-                            await textRoom.sendData(stringify(message));
-                            nameController.clear();
+                            await sendMessage();
                           },
                           icon: Icon(
                             Icons.send,
-                            color: Colors.white,
+                            color: Colors.green,
                           ),
-                          color: Colors.green,
+                          color: Colors.white,
                         ))
                   ],
                 ))

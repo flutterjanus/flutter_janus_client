@@ -222,46 +222,56 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
               },
               itemCount: textMessages.length,
             )),
-            Container(
-                height: 60,
-                padding: EdgeInsets.only(
-                  left: 20,
-                  right: 20,
-                  top: 5,
-                ),
-                color: Colors.grey.shade300,
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Flexible(
-                      child: TextFormField(
-                        onFieldSubmitted: (b) async {
-                          await sendMessage();
-                        },
-                        controller: nameController,
-                        cursorHeight: 24,
-                        decoration: InputDecoration.collapsed(
-                            hintText: "Type Your Message"),
-                        focusNode: focusNode,
-                      ),
-                      fit: FlexFit.loose,
-                      flex: 20,
-                    ),
-                    Flexible(
-                        flex: 1,
-                        fit: FlexFit.tight,
-                        child: IconButton(
-                          onPressed: () async {
+            Material(
+              clipBehavior: Clip.none,
+              elevation: 10,
+              child: Container(
+                // height: 70,
+                  padding: EdgeInsets.only(
+                    left: 20,
+                    right: 20,
+                    bottom: 5,
+                    top: 5,
+                  ),
+                  // color: Colors.grey.shade300,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Flexible(
+
+                        child: TextFormField(
+                          textInputAction: TextInputAction.send,
+                          onFieldSubmitted: (b) async {
                             await sendMessage();
                           },
-                          icon: Icon(
-                            Icons.send,
-                            color: Colors.green,
-                          ),
-                          color: Colors.white,
-                        ))
-                  ],
-                ))
+                          controller: nameController,
+                          cursorHeight: 24,
+                          decoration: InputDecoration.collapsed(
+                              hintText: "Type Your Message"),
+                          focusNode: focusNode,
+                        ),
+                        fit: FlexFit.tight,
+                        flex: 20,
+                      ),
+                      Flexible(
+                          flex: 1,
+                          fit: FlexFit.loose,
+                          child: IconButton(
+                            iconSize: 20,
+                            splashRadius: 24,
+                            onPressed: () async {
+                              await sendMessage();
+                            },
+                            icon: Icon(
+                              Icons.send,
+                              size: 20,
+                              color: Colors.green,
+                            ),
+                            color: Colors.white,
+                          ))
+                    ],
+                  )),
+            )
           ],
         ));
   }

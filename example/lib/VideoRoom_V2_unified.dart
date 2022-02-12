@@ -18,7 +18,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   late JanusVideoRoomPlugin plugin;
-  late JanusVideoRoomPlugin remoteFeed;
+  late JanusVideoRoomPlugin? remoteFeed;
   late int myId;
   int myRoom = 1234;
   dynamic feedStreams = {};
@@ -89,7 +89,7 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
         // Nothing to do
         return;
       }
-      await remoteFeed.send(data: {
+      await remoteFeed?.send(data: {
         'message': {'request': "subscribe", 'streams': subscription}
       });
       return;
@@ -131,8 +131,8 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
     // We wait for the plugin to send us an offer
     var subscribe = {'request': "join", 'room': myRoom, 'ptype': "subscriber", 'streams': subscription, 'private_id': myId};
     print('sending subscribe request');
-    await remoteFeed.send(data: subscribe);
-    remoteFeed.messages?.listen((even) async {
+    await remoteFeed?.send(data: subscribe);
+    remoteFeed?.messages?.listen((even) async {
       var event = even.event["videoroom"];
       // Janus.debug("Event: " + event);
       if (event != null) {
@@ -175,13 +175,13 @@ class _VideoRoomState extends State<VideoRoomV2Unified> {
       }
       if (even.jsep != null) {
         print('handle jsep for subscriber');
-        await remoteFeed.handleRemoteJsep(even.jsep);
-        var jsep = await remoteFeed.createAnswer(audioSend: false, videoSend: false);
+        await remoteFeed?.handleRemoteJsep(even.jsep);
+        var jsep = await remoteFeed?.createAnswer(audioSend: false, videoSend: false);
         var body = {'request': "start", 'room': myRoom};
-        await remoteFeed.send(data: body, jsep: jsep);
+        await remoteFeed?.send(data: body, jsep: jsep);
       }
     });
-    remoteFeed.remoteTrack?.listen((event) async {
+    remoteFeed?.remoteTrack?.listen((event) async {
       print('remote track found');
       print(event.toMap());
       setState(() {

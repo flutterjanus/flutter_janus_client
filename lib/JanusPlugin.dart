@@ -155,7 +155,7 @@ class JanusPlugin {
         _context._logger.fine("Handling Remote Track");
         if (event.streams.length == 0) return;
         _remoteStreamController?.add(event.streams[0]);
-        if (event.track == null) return;
+        if (event.track.id == null) return;
         // Notify about the new track event
         String? mid = event.transceiver != null ? event.transceiver!.mid : event.track.id;
         try {
@@ -457,7 +457,7 @@ class JanusPlugin {
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object
   /// It supports both style of offer creation that is plan-b and unified.
   Future<RTCSessionDescription> createOffer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
-    dynamic offerOptions = null;
+    dynamic offerOptions;
     if (_context._isUnifiedPlan && !_context._usePlanB) {
       await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
       offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
@@ -508,7 +508,7 @@ class JanusPlugin {
   ///
   /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
   Future<void> sendData(String message) async {
-    if (message != null) {
+    // if (message != null) {
       if (webRTCHandle!.peerConnection != null) {
         print('before send RTCDataChannelMessage');
         if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] == null) {
@@ -521,9 +521,9 @@ class JanusPlugin {
       } else {
         throw Exception("You Must Initialize Peer Connection followed by initDataChannel()");
       }
-    } else {
-      throw Exception("message must be provided!");
-    }
+    // } else {
+    //   throw Exception("message must be provided!");
+    // }
   }
 
   Future _prepareTranscievers({bool audioRecv: false, bool videoRecv: false, bool audioSend: true, bool videoSend: true}) async {

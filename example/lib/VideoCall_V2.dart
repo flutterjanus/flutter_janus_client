@@ -50,9 +50,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                   decoration: InputDecoration(labelText: "Your Name"),
                   controller: nameController,
                 ),
-                RaisedButton(
-                  color: Colors.green,
-                  textColor: Colors.white,
+                ElevatedButton(
                   onPressed: () {
                     registerUser(nameController.text);
                   },
@@ -78,9 +76,7 @@ class _VideoCallV2ExampleState extends State<VideoCallV2Example> {
                   decoration: InputDecoration(labelText: "Name Of Registered User to call"),
                   controller: nameController,
                 ),
-                RaisedButton(
-                  color: Colors.green,
-                  textColor: Colors.white,
+                ElevatedButton(
                   onPressed: () {
                     makeCall();
                   },

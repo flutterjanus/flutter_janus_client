@@ -1,7 +1,7 @@
 part of janus_client;
 
 class JanusSession {
-  late JanusTransport _transport;
+  late JanusTransport? _transport;
   late JanusClient _context;
   int? _sessionId;
   Timer? _keepAliveTimer;
@@ -120,7 +120,7 @@ class JanusSession {
       _keepAliveTimer!.cancel();
     }
     if (_transport != null) {
-      _transport.dispose();
+      _transport?.dispose();
     }
   }
 

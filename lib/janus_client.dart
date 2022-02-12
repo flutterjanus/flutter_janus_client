@@ -99,7 +99,7 @@ class JanusClient {
   String? _token;
   late Duration _pollingInterval;
   late bool _withCredentials;
-  late int _maxEvent;
+  late int? _maxEvent;
   late List<RTCIceServer>? _iceServers = [];
   late int _refreshInterval;
   late bool _isUnifiedPlan;

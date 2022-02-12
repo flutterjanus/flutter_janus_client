@@ -287,7 +287,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     var payload = {
       "request": "listparticipants",
       "room": roomId,
-    }..removeWhere((key, value) => value == null);
+    };
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
     return (response.plugindata?.data['participants'] as List<dynamic>).map((e) => AudioBridgeParticipants.fromJson(e)).toList();

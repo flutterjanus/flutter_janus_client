@@ -10,49 +10,83 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Janus Client Menu")),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                title: Text('Old V2 Examples'),
-                onTap: () {
-                  Navigator.of(context).pushNamed("/old_menu");
-                },
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: DefaultTextStyle(
+              style: TextStyle(color: Colors.black),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ListTile(
+                    title: Text('Old V2 Examples'),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/old_menu");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(text: "Typed Video Room V2 Unified"),
+                        TextSpan(
+                            text: "  New", style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context)
+                          .pushNamed("/typed_video_room_v2_unified");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(text: "Typed Streaming Unified"),
+                        TextSpan(
+                            text: "  New", style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/typed_streaming");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(text: "Typed Video Call Unified"),
+                        TextSpan(
+                            text: "  New", style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/typed_video_call");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(text: "Typed Audio Bridge Unified"),
+                        TextSpan(
+                            text: "  New", style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/typed_audio_bridge");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
+                      text: TextSpan(children: [
+                        TextSpan(text: "Typed Text Room"),
+                        TextSpan(
+                            text: "  New", style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/typed_text_room");
+                    },
+                  ),
+                ],
               ),
-              ListTile(
-                title: RichText(
-                  text: TextSpan(children: [TextSpan(text: "Typed Video Room V2 Unified"), TextSpan(text: "  New", style: TextStyle(color: Colors.green))]),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed("/typed_video_room_v2_unified");
-                },
-              ),
-              ListTile(
-                title: RichText(
-                  text: TextSpan(children: [TextSpan(text: "Typed Streaming Unified"), TextSpan(text: "  New", style: TextStyle(color: Colors.green))]),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed("/typed_streaming");
-                },
-              ),
-              ListTile(
-                title: RichText(
-                  text: TextSpan(children: [TextSpan(text: "Typed Video Call Unified"), TextSpan(text: "  New", style: TextStyle(color: Colors.green))]),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed("/typed_video_call");
-                },
-              ),
-              ListTile(
-                title: RichText(
-                  text: TextSpan(children: [TextSpan(text: "Typed Audio Bridge Unified"), TextSpan(text: "  New", style: TextStyle(color: Colors.green))]),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed("/typed_audio_bridge");
-                },
-              ),
-            ],
+            ),
           ),
         ));
   }
@@ -94,7 +128,9 @@ class OldExamplesMenu extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Title(color: Colors.green, child: Text('Updated Unified Plan Examples')),
+              child: Title(
+                  color: Colors.green,
+                  child: Text('Updated Unified Plan Examples')),
             ),
             Divider(),
             ListTile(

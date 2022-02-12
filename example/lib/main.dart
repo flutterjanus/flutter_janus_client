@@ -16,6 +16,7 @@ import 'VideoRoom_V2_unified.dart';
 void main() {
   runApp(MaterialApp(
     initialRoute: '/',
+    themeMode: ThemeMode.light,
     debugShowCheckedModeBanner: false,
     routes: {
       "/video_call_v2": (c) => VideoCallV2Example(),

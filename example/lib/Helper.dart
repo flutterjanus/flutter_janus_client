@@ -59,7 +59,7 @@ class StreamingItem {
     "description": description,
     "metadata": metadata,
     "enabled": enabled,
-    "media": media == null ? null : List<dynamic>.from(media.map((x) => x.toMap())),
+    "media":  List<dynamic>.from(media.map((x) => x.toMap())),
   };
 }
 

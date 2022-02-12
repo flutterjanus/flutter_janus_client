@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client_example/Helper.dart';
 import 'package:janus_client_example/conf.dart';
 
 class TypedStreamingV2 extends StatefulWidget {

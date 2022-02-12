@@ -61,7 +61,7 @@ class WebSocketJanusTransport extends JanusTransport {
 
   void dispose() {
     if (channel != null && sink != null) {
-      sink!.close();
+      sink?.close();
       isConnected = false;
     }
   }

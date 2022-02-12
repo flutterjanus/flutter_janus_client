@@ -101,9 +101,7 @@ class _StreamingState extends State<StreamingV2> {
                                   });
                                 }
                               }),
-                          RaisedButton(
-                            color: Colors.green,
-                            textColor: Colors.white,
+                          ElevatedButton(
                             onPressed: () {
                               plugin.send(data: {
                                 "request": "watch",

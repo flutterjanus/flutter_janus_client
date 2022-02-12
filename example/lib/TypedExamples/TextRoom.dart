@@ -82,7 +82,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
                   ],
                   title: Text('Register yourself'),
                   content: Container(
-                    width: MediaQuery.of(context).size.width*0.9,
+                    width: MediaQuery.of(context).size.width * 0.9,
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -94,7 +94,6 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
                             controller: userNameController,
                           ),
                         ),
-
                       ],
                     ),
                   ),
@@ -113,6 +112,8 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
           setState(() {
             textMessages.add(data);
           });
+          scrollToBottom();
+
         }
         if (data['textroom'] == 'leave') {
           setState(() {
@@ -122,6 +123,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
               userNameDisplayMap.remove(data['username']);
             });
           });
+          scrollToBottom();
         }
         if (data['textroom'] == 'join') {
           setState(() {
@@ -130,6 +132,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
             textMessages
                 .add({'from': data['username'], 'text': 'Joined The Chat!'});
           });
+          scrollToBottom();
         }
         if (data['participants'] != null) {
           (data['participants'] as List<dynamic>).forEach((element) {
@@ -158,10 +161,17 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
     initializeClient();
   }
 
+  scrollToBottom(){
+    controller.animateTo(
+      controller.position.maxScrollExtent+200,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.fastOutSlowIn,
+    );
+  }
   Future<void> sendMessage() async {
     await textRoom.sendMessage(1234, nameController.text);
-    controller.jumpTo(controller.position.maxScrollExtent);
     nameController.text = '';
+    scrollToBottom();
   }
 
   @override

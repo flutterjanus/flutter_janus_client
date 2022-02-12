@@ -24,14 +24,31 @@ class Participant {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Participant && runtimeType == other.runtimeType && id == other.id && display == other.display && setup == other.setup && muted == other.muted && talking == other.talking);
+      (other is Participant &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          display == other.display &&
+          setup == other.setup &&
+          muted == other.muted &&
+          talking == other.talking);
 
   @override
-  int get hashCode => id.hashCode ^ display.hashCode ^ setup.hashCode ^ muted.hashCode ^ talking.hashCode;
+  int get hashCode =>
+      id.hashCode ^
+      display.hashCode ^
+      setup.hashCode ^
+      muted.hashCode ^
+      talking.hashCode;
 
   @override
   String toString() {
-    return 'Participant{' + ' id: $id,' + ' display: $display,' + ' setup: $setup,' + ' muted: $muted,' + ' talking: $talking,' + '}';
+    return 'Participant{' +
+        ' id: $id,' +
+        ' display: $display,' +
+        ' setup: $setup,' +
+        ' muted: $muted,' +
+        ' talking: $talking,' +
+        '}';
   }
 
   Participant copyWith({
@@ -123,7 +140,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
         ]);
     session = await j.createSession();
     pluginHandle = await session.attach<JanusAudioBridgePlugin>();
-    stream=await pluginHandle.initializeMediaDevices(
+    stream = await pluginHandle.initializeMediaDevices(
         mediaConstraints: {"audio": true, "video": false});
 
     var register = {"request": "join", "room": 1234, "display": 'shivansh'};
@@ -149,7 +166,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
               'room': 1234
             }))['plugindata']['data'];
             var participant = data['participants'];
-            if (participant is List && participant != null) {
+            if (participant != null && participant is List) {
               setState(() {
                 var temp = participant.map((element) {
                   return Participant(
@@ -157,7 +174,9 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']!=null?element['talking']:false);
+                      talking: element['talking'] != null
+                          ? element['talking']
+                          : false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants
@@ -179,7 +198,7 @@ class _AudioRoomState extends State<AudioRoomV2> {
           }
           if (data['audiobridge'] == 'event') {
             var participant = data['participants'];
-            if (participant is List && participant != null) {
+            if (participant != null && participant is List) {
               setState(() {
                 var temp = participant.map((element) {
                   return Participant(
@@ -187,7 +206,9 @@ class _AudioRoomState extends State<AudioRoomV2> {
                       display: element['display'],
                       setup: element['setup'],
                       muted: element['muted'],
-                      talking: element['talking']!=null?element['talking']:false);
+                      talking: element['talking'] != null
+                          ? element['talking']
+                          : false);
                 }).toList();
                 temp.forEach((element) {
                   var existingIndex = participants

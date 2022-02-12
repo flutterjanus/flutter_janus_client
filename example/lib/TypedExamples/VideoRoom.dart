@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -256,9 +254,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  if (plugin != null) {
-                    // plugin.switchCamera();
-                  }
+
                 })
           ],
           title: const Text('janus_client'),

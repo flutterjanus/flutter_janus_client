@@ -17,8 +17,9 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
   TextEditingController nameController = TextEditingController();
+  TextEditingController userNameController = TextEditingController();
   ScrollController controller = ScrollController();
-  FocusNode focusNode=FocusNode();
+  FocusNode focusNode = FocusNode();
 
   initializeClient() async {
     rest = RestJanusTransport(url: servermap['janus_rest']);
@@ -55,7 +56,51 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
     await textRoom.setup();
     textRoom.onData?.listen((event) async {
       if (RTCDataChannelState.RTCDataChannelOpen == event) {
-        await textRoom.joinRoom(1234, "shivansh", display: "shivansh");
+        var dialog;
+        dialog = await showDialog(
+            barrierDismissible: false,
+            useSafeArea: true,
+            context: context,
+            builder: (context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                child: AlertDialog(
+                  insetPadding: EdgeInsets.zero,
+                  actionsAlignment: MainAxisAlignment.center,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                          onPressed: () async {
+                            await textRoom.joinRoom(
+                                1234, userNameController.text,
+                                display: userNameController.text);
+                            Navigator.of(context).pop(dialog);
+                          },
+                          child: Text('Join')),
+                    )
+                  ],
+                  title: Text('Register yourself'),
+                  content: Container(
+                    width: MediaQuery.of(context).size.width*0.9,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: TextFormField(
+                            decoration:
+                                InputDecoration.collapsed(hintText: "Username"),
+                            controller: userNameController,
+                          ),
+                        ),
+
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            });
       }
     });
 
@@ -116,8 +161,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
   Future<void> sendMessage() async {
     await textRoom.sendMessage(1234, nameController.text);
     controller.jumpTo(controller.position.maxScrollExtent);
-    nameController.text='';
-
+    nameController.text = '';
   }
 
   @override
@@ -169,15 +213,19 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
               itemCount: textMessages.length,
             )),
             Container(
-              height: 60,
-                padding: EdgeInsets.only(left: 20,right: 20,top: 5,),
+                height: 60,
+                padding: EdgeInsets.only(
+                  left: 20,
+                  right: 20,
+                  top: 5,
+                ),
                 color: Colors.grey.shade300,
                 child: Row(
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Flexible(
                       child: TextFormField(
-                        onFieldSubmitted: (b)async{
+                        onFieldSubmitted: (b) async {
                           await sendMessage();
                         },
                         controller: nameController,

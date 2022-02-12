@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the stringify function from the janus_client library, for the Dart programming language.">
+  <title>stringify function - janus_client library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../static-assets/styles.css?v1">
+  <link rel="icon" href="../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../"
+      data-using-base-href="false">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../index.html">janus_client</a></li>
+    <li><a href="../janus_client/janus_client-library.html">janus_client</a></li>
+    <li class="self-crumb">stringify function</li>
+  </ol>
+  <div class="self-name">stringify</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<main>
+
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-function">stringify</span> function 
+    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
+ 
+</h1></div>
+
+    <section class="multi-line-signature">
+        
+
+<span class="returntype">dynamic</span>
+<span class="name ">stringify</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="stringify-param-dynamic"><span class="type-annotation">dynamic</span> <span class="parameter-name">dynamic</span></span></li>
+</ol>)
+
+    </section>
+    
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">stringify(dynamic) {
+  JsonEncoder encoder = JsonEncoder();
+  return &#39;${encoder.convert(dynamic)}&#39;;
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../index.html">janus_client</a></li>
+  <li><a href="../janus_client/janus_client-library.html">janus_client</a></li>
+  <li class="self-crumb">stringify function</li>
+</ol>
+
+
+    <h5>janus_client library</h5>
+    <ol>
+  <li class="section-title"><a href="../janus_client/janus_client-library.html#classes">Classes</a></li>
+  <li><a href="../janus_client/AttachedStreams-class.html">AttachedStreams</a></li>
+  <li><a href="../janus_client/AudioBridgeConfiguredEvent-class.html">AudioBridgeConfiguredEvent</a></li>
+  <li><a href="../janus_client/AudioBridgeEvent-class.html">AudioBridgeEvent</a></li>
+  <li><a href="../janus_client/AudioBridgeJoinedEvent-class.html">AudioBridgeJoinedEvent</a></li>
+  <li><a href="../janus_client/AudioBridgeLeavingEvent-class.html">AudioBridgeLeavingEvent</a></li>
+  <li><a href="../janus_client/AudioBridgeNewParticipantsEvent-class.html">AudioBridgeNewParticipantsEvent</a></li>
+  <li><a href="../janus_client/AudioBridgeParticipants-class.html">AudioBridgeParticipants</a></li>
+  <li><a href="../janus_client/AudioRoomCreatedResponse-class.html">AudioRoomCreatedResponse</a></li>
+  <li><a href="../janus_client/BaseStream-class.html">BaseStream</a></li>
+  <li><a href="../janus_client/CreateMediaItem-class.html">CreateMediaItem</a></li>
+  <li><a href="../janus_client/EventMessage-class.html">EventMessage</a></li>
+  <li><a href="../janus_client/HangupResult-class.html">HangupResult</a></li>
+  <li><a href="../janus_client/JanusAudioBridgePlugin-class.html">JanusAudioBridgePlugin</a></li>
+  <li><a href="../janus_client/JanusClient-class.html">JanusClient</a></li>
+  <li><a href="../janus_client/JanusEchoTestPlugin-class.html">JanusEchoTestPlugin</a></li>
+  <li><a href="../janus_client/JanusError-class.html">JanusError</a></li>
+  <li><a href="../janus_client/JanusEvent-class.html">JanusEvent</a></li>
+  <li><a href="../janus_client/JanusPlugin-class.html">JanusPlugin</a></li>
+  <li><a href="../janus_client/JanusPlugins-class.html">JanusPlugins</a></li>
+  <li><a href="../janus_client/JanusSession-class.html">JanusSession</a></li>
+  <li><a href="../janus_client/JanusSipPlugin-class.html">JanusSipPlugin</a></li>
+  <li><a href="../janus_client/JanusStreamingPlugin-class.html">JanusStreamingPlugin</a></li>
+  <li><a href="../janus_client/JanusTextRoomPlugin-class.html">JanusTextRoomPlugin</a></li>
+  <li><a href="../janus_client/JanusTransport-class.html">JanusTransport</a></li>
+  <li><a href="../janus_client/JanusVideoCallPlugin-class.html">JanusVideoCallPlugin</a></li>
+  <li><a href="../janus_client/JanusVideoRoom-class.html">JanusVideoRoom</a></li>
+  <li><a href="../janus_client/JanusVideoRoomPlugin-class.html">JanusVideoRoomPlugin</a></li>
+  <li><a href="../janus_client/JanusWebRTCHandle-class.html">JanusWebRTCHandle</a></li>
+  <li><a href="../janus_client/Media-class.html">Media</a></li>
+  <li><a href="../janus_client/Participants-class.html">Participants</a></li>
+  <li><a href="../janus_client/Plugindata-class.html">Plugindata</a></li>
+  <li><a href="../janus_client/Ports-class.html">Ports</a></li>
+  <li><a href="../janus_client/Publishers-class.html">Publishers</a></li>
+  <li><a href="../janus_client/PublisherStream-class.html">PublisherStream</a></li>
+  <li><a href="../janus_client/RemoteTrack-class.html">RemoteTrack</a></li>
+  <li><a href="../janus_client/RestJanusTransport-class.html">RestJanusTransport</a></li>
+  <li><a href="../janus_client/Result-class.html">Result</a></li>
+  <li><a href="../janus_client/RTCIceServer-class.html">RTCIceServer</a></li>
+  <li><a href="../janus_client/RtpForwarderCreated-class.html">RtpForwarderCreated</a></li>
+  <li><a href="../janus_client/RtpForwardStopped-class.html">RtpForwardStopped</a></li>
+  <li><a href="../janus_client/StreamingMount-class.html">StreamingMount</a></li>
+  <li><a href="../janus_client/StreamingMountEdited-class.html">StreamingMountEdited</a></li>
+  <li><a href="../janus_client/StreamingMountPoint-class.html">StreamingMountPoint</a></li>
+  <li><a href="../janus_client/StreamingMountPointInfo-class.html">StreamingMountPointInfo</a></li>
+  <li><a href="../janus_client/StreamingPluginPreparingEvent-class.html">StreamingPluginPreparingEvent</a></li>
+  <li><a href="../janus_client/StreamingPluginStoppingEvent-class.html">StreamingPluginStoppingEvent</a></li>
+  <li><a href="../janus_client/StreamingPluginStream-class.html">StreamingPluginStream</a></li>
+  <li><a href="../janus_client/Streams-class.html">Streams</a></li>
+  <li><a href="../janus_client/TypedEvent-class.html">TypedEvent</a></li>
+  <li><a href="../janus_client/VideoCallAcceptedEvent-class.html">VideoCallAcceptedEvent</a></li>
+  <li><a href="../janus_client/VideoCallCallingEvent-class.html">VideoCallCallingEvent</a></li>
+  <li><a href="../janus_client/VideoCallEvent-class.html">VideoCallEvent</a></li>
+  <li><a href="../janus_client/VideoCallHangupEvent-class.html">VideoCallHangupEvent</a></li>
+  <li><a href="../janus_client/VideoCallIncomingCallEvent-class.html">VideoCallIncomingCallEvent</a></li>
+  <li><a href="../janus_client/VideoCallRegisteredEvent-class.html">VideoCallRegisteredEvent</a></li>
+  <li><a href="../janus_client/VideoRoomAttachedEvent-class.html">VideoRoomAttachedEvent</a></li>
+  <li><a href="../janus_client/VideoRoomConfigured-class.html">VideoRoomConfigured</a></li>
+  <li><a href="../janus_client/VideoRoomEvent-class.html">VideoRoomEvent</a></li>
+  <li><a href="../janus_client/VideoRoomJoinedEvent-class.html">VideoRoomJoinedEvent</a></li>
+  <li><a href="../janus_client/VideoRoomLeavingEvent-class.html">VideoRoomLeavingEvent</a></li>
+  <li><a href="../janus_client/VideoRoomListParticipantsResponse-class.html">VideoRoomListParticipantsResponse</a></li>
+  <li><a href="../janus_client/VideoRoomListResponse-class.html">VideoRoomListResponse</a></li>
+  <li><a href="../janus_client/VideoRoomNewPublisherEvent-class.html">VideoRoomNewPublisherEvent</a></li>
+  <li><a href="../janus_client/WebSocketJanusTransport-class.html">WebSocketJanusTransport</a></li>
+
+
+
+
+
+  <li class="section-title"><a href="../janus_client/janus_client-library.html#functions">Functions</a></li>
+  <li><a href="../janus_client/getUuid.html">getUuid</a></li>
+  <li><a href="../janus_client/parse.html">parse</a></li>
+  <li><a href="../janus_client/randomString.html">randomString</a></li>
+  <li><a href="../janus_client/stopAllTracksAndDispose.html">stopAllTracksAndDispose</a></li>
+  <li><a href="../janus_client/stringify.html">stringify</a></li>
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-left-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    janus_client
+      2.2.0
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../static-assets/highlight.pack.js?v1"></script>
+<script src="../static-assets/script.js?v1"></script>
+
+
+
+</body>
+
+</html>
+

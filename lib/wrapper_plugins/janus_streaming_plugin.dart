@@ -23,7 +23,7 @@ class JanusStreamingPlugin extends JanusPlugin {
     return null;
   }
 
-  /// Create a new Streaming Mount-point
+  /// Create a new streaming Mount-point
   /// type = rtp|live|ondemand|rtsp
   ///        rtp = stream originated by an external tool (e.g., gstreamer or
   ///              ffmpeg) and sent to the plugin via RTP

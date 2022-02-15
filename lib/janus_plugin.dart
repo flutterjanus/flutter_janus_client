@@ -410,15 +410,17 @@ class JanusPlugin {
 
   /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
+  /// [useDisplayMediaDevices] : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
+  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.
   /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView
-  Future<MediaStream?> initializeMediaDevices({Map<String, dynamic>? mediaConstraints}) async {
+  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, Map<String, dynamic>? mediaConstraints}) async {
     if (mediaConstraints == null) {
       List<MediaDeviceInfo> audioDevices = await Helper.audiooutputs;
       List<MediaDeviceInfo> videoDevices = await Helper.cameras;
       mediaConstraints = {"audio": audioDevices.length > 0, "video": videoDevices.length > 0};
     }
     if (webRTCHandle != null) {
-      webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      webRTCHandle!.localStream = useDisplayMediaDevices == true ? (await navigator.mediaDevices.getDisplayMedia(mediaConstraints)) : (await navigator.mediaDevices.getUserMedia(mediaConstraints));
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.fine('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
@@ -509,18 +511,18 @@ class JanusPlugin {
   /// for now janus text room only supports text as string although with normal data channel api we can send blob or Uint8List if we want.
   Future<void> sendData(String message) async {
     // if (message != null) {
-      if (webRTCHandle!.peerConnection != null) {
-        print('before send RTCDataChannelMessage');
-        if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] == null) {
-          throw Exception("You Must  call initDataChannel method! before you can send any data channel message");
-        }
-        RTCDataChannel dataChannel = webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!;
-        if (dataChannel.state == RTCDataChannelState.RTCDataChannelOpen) {
-          return await dataChannel.send(RTCDataChannelMessage(message));
-        }
-      } else {
-        throw Exception("You Must Initialize Peer Connection followed by initDataChannel()");
+    if (webRTCHandle!.peerConnection != null) {
+      print('before send RTCDataChannelMessage');
+      if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] == null) {
+        throw Exception("You Must  call initDataChannel method! before you can send any data channel message");
       }
+      RTCDataChannel dataChannel = webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!;
+      if (dataChannel.state == RTCDataChannelState.RTCDataChannelOpen) {
+        return await dataChannel.send(RTCDataChannelMessage(message));
+      }
+    } else {
+      throw Exception("You Must Initialize Peer Connection followed by initDataChannel()");
+    }
     // } else {
     //   throw Exception("message must be provided!");
     // }

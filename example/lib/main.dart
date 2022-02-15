@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client_example/AudioRoom_V2.dart';
+import 'package:janus_client_example/audio_room_v2.dart';
 import 'package:janus_client_example/Home.dart';
-import 'package:janus_client_example/Streaming_V2.dart';
-import 'package:janus_client_example/Streaming_V2_unified.dart';
-import 'package:janus_client_example/TextRoom_V2.dart';
-import 'package:janus_client_example/TypedExamples/AudioBridge.dart';
-import 'package:janus_client_example/TypedExamples/Streaming.dart';
-import 'package:janus_client_example/TypedExamples/VideoCall.dart';
-import 'package:janus_client_example/VideoCall_V2.dart';
-import 'package:janus_client_example/VideoRoom_V2.dart';
-import 'TypedExamples/TextRoom.dart';
-import 'TypedExamples/VideoRoom.dart';
-import 'VideoRoom_V2_unified.dart';
+import 'package:janus_client_example/streaming_v2.dart';
+import 'package:janus_client_example/streaming_v2_unified.dart';
+import 'package:janus_client_example/text_room_v2.dart';
+import 'package:janus_client_example/typed_examples/audio_bridge.dart';
+import 'package:janus_client_example/typed_examples/screen_share_videoroom.dart';
+import 'package:janus_client_example/typed_examples/streaming.dart';
+import 'package:janus_client_example/typed_examples/video_call.dart';
+import 'package:janus_client_example/video_call_v2.dart';
+import 'package:janus_client_example/video_room_v2.dart';
+import 'typed_examples/text_room.dart';
+import 'typed_examples/video_room.dart';
+import 'video_room_v2_unified.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -31,6 +32,7 @@ void main() {
       "/text_room_v2": (c) => TextRoomV2Example(),
       "/streaming_v2": (c) => StreamingV2(),
       "/streaming_v2_unified": (c) => StreamingV2Unified(),
+      "/screen_share_typed_video_room_v2_unified": (c) => TypedScreenShareVideoRoomV2Unified(),
       "/": (c) => Home()
     },
   ));

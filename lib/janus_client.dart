@@ -75,9 +75,9 @@ part './interfaces/streaming/streaming_mount_point.dart';
 
 part './interfaces/streaming/streaming_mount_point_info.dart';
 
-part 'interfaces/streaming/events/streaming_plugin_preparing_event.dart';
+part './interfaces/streaming/events/streaming_plugin_preparing_event.dart';
 
-part 'interfaces/streaming/events/streaming_plugin_stopping_event.dart';
+part './interfaces/streaming/events/streaming_plugin_stopping_event.dart';
 
 part './interfaces/audio_bridge/audio_room_created_response.dart';
 

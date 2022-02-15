@@ -55,7 +55,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "UserSense",
+      "name": "UserSense",
+      "avatar_url": "https://avatars.githubusercontent.com/u/65860664?v=4",
+      "profile": "https://github.com/UserSense",
+      "contributions": [
+        "code"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }

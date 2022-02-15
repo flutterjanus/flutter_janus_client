@@ -41,29 +41,29 @@ part './interfaces/video_room/video_room_list_response.dart';
 
 part './interfaces/video_room/video_room_list_participants_response.dart';
 
-part './interfaces/video_room/Events/video_room_atached_event.dart';
+part './interfaces/video_room/events/video_room_atached_event.dart';
 
-part './interfaces/video_room/Events/video_room_configured.dart';
+part './interfaces/video_room/events/video_room_configured.dart';
 
-part './interfaces/video_room/Events/video_room_joined_event.dart';
+part './interfaces/video_room/events/video_room_joined_event.dart';
 
-part './interfaces/video_room/Events/video_room_leaving_event.dart';
+part './interfaces/video_room/events/video_room_leaving_event.dart';
 
-part './interfaces/video_room/Events/video_room_new_publisher_event.dart';
+part './interfaces/video_room/events/video_room_new_publisher_event.dart';
 
-part './interfaces/video_room/Events/video_room_event.dart';
+part './interfaces/video_room/events/video_room_event.dart';
 
-part './interfaces/video_call/Events/video_call_accepted_event.dart';
+part './interfaces/video_call/events/video_call_accepted_event.dart';
 
-part './interfaces/video_call/Events/video_call_calling_event.dart';
+part './interfaces/video_call/events/video_call_calling_event.dart';
 
-part './interfaces/video_call/Events/video_call_event.dart';
+part './interfaces/video_call/events/video_call_event.dart';
 
-part './interfaces/video_call/Events/video_call_hangup_event.dart';
+part './interfaces/video_call/events/video_call_hangup_event.dart';
 
-part './interfaces/video_call/Events/video_call_incoming_call_event.dart';
+part './interfaces/video_call/events/video_call_incoming_call_event.dart';
 
-part './interfaces/video_call/Events/video_call_registered_event.dart';
+part './interfaces/video_call/events/video_call_registered_event.dart';
 
 part './interfaces/streaming/create_media_item.dart';
 
@@ -75,9 +75,9 @@ part './interfaces/streaming/streaming_mount_point.dart';
 
 part './interfaces/streaming/streaming_mount_point_info.dart';
 
-part 'interfaces/streaming/Events/streaming_plugin_preparing_event.dart';
+part 'interfaces/streaming/events/streaming_plugin_preparing_event.dart';
 
-part 'interfaces/streaming/Events/streaming_plugin_stopping_event.dart';
+part 'interfaces/streaming/events/streaming_plugin_stopping_event.dart';
 
 part './interfaces/audio_bridge/audio_room_created_response.dart';
 
@@ -85,13 +85,13 @@ part './interfaces/audio_bridge/rtp_forward_stopped.dart';
 
 part './interfaces/audio_bridge/rtp_forwarder_created.dart';
 
-part './interfaces/audio_bridge/Events/audio_bridge_configured_event.dart';
+part './interfaces/audio_bridge/events/audio_bridge_configured_event.dart';
 
-part './interfaces/audio_bridge/Events/audio_bridge_event.dart';
+part './interfaces/audio_bridge/events/audio_bridge_event.dart';
 
-part './interfaces/audio_bridge/Events/audio_bridge_joined_event.dart';
+part './interfaces/audio_bridge/events/audio_bridge_joined_event.dart';
 
-part './interfaces/audio_bridge/Events/audio_bridge_leaving_event.dart';
+part './interfaces/audio_bridge/events/audio_bridge_leaving_event.dart';
 
 class JanusClient {
   late JanusTransport _transport;

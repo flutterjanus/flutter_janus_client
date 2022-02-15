@@ -38,8 +38,19 @@ class _HomeState extends State<Home> {
                   ),
                   ListTile(
                     title: RichText(
+                        text: TextSpan(children: [
+                          TextSpan(text: "Screen Share Typed Video Room V2 Unified"),
+                          TextSpan(
+                              text: "  New", style: TextStyle(color: Colors.green))
+                        ])),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/screen_share_typed_video_room_v2_unified");
+                    },
+                  ),
+                  ListTile(
+                    title: RichText(
                       text: TextSpan(children: [
-                        TextSpan(text: "Typed Streaming Unified"),
+                        TextSpan(text: "Typed streaming Unified"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))
                       ]),
@@ -121,7 +132,7 @@ class OldExamplesMenu extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text("Streaming V2"),
+              title: Text("streaming V2"),
               onTap: () {
                 Navigator.of(context).pushNamed("/streaming_v2");
               },
@@ -146,7 +157,7 @@ class OldExamplesMenu extends StatelessWidget {
               },
             ),
             ListTile(
-              title: Text("Streaming V2 Unified"),
+              title: Text("streaming V2 Unified"),
               onTap: () {
                 Navigator.of(context).pushNamed("/streaming_v2_unified");
               },

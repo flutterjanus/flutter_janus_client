@@ -65,14 +65,14 @@ class StreamingMountPointInfo {
 
 class Media {
   Media({
-      this.mid, 
-      this.mindex, 
-      this.type, 
-      this.label, 
-      this.ageMs, 
-      this.pt, 
-      this.rtpmap, 
-      this.fmtp,});
+    this.mid,
+    this.mindex,
+    this.type,
+    this.label,
+    this.ageMs,
+    this.pt,
+    this.rtpmap,
+    this.fmtp,});
 
   Media.fromJson(dynamic json) {
     mid = json['mid'];

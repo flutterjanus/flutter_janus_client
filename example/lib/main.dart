@@ -5,6 +5,7 @@ import 'package:janus_client_example/streaming_v2.dart';
 import 'package:janus_client_example/streaming_v2_unified.dart';
 import 'package:janus_client_example/text_room_v2.dart';
 import 'package:janus_client_example/typed_examples/audio_bridge.dart';
+import 'package:janus_client_example/typed_examples/screen_share_videoroom.dart';
 import 'package:janus_client_example/typed_examples/streaming.dart';
 import 'package:janus_client_example/typed_examples/video_call.dart';
 import 'package:janus_client_example/video_call_v2.dart';
@@ -31,6 +32,7 @@ void main() {
       "/text_room_v2": (c) => TextRoomV2Example(),
       "/streaming_v2": (c) => StreamingV2(),
       "/streaming_v2_unified": (c) => StreamingV2Unified(),
+      "/screen_share_typed_video_room_v2_unified": (c) => TypedScreenShareVideoRoomV2Unified(),
       "/": (c) => Home()
     },
   ));

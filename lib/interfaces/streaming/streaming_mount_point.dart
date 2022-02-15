@@ -1,4 +1,6 @@
+
 part of janus_client;
+
 class StreamingMountPoint {
   StreamingMountPoint({
       this.id, 
@@ -42,3 +44,4 @@ class StreamingMountPoint {
   }
 
 }
+

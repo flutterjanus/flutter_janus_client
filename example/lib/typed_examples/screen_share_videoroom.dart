@@ -27,6 +27,8 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
   Map<int, dynamic> feeds = {};
   Map<String, int> subStreams = {};
   Map<int, MediaStream?> mediaStreams = {};
+  bool roomJoined=false;
+  bool screenSharing=false;
 
   @override
   void didChangeDependencies() async {
@@ -101,17 +103,8 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
   }
 
   Future<void> joinRoom() async {
-    var devices = await navigator.mediaDevices.enumerateDevices();
-    Map<String,dynamic> constrains = {};
-    devices.map((e) => e.kind.toString()).forEach((element) {
-      String dat = element.split('input')[0];
-      dat = dat.split('output')[0];
-      constrains.putIfAbsent(dat, () => true);
-    });
     myStream = await plugin.initializeMediaDevices(
-        // setting this true streams screen as a video source
-        useDisplayMediaDevices: true,
-        mediaConstraints: constrains);
+        useDisplayMediaDevices: true,mediaConstraints: {"video":true,"audio":true});
     RemoteStream mystr = RemoteStream('0');
     await mystr.init();
     mystr.videoRenderer.srcObject = myStream;
@@ -122,6 +115,15 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
       1234,
       displayName: "Shivansh",
     );
+    var transreciever=await plugin.webRTCHandle?.peerConnection?.transceivers;
+    transreciever?.forEach((element) {
+      element.sender.track?.onEnded = () {
+        print('screen share ended');
+        setState(() {
+          screenSharing=false;
+        });
+      };
+    });
     plugin.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
@@ -173,6 +175,10 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
       if (data is VideoRoomConfigured) {
         print('typed event with jsep' + event.jsep.toString());
         await plugin.handleRemoteJsep(event.jsep);
+        setState(() {
+          roomJoined=true;
+          screenSharing=true;
+        });
       }
     });
   }
@@ -229,6 +235,28 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
     await remoteHandle?.dispose();
   }
 
+  Future<void>screenShareAgain()async{
+    var transreciever=await plugin.webRTCHandle?.peerConnection?.transceivers;
+    MediaStream stream=await navigator.mediaDevices.getDisplayMedia({"video":true,"audio":true});
+    remoteStreams[0]?.videoRenderer.srcObject=stream;
+    transreciever?.forEach((element) {
+      element.sender.track?.onMute=(){};
+      if(element.sender.track?.kind=="video"){
+        stream.getVideoTracks().forEach((track) {
+          element.sender.replaceTrack(track);
+        });
+      }
+      if(element.sender.track?.kind=="audio"){
+        stream.getAudioTracks().forEach((track) {
+          element.sender.replaceTrack(track);
+        });
+      }
+    });
+    setState(() {
+      screenSharing=true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -236,11 +264,16 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
           actions: [
             IconButton(
                 icon: Icon(
-                  Icons.call,
+                  roomJoined&&screenSharing?Icons.play_circle_outline:Icons.screen_share,
                   color: Colors.greenAccent,
                 ),
-                onPressed: () async {
-                  await this.joinRoom();
+                onPressed: roomJoined&&screenSharing?null:() async {
+                  if(!roomJoined){
+                    await this.joinRoom();
+                  }
+                  else if(roomJoined && !screenSharing){
+                    screenShareAgain();
+                  }
                 }),
             IconButton(
                 icon: Icon(
@@ -250,14 +283,6 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
                 onPressed: () async {
                   await callEnd();
                 }),
-            IconButton(
-                icon: Icon(
-                  Icons.switch_camera,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-
-                })
           ],
           title: const Text('janus_client'),
         ),

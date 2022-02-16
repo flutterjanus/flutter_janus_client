@@ -48,4 +48,8 @@ build/flutter_assets
 build/flutter_webrtc
 build/ios
 build/kotlin
+build/macos/
+build/windows/
+build/linux/
+
 build/path_provider_android

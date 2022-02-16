@@ -24,8 +24,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                      text: TextSpan(children: [
+                    title:
+                      Text.rich(TextSpan(children: [
                         TextSpan(text: "Typed Video Room V2 Unified"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))
@@ -37,8 +37,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                        text: TextSpan(children: [
+                    title: Text.rich(
+                        TextSpan(children: [
                           TextSpan(text: "Screen Share Typed Video Room V2 Unified"),
                           TextSpan(
                               text: "  New", style: TextStyle(color: Colors.green))
@@ -48,8 +48,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                      text: TextSpan(children: [
+                    title: Text.rich(
+                      TextSpan(children: [
                         TextSpan(text: "Typed streaming Unified"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))
@@ -60,8 +60,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                      text: TextSpan(children: [
+                    title: Text.rich(
+                       TextSpan(children: [
                         TextSpan(text: "Typed Video Call Unified"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))
@@ -72,8 +72,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                      text: TextSpan(children: [
+                    title: Text.rich(
+                      TextSpan(children: [
                         TextSpan(text: "Typed Audio Bridge Unified"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))
@@ -84,8 +84,8 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: RichText(
-                      text: TextSpan(children: [
+                    title: Text.rich(
+                      TextSpan(children: [
                         TextSpan(text: "Typed Text Room"),
                         TextSpan(
                             text: "  New", style: TextStyle(color: Colors.green))

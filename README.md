@@ -13,13 +13,14 @@ it easily integrates into your flutter application and allows you to build webrt
 
 
 ## News & Updates
+- Just like new flutter version comes With desktop support out of the box
 - All major plugins fully support unified plan
 - Typed examples updated with null safety and latest dart constraints
 - Introduced plugin specific wrapper classes with respective operation methods for rich development experience
 - Introduced typed events (Class Based Events) for brilliant auto completion support for IDE
 - Supports null-safety
 
-## Status
+## Feature Status
 | Feature           | Support | Well Tested | Unified Plan | Example |
 |-------------------|---------|-------------|--------------|---------|
 | WebSocket         | Yes     | Yes         | -            | Yes     |
@@ -30,6 +31,17 @@ it easily integrates into your flutter application and allows you to build webrt
 | Audio Room Plugin | Yes     | No          | Yes          | Yes     |
 | Sip Plugin        | Yes     | No          | -           | No      |
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
+| ScreenSharing using VideoRoom plugin  | Yes     | No          | Yes          | Yes     |
+
+## Platform Support Table
+| Platform           | Support | Well Tested|
+|-------------------|---------|-------------|
+| Browser(Web)      | Yes     | Yes         |
+| MacOs             | Yes     | No          |
+| Android           | Yes     | Yes         | 
+| Ios               | Yes     | No          | 
+| Linux             | Yes     | No          | 
+| Windows           | Yes     | No          | 
 
 
 ## Todo

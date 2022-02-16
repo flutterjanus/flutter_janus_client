@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -93,7 +94,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
           remoteStreams[feedId]?.video.addTrack(event.track!);
           remoteStreams[feedId]?.videoRenderer.srcObject =
               remoteStreams[feedId]?.video;
-          remoteStreams[feedId]?.videoRenderer.muted = false;
+          if(kIsWeb){
+            remoteStreams[feedId]?.videoRenderer.muted = false;
+          }
+
         }
       }
     });

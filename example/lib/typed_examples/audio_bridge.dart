@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -18,7 +19,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   late Map<String, RTCVideoRenderer> remoteRenderers = {};
   Map<String, AudioBridgeParticipants> participants = {};
   bool muted = false;
-  bool callStarted=false;
+  bool callStarted = false;
 
   @override
   void initState() {
@@ -47,7 +48,9 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
         });
         allStreams[event.mid!]?.addTrack(event.track!);
         remoteRenderers[event.mid!]?.srcObject = allStreams[event.mid!];
-        remoteRenderers[event.mid!]?.muted = false;
+        if (kIsWeb) {
+          remoteRenderers[event.mid!]?.muted = false;
+        }
       }
     });
 
@@ -124,26 +127,30 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
                 Icons.call,
                 color: Colors.greenAccent,
               ),
-              onPressed: !callStarted?() async {
-                setState(() {
-                  callStarted=!callStarted;
-                });
-                await this.initRenderers();
-                await this.initPlatformState();
-              }:null),
+              onPressed: !callStarted
+                  ? () async {
+                      setState(() {
+                        callStarted = !callStarted;
+                      });
+                      await this.initRenderers();
+                      await this.initPlatformState();
+                    }
+                  : null),
           IconButton(
               icon: Icon(
                 muted ? Icons.volume_off : Icons.volume_up,
                 color: Colors.white,
               ),
-              onPressed: callStarted?() async {
-                if (pluginHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateClosed) {
-                  setState(() {
-                    muted = !muted;
-                  });
-                  await pluginHandle?.configure(muted: muted);
-                }
-              }:null),
+              onPressed: callStarted
+                  ? () async {
+                      if (pluginHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateClosed) {
+                        setState(() {
+                          muted = !muted;
+                        });
+                        await pluginHandle?.configure(muted: muted);
+                      }
+                    }
+                  : null),
           IconButton(
               icon: Icon(
                 Icons.call_end,
@@ -151,7 +158,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
               ),
               onPressed: () {
                 setState(() {
-                  callStarted=!callStarted;
+                  callStarted = !callStarted;
                 });
                 leave();
               }),

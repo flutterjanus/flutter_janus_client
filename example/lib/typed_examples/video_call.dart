@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -112,7 +113,11 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
       if (event.track != null && event.flowing == true) {
         remoteVideoStream?.addTrack(event.track!);
         _remoteVideoRenderer.srcObject = remoteVideoStream;
-        _remoteVideoRenderer.muted = false;
+        // this is done only for web since web api are muted by default for local tagged mediaStream
+        if(kIsWeb){
+          _remoteVideoRenderer.muted = false;
+        }
+
       }
     });
     publishVideo.typedMessages?.listen((even) async {

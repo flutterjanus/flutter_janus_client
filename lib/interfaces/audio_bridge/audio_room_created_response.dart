@@ -11,7 +11,7 @@ class AudioRoomCreatedResponse {
     permanent = json['permanent'];
   }
   String? audiobridge;
-  int? room;
+  dynamic room;
   bool? permanent;
 
   Map<String, dynamic> toJson() {

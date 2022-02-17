@@ -53,7 +53,8 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.2/webrtc_interface/MediaStream-class.html">MediaStream</a>?</span>&gt;</span></span>
-<span class="name ">initializeMediaDevices</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initializeMediaDevices-param-mediaConstraints">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">mediaConstraints</span>}</span></li>
+<span class="name ">initializeMediaDevices</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initializeMediaDevices-param-useDisplayMediaDevices">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">useDisplayMediaDevices</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="initializeMediaDevices-param-mediaConstraints"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">mediaConstraints</span>}</span></li>
 </ol>)
 
       
@@ -62,21 +63,23 @@
     
 <section class="desc markdown">
   <p>method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client</p>
-<p>you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView</p>
+<p><code>useDisplayMediaDevices</code> : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
+<code>mediaConstraints</code> : using this map you can specify media contraits such as resolution and fps etc.
+you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;MediaStream?&gt; initializeMediaDevices({Map&lt;String, dynamic&gt;? mediaConstraints}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;MediaStream?&gt; initializeMediaDevices({bool? useDisplayMediaDevices = false, Map&lt;String, dynamic&gt;? mediaConstraints}) async {
   if (mediaConstraints == null) {
     List&lt;MediaDeviceInfo&gt; audioDevices = await Helper.audiooutputs;
     List&lt;MediaDeviceInfo&gt; videoDevices = await Helper.cameras;
     mediaConstraints = {&quot;audio&quot;: audioDevices.length &gt; 0, &quot;video&quot;: videoDevices.length &gt; 0};
   }
   if (webRTCHandle != null) {
-    webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    webRTCHandle!.localStream = useDisplayMediaDevices == true ? (await navigator.mediaDevices.getDisplayMedia(mediaConstraints)) : (await navigator.mediaDevices.getUserMedia(mediaConstraints));
     if (_context._isUnifiedPlan &amp;&amp; !_context._usePlanB) {
       _context._logger.fine(&#39;using unified plan&#39;);
       webRTCHandle!.localStream!.getTracks().forEach((element) async {

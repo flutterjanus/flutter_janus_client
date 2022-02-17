@@ -22,7 +22,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
   MediaStream? myStream;
-  int myRoom = 1234;
+  String myRoom = "1234";
   Map<int, dynamic> feedStreams = {};
   Map<int?, dynamic> subscriptions = {};
   Map<int, dynamic> feeds = {};
@@ -57,7 +57,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
     print(sources);
-    var start = await remoteHandle?.joinSubscriber(1234, streams: streams);
+    var start = await remoteHandle?.joinSubscriber(myRoom, streams: streams);
     remoteHandle?.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomAttachedEvent) {
@@ -121,7 +121,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       remoteStreams.putIfAbsent(0, () => mystr);
     });
     await plugin.joinPublisher(
-      1234,
+      myRoom,
       displayName: "Shivansh",
     );
     plugin.typedMessages?.listen((event) async {

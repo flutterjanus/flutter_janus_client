@@ -1,5 +1,5 @@
 name: janus_client
-description: janus gateway client for dart
+description: A plugin that allows the flutter app to communicate with a Janus server using different transport mechanisms, such as WebSocket and HTTP(rest). It features a developer-friendly api to interact with various WebRTC Janus Plugins. Hence, it can be considered as a swiss-knife for WebRTC solutions using general purpose webrtc server janus as its backend.
 version: 2.2.0
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 

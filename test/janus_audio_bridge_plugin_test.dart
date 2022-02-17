@@ -18,10 +18,10 @@ void main() async {
       audioBridgePlugin= await session.attach<JanusAudioBridgePlugin>();
     });
     test('Test RtpForward', () async {
-      print(await audioBridgePlugin.rtpForward(1234,"https://janus.conf.meetecho.com",9084));
+      print(await audioBridgePlugin.rtpForward("1234","https://janus.conf.meetecho.com",9084));
     });
     test('mute a Participant', () async {
-      print(await audioBridgePlugin.muteParticipant(1234,3465765,true));
+      print(await audioBridgePlugin.muteParticipant("1234",3465765,true));
     });
   });
 }

@@ -62,7 +62,7 @@ class VideoRoomListResponse {
 
 class JanusVideoRoom {
   JanusVideoRoom({
-      int? room, 
+      dynamic room,
       String? description, 
       bool? pinRequired, 
       bool? isPrivate, 
@@ -144,7 +144,7 @@ class JanusVideoRoom {
     _playoutdelayExt = json['playoutdelay_ext'];
     _transportWideCcExt = json['transport_wide_cc_ext'];
   }
-  int? _room;
+  dynamic _room;
   String? _description;
   bool? _pinRequired;
   bool? _isPrivate;

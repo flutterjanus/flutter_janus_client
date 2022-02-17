@@ -11,7 +11,7 @@ class RtpForwardStopped {
     streamId = json['stream_id'];
   }
   String? audiobridge;
-  int? room;
+  dynamic room;
   int? streamId;
 
   Map<String, dynamic> toJson() {

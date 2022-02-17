@@ -20,7 +20,7 @@ class JanusPlugin {
   bool _initialized = false;
   // internal method which takes care of type of roomId which is normally int but can be string if set in janus config for room
   _handleRoomIdTypeDifference(dynamic payload){
-    payload["room"]=_context._stringIds==false?int.parse(payload["room"] as String):payload["room"];
+    payload["room"]=_context._stringIds==false?payload["room"]:payload["room"].toString();
   }
 
   late Stream<dynamic> _events;

@@ -6,7 +6,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   ///  This allows you to modify the room description, secret, pin and whether it's private or not:
   ///  you won't be able to modify other more static properties, like the room ID, the sampling rate,
   ///  the extensions-related stuff and so on
-  Future<dynamic> editRoom(String roomId,
+  Future<dynamic> editRoom(dynamic roomId,
       {String? secret,
       String? newDescription,
       String? newSecret,
@@ -40,14 +40,14 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// Used to destroy an existing video room, whether created dynamically or statically
-  Future<dynamic> destroyRoom(String roomId, {String? secret, bool? permanent}) async {
+  Future<dynamic> destroyRoom(dynamic roomId, {String? secret, bool? permanent}) async {
     var payload = {"request": "destroy", "room": roomId, if (secret != null) "secret": secret, if (permanent != null) "permanent": permanent};
     _handleRoomIdTypeDifference(payload);
     return (await this.send(data: payload));
   }
 
   ///  Used to create a new video room
-  Future<dynamic> createRoom(String roomId, {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
+  Future<dynamic> createRoom(dynamic roomId, {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
     var payload = {"request": "create", "room": roomId, "permanent": permanent, "description": description, ...?extras};
     if (allowed != null) payload["allowed"] = allowed;
     if (isPrivate != null) payload["is_private"] = isPrivate;
@@ -58,7 +58,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// get list of participants in a existing video room
-  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(String roomId) async {
+  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(dynamic roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
     Map data = await this.send(data: payload);
     _handleRoomIdTypeDifference(payload);
@@ -83,7 +83,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
-  Future<void> joinPublisher(String roomId, {String? pin, int? id, String? token, String? displayName}) async {
+  Future<void> joinPublisher(dynamic roomId, {String? pin, int? id, String? token, String? displayName}) async {
     var payload = {
       "request": "join",
       "ptype": "publisher",
@@ -106,7 +106,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
 
   /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
   Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(
-    String roomId, {
+    dynamic roomId, {
     List<PublisherStream>? streams,
     int? privateId,
     int? feedId,

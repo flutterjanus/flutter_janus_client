@@ -53,10 +53,11 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">joinRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">joinRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-id">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">id</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-group"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">group</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-pin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">pin</span>, </span></li>
+<li><span class="parameter" id="joinRoom-param-expectedLoss"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">expectedLoss</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-display"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">display</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
 <li><span class="parameter" id="joinRoom-param-muted"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">muted</span>, </span></li>
@@ -77,9 +78,8 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusAudioBridgePlugin/joinRoom.html">joinRoom</a></p>
-<p>you use a join request to join an audio room, and wait for the joined event; this event will also include a list of the other participants, if any;<br><br>
-<code>room</code> : numeric ID of the room to join<br>
+  <p>you use a join request to join an audio room, and wait for the joined event; this event will also include a list of the other participants, if any;<br><br>
+<code>roomId</code> : numeric ID of the room to join<br>
 <code>id</code> : unique ID to assign to the participant; optional, assigned by the plugin if missing<br>
 <code>group</code> : "group to assign to this participant (for forwarding purposes only; optional, mandatory if enabled in the room)<br>
 <code>pin</code> : "password required to join the room, if any; optional<br>
@@ -87,15 +87,15 @@
 <code>token</code> : "invitation token, in case the room has an ACL; optional<br>
 <code>muted</code> : true|false, whether to start unmuted or muted<br>
 <code>codec</code> : "codec to use, among opus (default), pcma (A-Law) or pcmu (mu-Law)<br>
-<code>prebuffer</code> : number of packets to buffer before decoding this participant (default=room value, or DEFAULT_PREBUFFERING)<br>
+<code>preBuffer</code> : number of packets to buffer before decoding this participant (default=room value, or DEFAULT_PREBUFFERING)<br>
 <code>bitrate</code> : bitrate to use for the Opus stream in bps; optional, default=0 (libopus decides)<br>
 <code>quality</code> : 0-10, Opus-related complexity to use, the higher the value, the better the quality (but more CPU); optional, default is 4<br>
-<code>expected_loss</code> : 0-20, a percentage of the expected loss (capped at 20%), only needed in case FEC is used; optional, default is 0 (FEC disabled even when negotiated) or the room default<br>
+<code>expectedLoss</code> : 0-20, a percentage of the expected loss (capped at 20%), only needed in case FEC is used; optional, default is 0 (FEC disabled even when negotiated) or the room default<br>
 <code>volume</code> : percent value, &lt;100 reduces volume, &gt;100 increases volume; optional, default is 100 (no volume change)<br>
-<code>spatial_position</code> : in case spatial audio is enabled for the room, panning of this participant (0=left, 50=center, 100=right)<br>
+<code>spatialPosition</code> : in case spatial audio is enabled for the room, panning of this participant (0=left, 50=center, 100=right)<br>
 <code>secret</code> : "room management password; optional, if provided the user is an admin and can't be globally muted with mute_room<br>
-<code>audio_level_average</code> : "if provided, overrides the room audio_level_average for this user; optional<br>
-<code>audio_active_packets</code> : "if provided, overrides the room audio_active_packets for this user; optional<br>
+<code>audioLevelAverage</code> : "if provided, overrides the room audioLevelAverage for this user; optional<br>
+<code>audioActivePackets</code> : "if provided, overrides the room audioActivePackets for this user; optional<br>
 <code>record</code> : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
 <code>filename</code> : "basename of the file to record to, -audio.mjr will be added by the plugin<br></p>
 </section>
@@ -104,10 +104,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinRoom(int roomId,
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinRoom(String roomId,
     {String? id,
     String? group,
     String? pin,
+    int? expectedLoss,
     String? display,
     String? token,
     bool? muted,
@@ -132,15 +133,17 @@
     &quot;muted&quot;: muted,
     &quot;codec&quot;: codec,
     &quot;prebuffer&quot;: preBuffer,
+    &quot;expected_loss&quot;: expectedLoss,
     &quot;quality&quot;: quality,
     &quot;volume&quot;: volume,
     &quot;spatial_position&quot;: spatialPosition,
     &quot;secret&quot;: secret,
     &quot;audio_level_average&quot;: audioLevelAverage,
-    &quot;audio_active_packets&quot;: audioActivePackets,
+    &quot;audioActivePackets&quot;: audioActivePackets,
     &quot;record&quot;: record,
     &quot;filename&quot;: filename
   }..removeWhere((key, value) =&gt; value == null);
+  _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>

@@ -53,7 +53,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
-<span class="name ">editRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="editRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">editRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="editRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="editRoom-param-secret">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">secret</span>, </span></li>
 <li><span class="parameter" id="editRoom-param-newDescription"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newDescription</span>, </span></li>
 <li><span class="parameter" id="editRoom-param-newSecret"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">newSecret</span>, </span></li>
@@ -67,14 +67,13 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusAudioBridgePlugin/editRoom.html">editRoom</a></p>
-<p>Once a room has been created, you can still edit some (but not all) of its properties using the edit request. This allows you to modify the room description, secret, pin and whether it's private or not: you won't be able to modify other more static properties, like the room ID, the sampling rate, the extensions-related stuff and so on. If you're interested in changing the ACL, instead, check the allowed message.<br><br>
-<code>room</code> : unique numeric ID of the room to edit<br>
+  <p>Once a room has been created, you can still edit some (but not all) of its properties using the edit request. This allows you to modify the room description, secret, pin and whether it's private or not: you won't be able to modify other more static properties, like the room ID, the sampling rate, the extensions-related stuff and so on. If you're interested in changing the ACL, instead, check the allowed message.<br><br>
+<code>roomId</code> : unique numeric ID of the room to edit<br>
 <code>secret</code> : room secret, mandatory if configured<br>
-<code>new_description</code> : new pretty name of the room, optional<br>
-<code>new_secret</code> : new password required to edit/destroy the room, optional<br>
-<code>new_pin</code> : new password required to join the room, optional<br>
-<code>new_is_private</code> : true|false, whether the room should appear in a list request<br>
+<code>newDescription</code> : new pretty name of the room, optional<br>
+<code>newSecret</code> : new password required to edit/destroy the room, optional<br>
+<code>newPin</code> : new password required to join the room, optional<br>
+<code>newIsPrivate</code> : true|false, whether the room should appear in a list request<br>
 <code>permanent</code> : true|false, whether the room should be also removed from the config file, default=false</p>
 </section>
 
@@ -82,7 +81,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom(int roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom(String roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
   var payload = {
     &quot;request&quot;: &quot;edit&quot;,
     &quot;room&quot;: roomId,
@@ -93,6 +92,7 @@
     &quot;new_is_private&quot;: newIsPrivate,
     &quot;permanent&quot;: permanent
   }..removeWhere((key, value) =&gt; value == null);
+  _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
   return AudioRoomCreatedResponse.fromJson(response.plugindata?.data);

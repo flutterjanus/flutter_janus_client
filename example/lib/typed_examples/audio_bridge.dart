@@ -20,6 +20,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   Map<String, AudioBridgeParticipants> participants = {};
   bool muted = false;
   bool callStarted = false;
+  String myRoom="1234";
 
   @override
   void initState() {
@@ -35,7 +36,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     session = await j?.createSession();
     pluginHandle = await session?.attach<JanusAudioBridgePlugin>();
     await pluginHandle?.initializeMediaDevices(mediaConstraints: {"audio": true, "video": false});
-    pluginHandle?.joinRoom(1234, display: "Shivansh");
+    pluginHandle?.joinRoom(myRoom, display: "Shivansh");
     pluginHandle?.remoteTrack?.listen((event) async {
       if (event.track != null && event.flowing == true && event.mid != null) {
         setState(() {
@@ -58,7 +59,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
       Object data = event.event.plugindata?.data;
       if (data is AudioBridgeJoinedEvent) {
         await pluginHandle?.configure();
-        var parti = (await pluginHandle?.listParticipants(1234));
+         (await pluginHandle?.listParticipants(myRoom));
         data.participants?.forEach((value) {
           setState(() {
             participants.putIfAbsent(value.id.toString(), () => value);

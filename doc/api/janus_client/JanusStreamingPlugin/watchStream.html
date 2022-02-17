@@ -56,9 +56,9 @@
 <span class="name ">watchStream</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="watchStream-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">id</span>, </span></li>
 <li><span class="parameter" id="watchStream-param-media">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../janus_client/CreateMediaItem-class.html">CreateMediaItem</a></span>&gt;</span>?</span> <span class="parameter-name">media</span>, </span></li>
 <li><span class="parameter" id="watchStream-param-pin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">pin</span>, </span></li>
-<li><span class="parameter" id="watchStream-param-offer_audio"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offer_audio</span>, </span></li>
-<li><span class="parameter" id="watchStream-param-offer_video"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offer_video</span>, </span></li>
-<li><span class="parameter" id="watchStream-param-offer_data"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offer_data</span>}</span></li>
+<li><span class="parameter" id="watchStream-param-offerAudio"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offerAudio</span>, </span></li>
+<li><span class="parameter" id="watchStream-param-offerVideo"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offerVideo</span>, </span></li>
+<li><span class="parameter" id="watchStream-param-offerData"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;It is legacy option,you should use media for fine grade control&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">offerData</span>}</span></li>
 </ol>)
 
       
@@ -74,18 +74,18 @@
   int id, {
   List&lt;CreateMediaItem&gt;? media,
   String? pin,
-  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offer_audio,
-  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offer_video,
-  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offer_data,
+  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offerAudio,
+  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offerVideo,
+  @Deprecated(&#39;It is legacy option,you should use media for fine grade control&#39;) bool? offerData,
 }) async {
   var payload = {
     &quot;request&quot;: &quot;watch&quot;,
     &quot;id&quot;: id,
     if (pin != null) &quot;pin&quot;: pin,
     if (media != null) &quot;media&quot;: media,
-    if (offer_audio != null) &quot;offer_audio&quot;: true,
-    if (offer_video != null) &quot;offer_video&quot;: true,
-    if (offer_data != null) &quot;offer_data&quot;: offer_data
+    if (offerAudio != null) &quot;offer_audio&quot;: true,
+    if (offerVideo != null) &quot;offer_video&quot;: true,
+    if (offerData != null) &quot;offer_data&quot;: offerData
   };
   await this.send(data: payload);
 }</code></pre>

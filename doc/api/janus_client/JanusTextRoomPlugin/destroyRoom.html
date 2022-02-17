@@ -63,8 +63,7 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusTextRoomPlugin/destroyRoom.html">destroyRoom</a><br>
-this can be used to destroy a room .<br>
+  <p>this can be used to destroy a room .<br>
 Notice that, in general, all users can create rooms. If you want to limit this functionality, you can configure an admin admin_key in the plugin settings. When configured, only "create" requests that include the correct admin_key value in an "admin_key" property will succeed, and will be rejected otherwise. Notice that you can optionally extend this functionality to RTP forwarding as well, in order to only allow trusted clients to use that feature.<br><br>
 <code>roomId</code> : unique numeric ID, optional, chosen by plugin if missing.<br>
 <code>permanent</code> : true|false, whether the room should be also removed from the config file; default=false.<br>
@@ -83,6 +82,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     &quot;secret&quot;: secret,
     &quot;permanent&quot;: permanent,
   };
+  _handleRoomIdTypeDifference(payload);
 }</code></pre>
 </section>
 

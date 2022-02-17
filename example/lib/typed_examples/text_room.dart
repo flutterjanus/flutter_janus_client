@@ -169,7 +169,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
     );
   }
   Future<void> sendMessage() async {
-    await textRoom.sendMessage(1234, nameController.text);
+    await textRoom.sendMessage("1234", nameController.text);
     nameController.text = '';
     scrollToBottom();
   }

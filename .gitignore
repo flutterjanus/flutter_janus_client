@@ -9,3 +9,4 @@ janus_client.iml
 .vscode
 example/build/ios
 example/build/flutter_assets
+example/.flutter-plugins-dependencies

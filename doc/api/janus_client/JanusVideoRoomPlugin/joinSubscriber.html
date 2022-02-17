@@ -53,23 +53,34 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span> Function<span class="signature">(<span class="parameter" id="param-audioRecv">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">audioRecv</span>, </span><span class="parameter" id="param-audioSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">audioSend</span>, </span><span class="parameter" id="param-videoRecv"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">videoRecv</span>, </span><span class="parameter" id="param-videoSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">videoSend</span>}</span>)</span></span>&gt;</span></span>
-<span class="name ">joinSubscriber</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinSubscriber-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">joinSubscriber</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinSubscriber-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="joinSubscriber-param-streams">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../janus_client/PublisherStream-class.html">PublisherStream</a></span>&gt;</span>?</span> <span class="parameter-name">streams</span>, </span></li>
 <li><span class="parameter" id="joinSubscriber-param-privateId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">privateId</span>, </span></li>
-<li><span class="parameter" id="joinSubscriber-param-feedId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">feedId</span>}</span></li>
+<li><span class="parameter" id="joinSubscriber-param-feedId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">feedId</span>, </span></li>
+<li><span class="parameter" id="joinSubscriber-param-pin"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">pin</span>, </span></li>
+<li><span class="parameter" id="joinSubscriber-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>}</span></li>
 </ol>)
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>joins the <a href="../../janus_client/JanusVideoRoom-class.html">JanusVideoRoom</a> as a media publisher on provided <code>roomId</code> with its name as <code>displayName</code> and optionally can provide your own <code>id</code>.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;Future&lt;void&gt; Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})&gt; joinSubscriber(int roomId,
-    {List&lt;PublisherStream&gt;? streams, int? privateId, int? feedId}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;Future&lt;void&gt; Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})&gt; joinSubscriber(
+  String roomId, {
+  List&lt;PublisherStream&gt;? streams,
+  int? privateId,
+  int? feedId,
+  String? pin,
+  String? token,
+}) async {
   Future&lt;void&gt; start({audioRecv = true, audioSend = false, videoRecv = true, videoSend = false}) async {
     var payload = {&quot;request&quot;: &quot;start&quot;, &#39;room&#39;: roomId};
     RTCSessionDescription? offer = await this.createNullableAnswer(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
@@ -80,11 +91,14 @@
     &quot;request&quot;: &quot;join&quot;,
     &quot;room&quot;: roomId,
     &quot;ptype&quot;: &quot;subscriber&quot;,
-    if (feedId != null) &quot;feed&quot;: feedId,
-    if (privateId != null) &quot;private_id&quot;: privateId,
-    if (streams != null) &quot;streams&quot;: (streams).map((e) =&gt; e.toMap()).toList(),
-  };
-  Map data = await this.send(data: payload);
+    &quot;pin&quot;: pin,
+    &quot;token&quot;: token,
+    &quot;feed&quot;: feedId,
+    &quot;private_id&quot;: privateId,
+    &quot;streams&quot;: streams?.map((e) =&gt; e.toMap()).toList(),
+  }..removeWhere((key, value) =&gt; value == null);
+  _handleRoomIdTypeDifference(payload);
+  await this.send(data: payload);
   return start;
 }</code></pre>
 </section>

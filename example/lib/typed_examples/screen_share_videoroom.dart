@@ -21,7 +21,7 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
   MediaStream? myStream;
-  int myRoom = 1234;
+  String myRoom = "1234";
   Map<int, dynamic> feedStreams = {};
   Map<int?, dynamic> subscriptions = {};
   Map<int, dynamic> feeds = {};
@@ -40,7 +40,9 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
 
   initialize() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(transport: ws, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+    j = JanusClient(transport: ws,
+        stringIds: false,
+        isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
     session = await j.createSession();
     plugin = await session.attach<JanusVideoRoomPlugin>();
   }
@@ -54,7 +56,7 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
     print(sources);
-    var start = await remoteHandle?.joinSubscriber(1234, streams: streams);
+    var start = await remoteHandle?.joinSubscriber(myRoom, streams: streams);
     remoteHandle?.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomAttachedEvent) {
@@ -105,7 +107,7 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
       remoteStreams.putIfAbsent(0, () => mystr);
     });
     await plugin.joinPublisher(
-      1234,
+      myRoom,
       displayName: "Shivansh",
     );
     var transreciever = await plugin.webRTCHandle?.peerConnection?.transceivers;

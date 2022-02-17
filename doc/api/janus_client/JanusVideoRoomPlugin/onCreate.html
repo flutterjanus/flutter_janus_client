@@ -84,9 +84,9 @@ void onCreate() {
       } else if (typedEvent.event.plugindata?.data[&#39;videoroom&#39;] == &#39;event&#39; &amp;&amp; typedEvent.event.plugindata?.data[&#39;publishers&#39;] != null) {
         typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videoroom&#39;] == &#39;event&#39; &amp;&amp; typedEvent.event.plugindata?.data[&#39;leaving&#39;] != null
-      &amp;&amp; typedEvent.event.plugindata?.data[&#39;leaving&#39;].runtimeType==int
-      ) {
+      } else if (typedEvent.event.plugindata?.data[&#39;videoroom&#39;] == &#39;event&#39; &amp;&amp;
+          typedEvent.event.plugindata?.data[&#39;leaving&#39;] != null &amp;&amp;
+          typedEvent.event.plugindata?.data[&#39;leaving&#39;].runtimeType == int) {
         typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
       } else if (typedEvent.event.plugindata?.data[&#39;videoroom&#39;] == &#39;attached&#39; || typedEvent.event.plugindata?.data[&#39;streams&#39;] != null) {

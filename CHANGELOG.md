@@ -1,3 +1,9 @@
+## 2.2.1
+* fixes issues related to roomId type by converting roomId type to String
+* updated documentation and fixed some docstrings
+* introduced ScreenSharing example using video-room
+* fixed minor bugs in examples when running on macos,linux and windows
+* used transrecievers to mute and unmute tracks
 ## 2.2.0
 * All major plugins fully support unified plan
 * Typed examples updated with null safety and latest dart constraints

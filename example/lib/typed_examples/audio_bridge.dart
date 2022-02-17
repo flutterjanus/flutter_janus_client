@@ -20,7 +20,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   Map<String, AudioBridgeParticipants> participants = {};
   bool muted = false;
   bool callStarted = false;
-  String myRoom="1234";
+  int myRoom=1234;
 
   @override
   void initState() {

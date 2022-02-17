@@ -29,7 +29,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[allowRtpParticipants] : true|false, whether participants should be allowed to join via plain RTP as well, default=false.<br>
   ///[groups] :  non-hierarchical array of string group names to use to gat participants, for external forwarding purposes only, optional.<br>
   ///
-  Future<AudioRoomCreatedResponse> createRoom(String roomId,
+  Future<AudioRoomCreatedResponse> createRoom(dynamic roomId,
       {bool permanent = true,
       String? description,
       String? secret,
@@ -89,7 +89,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[newIsPrivate] : true|false, whether the room should appear in a list request<br>
   ///[permanent] : true|false, whether the room should be also removed from the config file, default=false
   ///
-  Future<dynamic> editRoom(String roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
+  Future<dynamic> editRoom(dynamic roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
     var payload = {
       "request": "edit",
       "room": roomId,
@@ -127,7 +127,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[record] : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
   ///[filename] : "basename of the file to record to, -audio.mjr will be added by the plugin<br>
   ///
-  Future<void> joinRoom(String roomId,
+  Future<void> joinRoom(dynamic roomId,
       {String? id,
       String? group,
       String? pin,
@@ -225,7 +225,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [participantId] unique numeric ID of the participant.<br>
   /// [mute] toggle mute status of the participant.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> muteParticipant(String roomId, int participantId, bool mute, {String? secret}) async {
+  Future<dynamic> muteParticipant(dynamic roomId, int participantId, bool mute, {String? secret}) async {
     var payload = {"request": mute ? 'mute' : 'unmute', "secret": secret, "room": roomId, "id": participantId}..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
@@ -238,7 +238,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// To stop a previously created RTP forwarder.<br>
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [streamId] unique numeric ID of the RTP forwarder.<br>
-  Future<RtpForwardStopped> stopRtpForward(String roomId, int streamId) async {
+  Future<RtpForwardStopped> stopRtpForward(dynamic roomId, int streamId) async {
     var payload = {"request": "stop_rtp_forward", "room": roomId, "stream_id": streamId};
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
@@ -252,7 +252,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [participantId] unique numeric ID of the participant.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> kickParticipant(String roomId, int participantId, {String? secret}) async {
+  Future<dynamic> kickParticipant(dynamic roomId, int participantId, {String? secret}) async {
     var payload = {"request": "kick", "secret": secret, "room": roomId, "id": participantId}..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
@@ -274,7 +274,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [alwaysOn] true|false, whether silence should be forwarded when the room is empty.<br>
   /// [srtpCrypto] key to use as crypto (base64 encoded key as in SDES); optional.<br>
   /// [adminKey] key to use if adminKey is set for rtp forward as well.<br>
-  Future<RtpForwarderCreated> rtpForward(String roomId, String host, int port,
+  Future<RtpForwarderCreated> rtpForward(dynamic roomId, String host, int port,
       {String? group, String? adminKey, String? ssrc, String? codec, String? ptype, int? srtpSuite, bool? alwaysOn, String? hostFamily, String? srtpCrypto}) async {
     var payload = {
       "request": "rtp_forward",
@@ -301,7 +301,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///
   /// To get a list of the participants in a specific room of [roomId]
   ///
-  Future<List<AudioBridgeParticipants>> listParticipants(String roomId) async {
+  Future<List<AudioBridgeParticipants>> listParticipants(dynamic roomId) async {
     var payload = {
       "request": "listparticipants",
       "room": roomId,

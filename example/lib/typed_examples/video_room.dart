@@ -22,7 +22,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
   MediaStream? myStream;
-  String myRoom = "1234";
+  int myRoom = 1234;
   Map<int, dynamic> feedStreams = {};
   Map<int?, dynamic> subscriptions = {};
   Map<int, dynamic> feeds = {};

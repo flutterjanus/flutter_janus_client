@@ -1,3 +1,4 @@
+/// This is a preliminary API providing most WebRTC Operations out of the box using [Janus Server](https://janus.conf.meetecho.com/)
 library janus_client;
 
 import 'package:collection/collection.dart';
@@ -107,6 +108,7 @@ class JanusClient {
   late bool _usePlanB;
   late Logger _logger;
   late Level _loggerLevel;
+  bool? _stringIds;
 
   /*
   * // According to this [Issue](https://github.com/meetecho/janus-gateway/issues/124) we cannot change Data channel Label
@@ -129,6 +131,7 @@ class JanusClient {
   ///
   /// setting usePlanB forces creation of peer connection with plan-b sdb semantics,
   /// and would cause isUnifiedPlan to have no effect on sdpSemantics config
+  /// By default roomId should be numeric in nature although if you have configured [stringIds] to true for room or janus, then you can have non-numeric roomIds.
   JanusClient(
       {required JanusTransport transport,
       List<RTCIceServer>? iceServers,
@@ -136,7 +139,7 @@ class JanusClient {
       String? apiSecret,
       bool isUnifiedPlan = true,
       String? token,
-
+      bool? stringIds=false,
       /// forces creation of peer connection with plan-b sdb semantics
       @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.') bool usePlanB = false,
       Duration? pollingInterval,
@@ -144,6 +147,7 @@ class JanusClient {
       maxEvent = 10,
       loggerLevel = Level.ALL,
       bool withCredentials = false}) {
+    _stringIds=stringIds;
     _transport = transport;
     _isUnifiedPlan = isUnifiedPlan;
     _iceServers = iceServers;

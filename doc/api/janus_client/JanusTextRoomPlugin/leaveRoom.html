@@ -53,7 +53,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">leaveRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="leaveRoom-param-room"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">room</span></span></li>
+<span class="name ">leaveRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="leaveRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span></span></li>
 </ol>)
 
       
@@ -61,19 +61,19 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusTextRoomPlugin/leaveRoom.html">leaveRoom</a></p>
-<p>you use a leave request to leave already joined Text Room, make sure to call <a href="../../janus_client/JanusTextRoomPlugin/setup.html">setup</a> before calling <a href="../../janus_client/JanusTextRoomPlugin/leaveRoom.html">leaveRoom</a><br><br>
-<code>room</code> : numeric ID of the room to join.<br></p>
+  <p>you use a leave request to leave already joined Text Room, make sure to call <a href="../../janus_client/JanusTextRoomPlugin/setup.html">setup</a> before calling <a href="../../janus_client/JanusTextRoomPlugin/leaveRoom.html">leaveRoom</a><br><br>
+<code>roomId</code> : numeric ID of the room to join.<br></p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; leaveRoom(int room) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; leaveRoom(int roomId) async {
   if (setupDone) {
-    _context._logger.fine(&#39;trying to leave room $room&#39;);
-    var payload = {&quot;textroom&quot;: &quot;leave&quot;, &quot;room&quot;: room};
+    _context._logger.fine(&#39;trying to leave room $roomId&#39;);
+    var payload = {&quot;textroom&quot;: &quot;leave&quot;, &quot;room&quot;: roomId};
+    _handleRoomIdTypeDifference(payload);
     await this.sendData(stringify(payload));
   } else {
     _context._logger.shout(

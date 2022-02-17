@@ -49,6 +49,9 @@
 </h1></div>
 
     
+<section class="desc markdown">
+  <p>This is a preliminary API providing most WebRTC Operations out of the box using <a href="https://janus.conf.meetecho.com/">Janus Server</a></p>
+</section>
 
 
     <section class="summary offset-anchor" id="classes">
@@ -365,7 +368,9 @@ transport_wide_cc_ext : false</name>
 
 </dt>
 <dd>
-   
+  This transport class is provided to <a href="../janus_client/JanusClient-class.html">JanusClient</a> instances in transport property in order to <br>
+inform the plugin that we need to use Rest as a transport mechanism for communicating with Janus Server.<br>
+therefore for events sent by Janus server is received with the help of polling. 
 </dd>
 
         <dt id="Result">
@@ -589,7 +594,8 @@ transport_wide_cc_ext : false</name>
 
 </dt>
 <dd>
-   
+  This transport class is provided to <a href="../janus_client/JanusClient-class.html">JanusClient</a> instances in transport property in order to <br>
+inform the plugin that we need to use WebSockets as a transport mechanism for communicating with Janus Server.<br> 
 </dd>
 
       </dl>

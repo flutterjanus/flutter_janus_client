@@ -53,7 +53,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
-<span class="name ">destroyRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="destroyRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">destroyRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="destroyRoom-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="destroyRoom-param-secret">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">secret</span>, </span></li>
 <li><span class="parameter" id="destroyRoom-param-permanent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">permanent</span>}</span></li>
 </ol>)
@@ -70,8 +70,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; destroyRoom(int roomId, {String? secret, bool? permanent}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; destroyRoom(String roomId, {String? secret, bool? permanent}) async {
   var payload = {&quot;request&quot;: &quot;destroy&quot;, &quot;room&quot;: roomId, if (secret != null) &quot;secret&quot;: secret, if (permanent != null) &quot;permanent&quot;: permanent};
+  _handleRoomIdTypeDifference(payload);
   return (await this.send(data: payload));
 }</code></pre>
 </section>

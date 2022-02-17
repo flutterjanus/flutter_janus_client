@@ -6,7 +6,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   ///  This allows you to modify the room description, secret, pin and whether it's private or not:
   ///  you won't be able to modify other more static properties, like the room ID, the sampling rate,
   ///  the extensions-related stuff and so on
-  Future<dynamic> editRoom(int roomId,
+  Future<dynamic> editRoom(String roomId,
       {String? secret,
       String? newDescription,
       String? newSecret,
@@ -35,29 +35,33 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       if (newLockRecord != null) "new_lock_record": newLockRecord,
       if (permanent != null) "permanent": permanent
     };
+    _handleRoomIdTypeDifference(payload);
     return (await this.send(data: payload));
   }
 
   /// Used to destroy an existing video room, whether created dynamically or statically
-  Future<dynamic> destroyRoom(int roomId, {String? secret, bool? permanent}) async {
+  Future<dynamic> destroyRoom(String roomId, {String? secret, bool? permanent}) async {
     var payload = {"request": "destroy", "room": roomId, if (secret != null) "secret": secret, if (permanent != null) "permanent": permanent};
+    _handleRoomIdTypeDifference(payload);
     return (await this.send(data: payload));
   }
 
   ///  Used to create a new video room
-  Future<dynamic> createRoom(int roomId, {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
+  Future<dynamic> createRoom(String roomId, {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
     var payload = {"request": "create", "room": roomId, "permanent": permanent, "description": description, ...?extras};
     if (allowed != null) payload["allowed"] = allowed;
     if (isPrivate != null) payload["is_private"] = isPrivate;
     if (secret != null) payload['secret'] = secret;
     if (pin != null) payload['pin'] = pin;
+    _handleRoomIdTypeDifference(payload);
     return (await this.send(data: payload));
   }
 
   /// get list of participants in a existing video room
-  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(int roomId) async {
+  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(String roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
     Map data = await this.send(data: payload);
+    _handleRoomIdTypeDifference(payload);
     return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(data, VideoRoomListParticipantsResponse.fromJson);
   }
 
@@ -78,16 +82,19 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     return _getPluginDataFromPayload<VideoRoomListResponse>(data, VideoRoomListResponse.fromJson);
   }
 
-  Future<void> joinPublisher(int roomId, {int? id, String? token, String? displayName}) async {
+  /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
+  Future<void> joinPublisher(String roomId, {String? pin, int? id, String? token, String? displayName}) async {
     var payload = {
       "request": "join",
       "ptype": "publisher",
       "room": roomId,
-      if (id != null) "id": id,
-      if (displayName != null) "display": displayName,
-      if (token != null) "token": token,
-    };
-    Map data = await this.send(data: payload);
+      "pin": pin,
+      "id": id,
+      "display": displayName,
+      "token": token,
+    }..removeWhere((key, value) => value == null);
+    _handleRoomIdTypeDifference(payload);
+    await this.send(data: payload);
   }
 
   Future<void> subscribeToStreams(List<PublisherStream> streams) async {
@@ -97,8 +104,15 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     }
   }
 
-  Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(int roomId,
-      {List<PublisherStream>? streams, int? privateId, int? feedId}) async {
+  /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
+  Future<Future<void> Function({String? audioRecv, String? audioSend, String? videoRecv, String? videoSend})> joinSubscriber(
+    String roomId, {
+    List<PublisherStream>? streams,
+    int? privateId,
+    int? feedId,
+    String? pin,
+    String? token,
+  }) async {
     Future<void> start({audioRecv = true, audioSend = false, videoRecv = true, videoSend = false}) async {
       var payload = {"request": "start", 'room': roomId};
       RTCSessionDescription? offer = await this.createNullableAnswer(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
@@ -109,14 +123,17 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "request": "join",
       "room": roomId,
       "ptype": "subscriber",
-      if (feedId != null) "feed": feedId,
-      if (privateId != null) "private_id": privateId,
-      if (streams != null) "streams": (streams).map((e) => e.toMap()).toList(),
-    };
-    Map data = await this.send(data: payload);
+      "pin": pin,
+      "token": token,
+      "feed": feedId,
+      "private_id": privateId,
+      "streams": streams?.map((e) => e.toMap()).toList(),
+    }..removeWhere((key, value) => value == null);
+    _handleRoomIdTypeDifference(payload);
+    await this.send(data: payload);
     return start;
   }
-
+  /// sends the publish request to [JanusVideoRoom]. It should be called once [VideoRoomJoinedEvent] is received from server.
   Future<void> publishMedia(
       {String? audioCodec,
       String? videCodec,
@@ -126,23 +143,27 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       String? newDisplayName,
       int? audioLevelAverage,
       int? audioActivePackets,
-      List<Map<String, String>>? descriptions}) async {
+      List<Map<String, String>>? descriptions,
+      RTCSessionDescription? offer}) async {
     var payload = {
       "request": "publish",
-      if (audioCodec != null) "audiocodec": audioCodec,
-      if (videCodec != null) "videocodec": videCodec,
-      if (bitrate != null) "bitrate": bitrate,
-      if (record != null) "record": record,
-      if (filename != null) "filename": filename,
-      if (newDisplayName != null) "display": newDisplayName,
-      if (audioLevelAverage != null) "audio_level_average": audioLevelAverage,
-      if (audioActivePackets != null) "audio_active_packets": audioActivePackets,
-      if (descriptions != null) "descriptions": descriptions
-    };
-    RTCSessionDescription offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
-    Map data = await this.send(data: payload, jsep: offer);
+      "audiocodec": audioCodec,
+      "videocodec": videCodec,
+      "bitrate": bitrate,
+      "record": record,
+      "filename": filename,
+      "display": newDisplayName,
+      "audio_level_average": audioLevelAverage,
+      "audio_active_packets": audioActivePackets,
+      "descriptions": descriptions
+    }..removeWhere((key, value) => value == null);
+    if (offer == null) {
+      offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+    }
+    await this.send(data: payload, jsep: offer);
   }
 
+  /// sends hangup request on current active [JanusVideoRoomPlugin] to tear off active PeerConnection in-effect leaving the room.
   Future<void> hangup() async {
     await super.hangup();
     await this.send(data: {"request": "leave"});
@@ -165,9 +186,9 @@ class JanusVideoRoomPlugin extends JanusPlugin {
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['publishers'] != null) {
           typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' && typedEvent.event.plugindata?.data['leaving'] != null
-        && typedEvent.event.plugindata?.data['leaving'].runtimeType==int
-        ) {
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
+            typedEvent.event.plugindata?.data['leaving'] != null &&
+            typedEvent.event.plugindata?.data['leaving'].runtimeType == int) {
           typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'attached' || typedEvent.event.plugindata?.data['streams'] != null) {

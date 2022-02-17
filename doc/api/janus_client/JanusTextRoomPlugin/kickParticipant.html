@@ -53,7 +53,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
-<span class="name ">kickParticipant</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="kickParticipant-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">kickParticipant</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="kickParticipant-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="kickParticipant-param-username"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">username</span>, </span></li>
 <li><span class="parameter" id="kickParticipant-param-secret">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">secret</span>}</span></li>
 </ol>)
@@ -63,8 +63,7 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusTextRoomPlugin/kickParticipant.html">kickParticipant</a></p>
-<p>If you're the administrator of a room (that is, you created it and have access to the secret) you can kick out individual participant.
+  <p>If you're the administrator of a room (that is, you created it and have access to the secret) you can kick out individual participant.
 <code>roomId</code> unique numeric ID of the room to stop the forwarder from.<br>
 <code>username</code> username of the participant to kick.<br>
 <code>secret</code> admin secret should be provided if configured.<br></p>
@@ -74,7 +73,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; kickParticipant(int roomId, String username,
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; kickParticipant(String roomId, String username,
     {String? secret}) async {
   var payload = {
     &quot;request&quot;: &quot;kick&quot;,
@@ -82,6 +81,7 @@
     &quot;room&quot;: roomId,
     &quot;username&quot;: username
   }..removeWhere((key, value) =&gt; value == null);
+  _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
   return response.plugindata?.data;

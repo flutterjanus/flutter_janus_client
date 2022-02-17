@@ -18,6 +18,10 @@ class JanusPlugin {
   late JanusSession? _session;
   String? plugin;
   bool _initialized = false;
+  // internal method which takes care of type of roomId which is normally int but can be string if set in janus config for room
+  _handleRoomIdTypeDifference(dynamic payload){
+    payload["room"]=_context._stringIds==false?int.parse(payload["room"] as String):payload["room"];
+  }
 
   late Stream<dynamic> _events;
   Stream<EventMessage>? messages;
@@ -70,14 +74,14 @@ class JanusPlugin {
       }
       _context._logger.fine('peer connection configuration');
       _context._logger.fine(configuration);
-      // todo: initialize stream controllers and streams
+      //initialize stream controllers and streams
       _initStreamControllersAndStreams();
       RTCPeerConnection peerConnection = await createPeerConnection(configuration, {});
-      //todo: add Event emitter logic
+      //add Event emitter logic
       _handleEventMessageEmitter();
-      //todo: unified plan webrtc tracks emitter
+      //unified plan webrtc tracks emitter
       _handleUnifiedWebRTCTracksEmitter(peerConnection);
-      //todo: send ice candidates to janus server on this specific handle
+      //send ice candidates to janus server on this specific handle
       _handleIceCandidatesSending(peerConnection);
       webRTCHandle = JanusWebRTCHandle(peerConnection: peerConnection);
       this.pollingActive = true;

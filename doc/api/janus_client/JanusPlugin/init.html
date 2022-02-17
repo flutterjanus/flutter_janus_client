@@ -84,14 +84,14 @@
     }
     _context._logger.fine(&#39;peer connection configuration&#39;);
     _context._logger.fine(configuration);
-    &#47;&#47; todo: initialize stream controllers and streams
+    &#47;&#47;initialize stream controllers and streams
     _initStreamControllersAndStreams();
     RTCPeerConnection peerConnection = await createPeerConnection(configuration, {});
-    &#47;&#47;todo: add Event emitter logic
+    &#47;&#47;add Event emitter logic
     _handleEventMessageEmitter();
-    &#47;&#47;todo: unified plan webrtc tracks emitter
+    &#47;&#47;unified plan webrtc tracks emitter
     _handleUnifiedWebRTCTracksEmitter(peerConnection);
-    &#47;&#47;todo: send ice candidates to janus server on this specific handle
+    &#47;&#47;send ice candidates to janus server on this specific handle
     _handleIceCandidatesSending(peerConnection);
     webRTCHandle = JanusWebRTCHandle(peerConnection: peerConnection);
     this.pollingActive = true;

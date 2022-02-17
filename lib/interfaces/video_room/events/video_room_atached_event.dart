@@ -17,7 +17,7 @@ class VideoRoomAttachedEvent {
     }
   }
   String? videoroom;
-  int? room;
+  dynamic room;
   List<AttachedStreams>? streams;
 
   Map<String, dynamic> toJson() {

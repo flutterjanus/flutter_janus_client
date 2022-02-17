@@ -11,7 +11,7 @@ class AudioBridgeConfiguredEvent {
     result = json['result'];
   }
   String? audiobridge;
-  int? room;
+  dynamic room;
   String? result;
 
   Map<String, dynamic> toJson() {

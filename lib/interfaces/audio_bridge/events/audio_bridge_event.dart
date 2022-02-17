@@ -1,7 +1,7 @@
 part of janus_client;
 class AudioBridgeEvent{
   String? audiobridge;
-  late int room;
+  dynamic room;
 
 
 //<editor-fold desc="Data Methods">

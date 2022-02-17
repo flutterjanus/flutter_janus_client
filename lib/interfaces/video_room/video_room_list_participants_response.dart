@@ -16,7 +16,7 @@ class VideoRoomListParticipantsResponse {
     }
   }
   String? videoroom;
-  int? room;
+  dynamic room;
   List<Participants>? participants;
 
   Map<String, dynamic> toJson() {

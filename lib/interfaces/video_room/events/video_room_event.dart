@@ -1,7 +1,7 @@
 part of janus_client;
 class VideoRoomEvent{
   late String videoroom;
-  late int room;
+  dynamic room;
 
 
 //<editor-fold desc="Data Methods">

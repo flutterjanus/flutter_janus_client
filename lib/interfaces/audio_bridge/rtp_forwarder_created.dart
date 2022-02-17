@@ -17,7 +17,7 @@ class RtpForwarderCreated {
     port = json['port'];
   }
   String? audiobridge;
-  int? room;
+  dynamic room;
   String? group;
   int? streamId;
   String? host;

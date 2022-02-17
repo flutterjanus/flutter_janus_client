@@ -15,6 +15,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
   List<dynamic> textMessages = [];
   Map<String, String> userNameDisplayMap = {};
   late RestJanusTransport rest;
+  int myRoom=1234;
   late WebSocketJanusTransport ws;
   TextEditingController nameController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
@@ -40,7 +41,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
 
   leave() async {
     try {
-      await textRoom.leaveRoom(1234);
+      await textRoom.leaveRoom(myRoom);
       setState(() {
         userNameDisplayMap = {};
         textMessages = [];
@@ -73,7 +74,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
                       child: ElevatedButton(
                           onPressed: () async {
                             await textRoom.joinRoom(
-                                1234, userNameController.text,
+                                myRoom, userNameController.text,
                                 display: userNameController.text);
                             Navigator.of(context).pop(dialog);
                           },
@@ -169,7 +170,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
     );
   }
   Future<void> sendMessage() async {
-    await textRoom.sendMessage("1234", nameController.text);
+    await textRoom.sendMessage(myRoom, nameController.text);
     nameController.text = '';
     scrollToBottom();
   }

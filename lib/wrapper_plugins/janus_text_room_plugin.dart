@@ -92,7 +92,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[ack] : true|false, whether the sender wants an ack for the sent message(s); optional, true by default <br>.
   ///[to] : username to send the message to; optional, only needed in case of private messages. <br>
   ///[tos] : array of usernames to send the message to; optional, only needed in case of private messages. <br>
-  Future<void> sendMessage(String roomId, String text,
+  Future<void> sendMessage(dynamic roomId, String text,
       {bool? ack, String? to, List<String>? tos}) async {
     if (setupDone) {
       var message = {
@@ -121,7 +121,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
     };
   }
 
-  Future<dynamic> listParticipants(String roomId) async {
+  Future<dynamic> listParticipants(dynamic roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
   }
 
@@ -133,7 +133,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [username] username of the participant to kick.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> kickParticipant(String roomId, String username,
+  Future<dynamic> kickParticipant(dynamic roomId, String username,
       {String? secret}) async {
     var payload = {
       "request": "kick",

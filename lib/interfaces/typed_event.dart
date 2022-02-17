@@ -120,7 +120,7 @@ class Plugindata {
 }
 
 class JanusError {
-  int error_code;
+  int errorCode;
   String error;
   String pluginName;
 
@@ -133,30 +133,30 @@ class JanusError {
 //<editor-fold desc="Data Methods">
 
   JanusError({
-    required this.error_code,
+    required this.errorCode,
     required this.error,
     required this.pluginName,
   });
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is JanusError && runtimeType == other.runtimeType && error_code == other.error_code && error == other.error && pluginName == other.pluginName);
+      identical(this, other) || (other is JanusError && runtimeType == other.runtimeType && errorCode == other.errorCode && error == other.error && pluginName == other.pluginName);
 
   @override
-  int get hashCode => error_code.hashCode ^ error.hashCode ^ pluginName.hashCode;
+  int get hashCode => errorCode.hashCode ^ error.hashCode ^ pluginName.hashCode;
 
   @override
   String toString() {
-    return 'JanusError{' + ' error_code: $error_code,' + ' error: $error,' + ' pluginName: $pluginName,' + '}';
+    return 'JanusError{' + ' error_code: $errorCode,' + ' error: $error,' + ' pluginName: $pluginName,' + '}';
   }
 
   JanusError copyWith({
-    int? error_code,
+    int? errorCode,
     String? error,
     String? pluginName,
   }) {
     return JanusError(
-      error_code: error_code ?? this.error_code,
+      errorCode: errorCode ?? this.errorCode,
       error: error ?? this.error,
       pluginName: pluginName ?? this.pluginName,
     );
@@ -164,7 +164,7 @@ class JanusError {
 
   Map<String, dynamic> toMap() {
     return {
-      'error_code': this.error_code,
+      'error_code': this.errorCode,
       'error': this.error,
       'pluginName': this.pluginName,
     };
@@ -172,7 +172,7 @@ class JanusError {
 
   factory JanusError.fromMap(Map<String, dynamic> map) {
     return JanusError(
-      error_code: map['error_code'] as int,
+      errorCode: map['error_code'] as int,
       error: map['error'] as String,
       pluginName: map.entries.where((element) => element.value == 'event').first.key,
     );

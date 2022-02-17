@@ -53,7 +53,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
-<span class="name ">createRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="createRoom-param-roomId">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">createRoom</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="createRoom-param-roomId">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="createRoom-param-adminKey"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">adminKey</span>, </span></li>
 <li><span class="parameter" id="createRoom-param-description"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">description</span>, </span></li>
 <li><span class="parameter" id="createRoom-param-secret"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">secret</span>, </span></li>
@@ -68,8 +68,7 @@
     </section>
     
 <section class="desc markdown">
-  <p><a href="../../janus_client/JanusTextRoomPlugin/createRoom.html">createRoom</a><br>
-this can be used to create a new text room .<br>
+  <p>this can be used to create a new text room .<br>
 Notice that, in general, all users can create rooms. If you want to limit this functionality, you can configure an admin admin_key in the plugin settings. When configured, only "create" requests that include the correct admin_key value in an "admin_key" property will succeed, and will be rejected otherwise. Notice that you can optionally extend this functionality to RTP forwarding as well, in order to only allow trusted clients to use that feature.<br><br>
 <code>roomId</code> : unique numeric ID, optional, chosen by plugin if missing.<br>
 <code>permanent</code> : true|false, whether the room should be saved in the config file, default=false.<br>
@@ -86,7 +85,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; createRoom(
-    {int? roomId,
+    {String? roomId,
     String? adminKey,
     String? description,
     String? secret,
@@ -105,6 +104,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     &quot;history&quot;: history,
     &quot;permanent&quot;: permanent,
   };
+  _handleRoomIdTypeDifference(payload);
 }</code></pre>
 </section>
 

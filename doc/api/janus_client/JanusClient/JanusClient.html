@@ -56,6 +56,7 @@
 <li><span class="parameter" id="-param-apiSecret"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">apiSecret</span>, </span></li>
 <li><span class="parameter" id="-param-isUnifiedPlan"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isUnifiedPlan</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
+<li><span class="parameter" id="-param-stringIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">stringIds</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-usePlanB"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">usePlanB</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-pollingInterval"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">pollingInterval</span>, </span></li>
 <li><span class="parameter" id="-param-loggerName"><span class="type-annotation">dynamic</span> <span class="parameter-name">loggerName</span> = <span class="default-value">&quot;JanusClient&quot;</span>, </span></li>
@@ -69,7 +70,8 @@
 <section class="desc markdown">
   <p>JanusClient</p>
 <p>setting usePlanB forces creation of peer connection with plan-b sdb semantics,
-and would cause isUnifiedPlan to have no effect on sdpSemantics config</p>
+and would cause isUnifiedPlan to have no effect on sdpSemantics config
+By default roomId should be numeric in nature although if you have configured <code>stringIds</code> to true for room or janus, then you can have non-numeric roomIds.</p>
 </section>
 
 
@@ -83,7 +85,7 @@ and would cause isUnifiedPlan to have no effect on sdpSemantics config</p>
     String? apiSecret,
     bool isUnifiedPlan = true,
     String? token,
-
+    bool? stringIds=false,
     &#47;&#47;&#47; forces creation of peer connection with plan-b sdb semantics
     @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;) bool usePlanB = false,
     Duration? pollingInterval,
@@ -91,6 +93,7 @@ and would cause isUnifiedPlan to have no effect on sdpSemantics config</p>
     maxEvent = 10,
     loggerLevel = Level.ALL,
     bool withCredentials = false}) {
+  _stringIds=stringIds;
   _transport = transport;
   _isUnifiedPlan = isUnifiedPlan;
   _iceServers = iceServers;

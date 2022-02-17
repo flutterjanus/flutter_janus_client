@@ -34,18 +34,18 @@ class JanusStreamingPlugin extends JanusPlugin {
   ///        rtsp = stream originated by an external RTSP feed (only
   ///               available if libcurl support was compiled)
   Future<StreamingMount?> createStream(String type,
-      {String? name, String? description, String? metadata, int? id, String? pin, List<CreateMediaItem>? media, String? secret, bool? is_private, bool? permanent, String? admin_key}) async {
+      {String? name, String? description, String? metadata, int? id, String? pin, List<CreateMediaItem>? media, String? secret, bool? isPrivate, bool? permanent, String? adminKey}) async {
     var payload = {
       "request": "create",
       "type": type,
-      if (admin_key != null) "admin_key": admin_key,
+      if (adminKey != null) "admin_key": adminKey,
       if (id != null) "id": id,
       if (name != null) "name": name,
       if (description != null) "description": description,
       if (metadata != null) "metadata": metadata,
       if (secret != null) "secret": secret,
       if (pin != null) "pin": pin,
-      if (is_private != null) "is_private": is_private,
+      if (isPrivate != null) "is_private": isPrivate,
       if (permanent != null) "permanent": permanent,
       if (media != null) "media": media,
     };
@@ -92,23 +92,23 @@ class JanusStreamingPlugin extends JanusPlugin {
     int id, {
     List<CreateMediaItem>? media,
     String? pin,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offer_audio,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offer_video,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offer_data,
+    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerAudio,
+    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerVideo,
+    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerData,
   }) async {
     var payload = {
       "request": "watch",
       "id": id,
       if (pin != null) "pin": pin,
       if (media != null) "media": media,
-      if (offer_audio != null) "offer_audio": true,
-      if (offer_video != null) "offer_video": true,
-      if (offer_data != null) "offer_data": offer_data
+      if (offerAudio != null) "offer_audio": true,
+      if (offerVideo != null) "offer_video": true,
+      if (offerData != null) "offer_data": offerData
     };
     await this.send(data: payload);
   }
 
-  /// start stream if watch request is successfully completed
+  /// call this method once watch request is successfully completed
   Future<void> startStream() async {
     if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
       await send(data: {"request": "start"});

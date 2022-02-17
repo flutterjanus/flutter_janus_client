@@ -62,7 +62,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">factory JanusError.fromMap(Map&lt;String, dynamic&gt; map) {
   return JanusError(
-    error_code: map[&#39;error_code&#39;] as int,
+    errorCode: map[&#39;error_code&#39;] as int,
     error: map[&#39;error&#39;] as String,
     pluginName: map.entries.where((element) =&gt; element.value == &#39;event&#39;).first.key,
   );
@@ -99,7 +99,7 @@
       <a href="../../janus_client/JanusError-class.html#instance-properties">Properties</a>
     </li>
     <li><a href="../../janus_client/JanusError/error.html">error</a></li>
-    <li><a href="../../janus_client/JanusError/error_code.html">error_code</a></li>
+    <li><a href="../../janus_client/JanusError/errorCode.html">errorCode</a></li>
     <li><a href="../../janus_client/JanusError/hashCode.html">hashCode</a></li>
     <li><a href="../../janus_client/JanusError/pluginName.html">pluginName</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>

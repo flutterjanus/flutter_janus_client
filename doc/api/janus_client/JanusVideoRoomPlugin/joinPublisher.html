@@ -53,8 +53,9 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">joinPublisher</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinPublisher-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">roomId</span>, </span></li>
-<li><span class="parameter" id="joinPublisher-param-id">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">id</span>, </span></li>
+<span class="name ">joinPublisher</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinPublisher-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<li><span class="parameter" id="joinPublisher-param-pin">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">pin</span>, </span></li>
+<li><span class="parameter" id="joinPublisher-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">id</span>, </span></li>
 <li><span class="parameter" id="joinPublisher-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
 <li><span class="parameter" id="joinPublisher-param-displayName"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">displayName</span>}</span></li>
 </ol>)
@@ -63,21 +64,26 @@
 
     </section>
     
+<section class="desc markdown">
+  <p>joins the <a href="../../janus_client/JanusVideoRoom-class.html">JanusVideoRoom</a> as a media publisher on provided <code>roomId</code> with its name as <code>displayName</code> and optionally can provide your own <code>id</code>.</p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinPublisher(int roomId, {int? id, String? token, String? displayName}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinPublisher(String roomId, {String? pin, int? id, String? token, String? displayName}) async {
   var payload = {
     &quot;request&quot;: &quot;join&quot;,
     &quot;ptype&quot;: &quot;publisher&quot;,
     &quot;room&quot;: roomId,
-    if (id != null) &quot;id&quot;: id,
-    if (displayName != null) &quot;display&quot;: displayName,
-    if (token != null) &quot;token&quot;: token,
-  };
-  Map data = await this.send(data: payload);
+    &quot;pin&quot;: pin,
+    &quot;id&quot;: id,
+    &quot;display&quot;: displayName,
+    &quot;token&quot;: token,
+  }..removeWhere((key, value) =&gt; value == null);
+  _handleRoomIdTypeDifference(payload);
+  await this.send(data: payload);
 }</code></pre>
 </section>
 

@@ -154,6 +154,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         await destroy();
       }
       publishVideo.handleRemoteJsep(even.jsep);
+    },onError:(error){
+      print(error);
     });
     await openRegisterDialog();
   }

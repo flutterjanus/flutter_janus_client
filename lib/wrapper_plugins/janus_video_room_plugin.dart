@@ -195,6 +195,10 @@ class JanusVideoRoomPlugin extends JanusPlugin {
           typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         }
+        else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
+            typedEvent.event.plugindata?.data['error_code'] != null) {
+          _typedMessagesSink?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
+        }
       });
     }
   }

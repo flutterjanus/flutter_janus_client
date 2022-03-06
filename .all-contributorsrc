@@ -64,6 +64,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "baihua666",
+      "name": "baihua666",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5125983?v=4",
+      "profile": "https://github.com/baihua666",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

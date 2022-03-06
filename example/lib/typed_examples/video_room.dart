@@ -78,6 +78,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         await remoteHandle?.handleRemoteJsep(event.jsep);
         await start!();
       }
+    }, onError: (error, trace) {
+      if (error is JanusError) {
+        print(error.toMap());
+      }
     });
     remoteHandle?.remoteTrack?.listen((event) async {
       String mid = event.mid!;
@@ -94,10 +98,9 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
           remoteStreams[feedId]?.video.addTrack(event.track!);
           remoteStreams[feedId]?.videoRenderer.srcObject =
               remoteStreams[feedId]?.video;
-          if(kIsWeb){
+          if (kIsWeb) {
             remoteStreams[feedId]?.videoRenderer.muted = false;
           }
-
         }
       }
     });
@@ -106,24 +109,21 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
 
   Future<void> joinRoom() async {
     var devices = await navigator.mediaDevices.enumerateDevices();
-    Map<String,dynamic> constrains = {};
+    Map<String, dynamic> constrains = {};
     devices.map((e) => e.kind.toString()).forEach((element) {
       String dat = element.split('input')[0];
       dat = dat.split('output')[0];
       constrains.putIfAbsent(dat, () => true);
     });
-    myStream = await plugin.initializeMediaDevices(
-        mediaConstraints: constrains);
+    myStream =
+        await plugin.initializeMediaDevices(mediaConstraints: constrains);
     RemoteStream mystr = RemoteStream('0');
     await mystr.init();
     mystr.videoRenderer.srcObject = myStream;
     setState(() {
       remoteStreams.putIfAbsent(0, () => mystr);
     });
-    await plugin.joinPublisher(
-      myRoom,
-      displayName: "Shivansh",
-    );
+    await plugin.joinPublisher(myRoom, displayName: "Shivansh");
     plugin.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
@@ -176,8 +176,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         print('typed event with jsep' + event.jsep.toString());
         await plugin.handleRemoteJsep(event.jsep);
       }
-    },onError:(error){
-      print(error);
+    }, onError: (error, trace) {
+      if (error is JanusError) {
+        print(error.toMap());
+      }
     });
   }
 
@@ -259,35 +261,30 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                   Icons.switch_camera,
                   color: Colors.white,
                 ),
-                onPressed: () {
-
-                })
+                onPressed: () {})
           ],
           title: const Text('janus_client'),
         ),
         body: GridView.builder(
             gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
             itemCount:
-            remoteStreams.entries
-                .map((e) => e.value)
-                .toList()
-                .length,
+                remoteStreams.entries.map((e) => e.value).toList().length,
             itemBuilder: (context, index) {
               List<RemoteStream> items =
-              remoteStreams.entries.map((e) => e.value).toList();
+                  remoteStreams.entries.map((e) => e.value).toList();
               RemoteStream remoteStream = items[index];
               return Stack(
                 children: [
                   RTCVideoView(remoteStream.audioRenderer,
                       filterQuality: FilterQuality.high,
                       objectFit:
-                      RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       mirror: true),
                   RTCVideoView(remoteStream.videoRenderer,
                       filterQuality: FilterQuality.high,
                       objectFit:
-                      RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
                       mirror: true)
                 ],
               );

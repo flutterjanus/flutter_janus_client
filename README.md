@@ -13,6 +13,7 @@ it easily integrates into your flutter application and allows you to build webrt
 
 
 ## News & Updates
+- Added errorHandler for typedMessage Stream for better development flow
 - Just like new flutter version comes With desktop support out of the box
 - All major plugins fully support unified plan
 - Typed examples updated with null safety and latest dart constraints

@@ -51,5 +51,6 @@ build/kotlin
 build/macos/
 build/windows/
 build/linux/
+example/.flutter-plugins-dependencies
 
 build/path_provider_android

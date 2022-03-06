@@ -12,16 +12,16 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.8.2
+  flutter_webrtc: ^0.8.3
 #    path: '../flutter-webrtc'
   path_provider: ^2.0.9
   http: ^0.13.4
   web_socket_channel: ^2.1.0
   stream_channel: ^2.1.0
-  uuid: ^3.0.5
+  uuid: ^3.0.6
   logging: ^1.0.2
   collection: ^1.15.0
-  dartdoc: ^5.0.0
+  dartdoc: ^5.0.1
 
 
 

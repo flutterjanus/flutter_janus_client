@@ -152,7 +152,7 @@ class JanusClient {
     _isUnifiedPlan = isUnifiedPlan;
     _iceServers = iceServers;
     _refreshInterval = refreshInterval;
-    _apiSecret = _apiSecret;
+    _apiSecret = apiSecret;
     _loggerName = loggerName;
     _maxEvent = maxEvent;
     _loggerLevel = loggerLevel;

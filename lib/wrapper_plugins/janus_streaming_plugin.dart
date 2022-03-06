@@ -151,6 +151,11 @@ class JanusStreamingPlugin extends JanusPlugin {
           typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
           _typedMessagesSink?.add(typedEvent);
         }
+        /// not tested
+        else if (typedEvent.event.plugindata?.data['streaming'] == 'event' &&
+            typedEvent.event.plugindata?.data['error_code'] != null) {
+          _typedMessagesSink?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
+        }
       });
     }
   }

@@ -176,6 +176,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         print('typed event with jsep' + event.jsep.toString());
         await plugin.handleRemoteJsep(event.jsep);
       }
+    },onError:(error){
+      print(error);
     });
   }
 

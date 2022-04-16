@@ -13,6 +13,8 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'dart:convert';
+
 
 part 'janus_session.dart';
 
@@ -89,7 +91,7 @@ part './interfaces/audio_bridge/rtp_forwarder_created.dart';
 part './interfaces/audio_bridge/events/audio_bridge_configured_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_event.dart';
-
+part './interfaces/audio_bridge/events/audio_bridge_talking_event.dart';
 part './interfaces/audio_bridge/events/audio_bridge_joined_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_leaving_event.dart';
@@ -139,15 +141,17 @@ class JanusClient {
       String? apiSecret,
       bool isUnifiedPlan = true,
       String? token,
-      bool? stringIds=false,
+      bool? stringIds = false,
+
       /// forces creation of peer connection with plan-b sdb semantics
-      @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.') bool usePlanB = false,
+      @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.')
+          bool usePlanB = false,
       Duration? pollingInterval,
       loggerName = "JanusClient",
       maxEvent = 10,
       loggerLevel = Level.ALL,
       bool withCredentials = false}) {
-    _stringIds=stringIds;
+    _stringIds = stringIds;
     _transport = transport;
     _isUnifiedPlan = isUnifiedPlan;
     _iceServers = iceServers;
@@ -172,7 +176,10 @@ class JanusClient {
   Future<JanusSession> createSession() async {
     _logger.info("Creating Session");
     _logger.fine("fine message");
-    JanusSession session = JanusSession(refreshInterval: _refreshInterval, transport: _transport, context: this);
+    JanusSession session = JanusSession(
+        refreshInterval: _refreshInterval,
+        transport: _transport,
+        context: this);
     try {
       await session.create();
     } catch (e) {

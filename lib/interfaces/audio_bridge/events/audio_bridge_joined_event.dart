@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of janus_client;
 
 class AudioBridgeJoinedEvent extends AudioBridgeEvent {
@@ -43,13 +44,21 @@ class AudioBridgeJoinedEvent extends AudioBridgeEvent {
 }
 
 class AudioBridgeParticipants {
+  int? id;
+  String? display;
+  bool? setup;
+  bool? muted;
+  bool? talking;
+  int? spatialPosition;
+  
   AudioBridgeParticipants({
-      this.id, 
+    this.id,
     this.display,
-      required this.setup,
-      required this.muted,
-      required this.talking,
-      this.spatialPosition,});
+     this.setup=false,
+    this.muted=false,
+    this.talking=false,
+    this.spatialPosition,
+  });
 
   AudioBridgeParticipants.fromJson(dynamic json) {
     id = json['id'];
@@ -59,12 +68,8 @@ class AudioBridgeParticipants {
     talking = json['talking']!=null?json['talking']:talking;
     spatialPosition = json['spatial_position'];
   }
-  int? id;
-  String? display;
-  bool setup=false;
-  bool muted=false;
-  bool talking=false;
-  int? spatialPosition;
+  
+
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -77,6 +82,26 @@ class AudioBridgeParticipants {
     return map;
   }
 
+
+
+
+  AudioBridgeParticipants copyWith({
+    int? id,
+    String? display,
+    bool? setup,
+    bool? muted,
+    bool? talking,
+    int? spatialPosition,
+  }) {
+    return AudioBridgeParticipants(
+      id: id ?? this.id,
+      display: display ?? this.display,
+      setup: setup ?? this.setup,
+      muted: muted ?? this.muted,
+      talking: talking ?? this.talking,
+      spatialPosition: spatialPosition ?? this.spatialPosition,
+    );
+  }
 }
 
 class AudioBridgeNewParticipantsEvent extends AudioBridgeEvent{

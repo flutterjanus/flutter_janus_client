@@ -17,10 +17,10 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   late WebSocketJanusTransport ws;
   late Map<String, MediaStream?> allStreams = {};
   late Map<String, RTCVideoRenderer> remoteRenderers = {};
-  Map<String, AudioBridgeParticipants> participants = {};
+  Map<String?, AudioBridgeParticipants?> participants = {};
   bool muted = false;
   bool callStarted = false;
-  int myRoom=1234;
+  int myRoom = 1234;
 
   @override
   void initState() {
@@ -32,10 +32,21 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
 
   Future<void> initPlatformState() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(withCredentials: true, isUnifiedPlan: true, apiSecret: "SecureIt", transport: ws, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
+    j = JanusClient(
+        withCredentials: true,
+        isUnifiedPlan: true,
+        apiSecret: "SecureIt",
+        transport: ws,
+        iceServers: [
+          RTCIceServer(
+              urls: "stun:stun1.l.google.com:19302",
+              username: "",
+              credential: "")
+        ]);
     session = await j?.createSession();
     pluginHandle = await session?.attach<JanusAudioBridgePlugin>();
-    await pluginHandle?.initializeMediaDevices(mediaConstraints: {"audio": true, "video": false});
+    await pluginHandle?.initializeMediaDevices(
+        mediaConstraints: {"audio": true, "video": false});
     pluginHandle?.joinRoom(myRoom, display: "Shivansh");
     pluginHandle?.remoteTrack?.listen((event) async {
       if (event.track != null && event.flowing == true && event.mid != null) {
@@ -59,7 +70,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
       Object data = event.event.plugindata?.data;
       if (data is AudioBridgeJoinedEvent) {
         await pluginHandle?.configure();
-         (await pluginHandle?.listParticipants(myRoom));
+        (await pluginHandle?.listParticipants(myRoom));
         data.participants?.forEach((value) {
           setState(() {
             participants.putIfAbsent(value.id.toString(), () => value);
@@ -79,6 +90,16 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
           });
         });
       }
+      if (data is AudioBridgeTalkingEvent) {
+        setState(() {
+          participants.update(data.userId.toString(), (value) {
+            return value?.copyWith(talking: data.isTalking);
+          }, ifAbsent: () {
+            return participants[data.userId.toString()]
+                ?.copyWith(talking: data.isTalking);
+          });
+        });
+      }
       if (data is AudioBridgeConfiguredEvent) {}
       if (data is AudioBridgeLeavingEvent) {
         setState(() {
@@ -86,12 +107,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
         });
       }
       await pluginHandle?.handleRemoteJsep(event.jsep);
-    });
-  }
-
-  updateTalkingId(id, talking) {
-    setState(() {
-      participants[id]?.talking = talking;
     });
   }
 
@@ -144,7 +159,9 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
               ),
               onPressed: callStarted
                   ? () async {
-                      if (pluginHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateClosed) {
+                      if (pluginHandle
+                              ?.webRTCHandle?.peerConnection?.signalingState !=
+                          RTCSignalingState.RTCSignalingStateClosed) {
                         setState(() {
                           muted = !muted;
                         });
@@ -174,14 +191,17 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
               child: ListView.builder(
                   itemCount: remoteRenderers.entries.map((e) => e.value).length,
                   itemBuilder: (context, index) {
-                    var renderer = remoteRenderers.entries.map((e) => e.value).toList()[index];
+                    var renderer = remoteRenderers.entries
+                        .map((e) => e.value)
+                        .toList()[index];
                     return Container(
                         color: Colors.red,
                         width: 50,
                         height: 50,
                         child: RTCVideoView(
                           renderer,
-                          objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                          objectFit: RTCVideoViewObjectFit
+                              .RTCVideoViewObjectFitContain,
                         ));
                   })),
         ),
@@ -196,13 +216,15 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
                     color: Colors.green,
                     child: Column(
                       children: [
-                        Text(e.display ?? ''),
+                        Text(e?.display ?? ''),
                         Icon(
-                          e.muted ? Icons.mic_off : Icons.mic,
+                          e?.muted == true ? Icons.mic_off : Icons.mic,
                           color: Colors.white,
                         ),
                         Icon(
-                          e.talking ? Icons.volume_up_sharp : Icons.volume_mute_sharp,
+                          e?.talking == true
+                              ? Icons.volume_up_sharp
+                              : Icons.volume_mute_sharp,
                           color: Colors.white,
                         )
                       ],

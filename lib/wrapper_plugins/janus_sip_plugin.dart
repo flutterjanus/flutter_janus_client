@@ -192,7 +192,8 @@ class JanusSipPlugin extends JanusPlugin {
       offer = await this.createOffer(
           videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
     }
-    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
+    JanusEvent response =
+        JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
 
@@ -248,50 +249,50 @@ class JanusSipPlugin extends JanusPlugin {
         if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "registered") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "unregistered") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipUnRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "ringing") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipRingingEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "accepted") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipAcceptedEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "progress") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipProgressEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "incomingcall") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipIncomingCallEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "missed_call") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipMissedCallEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "transfer") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
+          typedEvent.event.plugindata?.data =
+              SipTransferCallEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['sip'] == 'event' &&
             typedEvent.event.plugindata?.data['error_code'] != null) {

@@ -2,6 +2,14 @@
 library janus_client;
 
 import 'package:collection/collection.dart';
+import 'package:janus_client/interfaces/sip/events/sip_accepted_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_incoming_call_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_missed_call_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_progress_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_registered_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_ringing_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_transfer_call_event.dart';
+import 'package:janus_client/interfaces/sip/events/sip_unregistered_event.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:io';

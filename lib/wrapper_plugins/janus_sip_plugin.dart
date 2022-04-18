@@ -161,18 +161,18 @@ class JanusSipPlugin extends JanusPlugin {
   /// [srtp] : whether to mandate (sdes_mandatory) or offer (sdes_optional) SRTP support; optional
   /// [srtpProfile] : SRTP profile to negotiate, in case SRTP is offered; optional
   /// [autoAcceptReInvites] : whether we should blindly accept re-INVITEs with a 200 OK instead of relaying the SDP to the application; optional, TRUE by default
-  Future<void> call(
-    String uri, {
-    String? callId,
-    String? referId,
-    String? srtp,
-    String? secret,
-    String? ha1Secret,
-    String? authuser,
-    Map<String, dynamic>? headers,
-    String? srtpProfile,
-    bool? autoAcceptReInvites,
-  }) async {
+  ///[offer] : note it by default sends only audio sendrecv offer
+  Future<void> call(String uri,
+      {String? callId,
+      String? referId,
+      String? srtp,
+      String? secret,
+      String? ha1Secret,
+      String? authuser,
+      Map<String, dynamic>? headers,
+      String? srtpProfile,
+      bool? autoAcceptReInvites,
+      RTCSessionDescription? offer}) async {
     var payload = {
       "request": "call",
       "call_id": callId,
@@ -188,7 +188,11 @@ class JanusSipPlugin extends JanusPlugin {
       "authuser":
           authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
     }..removeWhere((key, value) => value == null);
-    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    if (offer == null) {
+      offer = await this.createOffer(
+          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    }
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
 

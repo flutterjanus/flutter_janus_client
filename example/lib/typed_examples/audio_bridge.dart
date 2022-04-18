@@ -128,7 +128,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     cleanUpWebRTCStuff();
   }

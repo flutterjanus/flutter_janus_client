@@ -12,7 +12,12 @@ class TypedEvent<T> {
   });
 
   @override
-  bool operator ==(Object other) => identical(this, other) || (other is TypedEvent && runtimeType == other.runtimeType && event == other.event && jsep == other.jsep);
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TypedEvent &&
+          runtimeType == other.runtimeType &&
+          event == other.event &&
+          jsep == other.jsep);
 
   @override
   int get hashCode => event.hashCode ^ jsep.hashCode;
@@ -63,7 +68,9 @@ class JanusEvent {
     sessionId = json['session_id'];
     transaction = json['transaction'];
     sender = json['sender'];
-    plugindata = json['plugindata'] != null ? Plugindata.fromJson(json['plugindata']) : null;
+    plugindata = json['plugindata'] != null
+        ? Plugindata.fromJson(json['plugindata'])
+        : null;
   }
 
   String? janus;
@@ -124,8 +131,9 @@ class JanusError {
   String error;
   String pluginName;
 
-  static throwErrorFromEvent(JanusEvent response){
-    if (response.plugindata?.data != null && (response.plugindata?.data as Map).containsKey('error')) {
+  static throwErrorFromEvent(JanusEvent response) {
+    if (response.plugindata?.data != null &&
+        (response.plugindata?.data as Map).containsKey('error')) {
       throw JanusError.fromMap(response.plugindata?.data);
     }
   }
@@ -140,14 +148,23 @@ class JanusError {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is JanusError && runtimeType == other.runtimeType && errorCode == other.errorCode && error == other.error && pluginName == other.pluginName);
+      identical(this, other) ||
+      (other is JanusError &&
+          runtimeType == other.runtimeType &&
+          errorCode == other.errorCode &&
+          error == other.error &&
+          pluginName == other.pluginName);
 
   @override
   int get hashCode => errorCode.hashCode ^ error.hashCode ^ pluginName.hashCode;
 
   @override
   String toString() {
-    return 'JanusError{' + ' error_code: $errorCode,' + ' error: $error,' + ' pluginName: $pluginName,' + '}';
+    return 'JanusError{' +
+        ' error_code: $errorCode,' +
+        ' error: $error,' +
+        ' pluginName: $pluginName,' +
+        '}';
   }
 
   JanusError copyWith({
@@ -171,10 +188,20 @@ class JanusError {
   }
 
   factory JanusError.fromMap(Map<String, dynamic> map) {
+    if (map['result']?.containsKey('code') &&
+        map['result']?.containsKey('reason')) {
+      return JanusError(
+        errorCode: map['result']?['code'] as int,
+        error: map['result']?['reason'] as String,
+        pluginName:
+            map.entries.where((element) => element.value == 'event').first.key,
+      );
+    }
     return JanusError(
       errorCode: map['error_code'] as int,
       error: map['error'] as String,
-      pluginName: map.entries.where((element) => element.value == 'event').first.key,
+      pluginName:
+          map.entries.where((element) => element.value == 'event').first.key,
     );
   }
 

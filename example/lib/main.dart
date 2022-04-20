@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:janus_client_example/Home.dart';
 import 'package:janus_client_example/typed_examples/audio_bridge.dart';
 import 'package:janus_client_example/typed_examples/screen_share_videoroom.dart';
+import 'package:janus_client_example/typed_examples/sip.dart';
 import 'package:janus_client_example/typed_examples/streaming.dart';
 import 'package:janus_client_example/typed_examples/video_call.dart';
 import 'typed_examples/text_room.dart';
@@ -14,6 +15,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     routes: {
       "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
+      "/typed_sip": (c) => TypedSipExample(),
       "/typed_streaming": (c) => TypedStreamingV2(),
       "/typed_video_call": (c) => TypedVideoCallV2Example(),
       "/typed_audio_bridge": (c) => TypedAudioRoomV2(),

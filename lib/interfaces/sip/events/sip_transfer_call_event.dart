@@ -1,3 +1,4 @@
+part of janus_client;
 class SipTransferCallEvent {
   String? sip;
   SipTransferCallEventResult? result;

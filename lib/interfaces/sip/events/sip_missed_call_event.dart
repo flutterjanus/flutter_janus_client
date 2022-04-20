@@ -1,3 +1,4 @@
+part of janus_client;
 class SipMissedCallEvent {
   String? sip;
   String? callId;

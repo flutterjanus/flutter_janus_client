@@ -295,7 +295,9 @@ class JanusSipPlugin extends JanusPlugin {
               SipTransferCallEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['sip'] == 'event' &&
-            typedEvent.event.plugindata?.data['error_code'] != null) {
+            (typedEvent.event.plugindata?.data['error_code'] != null ||
+                typedEvent.event.plugindata?.data?['result']?['code'] !=
+                    null)) {
           _typedMessagesSink
               ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
         }

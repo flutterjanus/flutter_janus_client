@@ -1,3 +1,4 @@
+part of janus_client;
 class SipRegisteredEvent {
   String? sip;
   SipRegisteredEventResult? result;
@@ -22,17 +23,17 @@ class SipRegisteredEvent {
 class SipRegisteredEventResult {
   String? event;
   String? username;
-  String? registerSent;
-  String? masterId;
+  bool? registerSent;
+  int? masterId;
 
   SipRegisteredEventResult(
       {this.event, this.username, this.registerSent, this.masterId});
 
   SipRegisteredEventResult.fromJson(Map<String, dynamic> json) {
-    this.event = json["event"];
-    this.username = json["username"];
-    this.registerSent = json["register_sent"];
-    this.masterId = json["master_id"];
+    this.event = json["event"] as String?;
+    this.username = json["username"] as String?;
+    this.registerSent = json["register_sent"] as bool?;
+    this.masterId = json["master_id"] as int?;
   }
 
   Map<String, dynamic> toJson() {

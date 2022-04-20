@@ -402,7 +402,9 @@ class JanusAudioBridgePlugin extends JanusPlugin {
 
         /// not tested
         else if (typedEvent.event.plugindata?.data['audiobridge'] == 'event' &&
-            typedEvent.event.plugindata?.data['error_code'] != null) {
+            (typedEvent.event.plugindata?.data['error_code'] != null ||
+                typedEvent.event.plugindata?.data?['result']?['code'] !=
+                    null)) {
           _typedMessagesSink
               ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
         }

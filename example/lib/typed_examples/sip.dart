@@ -14,7 +14,13 @@ class _SipExampleState extends State<TypedSipExample> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   late JanusSipPlugin sip;
-  TextEditingController nameController = TextEditingController();
+  TextEditingController proxyController =
+      TextEditingController(text: "sip:sip.theansr.com");
+  TextEditingController usernameController =
+      TextEditingController(text: "sip:test_janus@sip.theansr.com");
+  TextEditingController secretController =
+      TextEditingController(text: "+iBBfWDygkaF8P21tXkV");
+  TextEditingController callUriController = TextEditingController();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? localStream;
@@ -35,10 +41,10 @@ class _SipExampleState extends State<TypedSipExample> {
 
   makeCall() async {
     await localMediaSetup();
-    await sip.call(
-      nameController.text,
-    );
-    nameController.text = "";
+    // await sip.call(
+    //   nameController.text,
+    // );
+    // nameController.text = "";
   }
 
   openRegisterDialog() async {
@@ -60,28 +66,22 @@ class _SipExampleState extends State<TypedSipExample> {
                       decoration: InputDecoration(
                           labelText: "Sip Server URI",
                           hintText: "sip:host:port"),
-                      controller: nameController,
+                      controller: proxyController,
                       validator: (val) {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
-                      },
-                      onFieldSubmitted: (v) {
-                        registerUser();
                       },
                     ),
                     TextFormField(
                       decoration: InputDecoration(
                           labelText: "Sip username",
                           hintText: "sip:test@host:port"),
-                      controller: nameController,
+                      controller: usernameController,
                       validator: (val) {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
-                      },
-                      onFieldSubmitted: (v) {
-                        registerUser();
                       },
                     ),
                     TextFormField(
@@ -89,14 +89,11 @@ class _SipExampleState extends State<TypedSipExample> {
                         labelText: "Sip password",
                       ),
                       obscureText: true,
-                      controller: nameController,
+                      controller: secretController,
                       validator: (val) {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
-                      },
-                      onFieldSubmitted: (v) {
-                        registerUser();
                       },
                     ),
                     Padding(padding: EdgeInsets.all(9)),
@@ -125,9 +122,8 @@ class _SipExampleState extends State<TypedSipExample> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(
-                      labelText: "Name Of Registered User to call"),
-                  controller: nameController,
+                  decoration: InputDecoration(labelText: "sip URI to call"),
+                  controller: callUriController,
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -178,13 +174,17 @@ class _SipExampleState extends State<TypedSipExample> {
     });
     sip.typedMessages?.listen((even) async {
       Object data = even.event.plugindata?.data;
-      if (data is VideoCallRegisteredEvent) {
+      if (data is SipRegisteredEvent) {
+        print(data.toJson());
         Navigator.of(context).pop();
-        print(data.result?.username);
-        nameController.clear();
         await makeCallDialog();
       }
-      sip.handleRemoteJsep(even.jsep);
+      if (data is SipAcceptedEvent) {
+        sip.handleRemoteJsep(even.jsep);
+      }
+      if (data is SipProgressEvent) {
+        sip.handleRemoteJsep(even.jsep);
+      }
     }, onError: (error) async {
       if (error is JanusError) {
         var dialog;
@@ -196,7 +196,7 @@ class _SipExampleState extends State<TypedSipExample> {
                   TextButton(
                       onPressed: () async {
                         Navigator.of(context).pop(dialog);
-                        nameController.clear();
+                        // nameController.clear();
                       },
                       child: Text('Okay'))
                 ],
@@ -219,7 +219,9 @@ class _SipExampleState extends State<TypedSipExample> {
 
   Future<void> registerUser() async {
     if (formKey.currentState?.validate() == true) {
-      await sip.register(nameController.text, proxy: "", secret: "");
+      print('registering user...');
+      await sip.register(usernameController.text,
+          proxy: proxyController.text, secret: secretController.text);
     }
   }
 

@@ -20,7 +20,8 @@ class _SipExampleState extends State<TypedSipExample> {
       TextEditingController(text: "sip:test_janus@sip.theansr.com");
   TextEditingController secretController =
       TextEditingController(text: "+iBBfWDygkaF8P21tXkV");
-  TextEditingController callUriController = TextEditingController();
+  TextEditingController callUriController =
+      TextEditingController(text: "sip:00918744849050@sip.theansr.com");
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? localStream;
@@ -41,9 +42,7 @@ class _SipExampleState extends State<TypedSipExample> {
 
   makeCall() async {
     await localMediaSetup();
-    // await sip.call(
-    //   nameController.text,
-    // );
+    await sip.call(callUriController.text);
     // nameController.text = "";
   }
 

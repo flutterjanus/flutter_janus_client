@@ -2,14 +2,6 @@
 library janus_client;
 
 import 'package:collection/collection.dart';
-import 'package:janus_client/interfaces/sip/events/sip_accepted_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_incoming_call_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_missed_call_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_progress_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_registered_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_ringing_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_transfer_call_event.dart';
-import 'package:janus_client/interfaces/sip/events/sip_unregistered_event.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:io';
@@ -22,7 +14,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'dart:convert';
-
 
 part 'janus_session.dart';
 
@@ -103,6 +94,14 @@ part './interfaces/audio_bridge/events/audio_bridge_talking_event.dart';
 part './interfaces/audio_bridge/events/audio_bridge_joined_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_leaving_event.dart';
+part './interfaces/sip/events/sip_registered_event.dart';
+part './interfaces/sip/events/sip_accepted_event.dart';
+part './interfaces/sip/events/sip_incoming_call_event.dart';
+part './interfaces/sip/events/sip_missed_call_event.dart';
+part './interfaces/sip/events/sip_progress_event.dart';
+part './interfaces/sip/events/sip_ringing_event.dart';
+part './interfaces/sip/events/sip_transfer_call_event.dart';
+part './interfaces/sip/events/sip_unregistered_event.dart';
 
 class JanusClient {
   late JanusTransport _transport;

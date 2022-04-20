@@ -1,21 +1,37 @@
 part of janus_client;
 
 class JanusStreamingPlugin extends JanusPlugin {
-  JanusStreamingPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.STREAMING, session: session, transport: transport);
+  JanusStreamingPlugin({handleId, context, transport, session})
+      : super(
+            context: context,
+            handleId: handleId,
+            plugin: JanusPlugins.STREAMING,
+            session: session,
+            transport: transport);
 
   /// Get list of all streaming mount-point available on server
   Future<List<StreamingMountPoint>> listStreams() async {
     var payload = {"request": "list"};
     var response = await this.send(data: payload);
-    if (response['janus'] == 'success' && response['plugindata'] != null && response['plugindata']['data'] != null && response['plugindata']['data']['list'] != null) {
-      return (response['plugindata']['data']['list'] as List<dynamic>).map((e) => StreamingMountPoint.fromJson(e)).toList();
+    if (response['janus'] == 'success' &&
+        response['plugindata'] != null &&
+        response['plugindata']['data'] != null &&
+        response['plugindata']['data']['list'] != null) {
+      return (response['plugindata']['data']['list'] as List<dynamic>)
+          .map((e) => StreamingMountPoint.fromJson(e))
+          .toList();
     }
     return [];
   }
 
   /// Get verbose info of a specific mount-point
-  Future<StreamingMountPointInfo?> getStreamInfo(int id, {String? secret}) async {
-    var payload = {"request": "info", "id": id, if (secret != null) "secret": secret};
+  Future<StreamingMountPointInfo?> getStreamInfo(int id,
+      {String? secret}) async {
+    var payload = {
+      "request": "info",
+      "id": id,
+      if (secret != null) "secret": secret
+    };
     var response = await this.send(data: payload);
     if (response['info'] != null) {
       return StreamingMountPointInfo.fromJson(response['info']);
@@ -34,7 +50,16 @@ class JanusStreamingPlugin extends JanusPlugin {
   ///        rtsp = stream originated by an external RTSP feed (only
   ///               available if libcurl support was compiled)
   Future<StreamingMount?> createStream(String type,
-      {String? name, String? description, String? metadata, int? id, String? pin, List<CreateMediaItem>? media, String? secret, bool? isPrivate, bool? permanent, String? adminKey}) async {
+      {String? name,
+      String? description,
+      String? metadata,
+      int? id,
+      String? pin,
+      List<CreateMediaItem>? media,
+      String? secret,
+      bool? isPrivate,
+      bool? permanent,
+      String? adminKey}) async {
     var payload = {
       "request": "create",
       "type": type,
@@ -57,7 +82,14 @@ class JanusStreamingPlugin extends JanusPlugin {
   }
 
   /// edit existing streaming mount-point
-  Future<StreamingMountEdited?> editStream(int id, {String? secret, String? description, String? metadata, String? newSecret, bool? newIsPrivate, bool? permanent, String? newPin}) async {
+  Future<StreamingMountEdited?> editStream(int id,
+      {String? secret,
+      String? description,
+      String? metadata,
+      String? newSecret,
+      bool? newIsPrivate,
+      bool? permanent,
+      String? newPin}) async {
     var payload = {
       "request": "edit",
       "id": id,
@@ -80,7 +112,12 @@ class JanusStreamingPlugin extends JanusPlugin {
   /// setting permanent true will delete from config files as well.
   ///
   Future<bool> destroyStream(int id, {String? secret, bool? permanent}) async {
-    var payload = {"request": "destroy", "id": id, if (secret != null) "secret": secret, if (permanent != null) "permanent": permanent};
+    var payload = {
+      "request": "destroy",
+      "id": id,
+      if (secret != null) "secret": secret,
+      if (permanent != null) "permanent": permanent
+    };
     var response = await this.send(data: payload);
     if (response['streaming'] == 'destroyed') {
       return true;
@@ -92,9 +129,12 @@ class JanusStreamingPlugin extends JanusPlugin {
     int id, {
     List<CreateMediaItem>? media,
     String? pin,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerAudio,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerVideo,
-    @Deprecated('It is legacy option,you should use media for fine grade control') bool? offerData,
+    @Deprecated('It is legacy option,you should use media for fine grade control')
+        bool? offerAudio,
+    @Deprecated('It is legacy option,you should use media for fine grade control')
+        bool? offerVideo,
+    @Deprecated('It is legacy option,you should use media for fine grade control')
+        bool? offerData,
   }) async {
     var payload = {
       "request": "watch",
@@ -110,10 +150,12 @@ class JanusStreamingPlugin extends JanusPlugin {
 
   /// call this method once watch request is successfully completed
   Future<void> startStream() async {
-    if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+    if (webRTCHandle?.peerConnection?.iceConnectionState ==
+        RTCIceConnectionState.RTCIceConnectionStateConnected) {
       await send(data: {"request": "start"});
     } else {
-      RTCSessionDescription answer = await createAnswer(videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
+      RTCSessionDescription answer = await createAnswer(
+          videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
       await send(data: {"request": "start"}, jsep: answer);
     }
   }
@@ -141,20 +183,29 @@ class JanusStreamingPlugin extends JanusPlugin {
     if (!_onCreated) {
       _onCreated = true;
       messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data["streaming"] == "event" && typedEvent.event.plugindata?.data["result"] != null && typedEvent.event.plugindata?.data["result"]['status'] == 'preparing') {
+        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+        if (typedEvent.event.plugindata?.data["streaming"] == "event" &&
+            typedEvent.event.plugindata?.data["result"] != null &&
+            typedEvent.event.plugindata?.data["result"]['status'] ==
+                'preparing') {
           typedEvent.event.plugindata?.data = StreamingPluginPreparingEvent();
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data["streaming"] == "event" &&
             typedEvent.event.plugindata?.data["result"] != null &&
-            typedEvent.event.plugindata?.data["result"]['status'] == 'stopping') {
+            typedEvent.event.plugindata?.data["result"]['status'] ==
+                'stopping') {
           typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
           _typedMessagesSink?.add(typedEvent);
         }
+
         /// not tested
         else if (typedEvent.event.plugindata?.data['streaming'] == 'event' &&
-            typedEvent.event.plugindata?.data['error_code'] != null) {
-          _typedMessagesSink?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
+            (typedEvent.event.plugindata?.data['error_code'] != null ||
+                typedEvent.event.plugindata?.data?['result']?['code'] !=
+                    null)) {
+          _typedMessagesSink
+              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
         }
       });
     }

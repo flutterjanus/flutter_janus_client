@@ -85,18 +85,23 @@ class JanusSipPlugin extends JanusPlugin {
   /// [headers] : object with key/value mappings (header name/value), to specify custom headers to add to the SIP INVITE; optional
   /// [srtp] : whether to mandate (sdes_mandatory) or offer (sdes_optional) SRTP support; optional
   /// [autoAcceptReInvites] : whether we should blindly accept re-INVITEs with a 200 OK instead of relaying the SDP to the application; optional, TRUE by default
-  Future<void> accept({
-    String? srtp,
-    Map<String, dynamic>? headers,
-    bool? autoAcceptReInvites,
-  }) async {
+  Future<void> accept(
+      {String? srtp,
+      Map<String, dynamic>? headers,
+      bool? autoAcceptReInvites,
+      RTCSessionDescription? offer}) async {
     var payload = {
       "request": "accept",
       "headers": headers,
       "srtp": srtp,
       "autoaccept_reinvites": autoAcceptReInvites
     }..removeWhere((key, value) => value == null);
-    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    if (offer == null) {
+      offer = await this.createOffer(
+          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    }
+    JanusEvent response =
+        JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
 
@@ -293,7 +298,7 @@ class JanusSipPlugin extends JanusPlugin {
                 "transfer") {
           typedEvent.event.plugindata?.data =
               SipTransferCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
+          _typedMessagesSink?.add(typedEvent); 
         } else if (typedEvent.event.plugindata?.data['sip'] == 'event' &&
             (typedEvent.event.plugindata?.data['error_code'] != null ||
                 (typedEvent.event.plugindata?.data?['result']?['code'] !=

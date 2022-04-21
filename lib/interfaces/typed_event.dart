@@ -130,6 +130,7 @@ class JanusError {
   int errorCode;
   String error;
   String pluginName;
+  String? event;
 
   static throwErrorFromEvent(JanusEvent response) {
     if (response.plugindata?.data != null &&
@@ -143,6 +144,7 @@ class JanusError {
   JanusError({
     required this.errorCode,
     required this.error,
+    this.event,
     required this.pluginName,
   });
 
@@ -164,6 +166,7 @@ class JanusError {
         ' error_code: $errorCode,' +
         ' error: $error,' +
         ' pluginName: $pluginName,' +
+        ' event: $event,' +
         '}';
   }
 
@@ -191,6 +194,7 @@ class JanusError {
     if (map['result']?.containsKey('code') &&
         map['result']?.containsKey('reason')) {
       return JanusError(
+        event: map['result']?['event'] as String?,
         errorCode: map['result']?['code'] as int,
         error: map['result']?['reason'] as String,
         pluginName:

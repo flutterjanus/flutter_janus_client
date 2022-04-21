@@ -22,22 +22,19 @@ class _SipExampleState extends State<TypedSipExample> {
       TextEditingController(text: "+iBBfWDygkaF8P21tXkV");
   TextEditingController callUriController =
       TextEditingController(text: "sip:00918744849050@sip.theansr.com");
-  RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
-  MediaStream? localStream;
+  // MediaStream? localStream;
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
   dynamic incomingDialog;
+  MediaStream? localStream;
+
   dynamic registerDialog;
   dynamic callDialog;
 
   Future<void> localMediaSetup() async {
-    await _localRenderer.initialize();
     MediaStream? temp = await sip.initializeMediaDevices();
-    setState(() {
-      localStream = temp;
-    });
-    _localRenderer.srcObject = localStream;
+    localStream = temp;
   }
 
   makeCall() async {
@@ -139,7 +136,6 @@ class _SipExampleState extends State<TypedSipExample> {
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
-    await _localRenderer.initialize();
     await _remoteVideoRenderer.initialize();
   }
 
@@ -178,6 +174,14 @@ class _SipExampleState extends State<TypedSipExample> {
         Navigator.of(context).pop();
         await makeCallDialog();
       }
+      if (data is SipIncomingCallEvent) {
+        var dialog =
+            await showIncomingCallDialog(data.result?.callee, even.jsep);
+        setState(() {
+          incomingDialog = dialog;
+        });
+      }
+
       if (data is SipAcceptedEvent) {
         sip.handleRemoteJsep(even.jsep);
       }
@@ -194,6 +198,7 @@ class _SipExampleState extends State<TypedSipExample> {
                 actions: [
                   TextButton(
                       onPressed: () async {
+                        await stopAllTracksAndDispose(localStream);
                         Navigator.of(context).pop(dialog);
                         // nameController.clear();
                       },
@@ -220,7 +225,10 @@ class _SipExampleState extends State<TypedSipExample> {
     if (formKey.currentState?.validate() == true) {
       print('registering user...');
       await sip.register(usernameController.text,
-          proxy: proxyController.text, secret: secretController.text);
+          forceUdp: true,
+          rfc2543Cancel: true,
+          proxy: proxyController.text,
+          secret: secretController.text);
     }
   }
 
@@ -231,7 +239,7 @@ class _SipExampleState extends State<TypedSipExample> {
   }
 
   Future<dynamic> showIncomingCallDialog(
-      String caller, RTCSessionDescription? jsep) async {
+      String? caller, RTCSessionDescription? jsep) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -241,7 +249,6 @@ class _SipExampleState extends State<TypedSipExample> {
               ElevatedButton(
                   onPressed: () async {
                     await localMediaSetup();
-                    await sip.handleRemoteJsep(jsep);
                     Navigator.of(context, rootNavigator: true)
                         .pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
@@ -279,16 +286,6 @@ class _SipExampleState extends State<TypedSipExample> {
                 ],
               ),
             ),
-            Expanded(
-                flex: 1,
-                child: Container(
-                  child: RTCVideoView(
-                    _localRenderer,
-                    mirror: true,
-                    objectFit:
-                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  ),
-                ))
           ],
         ),
         Align(
@@ -323,13 +320,14 @@ class _SipExampleState extends State<TypedSipExample> {
     );
   }
 
-  Future<void> cleanUpWebRTCStuff() async {
-    await stopAllTracksAndDispose(localStream);
+  Future<void> stopTracks() async {
     await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
-    _localRenderer.srcObject = null;
+  }
+
+  Future<void> cleanUpWebRTCStuff() async {
+    await stopTracks();
     _remoteVideoRenderer.srcObject = null;
-    _localRenderer.dispose();
     _remoteVideoRenderer.dispose();
   }
 

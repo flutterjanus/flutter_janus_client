@@ -102,6 +102,9 @@ part './interfaces/sip/events/sip_progress_event.dart';
 part './interfaces/sip/events/sip_ringing_event.dart';
 part './interfaces/sip/events/sip_transfer_call_event.dart';
 part './interfaces/sip/events/sip_unregistered_event.dart';
+part './interfaces/sip/events/sip_hangup_event.dart';
+part './interfaces/sip/events/sip_proceeding_event.dart';
+part './interfaces/sip/events/sip_calling_event.dart';
 
 class JanusClient {
   late JanusTransport _transport;

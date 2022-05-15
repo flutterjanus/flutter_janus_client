@@ -8,7 +8,7 @@ var servers = [
 ];
 
 Map<String, String> servermap = {
-  'janus_ws': 'ws://0.0.0.0:8118',//'wss://janus.conf.meetecho.com/ws',
+  'janus_ws': 'wss://janus.conf.meetecho.com/ws',
   'janus_rest': 'https://janus.conf.meetecho.com/janus',
   'onemandev_master_ws': 'wss://master-janus.onemandev.tech/websocket',
   'onemandev_master_rest': 'https://master-janus.onemandev.tech/rest',

@@ -107,7 +107,7 @@ class JanusSession {
     plugin.handleId = handleId;
     _pluginHandles[handleId] = plugin;
     try {
-      await plugin.init();
+      await plugin._init();
     } on MissingPluginException {
       _context._logger.info('Platform exception: i believe you are trying in unit tests, platform specific api not accessible');
     }

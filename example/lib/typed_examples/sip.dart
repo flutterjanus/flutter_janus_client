@@ -13,7 +13,7 @@ class _SipExampleState extends State<TypedSipExample> {
   late JanusClient j;
   late WebSocketJanusTransport ws;
   late JanusSession session;
-  late JanusSipPlugin sip;
+  JanusSipPlugin? sip;
   TextEditingController proxyController =
       TextEditingController(text: "sip:sip.theansr.com");
   TextEditingController usernameController =
@@ -23,23 +23,33 @@ class _SipExampleState extends State<TypedSipExample> {
   TextEditingController callUriController =
       TextEditingController(text: "sip:00918744849050@sip.theansr.com");
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
-  // MediaStream? localStream;
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
   dynamic incomingDialog;
   MediaStream? localStream;
+  bool enableCallButton = true;
 
   dynamic registerDialog;
   dynamic callDialog;
+  String statusMessage = "";
+  dynamic _setState;
 
   Future<void> localMediaSetup() async {
-    MediaStream? temp = await sip.initializeMediaDevices();
+    MediaStream? temp = await sip?.initializeMediaDevices();
     localStream = temp;
   }
 
   makeCall() async {
+    setState(() {
+      enableCallButton = false;
+    });
+
+    await sip?.initializeWebRTCStack();
     await localMediaSetup();
-    await sip.call(callUriController.text);
+    var offer = await sip?.createOffer(
+        videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    await sip?.call(callUriController.text,
+        offer: offer, autoAcceptReInvites: false);
     // nameController.text = "";
   }
 
@@ -112,24 +122,48 @@ class _SipExampleState extends State<TypedSipExample> {
         context: context,
         barrierDismissible: false,
         builder: (context) {
-          return AlertDialog(
-            title: Text("Call Registered User or wait for user to call you"),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  decoration: InputDecoration(labelText: "sip URI to call"),
-                  controller: callUriController,
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    makeCall();
-                  },
-                  child: Text("Call"),
-                )
-              ],
-            ),
-          );
+          return StatefulBuilder(builder: (context, _state) {
+            _setState = _state;
+            return AlertDialog(
+              title: Text("Call Registered User or wait for user to call you"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    decoration: InputDecoration(labelText: "sip URI to call"),
+                    controller: callUriController,
+                  ),
+                  ElevatedButton(
+                    onPressed: enableCallButton
+                        ? () async {
+                            await makeCall();
+                          }
+                        : null,
+                    child: Text("Call"),
+                  ),
+                  Visibility(
+                      visible: !enableCallButton,
+                      child: Text("status:$statusMessage")),
+                  Visibility(
+                    visible: !enableCallButton,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        await sip?.hangup();
+                        _setState(() {
+                          enableCallButton = true;
+                          statusMessage = "";
+                        });
+                      },
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.red)),
+                      child: Text("Hangup"),
+                    ),
+                  )
+                ],
+              ),
+            );
+          });
         });
   }
 
@@ -157,7 +191,7 @@ class _SipExampleState extends State<TypedSipExample> {
     setState(() {
       remoteVideoStream = tempVideo;
     });
-    sip.remoteTrack?.listen((event) async {
+    sip?.remoteTrack?.listen((event) async {
       if (event.track != null && event.flowing == true) {
         remoteVideoStream?.addTrack(event.track!);
         _remoteVideoRenderer.srcObject = remoteVideoStream;
@@ -167,7 +201,7 @@ class _SipExampleState extends State<TypedSipExample> {
         }
       }
     });
-    sip.typedMessages?.listen((even) async {
+    sip?.typedMessages?.listen((even) async {
       Object data = even.event.plugindata?.data;
       if (data is SipRegisteredEvent) {
         print(data.toJson());
@@ -183,10 +217,62 @@ class _SipExampleState extends State<TypedSipExample> {
       }
 
       if (data is SipAcceptedEvent) {
-        sip.handleRemoteJsep(even.jsep);
+        _setState(() {
+          statusMessage = "Call Connected!";
+        });
+        print('accepted event encountered');
+        await sip?.handleRemoteJsep(even.jsep);
       }
       if (data is SipProgressEvent) {
-        sip.handleRemoteJsep(even.jsep);
+        _setState(() {
+          statusMessage = "Call Connected!";
+        });
+
+        print('progress event encountered');
+        await sip?.handleRemoteJsep(even.jsep);
+      }
+      if (data is SipCallingEvent) {
+        print('calling');
+        print(data);
+        _setState(() {
+          statusMessage = "Calling..";
+        });
+      }
+      if (data is SipProceedingEvent) {
+        print('Proceeding');
+        print(data);
+        _setState(() {
+          statusMessage = "Ringing..";
+        });
+      }
+      if (data is SipRingingEvent) {
+        print('ringing');
+        print(data);
+      }
+      if (data is SipHangupEvent) {
+        _setState(() {
+          enableCallButton = true;
+          statusMessage = "";
+        });
+
+        await stopAllTracksAndDispose(localStream);
+        var dialog;
+        dialog = await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                actions: [
+                  TextButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop(dialog);
+                        // nameController.clear();
+                      },
+                      child: Text('Okay'))
+                ],
+                title: Text('Hangup!'),
+                content: Text(data.reason ?? ""),
+              );
+            });
       }
     }, onError: (error) async {
       if (error is JanusError) {
@@ -224,7 +310,7 @@ class _SipExampleState extends State<TypedSipExample> {
   Future<void> registerUser() async {
     if (formKey.currentState?.validate() == true) {
       print('registering user...');
-      await sip.register(usernameController.text,
+      await sip?.register(usernameController.text,
           forceUdp: true,
           rfc2543Cancel: true,
           proxy: proxyController.text,
@@ -233,7 +319,7 @@ class _SipExampleState extends State<TypedSipExample> {
   }
 
   destroy() async {
-    sip.dispose();
+    sip?.dispose();
     session.dispose();
     Navigator.of(context).pop();
   }
@@ -252,7 +338,7 @@ class _SipExampleState extends State<TypedSipExample> {
                     Navigator.of(context, rootNavigator: true)
                         .pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
-                    await sip.accept();
+                    await sip?.accept();
                   },
                   child: Text('Accept')),
               ElevatedButton(
@@ -260,7 +346,7 @@ class _SipExampleState extends State<TypedSipExample> {
                     Navigator.of(context, rootNavigator: true)
                         .pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
-                    await sip.decline();
+                    await sip?.decline();
                   },
                   child: Text('Reject')),
             ],
@@ -295,7 +381,7 @@ class _SipExampleState extends State<TypedSipExample> {
                 icon: Icon(Icons.refresh),
                 color: Colors.white,
                 onPressed: () {
-                  sip.switchCamera();
+                  sip?.switchCamera();
                 }),
             padding: EdgeInsets.all(25),
           ),
@@ -310,7 +396,7 @@ class _SipExampleState extends State<TypedSipExample> {
                     icon: Icon(Icons.call_end),
                     color: Colors.white,
                     onPressed: () async {
-                      await sip.hangup();
+                      await sip?.hangup();
                       destroy();
                     })),
             padding: EdgeInsets.all(10),

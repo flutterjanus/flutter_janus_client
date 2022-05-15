@@ -117,7 +117,8 @@ class JanusSipPlugin extends JanusPlugin {
   Future<void> hangup({
     Map<String, dynamic>? headers,
   }) async {
-    var payload = {"request": "hangup", "headers": headers};
+    var payload = {"request": "hangup", "headers": headers}
+      ..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }
@@ -271,6 +272,18 @@ class JanusSipPlugin extends JanusPlugin {
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
             typedEvent.event.plugindata?.data?["result"]?['event'] ==
+                "calling") {
+          typedEvent.event.plugindata?.data =
+              SipCallingEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
+            typedEvent.event.plugindata?.data?["result"]?['event'] ==
+                "proceeding") {
+          typedEvent.event.plugindata?.data =
+              SipProceedingEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
+            typedEvent.event.plugindata?.data?["result"]?['event'] ==
                 "accepted") {
           typedEvent.event.plugindata?.data =
               SipAcceptedEvent.fromJson(typedEvent.event.plugindata?.data);
@@ -298,13 +311,17 @@ class JanusSipPlugin extends JanusPlugin {
                 "transfer") {
           typedEvent.event.plugindata?.data =
               SipTransferCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent); 
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data?['result']?['code'] !=
+                null &&
+            typedEvent.event.plugindata?.data?["result"]?['event'] ==
+                "hangup" &&
+            typedEvent.event.plugindata?.data?['result']?['reason'] != null) {
+          typedEvent.event.plugindata?.data =
+              SipHangupEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['sip'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                (typedEvent.event.plugindata?.data?['result']?['code'] !=
-                        null &&
-                    typedEvent.event.plugindata?.data?['result']?['reason'] !=
-                        null))) {
+            typedEvent.event.plugindata?.data['error_code'] != null) {
           _typedMessagesSink
               ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
         }

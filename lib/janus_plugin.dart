@@ -332,9 +332,9 @@ class JanusPlugin {
   }
 
   void _addTrickleCandidate(event) {
-        var isTrickle = event['janus'] == 'trickle';
-        if (isTrickle) {
-          var candidateMap = event['candidate'];
+        final isTrickleEvent = event['janus'] == 'trickle';
+        if (isTrickleEvent) {
+          final candidateMap = event['candidate'];
           RTCIceCandidate candidate = RTCIceCandidate(
               candidateMap['candidate'],
               candidateMap['sdpMid'],

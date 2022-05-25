@@ -324,10 +324,23 @@ class JanusPlugin {
             event: event,
             jsep: RTCSessionDescription(jsep['sdp'], jsep['type'])));
       } else {
+        _addTrickleCandidate(event);
         _messagesStreamController!.sink
             .add(EventMessage(event: event, jsep: null));
       }
     });
+  }
+
+  void _addTrickleCandidate(event) {
+        final isTrickleEvent = event['janus'] == 'trickle';
+        if (isTrickleEvent) {
+          final candidateMap = event['candidate'];
+          RTCIceCandidate candidate = RTCIceCandidate(
+              candidateMap['candidate'],
+              candidateMap['sdpMid'],
+              candidateMap['sdpMLineIndex']);
+          webRTCHandle!.peerConnection!.addCandidate(candidate);
+        } 
   }
 
   _handlePolling() async {

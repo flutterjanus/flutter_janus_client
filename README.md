@@ -13,6 +13,7 @@ it easily integrates into your flutter application and allows you to build webrt
 
 
 ## News & Updates
+- sip plugin wrapper added with sip calling example
 - Added errorHandler for typedMessage Stream for better development flow
 - Just like new flutter version comes With desktop support out of the box
 - All major plugins fully support unified plan
@@ -30,7 +31,7 @@ it easily integrates into your flutter application and allows you to build webrt
 | Video Call Plugin | Yes     | No          | Yes          | Yes     |
 | Streaming Plugin  | Yes     | No          | Yes          | Yes     |
 | Audio Room Plugin | Yes     | No          | Yes          | Yes     |
-| Sip Plugin        | Yes     | No          | -           | No      |
+| Sip Plugin        | Yes     | No          | Yes           | Yes      |
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 | ScreenSharing using VideoRoom plugin  | Yes     | No          | Yes          | Yes     |
 

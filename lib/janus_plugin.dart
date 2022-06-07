@@ -18,6 +18,7 @@ class JanusPlugin {
   late JanusSession? _session;
   String? plugin;
   bool _initialized = false;
+
   // internal method which takes care of type of roomId which is normally int but can be string if set in janus config for room
   _handleRoomIdTypeDifference(dynamic payload) {
     payload["room"] = _context._stringIds == false
@@ -48,6 +49,7 @@ class JanusPlugin {
   Timer? _pollingTimer;
   JanusWebRTCHandle? webRTCHandle;
   Map<String, dynamic>? _webRtcConfiguration;
+
   //temporary variables
   StreamSubscription? _wsStreamSubscription;
   late bool pollingActive;
@@ -332,15 +334,13 @@ class JanusPlugin {
   }
 
   void _addTrickleCandidate(event) {
-        final isTrickleEvent = event['janus'] == 'trickle';
-        if (isTrickleEvent) {
-          final candidateMap = event['candidate'];
-          RTCIceCandidate candidate = RTCIceCandidate(
-              candidateMap['candidate'],
-              candidateMap['sdpMid'],
-              candidateMap['sdpMLineIndex']);
-          webRTCHandle!.peerConnection!.addCandidate(candidate);
-        } 
+    final isTrickleEvent = event['janus'] == 'trickle';
+    if (isTrickleEvent) {
+      final candidateMap = event['candidate'];
+      RTCIceCandidate candidate = RTCIceCandidate(candidateMap['candidate'],
+          candidateMap['sdpMid'], candidateMap['sdpMLineIndex']);
+      webRTCHandle!.peerConnection!.addCandidate(candidate);
+    }
   }
 
   _handlePolling() async {
@@ -519,11 +519,15 @@ class JanusPlugin {
         "video": videoDevices.length > 0
       };
     }
-
+    _context._logger.fine(mediaConstraints);
     if (webRTCHandle != null) {
-      webRTCHandle!.localStream = useDisplayMediaDevices == true
-          ? (await navigator.mediaDevices.getDisplayMedia(mediaConstraints))
-          : (await navigator.mediaDevices.getUserMedia(mediaConstraints));
+      if (useDisplayMediaDevices == true) {
+        webRTCHandle!.localStream =
+            await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+      } else {
+        webRTCHandle!.localStream =
+            await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      }
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.fine('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {

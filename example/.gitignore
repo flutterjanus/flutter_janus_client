@@ -44,7 +44,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 build/app
+/build/*.cache.dill.track.dill
+build/last_build_run.json
 build/flutter_assets
+build/*/_composite.stamp
+build/*/gen_localizations.stamp
+build/*/gen_dart_plugin_registrant.stamp
 build/flutter_webrtc
 build/ios
 build/kotlin

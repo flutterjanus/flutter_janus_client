@@ -153,7 +153,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
                   : null),
           IconButton(
               icon: Icon(
-                muted ? Icons.volume_off : Icons.volume_up,
+                muted ? Icons.mic_off : Icons.mic_outlined,
                 color: Colors.white,
               ),
               onPressed: callStarted

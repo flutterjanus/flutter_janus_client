@@ -1,3 +1,7 @@
+## 2.2.3
+* Added SipPluginWrapper and sip working example
+* peer dependencies updated
+
 ## 2.2.2
 
 * fixes issues related to apiSecret thanks goes to @baihua666 for spotting and fixing it.

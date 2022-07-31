@@ -109,12 +109,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
 
   Future<void> joinRoom() async {
     var devices = await navigator.mediaDevices.enumerateDevices();
-    Map<String, dynamic> constrains = {};
-    devices.map((e) => e.kind.toString()).forEach((element) {
-      String dat = element.split('input')[0];
-      dat = dat.split('output')[0];
-      constrains.putIfAbsent(dat, () => true);
-    });
+    Map<String, dynamic> constrains = {'video': true, 'audio': true};
     myStream =
         await plugin.initializeMediaDevices(mediaConstraints: constrains);
     RemoteStream mystr = RemoteStream('0');
@@ -261,7 +256,9 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                   Icons.switch_camera,
                   color: Colors.white,
                 ),
-                onPressed: () {})
+                onPressed: () async{
+                  await plugin.switchCamera();
+                })
           ],
           title: const Text('janus_client'),
         ),
@@ -277,14 +274,14 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
               return Stack(
                 children: [
                   RTCVideoView(remoteStream.audioRenderer,
-                      filterQuality: FilterQuality.high,
+                      filterQuality: FilterQuality.none,
                       objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       mirror: true),
                   RTCVideoView(remoteStream.videoRenderer,
-                      filterQuality: FilterQuality.high,
+                      filterQuality: FilterQuality.none,
                       objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitCover,
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       mirror: true)
                 ],
               );

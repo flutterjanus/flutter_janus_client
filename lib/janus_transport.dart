@@ -5,9 +5,13 @@ abstract class JanusTransport {
   int? sessionId;
 
   JanusTransport({this.url});
+
+  Future<dynamic> getInfo();
+
   /// this is called internally whenever [JanusSession] or [JanusPlugin] is disposed for cleaning up of active connections either polling or websocket connection.
   void dispose();
 }
+
 ///
 /// This transport class is provided to [JanusClient] instances in transport property in order to <br>
 /// inform the plugin that we need to use Rest as a transport mechanism for communicating with Janus Server.<br>
@@ -26,7 +30,9 @@ class RestJanusTransport extends JanusTransport {
       suffixUrl = suffixUrl + "/$sessionId/$handleId";
     }
     try {
-      var response = (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body))).body;
+      var response =
+          (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body)))
+              .body;
       return parse(response);
     } on JsonCyclicError {
       return null;
@@ -52,7 +58,13 @@ class RestJanusTransport extends JanusTransport {
 
   @override
   void dispose() {}
+
+  @override
+  Future<dynamic> getInfo() async {
+    return parse((await http.get(Uri.parse(url! + "/info"))).body);
+  }
 }
+
 ///
 /// This transport class is provided to [JanusClient] instances in transport property in order to <br>
 /// inform the plugin that we need to use WebSockets as a transport mechanism for communicating with Janus Server.<br>
@@ -70,6 +82,7 @@ class WebSocketJanusTransport extends JanusTransport {
       isConnected = false;
     }
   }
+
   /// this method is used to send json payload to Janus Server for communicating the intent.
   Future<dynamic> send(Map<String, dynamic> data, {int? handleId}) async {
     if (data['transaction'] != null) {
@@ -78,16 +91,35 @@ class WebSocketJanusTransport extends JanusTransport {
         data['handle_id'] = handleId;
       }
       sink!.add(stringify(data));
-      return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == data['transaction']), orElse: () => {}));
+      return parse(await stream.firstWhere(
+          (element) => (parse(element)['transaction'] == data['transaction']),
+          orElse: () => {}));
     } else {
       throw "transaction key missing in body";
     }
   }
+
+  @override
+  Future<dynamic> getInfo() async {
+    if (!isConnected) {
+      connect();
+    }
+    Map payload = {};
+    String transaction = getUuid().v4();
+    payload['transaction'] = transaction;
+    payload['janus'] = 'info';
+    sink!.add(stringify(payload));
+    return parse(await stream.firstWhere(
+        (element) => (parse(element)['transaction'] == payload['transaction']),
+        orElse: () => {}));
+  }
+
   /// this method is internally called by plugin to establish connection with provided websocket uri.
   void connect() {
     try {
       isConnected = true;
-      channel = WebSocketChannel.connect(Uri.parse(url!), protocols: ['janus-protocol']);
+      channel = WebSocketChannel.connect(Uri.parse(url!),
+          protocols: ['janus-protocol']);
     } catch (e) {
       print(e.toString());
       print('something went wrong');

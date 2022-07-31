@@ -551,38 +551,41 @@ class JanusPlugin {
   }
 
   /// a utility method which can be used to switch camera of user device if it has more than one camera
-  Future<bool> switchCamera() async {
-    if (_context._isUnifiedPlan) {
-      List<RTCRtpSender>? senders =
-          await webRTCHandle?.peerConnection?.getSenders();
-      List<MediaStreamTrack?>? videoTracks = senders
-          ?.where((element) => element.track?.kind == "video")
-          .map((e) => e.track)
-          .toList();
-      if (videoTracks != null && videoTracks.first != null) {
-        return Helper.switchCamera(videoTracks.first!);
-      }
-      return false;
+  Future<Function> switchCamera({String? deviceId}) async {
+    List<MediaDeviceInfo> videoDevices =
+        (await navigator.mediaDevices.enumerateDevices())
+            .where((element) => element.kind == 'videoinput')
+            .toList();
+    if (videoDevices.isEmpty) {
+      throw Exception("No Camera Found");
     }
-    MediaStreamTrack? videoTrack;
-    if (webRTCHandle!.localStream != null) {
-      videoTrack = webRTCHandle!.localStream!
-          .getVideoTracks()
-          .firstWhere((track) => track.kind == "video");
-      return await Helper.switchCamera(videoTrack);
-    } else {
-      if (webRTCHandle!.peerConnection!.getLocalStreams().length > 0) {
-        videoTrack = webRTCHandle?.peerConnection
-            ?.getLocalStreams()
-            .first
-            ?.getVideoTracks()
-            .firstWhereOrNull((track) => track.kind == "video");
-        if (videoTrack != null) {
-          return await Helper.switchCamera(videoTrack);
-        }
+    int index = 0;
+    cameraToggler() async {
+      if (index == videoDevices.length) {
+        index = 0;
       }
+      MediaDeviceInfo info = videoDevices[index];
+      if (webRTCHandle != null && webRTCHandle?.peerConnection != null) {
+        List<RTCRtpSender>? senders =
+            await webRTCHandle?.peerConnection?.getSenders();
+        MediaStream stream =
+            await createLocalMediaStream("switchCameraVideoTracks");
+        List<MediaStreamTrack> tracks = [];
+        senders?.forEach((element) async {
+          if (element.track?.kind == "video") {
+            tracks.add(element.track!);
+            await stream.addTrack(element.track!);
+          }
+        });
+        print(tracks);
+        print("${info.label}, ${info.deviceId}");
+        return await Helper.switchCamera(tracks[index], info.deviceId, stream);
+      }
+      ++index;
       throw "Media devices and stream not initialized,try calling initializeMediaDevices() ";
     }
+
+    return cameraToggler;
   }
 
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object

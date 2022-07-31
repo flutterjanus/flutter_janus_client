@@ -256,8 +256,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                   Icons.switch_camera,
                   color: Colors.white,
                 ),
-                onPressed: () async{
-                  await plugin.switchCamera();
+                onPressed: () async {
+                  (await plugin.switchCamera())();
                 })
           ],
           title: const Text('janus_client'),

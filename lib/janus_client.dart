@@ -15,6 +15,10 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'dart:convert';
 
+part './interfaces/janus_client.dart';
+
+part './interfaces/text_room/text_room.dart';
+
 part 'janus_session.dart';
 
 part 'janus_transport.dart';
@@ -90,20 +94,33 @@ part './interfaces/audio_bridge/rtp_forwarder_created.dart';
 part './interfaces/audio_bridge/events/audio_bridge_configured_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_event.dart';
+
 part './interfaces/audio_bridge/events/audio_bridge_talking_event.dart';
+
 part './interfaces/audio_bridge/events/audio_bridge_joined_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_leaving_event.dart';
+
 part './interfaces/sip/events/sip_registered_event.dart';
+
 part './interfaces/sip/events/sip_accepted_event.dart';
+
 part './interfaces/sip/events/sip_incoming_call_event.dart';
+
 part './interfaces/sip/events/sip_missed_call_event.dart';
+
 part './interfaces/sip/events/sip_progress_event.dart';
+
 part './interfaces/sip/events/sip_ringing_event.dart';
+
 part './interfaces/sip/events/sip_transfer_call_event.dart';
+
 part './interfaces/sip/events/sip_unregistered_event.dart';
+
 part './interfaces/sip/events/sip_hangup_event.dart';
+
 part './interfaces/sip/events/sip_proceeding_event.dart';
+
 part './interfaces/sip/events/sip_calling_event.dart';
 
 class JanusClient {
@@ -197,5 +214,10 @@ class JanusClient {
     }
     _logger.info("Session Created");
     return session;
+  }
+
+  /// Get janus server verbose information more like found on path `/info`
+  Future<JanusClientInfo> getInfo() async {
+    return JanusClientInfo.fromJson(await _transport.getInfo());
   }
 }

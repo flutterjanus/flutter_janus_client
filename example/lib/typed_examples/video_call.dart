@@ -35,7 +35,9 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   makeCall() async {
     await localMediaSetup();
-    await publishVideo.call(nameController.text);
+    var offer = await publishVideo.createOffer(
+        audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
+    await publishVideo.call(nameController.text, offer: offer);
     nameController.text = "";
   }
 
@@ -68,8 +70,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     ),
                     Padding(padding: EdgeInsets.all(9)),
                     ElevatedButton(
-                      onPressed: () {
-                        registerUser();
+                      onPressed: () async{
+                        await registerUser();
                       },
                       child: Text("Proceed"),
                     )
@@ -97,8 +99,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   controller: nameController,
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    makeCall();
+                  onPressed: () async {
+                    await makeCall();
                   },
                   child: Text("Call"),
                 )
@@ -158,8 +160,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
       }
       if (data is VideoCallAcceptedEvent) {
         Navigator.of(context).pop();
-        Navigator.of(context, rootNavigator: true)
-            .pop(callDialog);
+        Navigator.of(context, rootNavigator: true).pop(callDialog);
       }
       if (data is VideoCallCallingEvent) {
         var dialog;
@@ -240,10 +241,10 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    Navigator.of(context, rootNavigator: true)
-                        .pop(incomingDialog);
-                    Navigator.of(context, rootNavigator: true).pop(callDialog);
                     await publishVideo.acceptCall();
+                    Navigator.of(context).pop(incomingDialog);
+                    Navigator.of(context).pop(callDialog);
+
                   },
                   child: Text('Accept')),
               ElevatedButton(

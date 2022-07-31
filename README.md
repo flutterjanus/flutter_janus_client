@@ -13,6 +13,7 @@ it easily integrates into your flutter application and allows you to build webrt
 
 
 ## News & Updates
+- sip plugin wrapper added with sip calling example
 - Added errorHandler for typedMessage Stream for better development flow
 - Just like new flutter version comes With desktop support out of the box
 - All major plugins fully support unified plan
@@ -30,7 +31,7 @@ it easily integrates into your flutter application and allows you to build webrt
 | Video Call Plugin | Yes     | No          | Yes          | Yes     |
 | Streaming Plugin  | Yes     | No          | Yes          | Yes     |
 | Audio Room Plugin | Yes     | No          | Yes          | Yes     |
-| Sip Plugin        | Yes     | No          | -           | No      |
+| Sip Plugin        | Yes     | No          | Yes           | Yes      |
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 | ScreenSharing using VideoRoom plugin  | Yes     | No          | Yes          | Yes     |
 
@@ -83,3 +84,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## Wait there's more... The Javascript Client!
+If you loved the api style and architecture of flutter_janus_client and you wishing to have something similar for your next javascript project involving webrtc features.
+then worry not because we have got you covered. we have written wrapper on top of our good old `janus.js`, you might ask why? well the answer to that question is it does not support
+type bindings hence no rich ide support, so we proudly presents [typed_janus_js(feature rich promisified and reactive wrapper on top of janus.js)](https://github.com/flutterjanus/JanusJs)
+or you can straight away use it by installing from npm `npm i typed_janus_js`.

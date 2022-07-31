@@ -115,18 +115,35 @@ class JanusTextRoomPlugin extends JanusPlugin {
     }
   }
 
-  Future<dynamic> listRooms() async {
+  Future<List<JanusTextRoom>?> listRooms() async {
     var payload = {
-      "textroom": "list",
+      "request": "list",
     };
+    _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('list rooms invoked');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return (response.plugindata?.data?['list'] as List<dynamic>?)
+        ?.map((e) => JanusTextRoom.fromJson(e))
+        .toList();
   }
 
-  Future<dynamic> listParticipants(dynamic roomId) async {
+  Future<List<dynamic>?> listParticipants(dynamic roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
+    _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('listParticipants invoked with roomId:$roomId');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response.plugindata?.data?['participants'];
   }
 
-  Future<dynamic> exists(roomId) async {
-    var payload = {"textroom": "exists", "room": roomId};
+  Future<bool?> exists(dynamic roomId) async {
+    var payload = {"request": "exists", "room": roomId};
+    _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('exists invoked with roomId:$roomId');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response.plugindata?.data?['exists'];
   }
 
   /// If you're the administrator of a room (that is, you created it and have access to the secret) you can kick out individual participant.
@@ -161,6 +178,10 @@ class JanusTextRoomPlugin extends JanusPlugin {
       "permanent": permanent,
     };
     _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('destroyRoom invoked with roomId:$roomId');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response;
   }
 
   /// this can be used to create a new text room .<br>
@@ -194,6 +215,10 @@ class JanusTextRoomPlugin extends JanusPlugin {
       "permanent": permanent,
     };
     _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('createRoom invoked with roomId:$roomId');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response;
   }
 
   ///
@@ -226,5 +251,9 @@ class JanusTextRoomPlugin extends JanusPlugin {
       "new_is_private": isPrivate,
     };
     _handleRoomIdTypeDifference(payload);
+    _context._logger.fine('editRoom invoked with roomId:$roomId');
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+    JanusError.throwErrorFromEvent(response);
+    return response;
   }
 }

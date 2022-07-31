@@ -552,6 +552,18 @@ class JanusPlugin {
 
   /// a utility method which can be used to switch camera of user device if it has more than one camera
   Future<bool> switchCamera() async {
+    if (_context._isUnifiedPlan) {
+      List<RTCRtpSender>? senders =
+          await webRTCHandle?.peerConnection?.getSenders();
+      List<MediaStreamTrack?>? videoTracks = senders
+          ?.where((element) => element.track?.kind == "video")
+          .map((e) => e.track)
+          .toList();
+      if (videoTracks != null && videoTracks.first != null) {
+        return Helper.switchCamera(videoTracks.first!);
+      }
+      return false;
+    }
     MediaStreamTrack? videoTrack;
     if (webRTCHandle!.localStream != null) {
       videoTrack = webRTCHandle!.localStream!

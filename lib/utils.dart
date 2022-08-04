@@ -244,5 +244,8 @@ Future<String> getCameraDeviceId(front) async {
   if (videoDevices.isEmpty) {
     throw Exception("No camera found");
   }
+  if(videoDevices.length == 1) {
+    return videoDevices.first.deviceId;
+  }
   return (front ? videoDevices.first.deviceId : videoDevices.last.deviceId);
 }

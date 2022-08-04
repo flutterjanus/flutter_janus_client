@@ -77,6 +77,9 @@ class JanusPlugin {
     _context._logger.fine('webRTC stack intialized');
     RTCPeerConnection peerConnection =
         await createPeerConnection(_webRtcConfiguration!, {});
+    peerConnection.onRenegotiationNeeded = () {
+      _context._logger.fine('onRenegotiationNeeded');
+    };
     //unified plan webrtc tracks emitter
     _handleUnifiedWebRTCTracksEmitter(peerConnection);
     //send ice candidates to janus server on this specific handle
@@ -405,6 +408,23 @@ class JanusPlugin {
 
   Future<void> hangup() async {
     _cancelPollingTimer();
+    await _disposeMediaStreams();
+  }
+
+  Future<void> _disposeMediaStreams({ignoreRemote = false}) async {
+     _context._logger.fine('disposing localStream and remoteStream if it already exists');
+    if (webRTCHandle!.localStream != null) {
+      webRTCHandle?.localStream?.getTracks().forEach((element) async {
+        await element.stop();
+      });
+      webRTCHandle?.localStream?.dispose();
+    }
+    if (webRTCHandle!.remoteStream != null && !ignoreRemote) {
+      webRTCHandle?.remoteStream?.getTracks().forEach((element) async {
+        await element.stop();
+      });
+      webRTCHandle?.remoteStream?.dispose();
+    }
   }
 
   /// This function takes care of cleaning up all the internal stream controller and timers used to make janus_client compatible with streams and polling support
@@ -513,12 +533,18 @@ class JanusPlugin {
   Future<MediaStream?> initializeMediaDevices(
       {bool? useDisplayMediaDevices = false,
       Map<String, dynamic>? mediaConstraints}) async {
+    await _disposeMediaStreams(ignoreRemote: true);
+    List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
+    List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
+    if (videoDevices.isEmpty && audioDevices.isEmpty) {
+      throw Exception("No device found for media generation");
+    }
     if (mediaConstraints == null) {
-      List<MediaDeviceInfo> audioDevices = await Helper.audiooutputs;
-      List<MediaDeviceInfo> videoDevices = await Helper.cameras;
       mediaConstraints = {
         "audio": audioDevices.length > 0,
-        "video": videoDevices.length > 0
+        'video': {
+          'deviceId': {'exact': videoDevices.first.deviceId},
+        },
       };
     }
     _context._logger.fine(mediaConstraints);
@@ -550,42 +576,57 @@ class JanusPlugin {
     }
   }
 
+  Future<List<MediaDeviceInfo>> getVideoInputDevices() async {
+    return (await navigator.mediaDevices.enumerateDevices())
+        .where((element) => element.kind == 'videoinput')
+        .toList();
+  }
+
+  Future<List<MediaDeviceInfo>> getAudioInputDevices() async {
+    return (await navigator.mediaDevices.enumerateDevices())
+        .where((element) => element.kind == 'audioinput')
+        .toList();
+  }
+
   /// a utility method which can be used to switch camera of user device if it has more than one camera
-  Future<Function> switchCamera({String? deviceId}) async {
-    List<MediaDeviceInfo> videoDevices =
-        (await navigator.mediaDevices.enumerateDevices())
-            .where((element) => element.kind == 'videoinput')
-            .toList();
+  /// [deviceId] : device id of the camera you want to switch to
+  /// [deviceId] is important for switchCamera to work in browsers.
+  Future<bool> switchCamera({String? deviceId}) async {
+    List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
     if (videoDevices.isEmpty) {
       throw Exception("No Camera Found");
     }
-    int index = 0;
-    cameraToggler() async {
-      if (index == videoDevices.length) {
-        index = 0;
+    if (kIsWeb) {
+      if (deviceId == null) {
+        _context._logger.fine('deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
+        deviceId = videoDevices.last.deviceId;
       }
-      MediaDeviceInfo info = videoDevices[index];
-      if (webRTCHandle != null && webRTCHandle?.peerConnection != null) {
-        List<RTCRtpSender>? senders =
-            await webRTCHandle?.peerConnection?.getSenders();
-        MediaStream stream =
-            await createLocalMediaStream("switchCameraVideoTracks");
-        List<MediaStreamTrack> tracks = [];
-        senders?.forEach((element) async {
-          if (element.track?.kind == "video") {
-            tracks.add(element.track!);
-            await stream.addTrack(element.track!);
+      await _disposeMediaStreams(ignoreRemote: true);
+      print(videoDevices);
+      webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia({
+        'video': {
+          'deviceId': {'exact': deviceId}
+        },
+        'audio': true
+      });
+      List<RTCRtpSender> senders =
+          (await webRTCHandle!.peerConnection!.getSenders());
+      webRTCHandle!.localStream?.getTracks().forEach((element) async {
+        senders.forEach((sender) async {
+          if (sender.track?.kind == element.kind) {
+            await sender.replaceTrack(element);
           }
         });
-        print(tracks);
-        print("${info.label}, ${info.deviceId}");
-        return await Helper.switchCamera(tracks[index], info.deviceId, stream);
+      });
+      return true;
+    } else {
+      if (webRTCHandle?.localStream != null) {
+         _context._logger.fine('using helper to switch camera, only works in android and ios');
+        return Helper.switchCamera(
+            webRTCHandle!.localStream!.getVideoTracks().first);
       }
-      ++index;
-      throw "Media devices and stream not initialized,try calling initializeMediaDevices() ";
+      return false;
     }
-
-    return cameraToggler;
   }
 
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object

@@ -21,7 +21,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   late JanusVideoRoomPlugin plugin;
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
-  MediaStream? myStream;
+  bool front = true;
   int myRoom = 1234;
   Map<int, dynamic> feedStreams = {};
   Map<int?, dynamic> subscriptions = {};
@@ -108,13 +108,10 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   Future<void> joinRoom() async {
-    var devices = await navigator.mediaDevices.enumerateDevices();
-    Map<String, dynamic> constrains = {'video': true, 'audio': true};
-    myStream =
-        await plugin.initializeMediaDevices(mediaConstraints: constrains);
+    await plugin.initializeMediaDevices();
     RemoteStream mystr = RemoteStream('0');
     await mystr.init();
-    mystr.videoRenderer.srcObject = myStream;
+    mystr.videoRenderer.srcObject = plugin.webRTCHandle!.localStream;
     setState(() {
       remoteStreams.putIfAbsent(0, () => mystr);
     });
@@ -221,11 +218,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     });
     subStreams.clear();
     subscriptions.clear();
-    // stop all tracks and then dispose
-    myStream?.getTracks().forEach((element) async {
-      await element.stop();
-    });
-    await myStream?.dispose();
+    await plugin.webRTCHandle!.localStream?.dispose();
     await plugin.dispose();
     await remoteHandle?.dispose();
   }
@@ -257,7 +250,19 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                   color: Colors.white,
                 ),
                 onPressed: () async {
-                  (await plugin.switchCamera())();
+                  setState(() {
+                    front = !front;
+                  });
+                  await plugin.switchCamera(
+                      deviceId: await getCameraDeviceId(front));
+                  RemoteStream mystr = RemoteStream('0');
+                  await mystr.init();
+                  mystr.videoRenderer.srcObject =
+                      plugin.webRTCHandle!.localStream;
+                  setState(() {
+                    remoteStreams.remove(0);
+                    remoteStreams[0] = mystr;
+                  });
                 })
           ],
           title: const Text('janus_client'),

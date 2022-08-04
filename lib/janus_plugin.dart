@@ -412,7 +412,8 @@ class JanusPlugin {
   }
 
   Future<void> _disposeMediaStreams({ignoreRemote = false}) async {
-     _context._logger.fine('disposing localStream and remoteStream if it already exists');
+    _context._logger
+        .fine('disposing localStream and remoteStream if it already exists');
     if (webRTCHandle!.localStream != null) {
       webRTCHandle?.localStream?.getTracks().forEach((element) async {
         await element.stop();
@@ -540,12 +541,18 @@ class JanusPlugin {
       throw Exception("No device found for media generation");
     }
     if (mediaConstraints == null) {
-      mediaConstraints = {
-        "audio": audioDevices.length > 0,
-        'video': {
-          'deviceId': {'exact': videoDevices.first.deviceId},
-        },
-      };
+      if (videoDevices.isEmpty && audioDevices.isNotEmpty) {
+        mediaConstraints = {"audio": true, "video": false};
+      } else if (videoDevices.length == 1 && audioDevices.isNotEmpty) {
+        mediaConstraints = {"audio": true, 'video': true};
+      } else {
+        mediaConstraints = {
+          "audio": audioDevices.length > 0,
+          'video': {
+            'deviceId': {'exact': videoDevices.first.deviceId},
+          },
+        };
+      }
     }
     _context._logger.fine(mediaConstraints);
     if (webRTCHandle != null) {
@@ -598,7 +605,8 @@ class JanusPlugin {
     }
     if (kIsWeb) {
       if (deviceId == null) {
-        _context._logger.fine('deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
+        _context._logger.fine(
+            'deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
         deviceId = videoDevices.last.deviceId;
       }
       await _disposeMediaStreams(ignoreRemote: true);
@@ -621,7 +629,8 @@ class JanusPlugin {
       return true;
     } else {
       if (webRTCHandle?.localStream != null) {
-         _context._logger.fine('using helper to switch camera, only works in android and ios');
+        _context._logger.fine(
+            'using helper to switch camera, only works in android and ios');
         return Helper.switchCamera(
             webRTCHandle!.localStream!.getVideoTracks().first);
       }

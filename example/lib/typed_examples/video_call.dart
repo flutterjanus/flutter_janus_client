@@ -23,6 +23,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   dynamic incomingDialog;
   dynamic registerDialog;
   dynamic callDialog;
+  bool front = true;
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
@@ -70,7 +71,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     ),
                     Padding(padding: EdgeInsets.all(9)),
                     ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         await registerUser();
                       },
                       child: Text("Proceed"),
@@ -244,7 +245,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     await publishVideo.acceptCall();
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);
-
                   },
                   child: Text('Accept')),
               ElevatedButton(
@@ -296,8 +296,13 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             child: IconButton(
                 icon: Icon(Icons.refresh),
                 color: Colors.white,
-                onPressed: () {
-                  publishVideo.switchCamera();
+                onPressed: () async {
+                  setState(() {
+                    front = !front;
+                  });
+                  //  note:- deviceId is important for web browsers
+                  await publishVideo.switchCamera(
+                      deviceId: await getCameraDeviceId(front));
                 }),
             padding: EdgeInsets.all(25),
           ),

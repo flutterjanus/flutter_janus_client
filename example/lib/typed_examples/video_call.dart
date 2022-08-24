@@ -287,21 +287,15 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             decoration: BoxDecoration(
                 color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Visibility(
-                    visible: ringing,
-                    child: Expanded(
-                        flex: 12,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Ringing...",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ]))),
+                  visible: ringing,
+                  child: Text(
+                    "Ringing...",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
                 Flexible(
                     child: Padding(
                         padding: EdgeInsets.all(10),
@@ -316,7 +310,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                               //  note:- deviceId is important for web browsers
                               await publishVideo.switchCamera(
                                   deviceId: await getCameraDeviceId(front));
-                                  
+
                               // everytime we make changes in stream we update in ui and renderer like this.
                               setState(() {
                                 _localRenderer.srcObject =
@@ -348,7 +342,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   Future<void> cleanUpWebRTCStuff() async {
-    // await stopAllTracksAndDispose(localStream);
+    await stopAllTracksAndDispose(publishVideo.webRTCHandle?.localStream);
     await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
     _localRenderer.srcObject = null;

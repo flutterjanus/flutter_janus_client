@@ -1,5 +1,15 @@
+## 2.2.4
+
+* Fixed bugs in videocall example
+
+* upgraded dependency
+
+* fixed switchCamera utility function for browsers
+
 ## 2.2.3
+
 * Added SipPluginWrapper and sip working example
+
 * peer dependencies updated
 
 ## 2.2.2

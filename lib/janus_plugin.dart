@@ -411,14 +411,24 @@ class JanusPlugin {
     await _disposeMediaStreams();
   }
 
-  Future<void> _disposeMediaStreams({ignoreRemote = false}) async {
+  Future<void> _disposeMediaStreams(
+      {ignoreRemote = false, video = true, audio = true}) async {
     _context._logger
         .fine('disposing localStream and remoteStream if it already exists');
     if (webRTCHandle!.localStream != null) {
-      webRTCHandle?.localStream?.getTracks().forEach((element) async {
-        await element.stop();
-      });
-      webRTCHandle?.localStream?.dispose();
+      if (audio) {
+        webRTCHandle?.localStream?.getAudioTracks().forEach((element) async {
+          await element.stop();
+        });
+      }
+      if (video) {
+        webRTCHandle?.localStream?.getVideoTracks().forEach((element) async {
+          await element.stop();
+        });
+      }
+      if (audio && video) {
+        webRTCHandle?.localStream?.dispose();
+      }
     }
     if (webRTCHandle!.remoteStream != null && !ignoreRemote) {
       webRTCHandle?.remoteStream?.getTracks().forEach((element) async {
@@ -609,17 +619,15 @@ class JanusPlugin {
             'deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
         deviceId = videoDevices.last.deviceId;
       }
-      await _disposeMediaStreams(ignoreRemote: true);
-      print(videoDevices);
+      await _disposeMediaStreams(ignoreRemote: true,video: true,audio: false);
       webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia({
         'video': {
           'deviceId': {'exact': deviceId}
         },
-        'audio': true
       });
       List<RTCRtpSender> senders =
           (await webRTCHandle!.peerConnection!.getSenders());
-      webRTCHandle!.localStream?.getTracks().forEach((element) async {
+      webRTCHandle!.localStream?.getVideoTracks().forEach((element) async {
         senders.forEach((sender) async {
           if (sender.track?.kind == element.kind) {
             await sender.replaceTrack(element);

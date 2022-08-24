@@ -1,3 +1,7 @@
+## 2.2.5
+
+* fixes
+
 ## 2.2.4
 
 * Fixed bugs in videocall example

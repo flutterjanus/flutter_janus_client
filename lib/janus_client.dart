@@ -1,10 +1,8 @@
 /// This is a preliminary API providing most WebRTC Operations out of the box using [Janus Server](https://janus.conf.meetecho.com/)
 library janus_client;
-
-import 'dart:html';
-
 import 'package:collection/collection.dart';
 import 'package:dartdoc/dartdoc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:io';

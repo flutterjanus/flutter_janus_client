@@ -17,20 +17,21 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
-  MediaStream? localStream;
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
-  dynamic incomingDialog;
-  dynamic registerDialog;
-  dynamic callDialog;
+  AlertDialog? incomingDialog;
+  AlertDialog? registerDialog;
+  AlertDialog? callDialog;
+  bool ringing = false;
+  bool front = true;
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
     MediaStream? temp = await publishVideo.initializeMediaDevices();
     setState(() {
-      localStream = temp;
+      publishVideo.webRTCHandle?.localStream = temp;
     });
-    _localRenderer.srcObject = localStream;
+    _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
   }
 
   makeCall() async {
@@ -42,7 +43,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   openRegisterDialog() async {
-    registerDialog = await showDialog(
+    registerDialog = await showDialog<AlertDialog>(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -70,7 +71,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     ),
                     Padding(padding: EdgeInsets.all(9)),
                     ElevatedButton(
-                      onPressed: () async{
+                      onPressed: () async {
                         await registerUser();
                       },
                       child: Text("Proceed"),
@@ -84,7 +85,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   makeCallDialog() async {
-    callDialog = await showDialog(
+    callDialog = await showDialog<AlertDialog>(
         context: context,
         barrierDismissible: false,
         builder: (context) {
@@ -112,7 +113,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   @override
   void didChangeDependencies() async {
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
     await _localRenderer.initialize();
     await _remoteVideoRenderer.initialize();
@@ -149,7 +149,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     publishVideo.typedMessages?.listen((even) async {
       Object data = even.event.plugindata?.data;
       if (data is VideoCallRegisteredEvent) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(registerDialog);
         print(data.result?.username);
         nameController.clear();
         await makeCallDialog();
@@ -159,26 +159,15 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             await showIncomingCallDialog(data.result!.username!, even.jsep);
       }
       if (data is VideoCallAcceptedEvent) {
-        Navigator.of(context).pop();
-        Navigator.of(context, rootNavigator: true).pop(callDialog);
+        setState(() {
+          ringing = false;
+        });
       }
       if (data is VideoCallCallingEvent) {
-        var dialog;
-        dialog = await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: Text('Calling the peer..'),
-                  actions: [
-                    ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context, rootNavigator: true)
-                              .pop(dialog);
-                          Navigator.of(context, rootNavigator: true)
-                              .pop(callDialog);
-                        },
-                        child: Text('Okay'))
-                  ],
-                ));
+        Navigator.of(context).pop(callDialog);
+        setState(() {
+          ringing = true;
+        });
       }
       if (data is VideoCallHangupEvent) {
         await destroy();
@@ -244,7 +233,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     await publishVideo.acceptCall();
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);
-
                   },
                   child: Text('Accept')),
               ElevatedButton(
@@ -265,6 +253,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     return Scaffold(
       body: Stack(children: [
         Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: Stack(
@@ -291,15 +280,51 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
           ],
         ),
         Align(
-          alignment: Alignment.topRight,
-          child: Padding(
-            child: IconButton(
-                icon: Icon(Icons.refresh),
-                color: Colors.white,
-                onPressed: () {
-                  publishVideo.switchCamera();
-                }),
-            padding: EdgeInsets.all(25),
+          alignment: Alignment.topLeft,
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 60,
+            decoration: BoxDecoration(
+                color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Visibility(
+                    visible: ringing,
+                    child: Expanded(
+                        flex: 12,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Ringing...",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ]))),
+                Flexible(
+                    child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: IconButton(
+                            icon: Icon(Icons.cameraswitch_outlined),
+                            color: Colors.white,
+                            splashRadius: 25,
+                            onPressed: () async {
+                              setState(() {
+                                front = !front;
+                              });
+                              //  note:- deviceId is important for web browsers
+                              await publishVideo.switchCamera(
+                                  deviceId: await getCameraDeviceId(front));
+                                  
+                              // everytime we make changes in stream we update in ui and renderer like this.
+                              setState(() {
+                                _localRenderer.srcObject =
+                                    publishVideo.webRTCHandle?.localStream;
+                              });
+                            })))
+              ],
+            ),
           ),
         ),
         Align(
@@ -323,7 +348,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   Future<void> cleanUpWebRTCStuff() async {
-    await stopAllTracksAndDispose(localStream);
+    // await stopAllTracksAndDispose(localStream);
     await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
     _localRenderer.srcObject = null;

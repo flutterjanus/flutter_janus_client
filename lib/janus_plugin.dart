@@ -619,15 +619,16 @@ class JanusPlugin {
             'deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
         deviceId = videoDevices.last.deviceId;
       }
-      await _disposeMediaStreams(ignoreRemote: true,video: true,audio: false);
+      await _disposeMediaStreams(ignoreRemote: true);
       webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia({
         'video': {
           'deviceId': {'exact': deviceId}
         },
+        'audio':true
       });
       List<RTCRtpSender> senders =
           (await webRTCHandle!.peerConnection!.getSenders());
-      webRTCHandle!.localStream?.getVideoTracks().forEach((element) async {
+      webRTCHandle!.localStream?.getTracks().forEach((element) async {
         senders.forEach((sender) async {
           if (sender.track?.kind == element.kind) {
             await sender.replaceTrack(element);

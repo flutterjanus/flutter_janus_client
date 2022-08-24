@@ -18,7 +18,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? remoteVideoStream;
-  MediaStream? remoteAudioStream;
   AlertDialog? incomingDialog;
   AlertDialog? registerDialog;
   AlertDialog? callDialog;
@@ -27,10 +26,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
-    MediaStream? temp = await publishVideo.initializeMediaDevices();
-    setState(() {
-      publishVideo.webRTCHandle?.localStream = temp;
-    });
+    await publishVideo.initializeMediaDevices();
     _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
   }
 
@@ -213,6 +209,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   destroy() async {
+    await stopAllTracksAndDispose(publishVideo.webRTCHandle?.localStream);
+    await stopAllTracksAndDispose(remoteVideoStream);
     publishVideo.dispose();
     session.dispose();
     Navigator.of(context).pop();
@@ -287,21 +285,14 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             decoration: BoxDecoration(
                 color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Visibility(
                     visible: ringing,
-                    child: Expanded(
-                        flex: 12,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Ringing...",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ]))),
+                    child: Text(
+                      "Ringing...",
+                      style: TextStyle(color: Colors.white),
+                    )),
                 Flexible(
                     child: Padding(
                         padding: EdgeInsets.all(10),
@@ -316,7 +307,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                               //  note:- deviceId is important for web browsers
                               await publishVideo.switchCamera(
                                   deviceId: await getCameraDeviceId(front));
-                                  
+
                               // everytime we make changes in stream we update in ui and renderer like this.
                               setState(() {
                                 _localRenderer.srcObject =
@@ -337,8 +328,9 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     icon: Icon(Icons.call_end),
                     color: Colors.white,
                     onPressed: () async {
-                      await publishVideo.hangup();
                       destroy();
+                      await publishVideo.hangup();
+                      // destroy();
                     })),
             padding: EdgeInsets.all(10),
           ),
@@ -348,9 +340,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   Future<void> cleanUpWebRTCStuff() async {
-    // await stopAllTracksAndDispose(localStream);
-    await stopAllTracksAndDispose(remoteAudioStream);
-    await stopAllTracksAndDispose(remoteVideoStream);
     _localRenderer.srcObject = null;
     _remoteVideoRenderer.srcObject = null;
     _localRenderer.dispose();

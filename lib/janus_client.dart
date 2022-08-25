@@ -1,5 +1,6 @@
 /// This is a preliminary API providing most WebRTC Operations out of the box using [Janus Server](https://janus.conf.meetecho.com/)
 library janus_client;
+
 import 'package:collection/collection.dart';
 import 'package:dartdoc/dartdoc.dart';
 import 'package:flutter/foundation.dart';
@@ -87,6 +88,7 @@ part './interfaces/streaming/events/streaming_plugin_preparing_event.dart';
 part './interfaces/streaming/events/streaming_plugin_stopping_event.dart';
 
 part './interfaces/audio_bridge/audio_room_created_response.dart';
+part './interfaces/audio_bridge/audio_room_destroyed_response.dart';
 
 part './interfaces/audio_bridge/rtp_forward_stopped.dart';
 
@@ -172,8 +174,7 @@ class JanusClient {
       bool? stringIds = false,
 
       /// forces creation of peer connection with plan-b sdb semantics
-      @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.')
-          bool usePlanB = false,
+      @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.') bool usePlanB = false,
       Duration? pollingInterval,
       loggerName = "JanusClient",
       maxEvent = 10,
@@ -204,10 +205,7 @@ class JanusClient {
   Future<JanusSession> createSession() async {
     _logger.info("Creating Session");
     _logger.fine("fine message");
-    JanusSession session = JanusSession(
-        refreshInterval: _refreshInterval,
-        transport: _transport,
-        context: this);
+    JanusSession session = JanusSession(refreshInterval: _refreshInterval, transport: _transport, context: this);
     try {
       await session.create();
     } catch (e) {

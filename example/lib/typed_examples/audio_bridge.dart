@@ -20,7 +20,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   Map<String?, AudioBridgeParticipants?> participants = {};
   bool muted = false;
   bool callStarted = false;
-  int myRoom = 1234;
+  String myRoom = "142d047547e35aff18e8fb88fcd0707f";
 
   @override
   void initState() {
@@ -35,6 +35,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     j = JanusClient(
         withCredentials: true,
         isUnifiedPlan: true,
+        stringIds: true,
         apiSecret: "SecureIt",
         transport: ws,
         iceServers: [

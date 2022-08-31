@@ -25,7 +25,7 @@ class AudioBridgeJoinedEvent extends AudioBridgeEvent {
       });
     }
   }
-  int? id;
+  dynamic id;
   String? display;
   List<AudioBridgeParticipants>? participants;
 
@@ -44,7 +44,7 @@ class AudioBridgeJoinedEvent extends AudioBridgeEvent {
 }
 
 class AudioBridgeParticipants {
-  int? id;
+  dynamic id;
   String? display;
   bool? setup;
   bool? muted;

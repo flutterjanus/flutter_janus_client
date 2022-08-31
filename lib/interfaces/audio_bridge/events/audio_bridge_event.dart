@@ -26,17 +26,7 @@ class AudioBridgeEvent{
   String toString() {
     return 'VideoRoomEvent{' + 'audiobridge: $audiobridge,' + ' room: $room,' + '}';
   }
-
-  AudioBridgeEvent copyWith({
-    String? audiobridge,
-    int? room,
-  }) {
-    return AudioBridgeEvent.create(
-      audiobridge ?? this.audiobridge,
-      room ?? this.room,
-    );
-  }
-
+  
   Map<String, dynamic> toMap() {
     return {
       'audiobridge': this.audiobridge,

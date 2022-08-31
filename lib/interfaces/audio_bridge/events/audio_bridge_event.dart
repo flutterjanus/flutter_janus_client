@@ -47,7 +47,7 @@ class AudioBridgeEvent{
   factory AudioBridgeEvent.fromMap(Map<String, dynamic> map) {
     return AudioBridgeEvent.create(
       map['audiobridge'] as String,
-      map['room'] as int,
+      map['room'] as dynamic,
     );
   }
 

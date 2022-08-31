@@ -1,16 +1,20 @@
 part of janus_client;
+
 class StreamingMount {
   StreamingMount({
-      this.streaming, 
-      this.create, 
-      this.permanent, 
-      this.stream,});
+    this.streaming,
+    this.create,
+    this.permanent,
+    this.stream,
+  });
 
   StreamingMount.fromJson(dynamic json) {
     streaming = json['streaming'];
     create = json['create'];
     permanent = json['permanent'];
-    stream = json['stream'] != null ? StreamingPluginStream.fromJson(json['stream']) : null;
+    stream = json['stream'] != null
+        ? StreamingPluginStream.fromJson(json['stream'])
+        : null;
   }
   String? streaming;
   String? create;
@@ -27,16 +31,16 @@ class StreamingMount {
     }
     return map;
   }
-
 }
 
 class StreamingPluginStream {
   StreamingPluginStream({
-      this.id, 
-      this.type, 
-      this.description, 
-      this.isPrivate, 
-      this.ports,});
+    this.id,
+    this.type,
+    this.description,
+    this.isPrivate,
+    this.ports,
+  });
 
   StreamingPluginStream.fromJson(dynamic json) {
     id = json['id'];
@@ -67,14 +71,14 @@ class StreamingPluginStream {
     }
     return map;
   }
-
 }
 
 class Ports {
   Ports({
-      this.type, 
-      this.mid, 
-      this.port,});
+    this.type,
+    this.mid,
+    this.port,
+  });
 
   Ports.fromJson(dynamic json) {
     type = json['type'];
@@ -92,5 +96,4 @@ class Ports {
     map['port'] = port;
     return map;
   }
-
 }

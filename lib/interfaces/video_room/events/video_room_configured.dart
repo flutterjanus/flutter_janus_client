@@ -1,4 +1,5 @@
 part of janus_client;
+
 class VideoRoomConfigured extends VideoRoomEvent {
   VideoRoomConfigured({
     videoroom,

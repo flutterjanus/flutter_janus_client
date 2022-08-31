@@ -40,7 +40,11 @@ class _StreamingState extends State<TypedStreamingV2> {
                   DropdownButtonFormField<int>(
                       isExpanded: true,
                       value: selectedStreamId,
-                      items: List.generate(streams.length, (index) => DropdownMenuItem(value: streams[index].id, child: Text(streams[index].description ?? ''))),
+                      items: List.generate(
+                          streams.length,
+                          (index) => DropdownMenuItem(
+                              value: streams[index].id,
+                              child: Text(streams[index].description ?? ''))),
                       onChanged: (v) async {
                         print(v);
                         if (v != null) {
@@ -70,7 +74,10 @@ class _StreamingState extends State<TypedStreamingV2> {
       j = JanusClient(
         transport: ws,
         iceServers: [
-          RTCIceServer(username: '', credential: '', urls: 'stun:stun.l.google.com:19302'),
+          RTCIceServer(
+              username: '',
+              credential: '',
+              urls: 'stun:stun.l.google.com:19302'),
         ],
         isUnifiedPlan: true,
       );
@@ -83,29 +90,37 @@ class _StreamingState extends State<TypedStreamingV2> {
     });
     showStreamSelectionDialog();
     plugin.remoteTrack?.listen((event) async {
-      if (event.track != null && event.flowing == true && event.track?.kind == 'audio') {
+      if (event.track != null &&
+          event.flowing == true &&
+          event.track?.kind == 'audio') {
         MediaStream temp = await createLocalMediaStream(event.track!.id!);
         setState(() {
-          remoteAudioRenderers.putIfAbsent(event.track!.id!, () => RTCVideoRenderer());
+          remoteAudioRenderers.putIfAbsent(
+              event.track!.id!, () => RTCVideoRenderer());
           remoteAudioStreams.putIfAbsent(event.track!.id!, () => temp);
         });
         await remoteAudioRenderers[event.track!.id!]?.initialize();
         await remoteAudioStreams[event.track!.id!]?.addTrack(event.track!);
-        remoteAudioRenderers[event.track!.id!]?.srcObject = remoteAudioStreams[event.track!.id!];
+        remoteAudioRenderers[event.track!.id!]?.srcObject =
+            remoteAudioStreams[event.track!.id!];
         if (kIsWeb) {
           remoteAudioRenderers[event.track!.id!]?.muted = false;
         }
       }
 
-      if (event.track != null && event.flowing == true && event.track?.kind == 'video') {
+      if (event.track != null &&
+          event.flowing == true &&
+          event.track?.kind == 'video') {
         MediaStream temp = await createLocalMediaStream(event.track!.id!);
         setState(() {
-          remoteVideoRenderers.putIfAbsent(event.track!.id!, () => RTCVideoRenderer());
+          remoteVideoRenderers.putIfAbsent(
+              event.track!.id!, () => RTCVideoRenderer());
           remoteVideoStreams.putIfAbsent(event.track!.id!, () => temp);
         });
         await remoteVideoRenderers[event.track!.id!]?.initialize();
         await remoteVideoStreams[event.track!.id!]?.addTrack(event.track!);
-        remoteVideoRenderers[event.track!.id!]?.srcObject = remoteVideoStreams[event.track!.id!];
+        remoteVideoRenderers[event.track!.id!]?.srcObject =
+            remoteVideoStreams[event.track!.id!];
         if (kIsWeb) {
           remoteVideoRenderers[event.track!.id!]?.muted = false;
         }
@@ -162,13 +177,20 @@ class _StreamingState extends State<TypedStreamingV2> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(children: [
-        ...remoteAudioRenderers.entries.map((e) => e.value).map((e) => RTCVideoView(e)).toList(),
+        ...remoteAudioRenderers.entries
+            .map((e) => e.value)
+            .map((e) => RTCVideoView(e))
+            .toList(),
         Column(
           children: [
             Expanded(
                 child: GridView.count(
               crossAxisCount: 1,
-              childAspectRatio: MediaQuery.of(context).size.width / (MediaQuery.of(context).size.height / (remoteVideoRenderers.length > 0 ? remoteVideoRenderers.length : 1)),
+              childAspectRatio: MediaQuery.of(context).size.width /
+                  (MediaQuery.of(context).size.height /
+                      (remoteVideoRenderers.length > 0
+                          ? remoteVideoRenderers.length
+                          : 1)),
               mainAxisSpacing: 0,
               crossAxisSpacing: 5,
               shrinkWrap: true,
@@ -176,7 +198,8 @@ class _StreamingState extends State<TypedStreamingV2> {
                   .map((e) => e.value)
                   .map((e) => RTCVideoView(
                         e,
-                        objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                        objectFit:
+                            RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                       ))
                   .toList(),
             )),
@@ -206,9 +229,10 @@ class _StreamingState extends State<TypedStreamingV2> {
                           backgroundColor: Colors.grey,
                           radius: 30,
                           child: IconButton(
-                              icon: Icon(isMuted ? Icons.volume_off : Icons.volume_up),
+                              icon: Icon(
+                                  isMuted ? Icons.volume_off : Icons.volume_up),
                               color: Colors.white,
-                              onPressed: () async{
+                              onPressed: () async {
                                 if (isMuted) {
                                   setState(() {
                                     isMuted = false;
@@ -218,12 +242,13 @@ class _StreamingState extends State<TypedStreamingV2> {
                                     isMuted = true;
                                   });
                                 }
-                               var transrecievers= await plugin.webRTCHandle?.peerConnection?.transceivers;
-                               transrecievers?.forEach((element) {
-                                 if(element.receiver.track?.kind=='audio'){
-                                   element.receiver.track?.enabled=!isMuted;
-                                 }
-                               });
+                                var transrecievers = await plugin
+                                    .webRTCHandle?.peerConnection?.transceivers;
+                                transrecievers?.forEach((element) {
+                                  if (element.receiver.track?.kind == 'audio') {
+                                    element.receiver.track?.enabled = !isMuted;
+                                  }
+                                });
                               })),
                       padding: EdgeInsets.all(10),
                     ),
@@ -232,7 +257,8 @@ class _StreamingState extends State<TypedStreamingV2> {
                           backgroundColor: Colors.green,
                           radius: 30,
                           child: IconButton(
-                              icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow),
+                              icon: Icon(
+                                  isPlaying ? Icons.pause : Icons.play_arrow),
                               color: Colors.white,
                               onPressed: () async {
                                 if (isPlaying) {
@@ -260,7 +286,11 @@ class _StreamingState extends State<TypedStreamingV2> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [CircularProgressIndicator(), Padding(padding: EdgeInsets.all(10)), Text("Fetching Available Streams..")],
+                  children: [
+                    CircularProgressIndicator(),
+                    Padding(padding: EdgeInsets.all(10)),
+                    Text("Fetching Available Streams..")
+                  ],
                 ),
               )
             : Padding(padding: EdgeInsets.zero),

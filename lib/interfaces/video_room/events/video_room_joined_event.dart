@@ -8,9 +8,9 @@ class VideoRoomJoinedEvent extends VideoRoomEvent {
     this.id,
     this.privateId,
     this.publishers,
-  }){
-   super.videoroom=videoroom;
-   super.room=room;
+  }) {
+    super.videoroom = videoroom;
+    super.room = room;
   }
 
   VideoRoomJoinedEvent.fromJson(dynamic json) {
@@ -90,4 +90,3 @@ class Publishers {
     return map;
   }
 }
-

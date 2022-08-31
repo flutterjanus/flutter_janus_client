@@ -1,14 +1,14 @@
-
 part of janus_client;
 
 class StreamingMountPoint {
   StreamingMountPoint({
-      this.id, 
-      this.type, 
-      this.description, 
-      this.metadata, 
-      this.enabled, 
-      this.media,});
+    this.id,
+    this.type,
+    this.description,
+    this.metadata,
+    this.enabled,
+    this.media,
+  });
 
   StreamingMountPoint.fromJson(dynamic json) {
     id = json['id'];
@@ -42,6 +42,4 @@ class StreamingMountPoint {
     }
     return map;
   }
-
 }
-

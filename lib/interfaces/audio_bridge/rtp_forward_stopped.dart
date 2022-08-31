@@ -1,9 +1,11 @@
 part of janus_client;
+
 class RtpForwardStopped {
   RtpForwardStopped({
-      this.audiobridge, 
-      this.room, 
-      this.streamId,});
+    this.audiobridge,
+    this.room,
+    this.streamId,
+  });
 
   RtpForwardStopped.fromJson(dynamic json) {
     audiobridge = json['audiobridge'];
@@ -21,5 +23,4 @@ class RtpForwardStopped {
     map['stream_id'] = streamId;
     return map;
   }
-
 }

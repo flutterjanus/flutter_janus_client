@@ -51,14 +51,26 @@ class PublisherStream {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is PublisherStream && runtimeType == other.runtimeType && simulcast == other.simulcast && svc == other.svc && feed == other.feed && mid == other.mid);
+      identical(this, other) ||
+      (other is PublisherStream &&
+          runtimeType == other.runtimeType &&
+          simulcast == other.simulcast &&
+          svc == other.svc &&
+          feed == other.feed &&
+          mid == other.mid);
 
   @override
-  int get hashCode => simulcast.hashCode ^ svc.hashCode ^ feed.hashCode ^ mid.hashCode;
+  int get hashCode =>
+      simulcast.hashCode ^ svc.hashCode ^ feed.hashCode ^ mid.hashCode;
 
   @override
   String toString() {
-    return 'PublisherStream{' + ' simulcast: $simulcast,' + ' svc: $svc,' + ' feed: $feed,' + ' mid: $mid,' + '}';
+    return 'PublisherStream{' +
+        ' simulcast: $simulcast,' +
+        ' svc: $svc,' +
+        ' feed: $feed,' +
+        ' mid: $mid,' +
+        '}';
   }
 
   PublisherStream copyWith({

@@ -1,8 +1,10 @@
 part of janus_client;
+
 class VideoCallEvent {
   VideoCallEvent({
-      this.videocall, 
-      this.result,});
+    this.videocall,
+    this.result,
+  });
 
   VideoCallEvent.fromJson(dynamic json) {
     videocall = json['videocall'];
@@ -19,13 +21,13 @@ class VideoCallEvent {
     }
     return map;
   }
-
 }
 
 class Result {
   Result({
-      this.event, 
-      this.username,});
+    this.event,
+    this.username,
+  });
 
   Result.fromJson(dynamic json) {
     event = json['event'];
@@ -40,5 +42,4 @@ class Result {
     map['username'] = username;
     return map;
   }
-
 }

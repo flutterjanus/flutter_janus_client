@@ -1,9 +1,11 @@
 part of janus_client;
+
 class StreamingMountEdited {
   StreamingMountEdited({
-      this.streaming, 
-      this.id, 
-      this.permanent,});
+    this.streaming,
+    this.id,
+    this.permanent,
+  });
 
   StreamingMountEdited.fromJson(dynamic json) {
     streaming = json['streaming'];
@@ -21,5 +23,4 @@ class StreamingMountEdited {
     map['permanent'] = permanent;
     return map;
   }
-
 }

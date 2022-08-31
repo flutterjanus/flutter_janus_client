@@ -1,9 +1,11 @@
 part of janus_client;
+
 class CreateMediaItem {
   CreateMediaItem({
-      this.type, 
-      this.mid, 
-      this.port,});
+    this.type,
+    this.mid,
+    this.port,
+  });
 
   CreateMediaItem.fromJson(dynamic json) {
     type = json['type'];
@@ -21,5 +23,4 @@ class CreateMediaItem {
     map['port'] = port;
     return map;
   }
-
 }

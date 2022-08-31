@@ -2,15 +2,15 @@
 
 import 'package:janus_client/janus_client.dart';
 
-void main() async{
+void main() async {
   WebSocketJanusTransport ws = WebSocketJanusTransport(
       url: 'wss://master-janus.onemandev.tech/websocket');
-  JanusClient j=JanusClient(transport:ws);
+  JanusClient j = JanusClient(transport: ws);
   // RestJanusTransport rest =
   // RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
-  JanusSession session=await j.createSession();
+  JanusSession session = await j.createSession();
   print(session.sessionId);
-  JanusVideoRoomPlugin plugin=await session.attach<JanusVideoRoomPlugin>();
+  JanusVideoRoomPlugin plugin = await session.attach<JanusVideoRoomPlugin>();
   // print(await plugin.joinPublisher(1234));
 
   // group('RestJanusTransport', () {
@@ -29,17 +29,15 @@ void main() async{
   //     print(session.sessionId);
   //   });
 
-
-    // test('Attach A Plugin', () async {
-    //   Map<String, dynamic> request = {
-    //     "janus": "attach",
-    //     "plugin": "janus.plugin.videoroom",
-    //     "transaction": "random for attaching plugin"
-    //   };
-    //   var response = await rest.post(request);
-    //   rest.handleId = response['data']['id'];
-    //   expect(response['janus'], 'success');
-    // });
+  // test('Attach A Plugin', () async {
+  //   Map<String, dynamic> request = {
+  //     "janus": "attach",
+  //     "plugin": "janus.plugin.videoroom",
+  //     "transaction": "random for attaching plugin"
+  //   };
+  //   var response = await rest.post(request);
+  //   rest.handleId = response['data']['id'];
+  //   expect(response['janus'], 'success');
   // });
-
+  // });
 }

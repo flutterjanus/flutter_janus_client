@@ -1,12 +1,14 @@
 part of janus_client;
+
 class RtpForwarderCreated {
   RtpForwarderCreated({
-      this.audiobridge, 
-      this.room, 
-      this.group, 
-      this.streamId, 
-      this.host, 
-      this.port,});
+    this.audiobridge,
+    this.room,
+    this.group,
+    this.streamId,
+    this.host,
+    this.port,
+  });
 
   RtpForwarderCreated.fromJson(dynamic json) {
     audiobridge = json['audiobridge'];
@@ -33,5 +35,4 @@ class RtpForwarderCreated {
     map['port'] = port;
     return map;
   }
-
 }

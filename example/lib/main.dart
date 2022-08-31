@@ -20,7 +20,8 @@ void main() {
       "/typed_video_call": (c) => TypedVideoCallV2Example(),
       "/typed_audio_bridge": (c) => TypedAudioRoomV2(),
       "/typed_text_room": (c) => TypedTextRoom(),
-      "/screen_share_typed_video_room_v2_unified": (c) => TypedScreenShareVideoRoomV2Unified(),
+      "/screen_share_typed_video_room_v2_unified": (c) =>
+          TypedScreenShareVideoRoomV2Unified(),
       "/": (c) => Home()
     },
   ));

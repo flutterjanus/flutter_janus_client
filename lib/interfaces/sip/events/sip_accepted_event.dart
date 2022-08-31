@@ -1,4 +1,5 @@
 part of janus_client;
+
 class SipAcceptedEvent {
   String? sip;
   String? callId;

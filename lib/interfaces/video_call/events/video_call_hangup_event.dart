@@ -1,12 +1,15 @@
 part of janus_client;
+
 class VideoCallHangupEvent {
   VideoCallHangupEvent({
-      this.videocall, 
-      this.result,});
+    this.videocall,
+    this.result,
+  });
 
   VideoCallHangupEvent.fromJson(dynamic json) {
     videocall = json['videocall'];
-    result = json['result'] != null ? HangupResult.fromJson(json['result']) : null;
+    result =
+        json['result'] != null ? HangupResult.fromJson(json['result']) : null;
   }
   String? videocall;
   HangupResult? result;
@@ -19,14 +22,14 @@ class VideoCallHangupEvent {
     }
     return map;
   }
-
 }
 
 class HangupResult {
   HangupResult({
-      this.event, 
-      this.username, 
-      this.reason,});
+    this.event,
+    this.username,
+    this.reason,
+  });
 
   HangupResult.fromJson(dynamic json) {
     event = json['event'];
@@ -44,5 +47,4 @@ class HangupResult {
     map['reason'] = reason;
     return map;
   }
-
 }

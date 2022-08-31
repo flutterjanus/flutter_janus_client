@@ -1,4 +1,3 @@
 part of janus_client;
-class StreamingPluginStoppingEvent{
 
-}
+class StreamingPluginStoppingEvent {}

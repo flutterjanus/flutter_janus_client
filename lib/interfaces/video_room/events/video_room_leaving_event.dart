@@ -2,11 +2,12 @@ part of janus_client;
 
 class VideoRoomLeavingEvent extends VideoRoomEvent {
   VideoRoomLeavingEvent({
-      videoroom,
-      room,
-      this.leaving,}){
-    super.room=room;
-    super.videoroom=videoroom;
+    videoroom,
+    room,
+    this.leaving,
+  }) {
+    super.room = room;
+    super.videoroom = videoroom;
   }
 
   VideoRoomLeavingEvent.fromJson(dynamic json) {
@@ -23,5 +24,4 @@ class VideoRoomLeavingEvent extends VideoRoomEvent {
     map['leaving'] = leaving;
     return map;
   }
-
 }

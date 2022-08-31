@@ -1,4 +1,5 @@
 part of janus_client;
+
 class VideoCallAcceptedEvent extends VideoCallEvent {
   VideoCallAcceptedEvent.fromJson(dynamic json) {
     videocall = json['videocall'];

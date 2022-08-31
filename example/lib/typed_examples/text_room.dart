@@ -15,7 +15,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
   List<dynamic> textMessages = [];
   Map<String, String> userNameDisplayMap = {};
   late RestJanusTransport rest;
-  int myRoom=1234;
+  int myRoom = 1234;
   late WebSocketJanusTransport ws;
   TextEditingController nameController = TextEditingController();
   TextEditingController userNameController = TextEditingController();
@@ -114,7 +114,6 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
             textMessages.add(data);
           });
           scrollToBottom();
-
         }
         if (data['textroom'] == 'leave') {
           setState(() {
@@ -162,13 +161,14 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
     initializeClient();
   }
 
-  scrollToBottom(){
+  scrollToBottom() {
     controller.animateTo(
-      controller.position.maxScrollExtent+200,
+      controller.position.maxScrollExtent + 200,
       duration: Duration(milliseconds: 500),
       curve: Curves.fastOutSlowIn,
     );
   }
+
   Future<void> sendMessage() async {
     await textRoom.sendMessage(myRoom, nameController.text);
     nameController.text = '';
@@ -227,7 +227,7 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
               clipBehavior: Clip.none,
               elevation: 10,
               child: Container(
-                // height: 70,
+                  // height: 70,
                   padding: EdgeInsets.only(
                     left: 20,
                     right: 20,
@@ -239,7 +239,6 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Flexible(
-
                         child: TextFormField(
                           textInputAction: TextInputAction.send,
                           onFieldSubmitted: (b) async {

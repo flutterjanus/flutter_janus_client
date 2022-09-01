@@ -1,6 +1,6 @@
 name: janus_client
 description: A plugin that allows the flutter app to communicate with a Janus server using different transport mechanisms, such as WebSocket and HTTP(rest). It features a developer-friendly api to interact with various WebRTC Janus Plugins. Hence, it can be considered as a swiss-knife for WebRTC solutions.
-version: 2.2.5
+version: 2.2.6
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.9.4
+  flutter_webrtc: ^0.9.5
   path_provider: ^2.0.11
   http: ^0.13.4
   web_socket_channel: ^2.2.0

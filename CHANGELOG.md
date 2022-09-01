@@ -1,3 +1,7 @@
+## 2.2.6
+
+* fix stringIds issue for AudioBridge
+
 ## 2.2.5
 
 * fixes

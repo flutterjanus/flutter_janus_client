@@ -3,10 +3,13 @@
 
 .packages
 .pub/
-
+build/*
 .idea
 janus_client.iml
 .vscode
+flutter_janus_client.iml
+.last_build_id
+.metadata
 example/build/ios
 example/build/flutter_assets
 example/.flutter-plugins-dependencies

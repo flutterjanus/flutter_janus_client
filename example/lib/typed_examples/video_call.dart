@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
@@ -23,10 +24,19 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   AlertDialog? callDialog;
   bool ringing = false;
   bool front = true;
+  bool speakerOn = false;
+  List<MediaDeviceInfo>? _mediaDevicesList;
+  Future<void> _refreshMediaDevices() async {
+    var devices = await navigator.mediaDevices.enumerateDevices();
+    setState(() {
+      _mediaDevicesList = devices;
+    });
+  }
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
-    await publishVideo.initializeMediaDevices();
+    await publishVideo.initializeMediaDevices(
+        mediaConstraints: {'audio': true, 'video': true});
     _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
   }
 
@@ -132,6 +142,13 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     setState(() {
       remoteVideoStream = tempVideo;
     });
+    publishVideo.webRTCHandle?.peerConnection?.onConnectionState =
+        (connectionState) async {
+      if (connectionState ==
+          RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+        print('connection established');
+      }
+    };
     publishVideo.remoteTrack?.listen((event) async {
       if (event.track != null && event.flowing == true) {
         remoteVideoStream?.addTrack(event.track!);
@@ -168,7 +185,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
       if (data is VideoCallHangupEvent) {
         await destroy();
       }
-      publishVideo.handleRemoteJsep(even.jsep);
+      await publishVideo.handleRemoteJsep(even.jsep);
     }, onError: (error) async {
       if (error is JanusError) {
         var dialog;
@@ -198,6 +215,11 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     // TODO: implement initState
     super.initState();
     initJanusClient();
+    _refreshMediaDevices();
+    navigator.mediaDevices.ondevicechange = (event) async {
+      print('++++++ ondevicechange ++++++');
+      _refreshMediaDevices();
+    };
   }
 
   GlobalKey<FormState> formKey = GlobalKey();
@@ -228,7 +250,12 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    await publishVideo.acceptCall();
+                    var answer = await publishVideo.createAnswer(
+                        audioRecv: true,
+                        audioSend: true,
+                        videoRecv: true,
+                        videoSend: true);
+                    await publishVideo.acceptCall(answer: answer);
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);
                   },
@@ -246,9 +273,71 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         });
   }
 
+  _selectAudioInput(String deviceId) async {
+    print(deviceId);
+    await Helper.selectAudioInput(deviceId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(actions: [
+        PopupMenuButton<String>(
+          onSelected: _selectAudioInput,
+          icon: Icon(Icons.input),
+          itemBuilder: (BuildContext context) {
+            if (_mediaDevicesList != null) {
+              return _mediaDevicesList!
+                  .where((device) => device.kind == 'audioinput')
+                  .map((device) {
+                return PopupMenuItem<String>(
+                  value: device.deviceId,
+                  child: Text(device.label),
+                );
+              }).toList();
+            }
+            return [];
+          },
+        ),
+        Row(
+          children: [
+            Text('Speaker'),
+            CupertinoSwitch(
+              // This bool value toggles the switch.
+              value: speakerOn,
+              thumbColor: CupertinoColors.systemBlue,
+              trackColor: CupertinoColors.systemRed.withOpacity(0.14),
+              activeColor: CupertinoColors.systemRed.withOpacity(0.64),
+              onChanged: (bool? value) async {
+                // This is called when the user toggles the switch.
+                setState(() {
+                  speakerOn = value!;
+                });
+                await Helper.setSpeakerphoneOn(speakerOn);
+              },
+            ),
+          ],
+          crossAxisAlignment: CrossAxisAlignment.center,
+        ),
+        IconButton(
+            icon: Icon(Icons.cameraswitch_outlined),
+            color: Colors.white,
+            splashRadius: 25,
+            onPressed: () async {
+              setState(() {
+                front = !front;
+              });
+              //  note:- deviceId is important for web browsers
+              await publishVideo.switchCamera(
+                  deviceId: await getCameraDeviceId(front));
+
+              // everytime we make changes in stream we update in ui and renderer like this.
+              setState(() {
+                _localRenderer.srcObject =
+                    publishVideo.webRTCHandle?.localStream;
+              });
+            })
+      ]),
       body: Stack(children: [
         Column(
           mainAxisSize: MainAxisSize.min,
@@ -293,27 +382,10 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                       "Ringing...",
                       style: TextStyle(color: Colors.white),
                     )),
-                Flexible(
-                    child: Padding(
-                        padding: EdgeInsets.all(10),
-                        child: IconButton(
-                            icon: Icon(Icons.cameraswitch_outlined),
-                            color: Colors.white,
-                            splashRadius: 25,
-                            onPressed: () async {
-                              setState(() {
-                                front = !front;
-                              });
-                              //  note:- deviceId is important for web browsers
-                              await publishVideo.switchCamera(
-                                  deviceId: await getCameraDeviceId(front));
-
-                              // everytime we make changes in stream we update in ui and renderer like this.
-                              setState(() {
-                                _localRenderer.srcObject =
-                                    publishVideo.webRTCHandle?.localStream;
-                              });
-                            })))
+                // Flexible(
+                //     child: Padding(
+                //         padding: EdgeInsets.all(10),
+                //         child: ))
               ],
             ),
           ),

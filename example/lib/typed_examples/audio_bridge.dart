@@ -31,10 +31,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     _refreshMediaDevices();
     navigator.mediaDevices.ondevicechange = (event) async {
       print('++++++ ondevicechange ++++++');
-      var devices = await navigator.mediaDevices.enumerateDevices();
-      setState(() {
-        _mediaDevicesList = devices;
-      });
+      _refreshMediaDevices();
     };
   }
 
@@ -147,14 +144,6 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
       value.srcObject = null;
       await value.dispose();
     });
-  }
-
-  void _selectAudioOutput(String deviceId) async {
-    print(deviceId);
-    remoteRenderers.forEach((key, value) async {
-      await value.audioOutput(deviceId);
-    });
-    // await _localRenderer.audioOutput(deviceId);
   }
 
   void _selectAudioInput(String deviceId) async {

@@ -4,7 +4,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
-# janus_client
+# janus_client [![pub package](https://img.shields.io/pub/v/janus_client.svg)](https://pub.dartlang.org/packages/janus_client)[![Gitter](https://badges.gitter.im/flutter_janus_client/Lobby.svg)](https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.

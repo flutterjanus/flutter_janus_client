@@ -35,7 +35,8 @@ class _SipExampleState extends State<TypedSipExample> {
   dynamic _setState;
 
   Future<void> localMediaSetup() async {
-    MediaStream? temp = await sip?.initializeMediaDevices(useDisplayMediaDevices: false);
+    MediaStream? temp =
+        await sip?.initializeMediaDevices(useDisplayMediaDevices: false);
     localStream = temp;
   }
 

@@ -1,3 +1,16 @@
+## 2.2.7
+
+* Upgraded flutter_webrtc to fix #41 => audio input issue in ios devices
+* improved videocall and audiobridge example with newer audio I/O apis by flutter_webrtc
+
+## 2.2.6
+
+* fix stringIds issue for AudioBridge
+
+## 2.2.5
+
+* fixes
+
 ## 2.2.4
 
 * Fixed bugs in videocall example

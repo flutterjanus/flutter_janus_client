@@ -1,17 +1,19 @@
 part of janus_client;
+
 class StreamingMountPointInfo {
   StreamingMountPointInfo({
-      this.id, 
-      this.name, 
-      this.description, 
-      this.metadata, 
-      this.secret, 
-      this.pin, 
-      this.isPrivate, 
-      this.viewers, 
-      this.enabled, 
-      this.type, 
-      this.media,});
+    this.id,
+    this.name,
+    this.description,
+    this.metadata,
+    this.secret,
+    this.pin,
+    this.isPrivate,
+    this.viewers,
+    this.enabled,
+    this.type,
+    this.media,
+  });
 
   StreamingMountPointInfo.fromJson(dynamic json) {
     id = json['id'];
@@ -60,7 +62,6 @@ class StreamingMountPointInfo {
     }
     return map;
   }
-
 }
 
 class Media {
@@ -72,7 +73,8 @@ class Media {
     this.ageMs,
     this.pt,
     this.rtpmap,
-    this.fmtp,});
+    this.fmtp,
+  });
 
   Media.fromJson(dynamic json) {
     mid = json['mid'];
@@ -105,5 +107,4 @@ class Media {
     map['fmtp'] = fmtp;
     return map;
   }
-
 }

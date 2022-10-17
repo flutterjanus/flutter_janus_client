@@ -1,4 +1,5 @@
 part of janus_client;
+
 class SipProgressEvent {
   String? sip;
   String? callId;

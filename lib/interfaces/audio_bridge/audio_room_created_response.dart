@@ -1,9 +1,11 @@
 part of janus_client;
+
 class AudioRoomCreatedResponse {
   AudioRoomCreatedResponse({
-      this.audiobridge, 
-      this.room, 
-      this.permanent,});
+    this.audiobridge,
+    this.room,
+    this.permanent,
+  });
 
   AudioRoomCreatedResponse.fromJson(dynamic json) {
     audiobridge = json['audiobridge'];
@@ -21,5 +23,4 @@ class AudioRoomCreatedResponse {
     map['permanent'] = permanent;
     return map;
   }
-
 }

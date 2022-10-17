@@ -191,7 +191,8 @@ class JanusError {
   }
 
   factory JanusError.fromMap(Map<String, dynamic> map) {
-    if (map['result']!=null&&map['result']?.containsKey('code') &&
+    if (map['result'] != null &&
+        map['result']?.containsKey('code') &&
         map['result']?.containsKey('reason')) {
       return JanusError(
         event: map['result']?['event'] as String?,

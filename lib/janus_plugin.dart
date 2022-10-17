@@ -624,7 +624,7 @@ class JanusPlugin {
         'video': {
           'deviceId': {'exact': deviceId}
         },
-        'audio':true
+        'audio': true
       });
       List<RTCRtpSender> senders =
           (await webRTCHandle!.peerConnection!.getSenders());

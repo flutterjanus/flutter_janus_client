@@ -2,9 +2,10 @@ part of janus_client;
 
 class VideoRoomAttachedEvent {
   VideoRoomAttachedEvent({
-      this.videoroom, 
-      this.room, 
-      this.streams,});
+    this.videoroom,
+    this.room,
+    this.streams,
+  });
 
   VideoRoomAttachedEvent.fromJson(dynamic json) {
     videoroom = json['videoroom'];
@@ -29,22 +30,22 @@ class VideoRoomAttachedEvent {
     }
     return map;
   }
-
 }
 
 class AttachedStreams extends BaseStream {
   AttachedStreams({
-      mindex,
-      mid,
-      type,
-      this.feedId,
-      this.feedMid,
-      this.feedDisplay,
-      this.send,
-      this.ready,}){
-    super.mid=mid;
-    super.mindex=mindex;
-    super.type=type;
+    mindex,
+    mid,
+    type,
+    this.feedId,
+    this.feedMid,
+    this.feedDisplay,
+    this.send,
+    this.ready,
+  }) {
+    super.mid = mid;
+    super.mindex = mindex;
+    super.type = type;
   }
 
   AttachedStreams.fromJson(dynamic json) {
@@ -75,5 +76,4 @@ class AttachedStreams extends BaseStream {
     map['ready'] = ready;
     return map;
   }
-
 }

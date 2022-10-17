@@ -1,7 +1,7 @@
 part of janus_client;
 
 class AudioBridgeTalkingEvent extends AudioBridgeEvent {
-  int? userId;
+  dynamic userId;
   bool? isTalking;
   AudioBridgeTalkingEvent({audiobridge, room, userId, isTalking}) {
     super.audiobridge = audiobridge;

@@ -1,11 +1,13 @@
 part of janus_client;
+
 class VideoRoomListResponse {
   VideoRoomListResponse({
-      String? videoroom, 
-      List<JanusVideoRoom>? list,}){
+    String? videoroom,
+    List<JanusVideoRoom>? list,
+  }) {
     _videoroom = videoroom;
     _list = list;
-}
+  }
 
   VideoRoomListResponse.fromJson(dynamic json) {
     _videoroom = json['videoroom'];
@@ -30,7 +32,6 @@ class VideoRoomListResponse {
     }
     return map;
   }
-
 }
 
 /// room : 1234
@@ -62,32 +63,33 @@ class VideoRoomListResponse {
 
 class JanusVideoRoom {
   JanusVideoRoom({
-      dynamic room,
-      String? description, 
-      bool? pinRequired, 
-      bool? isPrivate, 
-      int? maxPublishers, 
-      int? bitrate, 
-      int? bitrateCap, 
-      int? firFreq, 
-      bool? requirePvtid, 
-      bool? requireE2ee, 
-      bool? notifyJoining, 
-      String? audiocodec, 
-      String? videocodec, 
-      bool? opusFec, 
-      bool? videoSvc, 
-      bool? record, 
-      String? recDir, 
-      bool? lockRecord, 
-      int? numParticipants, 
-      bool? audiolevelExt, 
-      bool? audiolevelEvent, 
-      int? audioActivePackets, 
-      int? audioLevelAverage, 
-      bool? videoorientExt, 
-      bool? playoutdelayExt, 
-      bool? transportWideCcExt,}){
+    dynamic room,
+    String? description,
+    bool? pinRequired,
+    bool? isPrivate,
+    int? maxPublishers,
+    int? bitrate,
+    int? bitrateCap,
+    int? firFreq,
+    bool? requirePvtid,
+    bool? requireE2ee,
+    bool? notifyJoining,
+    String? audiocodec,
+    String? videocodec,
+    bool? opusFec,
+    bool? videoSvc,
+    bool? record,
+    String? recDir,
+    bool? lockRecord,
+    int? numParticipants,
+    bool? audiolevelExt,
+    bool? audiolevelEvent,
+    int? audioActivePackets,
+    int? audioLevelAverage,
+    bool? videoorientExt,
+    bool? playoutdelayExt,
+    bool? transportWideCcExt,
+  }) {
     _room = room;
     _description = description;
     _pinRequired = pinRequired;
@@ -114,7 +116,7 @@ class JanusVideoRoom {
     _videoorientExt = videoorientExt;
     _playoutdelayExt = playoutdelayExt;
     _transportWideCcExt = transportWideCcExt;
-}
+  }
 
   JanusVideoRoom.fromJson(dynamic json) {
     _room = json['room'];
@@ -228,5 +230,4 @@ class JanusVideoRoom {
     map['transport_wide_cc_ext'] = _transportWideCcExt;
     return map;
   }
-
 }

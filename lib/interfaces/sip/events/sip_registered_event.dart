@@ -1,4 +1,5 @@
 part of janus_client;
+
 class SipRegisteredEvent {
   String? sip;
   SipRegisteredEventResult? result;

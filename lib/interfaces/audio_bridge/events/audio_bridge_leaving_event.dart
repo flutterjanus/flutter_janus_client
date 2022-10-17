@@ -1,12 +1,9 @@
 part of janus_client;
 
-class AudioBridgeLeavingEvent extends AudioBridgeEvent{
-  AudioBridgeLeavingEvent({
-    audiobridge,
-    room,
-    this.leaving}){
-    super.audiobridge=audiobridge;
-    super.room=room;
+class AudioBridgeLeavingEvent extends AudioBridgeEvent {
+  AudioBridgeLeavingEvent({audiobridge, room, this.leaving}) {
+    super.audiobridge = audiobridge;
+    super.room = room;
   }
 
   AudioBridgeLeavingEvent.fromJson(dynamic json) {
@@ -24,5 +21,4 @@ class AudioBridgeLeavingEvent extends AudioBridgeEvent{
     map['leaving'] = leaving;
     return map;
   }
-
 }

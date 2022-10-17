@@ -3,14 +3,14 @@ part of janus_client;
 
 class AudioBridgeJoinedEvent extends AudioBridgeEvent {
   AudioBridgeJoinedEvent({
-      audiobridge,
-      room,
-      this.id, 
-      this.display, 
-      this.participants,}){
-    super.audiobridge=audiobridge;
-    super.room=room;
-
+    audiobridge,
+    room,
+    this.id,
+    this.display,
+    this.participants,
+  }) {
+    super.audiobridge = audiobridge;
+    super.room = room;
   }
 
   AudioBridgeJoinedEvent.fromJson(dynamic json) {
@@ -25,7 +25,7 @@ class AudioBridgeJoinedEvent extends AudioBridgeEvent {
       });
     }
   }
-  int? id;
+  dynamic id;
   String? display;
   List<AudioBridgeParticipants>? participants;
 
@@ -40,36 +40,33 @@ class AudioBridgeJoinedEvent extends AudioBridgeEvent {
     }
     return map;
   }
-
 }
 
 class AudioBridgeParticipants {
-  int? id;
+  dynamic id;
   String? display;
   bool? setup;
   bool? muted;
   bool? talking;
   int? spatialPosition;
-  
+
   AudioBridgeParticipants({
     this.id,
     this.display,
-     this.setup=false,
-    this.muted=false,
-    this.talking=false,
+    this.setup = false,
+    this.muted = false,
+    this.talking = false,
     this.spatialPosition,
   });
 
   AudioBridgeParticipants.fromJson(dynamic json) {
     id = json['id'];
     display = json['display'];
-    setup = json['setup']!=null?json['setup']:setup;
-    muted = json['muted']!=null?json['muted']:muted;
-    talking = json['talking']!=null?json['talking']:talking;
+    setup = json['setup'] != null ? json['setup'] : setup;
+    muted = json['muted'] != null ? json['muted'] : muted;
+    talking = json['talking'] != null ? json['talking'] : talking;
     spatialPosition = json['spatial_position'];
   }
-  
-
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -81,9 +78,6 @@ class AudioBridgeParticipants {
     map['spatial_position'] = spatialPosition;
     return map;
   }
-
-
-
 
   AudioBridgeParticipants copyWith({
     int? id,
@@ -104,16 +98,16 @@ class AudioBridgeParticipants {
   }
 }
 
-class AudioBridgeNewParticipantsEvent extends AudioBridgeEvent{
+class AudioBridgeNewParticipantsEvent extends AudioBridgeEvent {
   List<AudioBridgeParticipants>? participants;
   AudioBridgeNewParticipantsEvent.fromJson(dynamic json) {
-        audiobridge = json['audiobridge'];
-        room = json['room'];
-        if (json['participants'] != null) {
-          participants = [];
-          json['participants'].forEach((v) {
-            participants?.add(AudioBridgeParticipants.fromJson(v));
-          });
-        }
-      }
+    audiobridge = json['audiobridge'];
+    room = json['room'];
+    if (json['participants'] != null) {
+      participants = [];
+      json['participants'].forEach((v) {
+        participants?.add(AudioBridgeParticipants.fromJson(v));
+      });
+    }
+  }
 }

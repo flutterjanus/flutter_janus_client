@@ -1,9 +1,11 @@
 part of janus_client;
+
 class VideoRoomListParticipantsResponse {
   VideoRoomListParticipantsResponse({
-      this.videoroom, 
-      this.room, 
-      this.participants,});
+    this.videoroom,
+    this.room,
+    this.participants,
+  });
 
   VideoRoomListParticipantsResponse.fromJson(dynamic json) {
     videoroom = json['videoroom'];
@@ -28,15 +30,15 @@ class VideoRoomListParticipantsResponse {
     }
     return map;
   }
-
 }
 
 class Participants {
   Participants({
-      this.id, 
-      this.display, 
-      this.publisher, 
-      this.talking,});
+    this.id,
+    this.display,
+    this.publisher,
+    this.talking,
+  });
 
   Participants.fromJson(dynamic json) {
     id = json['id'];
@@ -57,5 +59,4 @@ class Participants {
     map['talking'] = talking;
     return map;
   }
-
 }

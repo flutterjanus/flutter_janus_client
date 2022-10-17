@@ -18,11 +18,12 @@ class _HomeState extends State<Home> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ListTile(
-                    title:
-                      Text.rich(TextSpan(children: [
+                    title: Text.rich(
+                      TextSpan(children: [
                         TextSpan(text: "Typed Video Room V2 Unified"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {
@@ -31,14 +32,15 @@ class _HomeState extends State<Home> {
                     },
                   ),
                   ListTile(
-                    title: Text.rich(
-                        TextSpan(children: [
-                          TextSpan(text: "Screen Share Typed Video Room V2 Unified"),
-                          TextSpan(
-                              text: "  New", style: TextStyle(color: Colors.green))
-                        ])),
+                    title: Text.rich(TextSpan(children: [
+                      TextSpan(
+                          text: "Screen Share Typed Video Room V2 Unified"),
+                      TextSpan(
+                          text: "  New", style: TextStyle(color: Colors.green))
+                    ])),
                     onTap: () {
-                      Navigator.of(context).pushNamed("/screen_share_typed_video_room_v2_unified");
+                      Navigator.of(context).pushNamed(
+                          "/screen_share_typed_video_room_v2_unified");
                     },
                   ),
                   ListTile(
@@ -46,7 +48,8 @@ class _HomeState extends State<Home> {
                       TextSpan(children: [
                         TextSpan(text: "Typed streaming Unified"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {
@@ -55,10 +58,11 @@ class _HomeState extends State<Home> {
                   ),
                   ListTile(
                     title: Text.rich(
-                       TextSpan(children: [
+                      TextSpan(children: [
                         TextSpan(text: "Typed Video Call Unified"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {
@@ -70,7 +74,8 @@ class _HomeState extends State<Home> {
                       TextSpan(children: [
                         TextSpan(text: "Typed Audio Bridge Unified"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {
@@ -82,7 +87,8 @@ class _HomeState extends State<Home> {
                       TextSpan(children: [
                         TextSpan(text: "Typed Text Room"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {
@@ -94,7 +100,8 @@ class _HomeState extends State<Home> {
                       TextSpan(children: [
                         TextSpan(text: "Typed Sip Example"),
                         TextSpan(
-                            text: "  New", style: TextStyle(color: Colors.green))
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
                       ]),
                     ),
                     onTap: () {

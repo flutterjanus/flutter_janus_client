@@ -13,7 +13,7 @@ class TypedVideoRoomV2Unified extends StatefulWidget {
 
 class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   late JanusClient j;
-  Map<int, RemoteStream> remoteStreams = {};
+  Map<dynamic, RemoteStream> remoteStreams = {};
 
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
@@ -22,12 +22,12 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   JanusVideoRoomPlugin? remoteHandle;
   late int myId;
   bool front = true;
-  int myRoom = 1234;
-  Map<int, dynamic> feedStreams = {};
-  Map<int?, dynamic> subscriptions = {};
-  Map<int, dynamic> feeds = {};
-  Map<String, int> subStreams = {};
-  Map<int, MediaStream?> mediaStreams = {};
+  dynamic myRoom = 1234;
+  Map<dynamic, dynamic> feedStreams = {};
+  Map<dynamic, dynamic> subscriptions = {};
+  Map<dynamic, dynamic> feeds = {};
+  Map<dynamic, dynamic> subStreams = {};
+  Map<dynamic, MediaStream?> mediaStreams = {};
 
   @override
   void didChangeDependencies() async {
@@ -46,7 +46,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     plugin = await session.attach<JanusVideoRoomPlugin>();
   }
 
-  subscribeTo(List<Map<String, dynamic>> sources) async {
+  subscribeTo(List<Map<dynamic, dynamic>> sources) async {
     if (sources.length == 0) return;
     var streams = (sources)
         .map((e) => PublisherStream(mid: e['mid'], feed: e['feed']))
@@ -86,7 +86,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     remoteHandle?.remoteTrack?.listen((event) async {
       String mid = event.mid!;
       if (subStreams[mid] != null) {
-        int feedId = subStreams[mid]!;
+        dynamic feedId = subStreams[mid]!;
         if (!remoteStreams.containsKey(feedId)) {
           RemoteStream temp = RemoteStream(feedId.toString());
           await temp.init();
@@ -120,7 +120,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
         (await plugin.publishMedia(bitrate: 3000000));
-        List<Map<String, dynamic>> publisherStreams = [];
+        List<Map<dynamic, dynamic>> publisherStreams = [];
         for (Publishers publisher in data.publishers ?? []) {
           for (Streams stream in publisher.streams ?? []) {
             feedStreams[publisher.id!] = {

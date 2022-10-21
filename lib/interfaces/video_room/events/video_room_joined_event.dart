@@ -28,7 +28,7 @@ class VideoRoomJoinedEvent extends VideoRoomEvent {
   }
 
   String? description;
-  int? id;
+  dynamic id;
   int? privateId;
   List<Publishers>? publishers;
 
@@ -70,7 +70,7 @@ class Publishers {
     talking = json['talking'];
   }
 
-  int? id;
+  dynamic id;
   String? display;
   String? audioCodec;
   String? videoCodec;

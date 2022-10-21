@@ -37,8 +37,8 @@ class VideoRoomNewPublisherEvent extends VideoRoomEvent {
 class PublisherStream {
   bool? simulcast;
   bool? svc;
-  int? feed;
-  String? mid;
+  dynamic feed;
+  dynamic mid;
 
 //<editor-fold desc="Data Methods">
 
@@ -73,20 +73,6 @@ class PublisherStream {
         '}';
   }
 
-  PublisherStream copyWith({
-    bool? simulcast,
-    bool? svc,
-    int? feed,
-    String? mid,
-  }) {
-    return PublisherStream(
-      simulcast: simulcast ?? this.simulcast,
-      svc: svc ?? this.svc,
-      feed: feed ?? this.feed,
-      mid: mid ?? this.mid,
-    );
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'simulcast': this.simulcast,
@@ -100,8 +86,8 @@ class PublisherStream {
     return PublisherStream(
       simulcast: map['simulcast'] as bool,
       svc: map['svc'] as bool,
-      feed: map['feed'] as int,
-      mid: map['mid'] as String,
+      feed: map['feed'],
+      mid: map['mid'],
     );
   }
 

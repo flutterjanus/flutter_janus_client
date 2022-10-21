@@ -1,7 +1,7 @@
 part of janus_client;
 
 class VideoRoomEvent {
-  late String videoroom;
+  String? videoroom;
   dynamic room;
 
 //<editor-fold desc="Data Methods">
@@ -10,10 +10,7 @@ class VideoRoomEvent {
     room = room;
   }
 
-  VideoRoomEvent() {
-    this.videoroom = '';
-    room = 0;
-  }
+  VideoRoomEvent() {}
 
   @override
   bool operator ==(Object other) =>
@@ -33,29 +30,11 @@ class VideoRoomEvent {
         ' room: $room,' +
         '}';
   }
-
-  VideoRoomEvent copyWith({
-    String? videoroom,
-    int? room,
-  }) {
-    return VideoRoomEvent.create(
-      videoroom ?? this.videoroom,
-      room ?? this.room,
-    );
-  }
-
   Map<String, dynamic> toMap() {
     return {
       'videoroom': this.videoroom,
       'room': this.room,
     };
-  }
-
-  factory VideoRoomEvent.fromMap(Map<String, dynamic> map) {
-    return VideoRoomEvent.create(
-      map['videoroom'] as String,
-      map['room'] as int,
-    );
   }
 
 //</editor-fold>

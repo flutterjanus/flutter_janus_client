@@ -58,8 +58,8 @@ class AttachedStreams extends BaseStream {
     send = json['send'];
     ready = json['ready'];
   }
-  int? feedId;
-  String? feedMid;
+  dynamic feedId;
+  dynamic feedMid;
   String? feedDisplay;
   bool? send;
   bool? ready;

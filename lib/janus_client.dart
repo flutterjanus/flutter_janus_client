@@ -2,7 +2,6 @@
 library janus_client;
 
 import 'package:collection/collection.dart';
-import 'package:dartdoc/dartdoc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
@@ -15,7 +14,6 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
-import 'dart:convert';
 
 part './interfaces/janus_client.dart';
 

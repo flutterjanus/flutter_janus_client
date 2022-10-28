@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -67,7 +66,12 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; create() async {
   try {
     String transaction = getUuid().v4();
-    Map&lt;String, dynamic&gt; request = {&quot;janus&quot;: &quot;create&quot;, &quot;transaction&quot;: transaction, ..._context._tokenMap, ..._context._apiMap};
+    Map&lt;String, dynamic&gt; request = {
+      &quot;janus&quot;: &quot;create&quot;,
+      &quot;transaction&quot;: transaction,
+      ..._context._tokenMap,
+      ..._context._apiMap
+    };
     Map&lt;String, dynamic&gt;? response;
     if (_transport is RestJanusTransport) {
       RestJanusTransport rest = (_transport as RestJanusTransport);
@@ -86,7 +90,8 @@
         ws.connect();
       }
       ws.sink!.add(stringify(request));
-      response = parse(await ws.stream.firstWhere((element) =&gt; (parse(element)[&#39;transaction&#39;] == transaction)));
+      response = parse(await ws.stream.firstWhere(
+          (element) =&gt; (parse(element)[&#39;transaction&#39;] == transaction)));
       if (response!.containsKey(&#39;janus&#39;) &amp;&amp; response.containsKey(&#39;data&#39;)) {
         _sessionId = response[&#39;data&#39;][&#39;id&#39;] as int?;
         ws.sessionId = sessionId;
@@ -94,9 +99,11 @@
     }
     _keepAlive();
   } on WebSocketChannelException catch (e) {
-    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; + e.message!;
+    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; +
+        e.message!;
   } catch (e) {
-    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; + e.toString();
+    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; +
+        e.toString();
   }
 }</code></pre>
 </section>
@@ -122,8 +129,8 @@
     <h5>JanusSession class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusSession-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusSession/JanusSession.html">JanusSession</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusSession-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusSession/JanusSession.html">JanusSession</a></li>
 
 
     <li class="section-title">
@@ -158,7 +165,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -167,7 +174,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

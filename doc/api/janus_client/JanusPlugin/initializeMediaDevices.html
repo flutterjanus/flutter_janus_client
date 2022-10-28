@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -52,7 +51,7 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.2/webrtc_interface/MediaStream-class.html">MediaStream</a>?</span>&gt;</span></span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.8/webrtc_interface/MediaStream-class.html">MediaStream</a>?</span>&gt;</span></span>
 <span class="name ">initializeMediaDevices</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initializeMediaDevices-param-useDisplayMediaDevices">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">useDisplayMediaDevices</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="initializeMediaDevices-param-mediaConstraints"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">mediaConstraints</span>}</span></li>
 </ol>)
@@ -72,24 +71,50 @@ you can use this method to get the stream and show live preview of your camera t
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;MediaStream?&gt; initializeMediaDevices({bool? useDisplayMediaDevices = false, Map&lt;String, dynamic&gt;? mediaConstraints}) async {
-  if (mediaConstraints == null) {
-    List&lt;MediaDeviceInfo&gt; audioDevices = await Helper.audiooutputs;
-    List&lt;MediaDeviceInfo&gt; videoDevices = await Helper.cameras;
-    mediaConstraints = {&quot;audio&quot;: audioDevices.length &gt; 0, &quot;video&quot;: videoDevices.length &gt; 0};
+  <pre class="language-dart"><code class="language-dart">Future&lt;MediaStream?&gt; initializeMediaDevices(
+    {bool? useDisplayMediaDevices = false,
+    Map&lt;String, dynamic&gt;? mediaConstraints}) async {
+  await _disposeMediaStreams(ignoreRemote: true);
+  List&lt;MediaDeviceInfo&gt; videoDevices = await getVideoInputDevices();
+  List&lt;MediaDeviceInfo&gt; audioDevices = await getAudioInputDevices();
+  if (videoDevices.isEmpty &amp;&amp; audioDevices.isEmpty) {
+    throw Exception(&quot;No device found for media generation&quot;);
   }
+  if (mediaConstraints == null) {
+    if (videoDevices.isEmpty &amp;&amp; audioDevices.isNotEmpty) {
+      mediaConstraints = {&quot;audio&quot;: true, &quot;video&quot;: false};
+    } else if (videoDevices.length == 1 &amp;&amp; audioDevices.isNotEmpty) {
+      mediaConstraints = {&quot;audio&quot;: true, &#39;video&#39;: true};
+    } else {
+      mediaConstraints = {
+        &quot;audio&quot;: audioDevices.length &gt; 0,
+        &#39;video&#39;: {
+          &#39;deviceId&#39;: {&#39;exact&#39;: videoDevices.first.deviceId},
+        },
+      };
+    }
+  }
+  _context._logger.fine(mediaConstraints);
   if (webRTCHandle != null) {
-    webRTCHandle!.localStream = useDisplayMediaDevices == true ? (await navigator.mediaDevices.getDisplayMedia(mediaConstraints)) : (await navigator.mediaDevices.getUserMedia(mediaConstraints));
+    if (useDisplayMediaDevices == true) {
+      webRTCHandle!.localStream =
+          await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+    } else {
+      webRTCHandle!.localStream =
+          await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    }
     if (_context._isUnifiedPlan &amp;&amp; !_context._usePlanB) {
       _context._logger.fine(&#39;using unified plan&#39;);
       webRTCHandle!.localStream!.getTracks().forEach((element) async {
         _context._logger.fine(&#39;adding track in peerconnection&#39;);
         _context._logger.fine(element.toString());
-        await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+        await webRTCHandle!.peerConnection!
+            .addTrack(element, webRTCHandle!.localStream!);
       });
     } else {
       _localStreamController!.sink.add(webRTCHandle!.localStream);
-      await webRTCHandle!.peerConnection!.addStream(webRTCHandle!.localStream!);
+      await webRTCHandle!.peerConnection!
+          .addStream(webRTCHandle!.localStream!);
     }
     return webRTCHandle!.localStream;
   } else {
@@ -120,8 +145,8 @@ you can use this method to get the stream and show live preview of your camera t
     <h5>JanusPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
 
 
     <li class="section-title">
@@ -147,11 +172,13 @@ you can use this method to get the stream and show live preview of your camera t
     <li><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/JanusPlugin/onCreate.html">onCreate</a></li>
     <li><a href="../../janus_client/JanusPlugin/send.html">send</a></li>
@@ -177,7 +204,7 @@ you can use this method to get the stream and show live preview of your camera t
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -186,7 +213,7 @@ you can use this method to get the stream and show live preview of your camera t
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

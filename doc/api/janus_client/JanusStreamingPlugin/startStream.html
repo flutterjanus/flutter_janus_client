@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -68,10 +67,12 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; startStream() async {
-  if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
+  if (webRTCHandle?.peerConnection?.iceConnectionState ==
+      RTCIceConnectionState.RTCIceConnectionStateConnected) {
     await send(data: {&quot;request&quot;: &quot;start&quot;});
   } else {
-    RTCSessionDescription answer = await createAnswer(videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
+    RTCSessionDescription answer = await createAnswer(
+        videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
     await send(data: {&quot;request&quot;: &quot;start&quot;}, jsep: answer);
   }
 }</code></pre>
@@ -98,8 +99,8 @@
     <h5>JanusStreamingPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusStreamingPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusStreamingPlugin/JanusStreamingPlugin.html">JanusStreamingPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusStreamingPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusStreamingPlugin/JanusStreamingPlugin.html">JanusStreamingPlugin</a></li>
 
 
     <li class="section-title inherited">
@@ -128,12 +129,14 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusStreamingPlugin/editStream.html">editStream</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
     <li><a href="../../janus_client/JanusStreamingPlugin/getStreamInfo.html">getStreamInfo</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li><a href="../../janus_client/JanusStreamingPlugin/listStreams.html">listStreams</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/JanusStreamingPlugin/onCreate.html">onCreate</a></li>
@@ -165,7 +168,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -174,7 +177,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -53,7 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">joinPublisher</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinPublisher-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">joinPublisher</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinPublisher-param-roomId"><span class="type-annotation">dynamic</span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="joinPublisher-param-pin">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">pin</span>, </span></li>
 <li><span class="parameter" id="joinPublisher-param-id"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">id</span>, </span></li>
 <li><span class="parameter" id="joinPublisher-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
@@ -72,7 +71,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinPublisher(String roomId, {String? pin, int? id, String? token, String? displayName}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinPublisher(dynamic roomId,
+    {String? pin, int? id, String? token, String? displayName}) async {
   var payload = {
     &quot;request&quot;: &quot;join&quot;,
     &quot;ptype&quot;: &quot;publisher&quot;,
@@ -108,8 +108,8 @@
     <h5>JanusVideoRoomPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusVideoRoomPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusVideoRoomPlugin/JanusVideoRoomPlugin.html">JanusVideoRoomPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusVideoRoomPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusVideoRoomPlugin/JanusVideoRoomPlugin.html">JanusVideoRoomPlugin</a></li>
 
 
     <li class="section-title inherited">
@@ -138,13 +138,15 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/editRoom.html">editRoom</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/getRoomParticipants.html">getRoomParticipants</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/getRooms.html">getRooms</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/hangup.html">hangup</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/joinPublisher.html">joinPublisher</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/joinSubscriber.html">joinSubscriber</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
@@ -174,7 +176,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -183,7 +185,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

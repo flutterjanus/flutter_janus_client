@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -53,7 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
-<span class="name ">kickParticipant</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="kickParticipant-param-roomId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">roomId</span>, </span></li>
+<span class="name ">kickParticipant</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="kickParticipant-param-roomId"><span class="type-annotation">dynamic</span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="kickParticipant-param-username"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">username</span>, </span></li>
 <li><span class="parameter" id="kickParticipant-param-secret">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">secret</span>}</span></li>
 </ol>)
@@ -73,7 +72,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; kickParticipant(String roomId, String username,
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; kickParticipant(dynamic roomId, String username,
     {String? secret}) async {
   var payload = {
     &quot;request&quot;: &quot;kick&quot;,
@@ -109,8 +108,8 @@
     <h5>JanusTextRoomPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusTextRoomPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusTextRoomPlugin/JanusTextRoomPlugin.html">JanusTextRoomPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusTextRoomPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusTextRoomPlugin/JanusTextRoomPlugin.html">JanusTextRoomPlugin</a></li>
 
 
     <li class="section-title">
@@ -140,11 +139,13 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/editRoom.html">editRoom</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/exists.html">exists</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/joinRoom.html">joinRoom</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/kickParticipant.html">kickParticipant</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/leaveRoom.html">leaveRoom</a></li>
@@ -177,7 +178,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -186,7 +187,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

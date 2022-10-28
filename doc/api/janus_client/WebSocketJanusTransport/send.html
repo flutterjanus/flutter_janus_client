@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -76,7 +75,9 @@
       data[&#39;handle_id&#39;] = handleId;
     }
     sink!.add(stringify(data));
-    return parse(await stream.firstWhere((element) =&gt; (parse(element)[&#39;transaction&#39;] == data[&#39;transaction&#39;]), orElse: () =&gt; {}));
+    return parse(await stream.firstWhere(
+        (element) =&gt; (parse(element)[&#39;transaction&#39;] == data[&#39;transaction&#39;]),
+        orElse: () =&gt; {}));
   } else {
     throw &quot;transaction key missing in body&quot;;
   }
@@ -104,8 +105,8 @@
     <h5>WebSocketJanusTransport class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/WebSocketJanusTransport/WebSocketJanusTransport.html">WebSocketJanusTransport</a></li>
+        <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/WebSocketJanusTransport/WebSocketJanusTransport.html">WebSocketJanusTransport</a></li>
 
 
     <li class="section-title">
@@ -124,6 +125,7 @@
     <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/connect.html">connect</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/dispose.html">dispose</a></li>
+    <li><a href="../../janus_client/WebSocketJanusTransport/getInfo.html">getInfo</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/send.html">send</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
@@ -146,7 +148,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -155,7 +157,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

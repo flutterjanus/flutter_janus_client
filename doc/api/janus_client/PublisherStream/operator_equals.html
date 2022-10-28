@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -101,7 +100,13 @@ the <a href="../../janus_client/PublisherStream/hashCode.html">hashCode</a> meth
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 bool operator ==(Object other) =&gt;
-    identical(this, other) || (other is PublisherStream &amp;&amp; runtimeType == other.runtimeType &amp;&amp; simulcast == other.simulcast &amp;&amp; svc == other.svc &amp;&amp; feed == other.feed &amp;&amp; mid == other.mid);</code></pre>
+    identical(this, other) ||
+    (other is PublisherStream &amp;&amp;
+        runtimeType == other.runtimeType &amp;&amp;
+        simulcast == other.simulcast &amp;&amp;
+        svc == other.svc &amp;&amp;
+        feed == other.feed &amp;&amp;
+        mid == other.mid);</code></pre>
 </section>
 
 
@@ -125,9 +130,9 @@ bool operator ==(Object other) =&gt;
     <h5>PublisherStream class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/PublisherStream-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/PublisherStream/PublisherStream.html">PublisherStream</a></li>
-    <li><a href="../../janus_client/PublisherStream/PublisherStream.fromMap.html">fromMap</a></li>
+        <li class="section-title"><a href="../../janus_client/PublisherStream-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/PublisherStream/PublisherStream.html">PublisherStream</a></li>
+          <li><a href="../../janus_client/PublisherStream/PublisherStream.fromMap.html">fromMap</a></li>
 
 
     <li class="section-title">
@@ -141,7 +146,6 @@ bool operator ==(Object other) =&gt;
     <li><a href="../../janus_client/PublisherStream/svc.html">svc</a></li>
 
     <li class="section-title"><a href="../../janus_client/PublisherStream-class.html#instance-methods">Methods</a></li>
-    <li><a href="../../janus_client/PublisherStream/copyWith.html">copyWith</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/PublisherStream/toMap.html">toMap</a></li>
     <li><a href="../../janus_client/PublisherStream/toString.html">toString</a></li>
@@ -164,7 +168,7 @@ bool operator ==(Object other) =&gt;
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -173,7 +177,7 @@ bool operator ==(Object other) =&gt;
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

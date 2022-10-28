@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -67,7 +66,10 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;JanusSession&gt; createSession() async {
   _logger.info(&quot;Creating Session&quot;);
   _logger.fine(&quot;fine message&quot;);
-  JanusSession session = JanusSession(refreshInterval: _refreshInterval, transport: _transport, context: this);
+  JanusSession session = JanusSession(
+      refreshInterval: _refreshInterval,
+      transport: _transport,
+      context: this);
   try {
     await session.create();
   } catch (e) {
@@ -99,8 +101,8 @@
     <h5>JanusClient class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusClient-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusClient-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
 
 
     <li class="section-title inherited">
@@ -111,6 +113,7 @@
 
     <li class="section-title"><a href="../../janus_client/JanusClient-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/JanusClient/createSession.html">createSession</a></li>
+    <li><a href="../../janus_client/JanusClient/getInfo.html">getInfo</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
 
@@ -132,7 +135,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -141,7 +144,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

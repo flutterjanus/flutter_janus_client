@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -53,33 +52,59 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span>&gt;</span></span>
-<span class="name ">switchCamera</span>(<wbr>)
+<span class="name ">switchCamera</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="switchCamera-param-deviceId">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">deviceId</span>}</span></li>
+</ol>)
 
       
 
     </section>
     
 <section class="desc markdown">
-  <p>a utility method which can be used to switch camera of user device if it has more than one camera</p>
+  <p>a utility method which can be used to switch camera of user device if it has more than one camera
+<code>deviceId</code> : device id of the camera you want to switch to
+<code>deviceId</code> is important for switchCamera to work in browsers.</p>
 </section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;bool&gt; switchCamera() async {
-  MediaStreamTrack? videoTrack;
-  if (webRTCHandle!.localStream != null) {
-    videoTrack = webRTCHandle!.localStream!.getVideoTracks().firstWhere((track) =&gt; track.kind == &quot;video&quot;);
-    return await Helper.switchCamera(videoTrack);
-  } else {
-    if (webRTCHandle!.peerConnection!.getLocalStreams().length &gt; 0) {
-      videoTrack = webRTCHandle?.peerConnection?.getLocalStreams().first?.getVideoTracks().firstWhereOrNull((track) =&gt; track.kind == &quot;video&quot;);
-      if (videoTrack != null) {
-        return await Helper.switchCamera(videoTrack);
-      }
+  <pre class="language-dart"><code class="language-dart">Future&lt;bool&gt; switchCamera({String? deviceId}) async {
+  List&lt;MediaDeviceInfo&gt; videoDevices = await getVideoInputDevices();
+  if (videoDevices.isEmpty) {
+    throw Exception(&quot;No Camera Found&quot;);
+  }
+  if (kIsWeb) {
+    if (deviceId == null) {
+      _context._logger.fine(
+          &#39;deviceId not provided,hence switching to default last deviceId should be of back camera ideally&#39;);
+      deviceId = videoDevices.last.deviceId;
     }
-    throw &quot;Media devices and stream not initialized,try calling initializeMediaDevices() &quot;;
+    await _disposeMediaStreams(ignoreRemote: true);
+    webRTCHandle!.localStream = await navigator.mediaDevices.getUserMedia({
+      &#39;video&#39;: {
+        &#39;deviceId&#39;: {&#39;exact&#39;: deviceId}
+      },
+      &#39;audio&#39;: true
+    });
+    List&lt;RTCRtpSender&gt; senders =
+        (await webRTCHandle!.peerConnection!.getSenders());
+    webRTCHandle!.localStream?.getTracks().forEach((element) async {
+      senders.forEach((sender) async {
+        if (sender.track?.kind == element.kind) {
+          await sender.replaceTrack(element);
+        }
+      });
+    });
+    return true;
+  } else {
+    if (webRTCHandle?.localStream != null) {
+      _context._logger.fine(
+          &#39;using helper to switch camera, only works in android and ios&#39;);
+      return Helper.switchCamera(
+          webRTCHandle!.localStream!.getVideoTracks().first);
+    }
+    return false;
   }
 }</code></pre>
 </section>
@@ -105,8 +130,8 @@
     <h5>JanusPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
 
 
     <li class="section-title">
@@ -132,11 +157,13 @@
     <li><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/JanusPlugin/onCreate.html">onCreate</a></li>
     <li><a href="../../janus_client/JanusPlugin/send.html">send</a></li>
@@ -162,7 +189,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -171,7 +198,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

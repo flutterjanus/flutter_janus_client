@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -70,7 +69,8 @@
   <pre class="language-dart"><code class="language-dart">void connect() {
   try {
     isConnected = true;
-    channel = WebSocketChannel.connect(Uri.parse(url!), protocols: [&#39;janus-protocol&#39;]);
+    channel = WebSocketChannel.connect(Uri.parse(url!),
+        protocols: [&#39;janus-protocol&#39;]);
   } catch (e) {
     print(e.toString());
     print(&#39;something went wrong&#39;);
@@ -103,8 +103,8 @@
     <h5>WebSocketJanusTransport class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/WebSocketJanusTransport/WebSocketJanusTransport.html">WebSocketJanusTransport</a></li>
+        <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/WebSocketJanusTransport/WebSocketJanusTransport.html">WebSocketJanusTransport</a></li>
 
 
     <li class="section-title">
@@ -123,6 +123,7 @@
     <li class="section-title"><a href="../../janus_client/WebSocketJanusTransport-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/connect.html">connect</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/dispose.html">dispose</a></li>
+    <li><a href="../../janus_client/WebSocketJanusTransport/getInfo.html">getInfo</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/WebSocketJanusTransport/send.html">send</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
@@ -145,7 +146,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -154,7 +155,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

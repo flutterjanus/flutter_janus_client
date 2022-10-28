@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -53,7 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">initDataChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initDataChannel-param-rtcDataChannelInit">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.2/webrtc_interface/RTCDataChannelInit-class.html">RTCDataChannelInit</a>?</span> <span class="parameter-name">rtcDataChannelInit</span>}</span></li>
+<span class="name ">initDataChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initDataChannel-param-rtcDataChannelInit">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.8/webrtc_interface/RTCDataChannelInit-class.html">RTCDataChannelInit</a>?</span> <span class="parameter-name">rtcDataChannelInit</span>}</span></li>
 </ol>)
 
       
@@ -71,27 +70,34 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; initDataChannel({RTCDataChannelInit? rtcDataChannelInit}) async {
   if (webRTCHandle!.peerConnection != null) {
-    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) return;
+    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null)
+      return;
     if (rtcDataChannelInit == null) {
       rtcDataChannelInit = RTCDataChannelInit();
       rtcDataChannelInit.ordered = true;
       rtcDataChannelInit.protocol = &#39;janus-protocol&#39;;
     }
-    webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] = await webRTCHandle!.peerConnection!.createDataChannel(_context._dataChannelDefaultLabel, rtcDataChannelInit);
-    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) {
-      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onDataChannelState = (state) {
+    webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] =
+        await webRTCHandle!.peerConnection!.createDataChannel(
+            _context._dataChannelDefaultLabel, rtcDataChannelInit);
+    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] !=
+        null) {
+      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!
+          .onDataChannelState = (state) {
         if (!_onDataStreamController!.isClosed) {
           _onDataStreamController!.sink.add(state);
         }
       };
-      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onMessage = (RTCDataChannelMessage message) {
+      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!
+          .onMessage = (RTCDataChannelMessage message) {
         if (!_dataStreamController!.isClosed) {
           _dataStreamController!.sink.add(message);
         }
       };
     }
   } else {
-    throw Exception(&quot;You Must Initialize Peer Connection before even attempting data channel creation!&quot;);
+    throw Exception(
+        &quot;You Must Initialize Peer Connection before even attempting data channel creation!&quot;);
   }
 }</code></pre>
 </section>
@@ -117,8 +123,8 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
     <h5>JanusPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusPlugin/JanusPlugin.html">JanusPlugin</a></li>
 
 
     <li class="section-title">
@@ -144,11 +150,13 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
     <li><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/JanusPlugin/onCreate.html">onCreate</a></li>
     <li><a href="../../janus_client/JanusPlugin/send.html">send</a></li>
@@ -174,7 +182,7 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -183,7 +191,7 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

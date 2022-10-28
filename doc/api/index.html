@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="generator" content="made with love by dartdoc 5.0.0">
+  <meta name="generator" content="made with love by dartdoc 6.0.0">
   <meta name="description" content="janus_client API docs, for the Dart programming language.">
   <title>janus_client - Dart API docs</title>
 
@@ -22,8 +22,7 @@
 </head>
 
 
-<body data-base-href=""
-      data-using-base-href="false">
+<body data-base-href="" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -45,14 +44,16 @@
       
 <section class="desc markdown">
   <p><a href="https://ko-fi.com/U7U11OZL8"><img src="https://www.ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a></p><!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<p><a href="#contributors-"><img src="https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square" alt="All Contributors"></a></p><!-- ALL-CONTRIBUTORS-BADGE:END -->
+<p><a href="#contributors-"><img src="https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square" alt="All Contributors"></a></p><!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p><a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;"></a></p>
-<h1 id="janus_client">janus_client</h1>
+<h1 id="janus_client-pub-packagehttpsimgshieldsiopubvjanus_clientsvghttpspubdartlangorgpackagesjanus_clientgitterhttpsbadgesgitterimflutter_janus_clientlobbysvghttpsgitterimflutter_janus_clientlobbyutm_sourcebadgeutm_mediumbadgeutm_campaignpr-badge">janus_client <a href="https://pub.dartlang.org/packages/janus_client"><img src="https://img.shields.io/pub/v/janus_client.svg" alt="pub package"></a><a href="https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/flutter_janus_client/Lobby.svg" alt="Gitter"></a></h1>
 <p>It is a feature rich flutter package, which offers all webrtc operations supported by <a href="https://janus.conf.meetecho.com/">Janus: the general purpose WebRTC server</a>,
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.</p>
 <h2 id="demo-of-janusclienthttpsflutterjanusgithubioflutter_janus_clientexamplebuildweb"><a href="https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/">Demo of JanusClient</a></h2>
 <h2 id="news--updates">News &amp; Updates</h2>
 <ul>
+<li>sip plugin wrapper added with sip calling example</li>
+<li>Added errorHandler for typedMessage Stream for better development flow</li>
 <li>Just like new flutter version comes With desktop support out of the box</li>
 <li>All major plugins fully support unified plan</li>
 <li>Typed examples updated with null safety and latest dart constraints</li>
@@ -61,7 +62,7 @@ it easily integrates into your flutter application and allows you to build webrt
 <li>Supports null-safety</li>
 </ul>
 <h2 id="feature-status">Feature Status</h2>
-<table><thead><tr><th>Feature</th><th>Support</th><th>Well Tested</th><th>Unified Plan</th><th>Example</th></tr></thead><tbody><tr><td>WebSocket</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Rest/Http API</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Video Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Video Call Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Streaming Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Audio Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Sip Plugin</td><td>Yes</td><td>No</td><td>-</td><td>No</td></tr><tr><td>Text Room Plugin</td><td>Yes</td><td>No</td><td>-</td><td>Yes</td></tr><tr><td>ScreenSharing using VideoRoom plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr></tbody></table>
+<table><thead><tr><th>Feature</th><th>Support</th><th>Well Tested</th><th>Unified Plan</th><th>Example</th></tr></thead><tbody><tr><td>WebSocket</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Rest/Http API</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Video Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Video Call Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Streaming Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Audio Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Sip Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Text Room Plugin</td><td>Yes</td><td>No</td><td>-</td><td>Yes</td></tr><tr><td>ScreenSharing using VideoRoom plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr></tbody></table>
 <h2 id="platform-support-table">Platform Support Table</h2>
 <table><thead><tr><th>Platform</th><th>Support</th><th>Well Tested</th></tr></thead><tbody><tr><td>Browser(Web)</td><td>Yes</td><td>Yes</td></tr><tr><td>MacOs</td><td>Yes</td><td>No</td></tr><tr><td>Android</td><td>Yes</td><td>Yes</td></tr><tr><td>Ios</td><td>Yes</td><td>No</td></tr><tr><td>Linux</td><td>Yes</td><td>No</td></tr><tr><td>Windows</td><td>Yes</td><td>No</td></tr></tbody></table>
 <h2 id="todo">Todo</h2>
@@ -83,9 +84,18 @@ It is highly recommended you migrate your code to latest version that is 2.X.X (
     <td align="center"><a href="https://github.com/igala"><img src="https://avatars.githubusercontent.com/u/454390?v=4?s=100" width="100px;" alt=""><br><sub><b>Igal Avraham</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=igala" title="Code">💻</a></td>
     <td align="center"><a href="https://vigikaran.me/"><img src="https://avatars.githubusercontent.com/u/9039584?v=4?s=100" width="100px;" alt=""><br><sub><b>Vigikaran</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=vigikaran" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/UserSense"><img src="https://avatars.githubusercontent.com/u/65860664?v=4?s=100" width="100px;" alt=""><br><sub><b>UserSense</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=UserSense" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/baihua666"><img src="https://avatars.githubusercontent.com/u/5125983?v=4?s=100" width="100px;" alt=""><br><sub><b>baihua666</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/issues?q=author%3Abaihua666" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/ngoluuduythai"><img src="https://avatars.githubusercontent.com/u/12238262?v=4?s=100" width="100px;" alt=""><br><sub><b>ngoluuduythai</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=ngoluuduythai" title="Code">💻</a></td>
   </tr>
 </tbody></table><!-- markdownlint-restore --><!-- prettier-ignore-end --><!-- ALL-CONTRIBUTORS-LIST:END -->
 <p>This project follows the <a href="https://github.com/all-contributors/all-contributors">all-contributors</a> specification. Contributions of any kind welcome!</p>
+<h2 id="wait-theres-more-the-javascript-client">Wait there's more... The Javascript Client!</h2>
+<p>If you loved the api style and architecture of flutter_janus_client and you wishing to have something similar for your next javascript project involving webrtc features.
+then worry not because we have got you covered. we have written wrapper on top of our good old <code>janus.js</code>, you might ask why? well the answer to that question is it does not support
+type bindings hence no rich ide support, so we proudly presents <a href="https://github.com/flutterjanus/JanusJs">typed_janus_js(feature rich promisified and reactive wrapper on top of janus.js)</a>
+or you can straight away use it by installing from npm <code>npm i typed_janus_js</code>.</p>
 </section>
 
 
@@ -96,7 +106,14 @@ It is highly recommended you migrate your code to latest version that is 2.X.X (
   <span class="name"><a href="janus_client/janus_client-library.html">janus_client</a></span> 
 
 </dt>
-<dd>This is a preliminary API providing most WebRTC Operations out of the box using <a href="https://janus.conf.meetecho.com/">Janus Server</a> 
+<dd>This is a preliminary API providing most WebRTC Operations out of the box using <a href="https://janus.conf.meetecho.com/">Janus Server</a>
+</dd>
+
+          <dt id="sip_event">
+  <span class="name"><a href="interfaces_sip_sip_event/interfaces_sip_sip_event-library.html">sip_event</a></span> 
+
+</dt>
+<dd>
 </dd>
 
         </dl>
@@ -120,6 +137,7 @@ It is highly recommended you migrate your code to latest version that is 2.X.X (
     <ol>
       <li class="section-title">Libraries</li>
       <li><a href="janus_client/janus_client-library.html">janus_client</a></li>
+      <li><a href="interfaces_sip_sip_event/interfaces_sip_sip_event-library.html">sip_event</a></li>
 </ol>
 
   </div>
@@ -132,7 +150,7 @@ It is highly recommended you migrate your code to latest version that is 2.X.X (
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -141,7 +159,7 @@ It is highly recommended you migrate your code to latest version that is 2.X.X (
 
 
 <script src="static-assets/highlight.pack.js?v1"></script>
-<script src="static-assets/script.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
 
 
 

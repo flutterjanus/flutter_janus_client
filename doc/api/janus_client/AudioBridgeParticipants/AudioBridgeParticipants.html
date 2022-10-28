@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the AudioBridgeParticipants constructor from the Class AudioBridgeParticipants class from the janus_client library, for the Dart programming language.">
-  <title>AudioBridgeParticipants constructor - AudioBridgeParticipants class - janus_client library - Dart API</title>
+  <meta name="description" content="API docs for the AudioBridgeParticipants constructor from Class AudioBridgeParticipants from the janus_client library, for the Dart programming language.">
+  <title>AudioBridgeParticipants constructor - AudioBridgeParticipants - janus_client library - Dart API</title>
 
 
   
@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -50,11 +49,11 @@
 </h1></div>
 
     <section class="multi-line-signature">
-      <span class="name ">AudioBridgeParticipants</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-id">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">id</span>, </span></li>
+      <span class="name ">AudioBridgeParticipants</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-id">{<span class="type-annotation">dynamic</span> <span class="parameter-name">id</span>, </span></li>
 <li><span class="parameter" id="-param-display"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">display</span>, </span></li>
-<li><span class="parameter" id="-param-setup"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">setup</span>, </span></li>
-<li><span class="parameter" id="-param-muted"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">muted</span>, </span></li>
-<li><span class="parameter" id="-param-talking"><span>required</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">talking</span>, </span></li>
+<li><span class="parameter" id="-param-setup"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">setup</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="-param-muted"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">muted</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="-param-talking"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">talking</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-spatialPosition"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">spatialPosition</span>}</span></li>
 </ol>)
     </section>
@@ -66,12 +65,13 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">AudioBridgeParticipants({
-    this.id,
+  this.id,
   this.display,
-    required this.setup,
-    required this.muted,
-    required this.talking,
-    this.spatialPosition,});</code></pre>
+  this.setup = false,
+  this.muted = false,
+  this.talking = false,
+  this.spatialPosition,
+});</code></pre>
 </section>
 
 
@@ -95,9 +95,9 @@
     <h5>AudioBridgeParticipants class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/AudioBridgeParticipants-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/AudioBridgeParticipants/AudioBridgeParticipants.html">AudioBridgeParticipants</a></li>
-    <li><a href="../../janus_client/AudioBridgeParticipants/AudioBridgeParticipants.fromJson.html">fromJson</a></li>
+        <li class="section-title"><a href="../../janus_client/AudioBridgeParticipants-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/AudioBridgeParticipants/AudioBridgeParticipants.html">AudioBridgeParticipants</a></li>
+          <li><a href="../../janus_client/AudioBridgeParticipants/AudioBridgeParticipants.fromJson.html">fromJson</a></li>
 
 
     <li class="section-title">
@@ -113,6 +113,7 @@
     <li><a href="../../janus_client/AudioBridgeParticipants/talking.html">talking</a></li>
 
     <li class="section-title"><a href="../../janus_client/AudioBridgeParticipants-class.html#instance-methods">Methods</a></li>
+    <li><a href="../../janus_client/AudioBridgeParticipants/copyWith.html">copyWith</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li><a href="../../janus_client/AudioBridgeParticipants/toJson.html">toJson</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
@@ -135,7 +136,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -144,7 +145,7 @@
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

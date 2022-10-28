@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -100,7 +99,12 @@ the <a href="../../janus_client/TypedEvent/hashCode.html">hashCode</a> method as
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-bool operator ==(Object other) =&gt; identical(this, other) || (other is TypedEvent &amp;&amp; runtimeType == other.runtimeType &amp;&amp; event == other.event &amp;&amp; jsep == other.jsep);</code></pre>
+bool operator ==(Object other) =&gt;
+    identical(this, other) ||
+    (other is TypedEvent &amp;&amp;
+        runtimeType == other.runtimeType &amp;&amp;
+        event == other.event &amp;&amp;
+        jsep == other.jsep);</code></pre>
 </section>
 
 
@@ -124,9 +128,9 @@ bool operator ==(Object other) =&gt; identical(this, other) || (other is TypedEv
     <h5>TypedEvent class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/TypedEvent-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/TypedEvent/TypedEvent.html">TypedEvent</a></li>
-    <li><a href="../../janus_client/TypedEvent/TypedEvent.fromMap.html">fromMap</a></li>
+        <li class="section-title"><a href="../../janus_client/TypedEvent-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/TypedEvent/TypedEvent.html">TypedEvent</a></li>
+          <li><a href="../../janus_client/TypedEvent/TypedEvent.fromMap.html">fromMap</a></li>
 
 
     <li class="section-title">
@@ -161,7 +165,7 @@ bool operator ==(Object other) =&gt; identical(this, other) || (other is TypedEv
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -170,7 +174,7 @@ bool operator ==(Object other) =&gt; identical(this, other) || (other is TypedEv
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

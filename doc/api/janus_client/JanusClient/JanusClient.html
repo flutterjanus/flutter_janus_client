@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the JanusClient constructor from the Class JanusClient class from the janus_client library, for the Dart programming language.">
-  <title>JanusClient constructor - JanusClient class - janus_client library - Dart API</title>
+  <meta name="description" content="API docs for the JanusClient constructor from Class JanusClient from the janus_client library, for the Dart programming language.">
+  <title>JanusClient constructor - JanusClient - janus_client library - Dart API</title>
 
 
   
@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -85,20 +84,22 @@ By default roomId should be numeric in nature although if you have configured <c
     String? apiSecret,
     bool isUnifiedPlan = true,
     String? token,
-    bool? stringIds=false,
+    bool? stringIds = false,
+
     &#47;&#47;&#47; forces creation of peer connection with plan-b sdb semantics
-    @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;) bool usePlanB = false,
+    @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;)
+        bool usePlanB = false,
     Duration? pollingInterval,
     loggerName = &quot;JanusClient&quot;,
     maxEvent = 10,
     loggerLevel = Level.ALL,
     bool withCredentials = false}) {
-  _stringIds=stringIds;
+  _stringIds = stringIds;
   _transport = transport;
   _isUnifiedPlan = isUnifiedPlan;
   _iceServers = iceServers;
   _refreshInterval = refreshInterval;
-  _apiSecret = _apiSecret;
+  _apiSecret = apiSecret;
   _loggerName = loggerName;
   _maxEvent = maxEvent;
   _loggerLevel = loggerLevel;
@@ -137,8 +138,8 @@ By default roomId should be numeric in nature although if you have configured <c
     <h5>JanusClient class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusClient-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusClient-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
 
 
     <li class="section-title inherited">
@@ -149,6 +150,7 @@ By default roomId should be numeric in nature although if you have configured <c
 
     <li class="section-title"><a href="../../janus_client/JanusClient-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/JanusClient/createSession.html">createSession</a></li>
+    <li><a href="../../janus_client/JanusClient/getInfo.html">getInfo</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
 
@@ -170,7 +172,7 @@ By default roomId should be numeric in nature although if you have configured <c
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -179,7 +181,7 @@ By default roomId should be numeric in nature although if you have configured <c
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -75,21 +74,48 @@ void onCreate() {
   if (!_onCreated) {
     _onCreated = true;
     messages?.listen((event) {
-      TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-      print(typedEvent.event.plugindata?.data);
+      TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
       if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] == &quot;joined&quot;) {
-        print(&#39;hell&#39;);
-        typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
+        typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
+            typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] == &quot;event&quot; &amp;&amp; typedEvent.event.plugindata?.data[&quot;participants&quot;] != null) {
-        typedEvent.event.plugindata?.data = AudioBridgeNewParticipantsEvent.fromJson(typedEvent.event.plugindata?.data);
+      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
+              &quot;event&quot; &amp;&amp;
+          typedEvent.event.plugindata?.data[&quot;participants&quot;] != null) {
+        typedEvent.event.plugindata?.data =
+            AudioBridgeNewParticipantsEvent.fromJson(
+                typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] == &quot;event&quot; &amp;&amp; typedEvent.event.plugindata?.data[&quot;result&quot;] == &quot;ok&quot;) {
-        typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(typedEvent.event.plugindata?.data);
+      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
+              &quot;event&quot; &amp;&amp;
+          typedEvent.event.plugindata?.data[&quot;result&quot;] == &quot;ok&quot;) {
+        typedEvent.event.plugindata?.data =
+            AudioBridgeConfiguredEvent.fromJson(
+                typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] == &quot;event&quot; &amp;&amp; typedEvent.event.plugindata?.data[&quot;leaving&quot;] != null) {
-        typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
+      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
+              &quot;event&quot; &amp;&amp;
+          typedEvent.event.plugindata?.data[&quot;leaving&quot;] != null) {
+        typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(
+            typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
+      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
+              &quot;talking&quot; ||
+          typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
+              &quot;stopped-talking&quot;) {
+        typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(
+            typedEvent.event.plugindata?.data);
+        _typedMessagesSink?.add(typedEvent);
+      }
+
+      &#47;&#47;&#47; not tested
+      else if (typedEvent.event.plugindata?.data[&#39;audiobridge&#39;] == &#39;event&#39; &amp;&amp;
+          (typedEvent.event.plugindata?.data[&#39;error_code&#39;] != null ||
+              typedEvent.event.plugindata?.data?[&#39;result&#39;]?[&#39;code&#39;] !=
+                  null)) {
+        _typedMessagesSink
+            ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
       }
     });
   }
@@ -117,8 +143,8 @@ void onCreate() {
     <h5>JanusAudioBridgePlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusAudioBridgePlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusAudioBridgePlugin/JanusAudioBridgePlugin.html">JanusAudioBridgePlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusAudioBridgePlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/JanusAudioBridgePlugin.html">JanusAudioBridgePlugin</a></li>
 
 
     <li class="section-title inherited">
@@ -147,11 +173,13 @@ void onCreate() {
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusAudioBridgePlugin/editRoom.html">editRoom</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li><a href="../../janus_client/JanusAudioBridgePlugin/hangup.html">hangup</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li><a href="../../janus_client/JanusAudioBridgePlugin/joinRoom.html">joinRoom</a></li>
     <li><a href="../../janus_client/JanusAudioBridgePlugin/kickParticipant.html">kickParticipant</a></li>
     <li><a href="../../janus_client/JanusAudioBridgePlugin/listParticipants.html">listParticipants</a></li>
@@ -183,7 +211,7 @@ void onCreate() {
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -192,7 +220,7 @@ void onCreate() {
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

@@ -21,8 +21,7 @@
 </head>
 
 
-<body data-base-href="../../"
-      data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false">
 
 <div id="overlay-under-drawer"></div>
 
@@ -83,6 +82,10 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     &quot;permanent&quot;: permanent,
   };
   _handleRoomIdTypeDifference(payload);
+  _context._logger.fine(&#39;destroyRoom invoked with roomId:$roomId&#39;);
+  JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
+  JanusError.throwErrorFromEvent(response);
+  return response;
 }</code></pre>
 </section>
 
@@ -107,8 +110,8 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     <h5>JanusTextRoomPlugin class</h5>
     <ol>
 
-    <li class="section-title"><a href="../../janus_client/JanusTextRoomPlugin-class.html#constructors">Constructors</a></li>
-    <li><a href="../../janus_client/JanusTextRoomPlugin/JanusTextRoomPlugin.html">JanusTextRoomPlugin</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusTextRoomPlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusTextRoomPlugin/JanusTextRoomPlugin.html">JanusTextRoomPlugin</a></li>
 
 
     <li class="section-title">
@@ -138,11 +141,13 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/editRoom.html">editRoom</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/exists.html">exists</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/hangup.html">hangup</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/init.html">init</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/joinRoom.html">joinRoom</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/kickParticipant.html">kickParticipant</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/leaveRoom.html">leaveRoom</a></li>
@@ -175,7 +180,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
 <footer>
   <span class="no-break">
     janus_client
-      2.2.0
+      2.2.7
   </span>
 
   
@@ -184,7 +189,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
 
 
 <script src="../../static-assets/highlight.pack.js?v1"></script>
-<script src="../../static-assets/script.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
 
 
 

@@ -18,10 +18,12 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   TextEditingController nameController = TextEditingController();
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
+  TextEditingController messageController = TextEditingController();
   MediaStream? remoteVideoStream;
   AlertDialog? incomingDialog;
   AlertDialog? registerDialog;
   AlertDialog? callDialog;
+  List<String> messages = [];
   bool ringing = false;
   bool front = true;
   bool speakerOn = false;
@@ -42,6 +44,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   makeCall() async {
     await localMediaSetup();
+    await publishVideo.initDataChannel();
     var offer = await publishVideo.createOffer(
         audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
     await publishVideo.call(nameController.text, offer: offer);
@@ -141,6 +144,12 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     MediaStream? tempVideo = await createLocalMediaStream('remoteVideoStream');
     setState(() {
       remoteVideoStream = tempVideo;
+    });
+    publishVideo.data?.listen((event) async {
+      await publishVideo.sendData(event.text);
+      setState(() {
+        messages.add(event.text);
+      });
     });
     publishVideo.webRTCHandle?.peerConnection?.onConnectionState =
         (connectionState) async {
@@ -339,33 +348,72 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             })
       ]),
       body: Stack(children: [
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Expanded(
-              child: Stack(
-                children: [
-                  RTCVideoView(
-                    _remoteVideoRenderer,
-                    mirror: true,
-                    objectFit:
-                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  )
-                ],
+        Row(children: [
+          Flexible(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                child: Stack(
+                  children: [
+                    RTCVideoView(
+                      _remoteVideoRenderer,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    )
+                  ],
+                ),
               ),
-            ),
-            Expanded(
-                flex: 1,
-                child: Container(
-                  child: RTCVideoView(
-                    _localRenderer,
-                    mirror: true,
-                    objectFit:
-                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  ),
-                ))
-          ],
-        ),
+              Expanded(
+                  flex: 1,
+                  child: Container(
+                    child: RTCVideoView(
+                      _localRenderer,
+                      mirror: true,
+                      objectFit:
+                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    ),
+                  ))
+            ],
+          )),
+          Flexible(
+              child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Expanded(
+                  flex: 2,
+                  child: ListView(
+                    children: List.generate(
+                        messages.length, (index) => Text('${messages[index]}')),
+                  )),
+              Flexible(
+                  child: Row(
+                children: [
+                  Flexible(
+                      child: TextFormField(
+                    controller: messageController,
+                    onFieldSubmitted: (value) async {
+                      await publishVideo.sendData(value);
+                    },
+                    decoration:
+                        InputDecoration(label: Text('Data channel message')),
+                  )),
+                  Flexible(
+                      child: TextButton(
+                          onPressed: () async {
+                            await publishVideo.sendData(messageController.text);
+                            setState(() {
+                              messages.add(messageController.text);
+                            });
+                            messageController.clear();
+                          },
+                          child: Text('send')))
+                ],
+              ))
+            ],
+          ))
+        ]),
         Align(
           alignment: Alignment.topLeft,
           child: Container(
@@ -382,10 +430,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                       "Ringing...",
                       style: TextStyle(color: Colors.white),
                     )),
-                // Flexible(
-                //     child: Padding(
-                //         padding: EdgeInsets.all(10),
-                //         child: ))
               ],
             ),
           ),

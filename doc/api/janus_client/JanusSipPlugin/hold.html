@@ -52,7 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">hold</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="hold-param-direction">{<span class="type-annotation"><a href="../../janus_client/SipHoldState.html">SipHoldState</a>?</span> <span class="parameter-name">direction</span>}</span></li>
+<span class="name ">hold</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="hold-param-direction"><span class="type-annotation"><a href="../../janus_client/SipHoldState.html">SipHoldState</a></span> <span class="parameter-name">direction</span></span></li>
 </ol>)
 
       
@@ -68,10 +68,10 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; hold({
-  SipHoldState? direction,
-}) async {
-  var payload = {&quot;request&quot;: &quot;hold&quot;, &quot;direction&quot;: direction?.name};
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; hold(
+  SipHoldState direction,
+) async {
+  var payload = {&quot;request&quot;: &quot;hold&quot;, &quot;direction&quot;: direction.name};
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>

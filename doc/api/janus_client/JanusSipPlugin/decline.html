@@ -74,7 +74,8 @@
   int? code,
   Map&lt;String, dynamic&gt;? headers,
 }) async {
-  var payload = {&quot;request&quot;: &quot;decline&quot;, &quot;code&quot;: code, &quot;headers&quot;: headers};
+  var payload = {&quot;request&quot;: &quot;decline&quot;, &quot;code&quot;: code, &quot;headers&quot;: headers}
+    ..removeWhere((key, value) =&gt; value == null);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>

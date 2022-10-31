@@ -81,14 +81,14 @@ class JanusSipPlugin extends JanusPlugin {
     JanusError.throwErrorFromEvent(response);
   }
 
-  /// Accept Incoming Call  
-  /// 
+  /// Accept Incoming Call
+  ///
   /// [sessionDescription] : For accepting the call we can have offerless sip invite too, so here we have intententionaly given flexibility of having either offer or answer depending on what peer is providing  if it is not provided, default offer or answer is created and used with audio as sendrecv depending on the signaling state
-  /// 
+  ///
   /// [headers] : object with key/value mappings (header name/value), to specify custom headers to add to the SIP INVITE; optional
-  /// 
+  ///
   /// [srtp] : whether to mandate (sdes_mandatory) or offer (sdes_optional) SRTP support; optional
-  /// 
+  ///
   /// [autoAcceptReInvites] : whether we should blindly accept re-INVITEs with a 200 OK instead of relaying the SDP to the application; optional, TRUE by default
   Future<void> accept(
       {String? srtp,
@@ -141,17 +141,18 @@ class JanusSipPlugin extends JanusPlugin {
     int? code,
     Map<String, dynamic>? headers,
   }) async {
-    var payload = {"request": "decline", "code": code, "headers": headers};
+    var payload = {"request": "decline", "code": code, "headers": headers}
+      ..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }
 
   /// hold sip call
   /// [direction] : specify [SipHoldState] for direction of call flow
-  Future<void> hold({
-    SipHoldState? direction,
-  }) async {
-    var payload = {"request": "hold", "direction": direction?.name};
+  Future<void> hold(
+    SipHoldState direction,
+  ) async {
+    var payload = {"request": "hold", "direction": direction.name};
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }

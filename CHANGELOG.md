@@ -1,3 +1,7 @@
+## 2.2.9
+
+- type fix in AudioBridgeLeavingEvent (leaving)
+
 ## 2.2.8
 
 - sip plugin fixes (decline)

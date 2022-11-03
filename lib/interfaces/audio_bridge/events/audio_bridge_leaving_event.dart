@@ -12,7 +12,7 @@ class AudioBridgeLeavingEvent extends AudioBridgeEvent {
     leaving = json['leaving'];
   }
 
-  int? leaving;
+  dynamic leaving;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

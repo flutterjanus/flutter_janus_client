@@ -128,14 +128,53 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await this.send(data: payload);
   }
 
-  Future<void> subscribeToStreams(List<PublisherStream> streams) async {
+  Future<void> subscribeToStreams(List<PublisherStream> streams,
+      {RTCSessionDescription? offer}) async {
     if (streams.length > 0) {
       var payload = {
         'request': "subscribe",
-        'streams': streams.map((e) => e.toMap()).toList()
+        'streams': streams
+            .map((e) => e.toMap()..removeWhere((key, value) => value == null))
+            .toList()
       };
-      await this.send(data: payload);
+      await this.send(data: payload, jsep: offer);
     }
+  }
+
+  Future<void> update(
+      {List<SubscriberUpdateStream>? subscribe,
+      List<SubscriberUpdateStream>? unsubscribe}) async {
+    if (subscribe?.isEmpty == true && unsubscribe?.isEmpty == true) {
+      return;
+    }
+    Map<String, dynamic> payload = {
+      'request': "update",
+    };
+    if (subscribe?.isNotEmpty == true) {
+      payload['subscribe'] = subscribe
+          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
+          .toList();
+    }
+    if (unsubscribe?.isNotEmpty == true) {
+      payload['unsubscribe'] = unsubscribe
+          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
+          .toList();
+    }
+    await this.send(data: payload);
+  }
+
+  Future<void> start(dynamic roomId,
+      {audioRecv = true,
+      audioSend = false,
+      videoRecv = true,
+      videoSend = false}) async {
+    var payload = {"request": "start", 'room': roomId};
+    RTCSessionDescription? offer = await this.createNullableAnswer(
+        audioRecv: audioRecv,
+        audioSend: audioSend,
+        videoRecv: videoRecv,
+        videoSend: videoSend);
+    if (offer != null) await this.send(data: payload, jsep: offer);
   }
 
   /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
@@ -152,20 +191,6 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     String? pin,
     String? token,
   }) async {
-    Future<void> start(
-        {audioRecv = true,
-        audioSend = false,
-        videoRecv = true,
-        videoSend = false}) async {
-      var payload = {"request": "start", 'room': roomId};
-      RTCSessionDescription? offer = await this.createNullableAnswer(
-          audioRecv: audioRecv,
-          audioSend: audioSend,
-          videoRecv: videoRecv,
-          videoSend: videoSend);
-      if (offer != null) await this.send(data: payload, jsep: offer);
-    }
-
     var payload = {
       "request": "join",
       "room": roomId,
@@ -174,11 +199,23 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "token": token,
       "feed": feedId,
       "private_id": privateId,
-      "streams": streams?.map((e) => e.toMap()).toList(),
+      "streams": streams
+          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
+          .toList(),
     }..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     await this.send(data: payload);
-    return start;
+    return (
+        {audioRecv = true,
+        audioSend = false,
+        videoRecv = true,
+        videoSend = false}) async {
+      await this.start(roomId,
+          audioRecv: audioRecv,
+          audioSend: audioSend,
+          videoRecv: videoRecv,
+          videoSend: videoSend);
+    };
   }
 
   /// sends the publish request to [JanusVideoRoom]. It should be called once [VideoRoomJoinedEvent] is received from server.
@@ -210,6 +247,44 @@ class JanusVideoRoomPlugin extends JanusPlugin {
           audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
     }
     await this.send(data: payload, jsep: offer);
+  }
+
+  Future<void> configure(
+      {int? bitrate,
+      bool? keyframe,
+      bool? record,
+      String? filename,
+      String? display,
+      dynamic audioActivePackets,
+      int? audioLevelAverage,
+      List<Map<String, String>>? descriptions,
+      List<Map<String, dynamic>>? streams,
+      bool? restart,
+      RTCSessionDescription? sessionDescription}) async {
+    var payload = {
+      "request": "configure",
+      "bitrate": bitrate,
+      "keyframe": keyframe,
+      "record": record,
+      "filename": filename,
+      "display": display,
+      "audio_active_packets": audioActivePackets,
+      "audio_level_average": audioLevelAverage,
+      "streams": streams,
+      "restart": restart,
+      "descriptions": descriptions
+    }..removeWhere((key, value) => value == null);
+    await this.send(data: payload, jsep: sessionDescription);
+  }
+
+  Future<void> unsubscribe({List<UnsubscribeStreams>? streams}) async {
+    var payload = {
+      "request": "unsubscribe",
+      "streams": streams
+          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
+          .toList()
+    }..removeWhere((key, value) => value == null);
+    await this.send(data: payload);
   }
 
   /// sends hangup request on current active [JanusVideoRoomPlugin] to tear off active PeerConnection in-effect leaving the room.

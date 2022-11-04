@@ -64,7 +64,7 @@ class Publishers {
     if (json['streams'] != null) {
       streams = [];
       json['streams'].forEach((v) {
-        streams?.add(Streams.fromJson(v));
+        streams?.add(Streams.fromMap(v));
       });
     }
     talking = json['talking'];
@@ -84,7 +84,7 @@ class Publishers {
     map['audio_codec'] = audioCodec;
     map['video_codec'] = videoCodec;
     if (streams != null) {
-      map['streams'] = streams?.map((v) => v.toJson()).toList();
+      map['streams'] = streams?.map((v) => v.toMap()).toList();
     }
     map['talking'] = talking;
     return map;

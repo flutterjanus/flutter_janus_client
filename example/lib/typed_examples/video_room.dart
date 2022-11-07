@@ -37,7 +37,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
   }
 
   initialize() async {
-    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    ws = WebSocketJanusTransport(url: servermap['servercheap']);
     j = JanusClient(
         transport: ws,
         isUnifiedPlan: true,
@@ -64,6 +64,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       return;
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
+    remoteHandle?.initDataChannel();
+    remoteHandle?.data?.listen((event) {
+      print('subscriber data:=>');
+      print(event.text);
+    });
     remoteHandle?.webRTCHandle?.peerConnection?.onRenegotiationNeeded =
         () async {
       await remoteHandle?.start(myRoom);
@@ -120,6 +125,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
 
   Future<void> joinRoom() async {
     plugin = await session.attach<JanusVideoRoomPlugin>();
+    await plugin.initDataChannel();
+    plugin.data?.listen((event) {
+      print('subscriber data:=>');
+      print(event.text);
+    });
     await plugin.initializeMediaDevices(
         mediaConstraints: {'video': true, 'audio': false});
     RemoteStream myStream = RemoteStream('0');
@@ -275,6 +285,15 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                     remoteStreams.remove(0);
                     remoteStreams[0] = myStream;
                   });
+                }),
+            IconButton(
+                icon: Icon(
+                  Icons.send_sharp,
+                  color: Colors.white,
+                ),
+                onPressed: () async {
+                  await plugin.sendData("cool");
+                  await remoteHandle?.sendData("cool");
                 })
           ],
           title: const Text('janus_client'),

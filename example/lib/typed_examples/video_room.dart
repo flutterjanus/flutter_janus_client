@@ -189,7 +189,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     var unsubscribe = {
       "request": "unsubscribe",
       "streams": [
-        {feed: id}
+        {"feed": id}
       ]
     };
     if (remoteHandle != null)

@@ -178,7 +178,7 @@ class JanusClient {
       Duration? pollingInterval,
       loggerName = "JanusClient",
       maxEvent = 10,
-      loggerLevel = Level.ALL,
+      Level loggerLevel = Level.ALL,
       bool withCredentials = false}) {
     _stringIds = stringIds;
     _transport = transport;

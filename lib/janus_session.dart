@@ -61,7 +61,7 @@ class JanusSession {
     }
   }
 
-  Future<T> attach<T extends JanusPlugin>() async {
+  Future<T> attach<T extends JanusPlugin>({String? opaqueId}) async {
     JanusPlugin plugin;
     int? handleId;
     String transaction = getUuid().v4();
@@ -69,6 +69,9 @@ class JanusSession {
       "janus": "attach",
       "transaction": transaction
     };
+    if (opaqueId != null) {
+      request["opaque_id"] = opaqueId;
+    }
     request["token"] = _context._token;
     request["apisecret"] = _context._apiSecret;
     request["session_id"] = sessionId;

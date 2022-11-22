@@ -140,7 +140,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[filename] : "basename of the file to record to, -audio.mjr will be added by the plugin<br>
   ///
   Future<void> joinRoom(dynamic roomId,
-      {String? id,
+      {dynamic id,
       String? group,
       String? pin,
       int? expectedLoss,

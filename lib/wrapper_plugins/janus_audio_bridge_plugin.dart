@@ -398,6 +398,12 @@ class JanusAudioBridgePlugin extends JanusPlugin {
           typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(
               typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
+            "destroyed") {
+          typedEvent.event.plugindata?.data =
+              AudioBridgeDestroyedEvent.fromJson(
+                  typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
         }
 
         /// not tested

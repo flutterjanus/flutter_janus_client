@@ -97,6 +97,8 @@ part './interfaces/audio_bridge/events/audio_bridge_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_talking_event.dart';
 
+part './interfaces/audio_bridge/events/audio_bridge_destroyed_event.dart';
+
 part './interfaces/audio_bridge/events/audio_bridge_joined_event.dart';
 
 part './interfaces/audio_bridge/events/audio_bridge_leaving_event.dart';

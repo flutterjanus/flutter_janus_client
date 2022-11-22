@@ -121,6 +121,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
         });
       }
       if (data is AudioBridgeConfiguredEvent) {}
+      if (data is AudioBridgeDestroyedEvent) {}
       if (data is AudioBridgeLeavingEvent) {
         setState(() {
           participants.remove(data.leaving.toString());

@@ -67,7 +67,7 @@
   if (json[&#39;streams&#39;] != null) {
     streams = [];
     json[&#39;streams&#39;].forEach((v) {
-      streams?.add(Streams.fromJson(v));
+      streams?.add(Streams.fromMap(v));
     });
   }
   talking = json[&#39;talking&#39;];
@@ -135,7 +135,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

@@ -76,7 +76,7 @@
   }
   if (kIsWeb) {
     if (deviceId == null) {
-      _context._logger.fine(
+      _context._logger.finest(
           &#39;deviceId not provided,hence switching to default last deviceId should be of back camera ideally&#39;);
       deviceId = videoDevices.last.deviceId;
     }
@@ -99,7 +99,7 @@
     return true;
   } else {
     if (webRTCHandle?.localStream != null) {
-      _context._logger.fine(
+      _context._logger.finest(
           &#39;using helper to switch camera, only works in android and ios&#39;);
       return Helper.switchCamera(
           webRTCHandle!.localStream!.getVideoTracks().first);
@@ -189,7 +189,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

@@ -71,7 +71,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; sendData(String message) async {
   &#47;&#47; if (message != null) {
   if (webRTCHandle!.peerConnection != null) {
-    print(&#39;before send RTCDataChannelMessage&#39;);
+    this._context._logger.finest(&#39;before send RTCDataChannelMessage&#39;);
     if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] ==
         null) {
       throw Exception(
@@ -172,7 +172,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

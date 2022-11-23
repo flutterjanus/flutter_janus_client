@@ -72,11 +72,11 @@
         &#39;initializeWebRTCStack:-configuration is null call init before calling me&#39;);
     return;
   }
-  _context._logger.fine(&#39;webRTC stack intialized&#39;);
+  _context._logger.finest(&#39;webRTC stack intialized&#39;);
   RTCPeerConnection peerConnection =
       await createPeerConnection(_webRtcConfiguration!, {});
   peerConnection.onRenegotiationNeeded = () {
-    _context._logger.fine(&#39;onRenegotiationNeeded&#39;);
+    _context._logger.finest(&#39;onRenegotiationNeeded&#39;);
   };
   &#47;&#47;unified plan webrtc tracks emitter
   _handleUnifiedWebRTCTracksEmitter(peerConnection);
@@ -166,7 +166,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

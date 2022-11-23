@@ -60,7 +60,7 @@
 <li><span class="parameter" id="-param-pollingInterval"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">pollingInterval</span>, </span></li>
 <li><span class="parameter" id="-param-loggerName"><span class="type-annotation">dynamic</span> <span class="parameter-name">loggerName</span> = <span class="default-value">&quot;JanusClient&quot;</span>, </span></li>
 <li><span class="parameter" id="-param-maxEvent"><span class="type-annotation">dynamic</span> <span class="parameter-name">maxEvent</span> = <span class="default-value">10</span>, </span></li>
-<li><span class="parameter" id="-param-loggerLevel"><span class="type-annotation">dynamic</span> <span class="parameter-name">loggerLevel</span> = <span class="default-value">Level.ALL</span>, </span></li>
+<li><span class="parameter" id="-param-loggerLevel"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.1.0/logging/Level-class.html">Level</a></span> <span class="parameter-name">loggerLevel</span> = <span class="default-value">Level.ALL</span>, </span></li>
 <li><span class="parameter" id="-param-withCredentials"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withCredentials</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
     </section>
@@ -92,7 +92,7 @@ By default roomId should be numeric in nature although if you have configured <c
     Duration? pollingInterval,
     loggerName = &quot;JanusClient&quot;,
     maxEvent = 10,
-    loggerLevel = Level.ALL,
+    Level loggerLevel = Level.ALL,
     bool withCredentials = false}) {
   _stringIds = stringIds;
   _transport = transport;
@@ -172,7 +172,7 @@ By default roomId should be numeric in nature although if you have configured <c
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

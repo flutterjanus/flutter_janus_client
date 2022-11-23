@@ -53,7 +53,7 @@
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
 <span class="name ">send</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="send-param-data">{<span class="type-annotation">dynamic</span> <span class="parameter-name">data</span>, </span></li>
-<li><span class="parameter" id="send-param-jsep"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.8/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">jsep</span>}</span></li>
+<li><span class="parameter" id="send-param-jsep"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">jsep</span>}</span></li>
 </ol>)
 
       
@@ -81,8 +81,8 @@
     if (_context._apiSecret != null)
       request[&quot;apisecret&quot;] = _context._apiSecret;
     if (jsep != null) {
-      _context._logger.fine(&quot;sending jsep&quot;);
-      _context._logger.fine(jsep.toMap());
+      _context._logger.finest(&quot;sending jsep&quot;);
+      _context._logger.finest(jsep.toMap());
       request[&quot;jsep&quot;] = jsep.toMap();
     }
     if (_transport is RestJanusTransport) {
@@ -98,7 +98,7 @@
     }
     return response;
   } catch (e) {
-    print(e);
+    this._context._logger.fine(e);
   }
 }</code></pre>
 </section>
@@ -183,7 +183,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

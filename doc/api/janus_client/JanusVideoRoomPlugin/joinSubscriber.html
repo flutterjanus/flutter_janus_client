@@ -85,20 +85,6 @@
   String? pin,
   String? token,
 }) async {
-  Future&lt;void&gt; start(
-      {audioRecv = true,
-      audioSend = false,
-      videoRecv = true,
-      videoSend = false}) async {
-    var payload = {&quot;request&quot;: &quot;start&quot;, &#39;room&#39;: roomId};
-    RTCSessionDescription? offer = await this.createNullableAnswer(
-        audioRecv: audioRecv,
-        audioSend: audioSend,
-        videoRecv: videoRecv,
-        videoSend: videoSend);
-    if (offer != null) await this.send(data: payload, jsep: offer);
-  }
-
   var payload = {
     &quot;request&quot;: &quot;join&quot;,
     &quot;room&quot;: roomId,
@@ -107,11 +93,23 @@
     &quot;token&quot;: token,
     &quot;feed&quot;: feedId,
     &quot;private_id&quot;: privateId,
-    &quot;streams&quot;: streams?.map((e) =&gt; e.toMap()).toList(),
+    &quot;streams&quot;: streams
+        ?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
+        .toList(),
   }..removeWhere((key, value) =&gt; value == null);
   _handleRoomIdTypeDifference(payload);
   await this.send(data: payload);
-  return start;
+  return (
+      {audioRecv = true,
+      audioSend = false,
+      videoRecv = true,
+      videoSend = false}) async {
+    await this.start(roomId,
+        audioRecv: audioRecv,
+        audioSend: audioSend,
+        videoRecv: videoRecv,
+        videoSend: videoSend);
+  };
 }</code></pre>
 </section>
 
@@ -158,6 +156,7 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/webRTCHandle.html">webRTCHandle</a></li>
 
     <li class="section-title"><a href="../../janus_client/JanusVideoRoomPlugin-class.html#instance-methods">Methods</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/configure.html">configure</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createNullableAnswer.html">createNullableAnswer</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
@@ -182,9 +181,12 @@
     <li><a href="../../janus_client/JanusVideoRoomPlugin/publishMedia.html">publishMedia</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/send.html">send</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/sendData.html">sendData</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/start.html">start</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/subscribeToStreams.html">subscribeToStreams</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/switchCamera.html">switchCamera</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/unsubscribe.html">unsubscribe</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/update.html">update</a></li>
 
     <li class="section-title inherited"><a href="../../janus_client/JanusVideoRoomPlugin-class.html#operators">Operators</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
@@ -204,7 +206,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.7
+      2.2.9
   </span>
 
   

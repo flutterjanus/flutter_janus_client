@@ -10,7 +10,7 @@ class VideoRoomEvent {
     room = room;
   }
 
-  VideoRoomEvent() {}
+  VideoRoomEvent();
 
   @override
   bool operator ==(Object other) =>
@@ -30,6 +30,7 @@ class VideoRoomEvent {
         ' room: $room,' +
         '}';
   }
+
   Map<String, dynamic> toMap() {
     return {
       'videoroom': this.videoroom,

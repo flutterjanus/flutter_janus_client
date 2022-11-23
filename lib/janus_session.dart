@@ -181,7 +181,7 @@ class JanusSession {
           Map<String, dynamic>? response;
           if (_transport is RestJanusTransport) {
             RestJanusTransport rest = (_transport as RestJanusTransport);
-            _context._logger.info("keep alive using RestTransport");
+            _context._logger.finer("keep alive using RestTransport");
             response = (await rest.post({
               "janus": "keepalive",
               "session_id": sessionId,
@@ -189,13 +189,13 @@ class JanusSession {
               ..._context._apiMap,
               ..._context._tokenMap
             })) as Map<String, dynamic>;
-            _context._logger.fine(response);
+            _context._logger.finest(response);
           } else if (_transport is WebSocketJanusTransport) {
-            _context._logger.info("keep alive using WebSocketTransport");
+            _context._logger.finest("keep alive using WebSocketTransport");
             WebSocketJanusTransport ws =
                 (_transport as WebSocketJanusTransport);
             if (!ws.isConnected) {
-              _context._logger.fine(
+              _context._logger.finest(
                   "not connected trying to establish connection to webSocket");
               ws.connect();
             }
@@ -206,10 +206,10 @@ class JanusSession {
               ..._context._apiMap,
               ..._context._tokenMap
             }));
-            _context._logger.fine("keepalive request sent to webSocket");
+            _context._logger.finest("keepalive request sent to webSocket");
             response = parse(await ws.stream.firstWhere(
                 (element) => (parse(element)['transaction'] == transaction)));
-            _context._logger.fine(response);
+            _context._logger.finest(response);
           }
         } catch (e) {
           timer.cancel();

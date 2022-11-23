@@ -140,7 +140,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[filename] : "basename of the file to record to, -audio.mjr will be added by the plugin<br>
   ///
   Future<void> joinRoom(dynamic roomId,
-      {String? id,
+      {dynamic id,
       String? group,
       String? pin,
       int? expectedLoss,
@@ -397,6 +397,12 @@ class JanusAudioBridgePlugin extends JanusPlugin {
                 "stopped-talking") {
           typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(
               typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
+            "destroyed") {
+          typedEvent.event.plugindata?.data =
+              AudioBridgeDestroyedEvent.fromJson(
+                  typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         }
 

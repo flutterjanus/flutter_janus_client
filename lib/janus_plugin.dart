@@ -74,11 +74,11 @@ class JanusPlugin {
           'initializeWebRTCStack:-configuration is null call init before calling me');
       return;
     }
-    _context._logger.fine('webRTC stack intialized');
+    _context._logger.finest('webRTC stack intialized');
     RTCPeerConnection peerConnection =
         await createPeerConnection(_webRtcConfiguration!, {});
     peerConnection.onRenegotiationNeeded = () {
-      _context._logger.fine('onRenegotiationNeeded');
+      _context._logger.finest('onRenegotiationNeeded');
     };
     //unified plan webrtc tracks emitter
     _handleUnifiedWebRTCTracksEmitter(peerConnection);
@@ -174,7 +174,7 @@ class JanusPlugin {
   void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection) {
     if (_context._isUnifiedPlan && !_context._usePlanB) {
       peerConnection.onTrack = (RTCTrackEvent event) async {
-        _context._logger.fine('onTrack called with event');
+        _context._logger.finest('onTrack called with event');
         _context._logger.fine(event.toString());
         if (event.receiver != null) {
           event.receiver!.track!.onUnMute = () {
@@ -200,7 +200,7 @@ class JanusPlugin {
           };
         }
 
-        _context._logger.fine("Handling Remote Track");
+        _context._logger.finest("Handling Remote Track");
         if (event.streams.length == 0) return;
         _remoteStreamController?.add(event.streams[0]);
         if (event.track.id == null) return;
@@ -211,13 +211,13 @@ class JanusPlugin {
           _remoteTrackStreamController
               ?.add(RemoteTrack(track: event.track, mid: mid, flowing: true));
         } catch (e) {
-          _context._logger.fine(e);
+          _context._logger.severe(e);
         }
         if (event.track.onEnded != null) return;
-        _context._logger
-            .fine("Adding onended callback to track:" + event.track.toString());
+        _context._logger.finest(
+            "Adding onended callback to track:" + event.track.toString());
         event.track.onEnded = () async {
-          _context._logger.fine("Remote track removed:");
+          _context._logger.finest("Remote track removed:");
           String? mid = event.track.id;
           if (_context._isUnifiedPlan && !_context._usePlanB) {
             RTCRtpTransceiver? transceiver =
@@ -231,13 +231,14 @@ class JanusPlugin {
                 _remoteTrackStreamController?.add(
                     RemoteTrack(track: event.track, mid: mid, flowing: false));
             } catch (e) {
-              print(e);
+              this._context._logger.fine(e);
             }
           }
         };
         event.track.onMute = () async {
-          _context._logger.fine("Remote track muted:" + event.track.toString());
-          _context._logger.fine("Removing remote track");
+          _context._logger
+              .finest("Remote track muted:" + event.track.toString());
+          _context._logger.finest("Removing remote track");
           var mid = event.track.id;
           if (_context._isUnifiedPlan && !_context._usePlanB) {
             RTCRtpTransceiver? transceiver =
@@ -251,13 +252,13 @@ class JanusPlugin {
                 _remoteTrackStreamController?.add(
                     RemoteTrack(track: event.track, mid: mid, flowing: false));
             } catch (e) {
-              print(e);
+              this._context._logger.fine('error:' + e.toString());
             }
           }
         };
         event.track.onUnMute = () async {
           _context._logger
-              .fine("Remote track flowing again:" + event.track.toString());
+              .finest("Remote track flowing again:" + event.track.toString());
           try {
             // Notify the application the track is back
             String? mid = event.track.id;
@@ -273,7 +274,7 @@ class JanusPlugin {
               }
             }
           } catch (e) {
-            print(e);
+            this._context._logger.fine(e);
           }
         };
       };
@@ -289,7 +290,7 @@ class JanusPlugin {
     peerConnection.onIceCandidate = (RTCIceCandidate candidate) async {
       Map<String, dynamic>? response;
       if (!plugin!.contains('textroom')) {
-        print('sending trickle');
+        this._context._logger.finest('sending trickle');
         Map<String, dynamic> request = {
           "janus": "trickle",
           "candidate": candidate.toMap(),
@@ -386,7 +387,7 @@ class JanusPlugin {
         return;
       }
     } catch (e) {
-      print(e);
+      this._context._logger.fine(e);
       pollingActive = false;
       _context._logger.severe("fatal Exception");
       return;
@@ -414,7 +415,7 @@ class JanusPlugin {
   Future<void> _disposeMediaStreams(
       {ignoreRemote = false, video = true, audio = true}) async {
     _context._logger
-        .fine('disposing localStream and remoteStream if it already exists');
+        .finest('disposing localStream and remoteStream if it already exists');
     if (webRTCHandle!.localStream != null) {
       if (audio) {
         webRTCHandle?.localStream?.getAudioTracks().forEach((element) async {
@@ -508,8 +509,8 @@ class JanusPlugin {
       if (_context._apiSecret != null)
         request["apisecret"] = _context._apiSecret;
       if (jsep != null) {
-        _context._logger.fine("sending jsep");
-        _context._logger.fine(jsep.toMap());
+        _context._logger.finest("sending jsep");
+        _context._logger.finest(jsep.toMap());
         request["jsep"] = jsep.toMap();
       }
       if (_transport is RestJanusTransport) {
@@ -525,7 +526,7 @@ class JanusPlugin {
       }
       return response;
     } catch (e) {
-      print(e);
+      this._context._logger.fine(e);
     }
   }
 
@@ -574,10 +575,10 @@ class JanusPlugin {
             await navigator.mediaDevices.getUserMedia(mediaConstraints);
       }
       if (_context._isUnifiedPlan && !_context._usePlanB) {
-        _context._logger.fine('using unified plan');
+        _context._logger.finest('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
-          _context._logger.fine('adding track in peerconnection');
-          _context._logger.fine(element.toString());
+          _context._logger.finest('adding track in peerconnection');
+          _context._logger.finest(element.toString());
           await webRTCHandle!.peerConnection!
               .addTrack(element, webRTCHandle!.localStream!);
         });
@@ -615,7 +616,7 @@ class JanusPlugin {
     }
     if (kIsWeb) {
       if (deviceId == null) {
-        _context._logger.fine(
+        _context._logger.finest(
             'deviceId not provided,hence switching to default last deviceId should be of back camera ideally');
         deviceId = videoDevices.last.deviceId;
       }
@@ -638,7 +639,7 @@ class JanusPlugin {
       return true;
     } else {
       if (webRTCHandle?.localStream != null) {
-        _context._logger.fine(
+        _context._logger.finest(
             'using helper to switch camera, only works in android and ios');
         return Helper.switchCamera(
             webRTCHandle!.localStream!.getVideoTracks().first);
@@ -740,7 +741,7 @@ class JanusPlugin {
   Future<void> sendData(String message) async {
     // if (message != null) {
     if (webRTCHandle!.peerConnection != null) {
-      print('before send RTCDataChannelMessage');
+      this._context._logger.finest('before send RTCDataChannelMessage');
       if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] ==
           null) {
         throw Exception(
@@ -765,7 +766,10 @@ class JanusPlugin {
       bool videoRecv: false,
       bool audioSend: true,
       bool videoSend: true}) async {
-    print('using transrecievers in prepare transrecievers');
+    this
+        ._context
+        ._logger
+        .finest('using transrecievers in prepare transrecievers');
     RTCRtpTransceiver? audioTransceiver;
     RTCRtpTransceiver? videoTransceiver;
     List<RTCRtpTransceiver> transceivers =
@@ -791,7 +795,7 @@ class JanusPlugin {
       // Audio disabled: have we removed it?
       if (audioTransceiver != null) {
         audioTransceiver!.setDirection(TransceiverDirection.Inactive);
-        print("Setting audio transceiver to inactive:" +
+        this._context._logger.finest("Setting audio transceiver to inactive:" +
             audioTransceiver.toString());
       }
     } else {
@@ -799,27 +803,30 @@ class JanusPlugin {
       if (audioSend && audioRecv) {
         if (audioTransceiver != null) {
           audioTransceiver!.setDirection(TransceiverDirection.SendRecv);
-          print("Setting audio transceiver to sendrecv:" +
-              audioTransceiver.toString());
+          this._context._logger.finest(
+              "Setting audio transceiver to sendrecv:" +
+                  audioTransceiver.toString());
         }
       } else if (audioSend && !audioRecv) {
         if (audioTransceiver != null) {
           audioTransceiver!.setDirection(TransceiverDirection.SendOnly);
-          print("Setting audio transceiver to sendonly:" +
-              audioTransceiver.toString());
+          this._context._logger.finest(
+              "Setting audio transceiver to sendonly:" +
+                  audioTransceiver.toString());
         }
       } else if (!audioSend && audioRecv) {
         if (audioTransceiver != null) {
           audioTransceiver!.setDirection(TransceiverDirection.RecvOnly);
-          print("Setting audio transceiver to recvonly:" +
-              audioTransceiver.toString());
+          this._context._logger.finest(
+              "Setting audio transceiver to recvonly:" +
+                  audioTransceiver.toString());
         } else {
           // In theory, this is the only case where we might not have a transceiver yet
           audioTransceiver = await webRTCHandle!.peerConnection!.addTransceiver(
               kind: RTCRtpMediaType.RTCRtpMediaTypeAudio,
               init: RTCRtpTransceiverInit(
                   direction: TransceiverDirection.RecvOnly));
-          print("Adding recvonly audio transceiver:" +
+          this._context._logger.finest("Adding recvonly audio transceiver:" +
               audioTransceiver.toString());
         }
       }

@@ -37,6 +37,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
+    await publishVideo.initDataChannel();
     await publishVideo.initializeMediaDevices(
         mediaConstraints: {'audio': true, 'video': true});
     _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
@@ -146,7 +147,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
       remoteVideoStream = tempVideo;
     });
     publishVideo.data?.listen((event) async {
-      await publishVideo.sendData(event.text);
       setState(() {
         messages.add(event.text);
       });
@@ -393,9 +393,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   Flexible(
                       child: TextFormField(
                     controller: messageController,
-                    onFieldSubmitted: (value) async {
-                      await publishVideo.sendData(value);
-                    },
                     decoration:
                         InputDecoration(label: Text('Data channel message')),
                   )),

@@ -64,10 +64,13 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       return;
     }
     remoteHandle = await session.attach<JanusVideoRoomPlugin>();
-    remoteHandle?.initDataChannel();
     remoteHandle?.data?.listen((event) {
       print('subscriber data:=>');
       print(event.text);
+    });
+    remoteHandle?.onData?.listen((event) {
+      print('subscriber onData:=>');
+      print(event.toString());
     });
     remoteHandle?.webRTCHandle?.peerConnection?.onRenegotiationNeeded =
         () async {
@@ -90,6 +93,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       }
       if (event.jsep != null) {
         await remoteHandle?.handleRemoteJsep(event.jsep);
+        await remoteHandle?.initDataChannel();
         await remoteHandle?.start(myRoom);
       }
     }, onError: (error, trace) {
@@ -125,11 +129,6 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
 
   Future<void> joinRoom() async {
     plugin = await session.attach<JanusVideoRoomPlugin>();
-    await plugin.initDataChannel();
-    plugin.data?.listen((event) {
-      print('subscriber data:=>');
-      print(event.text);
-    });
     await plugin.initializeMediaDevices(
         mediaConstraints: {'video': true, 'audio': false});
     RemoteStream myStream = RemoteStream('0');
@@ -137,6 +136,14 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
     myStream.videoRenderer.srcObject = plugin.webRTCHandle!.localStream;
     setState(() {
       remoteStreams.putIfAbsent(0, () => myStream);
+    });
+    plugin.data?.listen((event) {
+      print('publisher data:=>');
+      print(event.text);
+    });
+    plugin.onData?.listen((event) {
+      print('publisher onData:=>');
+      print(event.toString());
     });
     await plugin.joinPublisher(myRoom, displayName: "Shivansh");
     plugin.webRTCHandle?.peerConnection?.onRenegotiationNeeded = () async {
@@ -186,8 +193,11 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
       if (data is VideoRoomLeavingEvent) {
         unSubscribeStream(data.leaving!);
       }
+      if (event.jsep != null) {
+        await plugin.handleRemoteJsep(event.jsep);
+        await plugin.initDataChannel();
+      }
       // if (data is VideoRoomConfigured) {}
-      plugin.handleRemoteJsep(event.jsep);
     }, onError: (error, trace) {
       if (error is JanusError) {
         print(error.toMap());
@@ -293,7 +303,7 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
                 ),
                 onPressed: () async {
                   await plugin.sendData("cool");
-                  await remoteHandle?.sendData("cool");
+                  // await remoteHandle?.sendData("cool");
                 })
           ],
           title: const Text('janus_client'),

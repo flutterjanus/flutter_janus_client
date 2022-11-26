@@ -61,6 +61,8 @@ class JanusSession {
     }
   }
 
+  /// This can be used to attach plugin handle to the session.<br><br>
+  /// [opaqueId] : opaque id is an optional string identifier used for client side correlations in event handlers or admin API.<br>
   Future<T> attach<T extends JanusPlugin>({String? opaqueId}) async {
     JanusPlugin plugin;
     int? handleId;

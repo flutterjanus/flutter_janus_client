@@ -135,6 +135,10 @@ class JanusPlugin {
       _wsStreamSubscription =
           (_transport as WebSocketJanusTransport).stream.listen((event) {
         _streamController!.add(parse(event));
+      }, onDone: () {
+        _messagesStreamController?.sink.close();
+      }, onError: (error) {
+        _messagesStreamController?.sink.addError(error);
       });
     }
   }

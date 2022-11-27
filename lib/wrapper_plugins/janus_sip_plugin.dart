@@ -337,6 +337,10 @@ class JanusSipPlugin extends JanusPlugin {
           _typedMessagesSink
               ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
         }
+      }, onDone: () {
+        _typedMessagesSink?.close();
+      }, onError: (error) {
+        _typedMessagesSink?.addError(error);
       });
     }
   }

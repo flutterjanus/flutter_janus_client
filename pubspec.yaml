@@ -4,7 +4,7 @@ version: 2.2.9
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
+  sdk: ">=2.15.0 <3.0.0"
   flutter: ">=1.10.0"
 
 dependencies:
@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.9.16
+  flutter_webrtc: ^0.9.17
   path_provider: ^2.0.11
   http: ^0.13.4
   web_socket_channel: ^2.2.0
@@ -21,11 +21,6 @@ dependencies:
   logging: ^1.0.2
   collection: ^1.15.0
   dartdoc: ^6.0.0
-
-
-
-
-
 
 dev_dependencies:
   flutter_test:
@@ -40,7 +35,6 @@ flutter:
   # The 'pluginClass' and Android 'package' identifiers should not ordinarily
   # be modified. They are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
-
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

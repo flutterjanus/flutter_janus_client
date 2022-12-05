@@ -21,7 +21,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
     await this.send(data: body);
     this.messages?.listen((event) async {
       if (event.jsep != null) {
-        await this.handleRemoteJsep(event.jsep!);
+        await this.handleRemoteJsep(event.jsep);
         var body = {"request": "ack"};
         await this.initDataChannel();
         RTCSessionDescription answer = await this.createAnswer(

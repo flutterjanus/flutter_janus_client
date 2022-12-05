@@ -61,7 +61,9 @@ class JanusSession {
     }
   }
 
-  Future<T> attach<T extends JanusPlugin>() async {
+  /// This can be used to attach plugin handle to the session.<br><br>
+  /// [opaqueId] : opaque id is an optional string identifier used for client side correlations in event handlers or admin API.<br>
+  Future<T> attach<T extends JanusPlugin>({String? opaqueId}) async {
     JanusPlugin plugin;
     int? handleId;
     String transaction = getUuid().v4();
@@ -69,6 +71,9 @@ class JanusSession {
       "janus": "attach",
       "transaction": transaction
     };
+    if (opaqueId != null) {
+      request["opaque_id"] = opaqueId;
+    }
     request["token"] = _context._token;
     request["apisecret"] = _context._apiSecret;
     request["session_id"] = sessionId;

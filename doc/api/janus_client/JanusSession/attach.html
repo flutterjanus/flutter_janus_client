@@ -52,18 +52,23 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">T</span>&gt;</span></span>
-<span class="name ">attach</span>&lt;<wbr><span class="type-parameter">T extends JanusPlugin</span>&gt;(<wbr>)
+<span class="name ">attach</span>&lt;<wbr><span class="type-parameter">T extends JanusPlugin</span>&gt;(<wbr><ol class="parameter-list"><li><span class="parameter" id="attach-param-opaqueId">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">opaqueId</span>}</span></li>
+</ol>)
 
       
 
     </section>
     
+<section class="desc markdown">
+  <p>This can be used to attach plugin handle to the session.<br><br>
+<code>opaqueId</code> : opaque id is an optional string identifier used for client side correlations in event handlers or admin API.<br></p>
+</section>
 
 
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;T&gt; attach&lt;T extends JanusPlugin&gt;() async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;T&gt; attach&lt;T extends JanusPlugin&gt;({String? opaqueId}) async {
   JanusPlugin plugin;
   int? handleId;
   String transaction = getUuid().v4();
@@ -71,6 +76,9 @@
     &quot;janus&quot;: &quot;attach&quot;,
     &quot;transaction&quot;: transaction
   };
+  if (opaqueId != null) {
+    request[&quot;opaque_id&quot;] = opaqueId;
+  }
   request[&quot;token&quot;] = _context._token;
   request[&quot;apisecret&quot;] = _context._apiSecret;
   request[&quot;session_id&quot;] = sessionId;

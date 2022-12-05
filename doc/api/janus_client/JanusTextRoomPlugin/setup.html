@@ -72,7 +72,7 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
   await this.send(data: body);
   this.messages?.listen((event) async {
     if (event.jsep != null) {
-      await this.handleRemoteJsep(event.jsep!);
+      await this.handleRemoteJsep(event.jsep);
       var body = {&quot;request&quot;: &quot;ack&quot;};
       await this.initDataChannel();
       RTCSessionDescription answer = await this.createAnswer(

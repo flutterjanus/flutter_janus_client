@@ -213,6 +213,11 @@ class _VideoRoomState extends State<TypedScreenShareVideoRoomV2Unified> {
             "streams": publisher.streams
           };
           for (Streams stream in publisher.streams ?? []) {
+            feedStreams[publisher.id!] = {
+              "id": publisher.id,
+              "display": publisher.display,
+              "streams": publisher.streams
+            };
             publisherStreams.add({"feed": publisher.id, ...stream.toMap()});
             if (publisher.id != null && stream.mid != null) {
               subStreams[stream.mid!] = publisher.id!;

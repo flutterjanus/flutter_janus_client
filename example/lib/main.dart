@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client_example/Home.dart';
 import 'package:janus_client_example/typed_examples/audio_bridge.dart';
+import 'package:janus_client_example/typed_examples/google_meet.dart';
 import 'package:janus_client_example/typed_examples/screen_share_videoroom.dart';
 import 'package:janus_client_example/typed_examples/sip.dart';
 import 'package:janus_client_example/typed_examples/streaming.dart';
@@ -15,6 +16,7 @@ void main() {
     debugShowCheckedModeBanner: false,
     routes: {
       "/typed_video_room_v2_unified": (c) => TypedVideoRoomV2Unified(),
+      "/google-meet": (c) => GoogleMeet(),
       "/typed_sip": (c) => TypedSipExample(),
       "/typed_streaming": (c) => TypedStreamingV2(),
       "/typed_video_call": (c) => TypedVideoCallV2Example(),

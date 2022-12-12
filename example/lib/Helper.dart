@@ -110,36 +110,27 @@ class Media {
 }
 
 class RemoteStream {
-  late MediaStream audio;
   late MediaStream video;
   RTCVideoRenderer videoRenderer = RTCVideoRenderer();
-  RTCVideoRenderer audioRenderer = RTCVideoRenderer();
+  MediaStream? mediaStream;
   String id;
+  dynamic mid;
 
   Future<void> dispose() async {
     await stopAllTracksAndDispose(video);
-    await stopAllTracksAndDispose(audio);
     videoRenderer.srcObject = null;
-    audioRenderer.srcObject = null;
     await videoRenderer.dispose();
-    await audioRenderer.dispose();
   }
 
   RemoteStream(this.id);
-  createAudio() async {
-    audio = await createLocalMediaStream('audio_$id');
-  }
 
   createVideo() async {
     video = await createLocalMediaStream('video_$id');
   }
 
   Future<void> init() async {
-    await createAudio();
     await createVideo();
     await videoRenderer.initialize();
-    await audioRenderer.initialize();
-    audioRenderer.srcObject = audio;
     videoRenderer.srcObject = video;
   }
 }

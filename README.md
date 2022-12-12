@@ -16,6 +16,7 @@ it easily integrates into your flutter application and allows you to build webrt
 
 ## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/index.html)
 ## News & Updates
+- videoroom and screenshare improvements (screenshare tested on android and chrome)
 - sip plugin wrapper added with sip calling example
 - Added errorHandler for typedMessage Stream for better development flow
 - Just like new flutter version comes With desktop support out of the box

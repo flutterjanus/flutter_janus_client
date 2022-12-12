@@ -26,6 +26,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.4
   prompt_dialog: ^1.0.9
+  flutter_foreground_task: ^3.10.0
+
+
+
 
 dev_dependencies:
   flutter_test:

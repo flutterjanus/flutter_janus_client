@@ -247,6 +247,8 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
               subscribeStreams.add(SubscriberUpdateStream(
                   feed: publisher.id, mid: stream.mid, crossrefid: null));
             }
+            subscribeStreams.add(SubscriberUpdateStream(
+                feed: publisher.id, mid: stream.mid, crossrefid: null));
           }
         }
         subscribeTo(publisherStreams);
@@ -407,7 +409,6 @@ class _VideoRoomState extends State<TypedVideoRoomV2Unified> {
         await element.dispose();
       });
     });
-
     await plugin.webRTCHandle!.localStream?.dispose();
     await plugin.dispose();
     await remoteHandle?.dispose();

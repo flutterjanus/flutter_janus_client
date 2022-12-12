@@ -163,27 +163,17 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await this.send(data: payload);
   }
 
-  Future<void> start(dynamic roomId,
-      {audioRecv = true,
-      audioSend = false,
-      videoRecv = true,
-      videoSend = false}) async {
+  Future<void> start(dynamic roomId, {RTCSessionDescription? answer}) async {
     var payload = {"request": "start", 'room': roomId};
-    RTCSessionDescription? offer = await this.createNullableAnswer(
-        audioRecv: audioRecv,
-        audioSend: audioSend,
-        videoRecv: videoRecv,
-        videoSend: videoSend);
-    if (offer != null) await this.send(data: payload, jsep: offer);
+    if (answer == null) {
+      answer = await this.createAnswer(
+          audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+    }
+    await this.send(data: payload, jsep: answer);
   }
 
   /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
-  Future<
-      Future<void> Function(
-          {String? audioRecv,
-          String? audioSend,
-          String? videoRecv,
-          String? videoSend})> joinSubscriber(
+  Future<dynamic> joinSubscriber(
     dynamic roomId, {
     List<PublisherStream>? streams,
     int? privateId,
@@ -205,17 +195,6 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     }..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     await this.send(data: payload);
-    return (
-        {audioRecv = true,
-        audioSend = false,
-        videoRecv = true,
-        videoSend = false}) async {
-      await this.start(roomId,
-          audioRecv: audioRecv,
-          audioSend: audioSend,
-          videoRecv: videoRecv,
-          videoSend: videoSend);
-    };
   }
 
   /// sends the publish request to [JanusVideoRoom]. It should be called once [VideoRoomJoinedEvent] is received from server.
@@ -228,7 +207,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       String? newDisplayName,
       int? audioLevelAverage,
       int? audioActivePackets,
-      List<Map<String, String>>? descriptions,
+      List<Map<String, String?>>? descriptions,
       RTCSessionDescription? offer}) async {
     var payload = {
       "request": "publish",
@@ -287,6 +266,11 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await this.send(data: payload);
   }
 
+  /// sends unpublish request on current active [JanusVideoRoomPlugin] to tear off active PeerConnection in-effect leaving the room.
+  Future<void> unpublish() async {
+    await this.send(data: {"request": "unpublish"});
+  }
+
   /// sends hangup request on current active [JanusVideoRoomPlugin] to tear off active PeerConnection in-effect leaving the room.
   Future<void> hangup() async {
     await super.hangup();
@@ -305,6 +289,19 @@ class JanusVideoRoomPlugin extends JanusPlugin {
         if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
           typedEvent.event.plugindata?.data =
               VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
+            typedEvent.event.plugindata?.data['unpublished'] != null&&typedEvent.event.plugindata?.data['unpublished'] is int) {
+          typedEvent.event.plugindata?.data =
+              VideoRoomUnPublishedEvent.fromJson(
+                  typedEvent.event.plugindata?.data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (typedEvent.event.plugindata?.data['videoroom'] ==
+                'updated' &&
+            typedEvent.event.plugindata?.data['streams'] != null) {
+          print('reaching here buddy');
+          typedEvent.event.plugindata?.data =
+              VideoRoomUpdatedEvent.fromJson(typedEvent.event.plugindata?.data);
           _typedMessagesSink?.add(typedEvent);
         } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
             typedEvent.event.plugindata?.data['configured'] == "ok") {

@@ -25,7 +25,7 @@ class JanusSession {
         "transaction": transaction,
         ..._context._tokenMap,
         ..._context._apiMap
-      };
+      }..removeWhere((key, value) => value == null);
       Map<String, dynamic>? response;
       if (_transport is RestJanusTransport) {
         RestJanusTransport rest = (_transport as RestJanusTransport);
@@ -61,16 +61,19 @@ class JanusSession {
     }
   }
 
-  Future<T> attach<T extends JanusPlugin>() async {
+  Future<T> attach<T extends JanusPlugin>(String? opaqueId) async {
     JanusPlugin plugin;
     int? handleId;
     String transaction = getUuid().v4();
     Map<String, dynamic> request = {
       "janus": "attach",
-      "transaction": transaction
+      "transaction": transaction,
+      ..._context._apiMap,
+      ..._context._tokenMap
     };
-    request["token"] = _context._token;
-    request["apisecret"] = _context._apiSecret;
+    if (opaqueId != null) {
+      request["opaque_id"] = opaqueId;
+    }
     request["session_id"] = sessionId;
     Map<String, dynamic>? response;
     if (T == JanusVideoRoomPlugin) {

@@ -20,6 +20,19 @@ class _HomeState extends State<Home> {
                   ListTile(
                     title: Text.rich(
                       TextSpan(children: [
+                        TextSpan(text: "Google meet"),
+                        TextSpan(
+                            text: "  New",
+                            style: TextStyle(color: Colors.green))
+                      ]),
+                    ),
+                    onTap: () {
+                      Navigator.of(context).pushNamed("/google-meet");
+                    },
+                  ),
+                  ListTile(
+                    title: Text.rich(
+                      TextSpan(children: [
                         TextSpan(text: "Typed Video Room V2 Unified"),
                         TextSpan(
                             text: "  New",

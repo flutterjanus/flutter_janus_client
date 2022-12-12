@@ -53,7 +53,11 @@ part './interfaces/video_room/events/video_room_configured.dart';
 
 part './interfaces/video_room/events/video_room_joined_event.dart';
 
+part './interfaces/video_room/events/video_room_updated_event.dart';
+
 part './interfaces/video_room/events/video_room_leaving_event.dart';
+
+part './interfaces/video_room/events/video_room_unpublished_event.dart';
 
 part './interfaces/video_room/events/video_room_new_publisher_event.dart';
 

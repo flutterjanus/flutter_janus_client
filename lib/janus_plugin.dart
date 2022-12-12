@@ -34,8 +34,10 @@ class JanusPlugin {
   Stream<RTCDataChannelMessage>? data;
   Stream<RTCDataChannelState>? onData;
   Stream<RemoteTrack>? remoteTrack;
+  Stream<dynamic>? renegotiationNeeded;
   Stream<MediaStream>? remoteStream;
   Stream<MediaStream?>? localStream;
+  StreamController<dynamic>? _renegotiationNeededController;
   StreamController<MediaStream?>? _localStreamController;
   StreamController<RemoteTrack>? _remoteTrackStreamController;
   StreamController<MediaStream>? _remoteStreamController;
@@ -78,7 +80,7 @@ class JanusPlugin {
     RTCPeerConnection peerConnection =
         await createPeerConnection(_webRtcConfiguration!, {});
     peerConnection.onRenegotiationNeeded = () {
-      _context._logger.finest('onRenegotiationNeeded');
+      _renegotiationNeededController?.sink.add(true);
     };
     //unified plan webrtc tracks emitter
     _handleUnifiedWebRTCTracksEmitter(peerConnection);
@@ -169,6 +171,10 @@ class JanusPlugin {
     // data channel state stream contoller
     _onDataStreamController = StreamController<RTCDataChannelState>();
     onData = _onDataStreamController!.stream.asBroadcastStream();
+    // data channel state stream contoller
+    _renegotiationNeededController = StreamController<void>();
+    renegotiationNeeded =
+        _renegotiationNeededController!.stream.asBroadcastStream();
   }
 
   void _handleUnifiedWebRTCTracksEmitter(RTCPeerConnection peerConnection) {
@@ -176,106 +182,31 @@ class JanusPlugin {
       peerConnection.onTrack = (RTCTrackEvent event) async {
         _context._logger.finest('onTrack called with event');
         _context._logger.fine(event.toString());
-        if (event.receiver != null) {
-          event.receiver!.track!.onUnMute = () {
-            if (!_remoteTrackStreamController!.isClosed)
-              _remoteTrackStreamController?.add(RemoteTrack(
-                  track: event.receiver!.track,
-                  mid: event.receiver!.track!.id,
-                  flowing: true));
-          };
-          event.receiver!.track!.onMute = () {
-            if (!_remoteTrackStreamController!.isClosed)
-              _remoteTrackStreamController?.add(RemoteTrack(
-                  track: event.receiver!.track,
-                  mid: event.receiver!.track!.id,
-                  flowing: false));
-          };
-          event.receiver!.track!.onEnded = () {
-            if (!_remoteTrackStreamController!.isClosed)
-              _remoteTrackStreamController?.add(RemoteTrack(
-                  track: event.receiver!.track,
-                  mid: event.receiver!.track!.id,
-                  flowing: false));
-          };
-        }
-
-        _context._logger.finest("Handling Remote Track");
-        if (event.streams.length == 0) return;
-        _remoteStreamController?.add(event.streams[0]);
-        if (event.track.id == null) return;
+        if (event.streams.isEmpty) return;
         // Notify about the new track event
-        String? mid =
-            event.transceiver != null ? event.transceiver!.mid : event.track.id;
-        try {
-          _remoteTrackStreamController
-              ?.add(RemoteTrack(track: event.track, mid: mid, flowing: true));
-        } catch (e) {
-          _context._logger.severe(e);
-        }
-        if (event.track.onEnded != null) return;
-        _context._logger.finest(
-            "Adding onended callback to track:" + event.track.toString());
+
+        var mid = event.transceiver != null
+            ? event.transceiver?.mid
+            : event.receiver != null
+                ? event.receiver?.track?.id
+                : event.track.id;
+        _remoteTrackStreamController
+            ?.add(RemoteTrack(track: event.track, mid: mid, flowing: true));
         event.track.onEnded = () async {
-          _context._logger.finest("Remote track removed:");
-          String? mid = event.track.id;
-          if (_context._isUnifiedPlan && !_context._usePlanB) {
-            RTCRtpTransceiver? transceiver =
-                (await webRTCHandle!.peerConnection!.getTransceivers())
-                    .firstWhereOrNull((t) => t.receiver.track == event.track);
-            mid = transceiver?.mid;
-          }
-          if (mid != null) {
-            try {
-              if (!_remoteTrackStreamController!.isClosed)
-                _remoteTrackStreamController?.add(
-                    RemoteTrack(track: event.track, mid: mid, flowing: false));
-            } catch (e) {
-              this._context._logger.fine(e);
-            }
-          }
+          // Notify the application
+          if (!_remoteTrackStreamController!.isClosed)
+            _remoteTrackStreamController?.add(
+                RemoteTrack(track: event.track, mid: mid, flowing: false));
         };
         event.track.onMute = () async {
-          _context._logger
-              .finest("Remote track muted:" + event.track.toString());
-          _context._logger.finest("Removing remote track");
-          var mid = event.track.id;
-          if (_context._isUnifiedPlan && !_context._usePlanB) {
-            RTCRtpTransceiver? transceiver =
-                (await webRTCHandle!.peerConnection!.getTransceivers())
-                    .firstWhereOrNull((t) => t.receiver.track == event.track);
-            mid = transceiver?.mid;
-          }
-          if (mid != null) {
-            try {
-              if (!_remoteTrackStreamController!.isClosed)
-                _remoteTrackStreamController?.add(
-                    RemoteTrack(track: event.track, mid: mid, flowing: false));
-            } catch (e) {
-              this._context._logger.fine('error:' + e.toString());
-            }
-          }
+          if (!_remoteTrackStreamController!.isClosed)
+            _remoteTrackStreamController?.add(
+                RemoteTrack(track: event.track, mid: mid, flowing: false));
         };
         event.track.onUnMute = () async {
-          _context._logger
-              .finest("Remote track flowing again:" + event.track.toString());
-          try {
-            // Notify the application the track is back
-            String? mid = event.track.id;
-            if (_context._isUnifiedPlan && !_context._usePlanB) {
-              RTCRtpTransceiver? transceiver =
-                  (await webRTCHandle!.peerConnection!.getTransceivers())
-                      .firstWhereOrNull((t) => t.receiver.track == event.track);
-              mid = transceiver?.mid;
-              if (mid != null) {
-                if (!_remoteTrackStreamController!.isClosed)
-                  _remoteTrackStreamController?.add(
-                      RemoteTrack(track: event.track, mid: mid, flowing: true));
-              }
-            }
-          } catch (e) {
-            this._context._logger.fine(e);
-          }
+          if (!_remoteTrackStreamController!.isClosed)
+            _remoteTrackStreamController
+                ?.add(RemoteTrack(track: event.track, mid: mid, flowing: true));
         };
       };
     }
@@ -294,12 +225,12 @@ class JanusPlugin {
         Map<String, dynamic> request = {
           "janus": "trickle",
           "candidate": candidate.toMap(),
-          "transaction": getUuid().v4()
+          "transaction": getUuid().v4(),
+          ..._context._apiMap,
+          ..._context._tokenMap
         };
         request["session_id"] = _session!.sessionId;
         request["handle_id"] = handleId;
-        request["apisecret"] = _context._apiSecret;
-        request["token"] = _context._token;
         //checking and posting using websocket if in available
         if (_transport is RestJanusTransport) {
           RestJanusTransport rest = (_transport as RestJanusTransport);
@@ -452,7 +383,9 @@ class JanusPlugin {
     _remoteTrackStreamController?.close();
     _dataStreamController?.close();
     _onDataStreamController?.close();
+    _renegotiationNeededController?.close();
     _wsStreamSubscription?.cancel();
+
     await stopAllTracksAndDispose(webRTCHandle?.localStream);
     await webRTCHandle?.peerConnection?.close();
     await webRTCHandle?.remoteStream?.dispose();
@@ -500,14 +433,13 @@ class JanusPlugin {
     try {
       String transaction = getUuid().v4();
       Map<String, dynamic>? response;
-      var request = {
+      Map<String, dynamic> request = {
         "janus": "message",
         "body": data,
         "transaction": transaction,
+        ..._context._apiMap,
+        ..._context._tokenMap
       };
-      if (_context._token != null) request["token"] = _context._token;
-      if (_context._apiSecret != null)
-        request["apisecret"] = _context._apiSecret;
       if (jsep != null) {
         _context._logger.finest("sending jsep");
         _context._logger.finest(jsep.toMap());
@@ -532,6 +464,7 @@ class JanusPlugin {
 
   /// It allows you to set Remote Description on internal peer connection, Received from janus server
   Future<void> handleRemoteJsep(RTCSessionDescription? data) async {
+    // var state = webRTCHandle?.peerConnection?.signalingState;
     if (data != null) {
       await webRTCHandle?.peerConnection?.setRemoteDescription(data);
     }

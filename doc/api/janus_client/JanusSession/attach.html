@@ -74,13 +74,13 @@
   String transaction = getUuid().v4();
   Map&lt;String, dynamic&gt; request = {
     &quot;janus&quot;: &quot;attach&quot;,
-    &quot;transaction&quot;: transaction
+    &quot;transaction&quot;: transaction,
+    ..._context._apiMap,
+    ..._context._tokenMap
   };
   if (opaqueId != null) {
     request[&quot;opaque_id&quot;] = opaqueId;
   }
-  request[&quot;token&quot;] = _context._token;
-  request[&quot;apisecret&quot;] = _context._apiSecret;
   request[&quot;session_id&quot;] = sessionId;
   Map&lt;String, dynamic&gt;? response;
   if (T == JanusVideoRoomPlugin) {

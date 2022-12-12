@@ -53,10 +53,7 @@
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
 <span class="name ">start</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="start-param-roomId"><span class="type-annotation">dynamic</span> <span class="parameter-name">roomId</span>, </span></li>
-<li><span class="parameter" id="start-param-audioRecv">{<span class="type-annotation">dynamic</span> <span class="parameter-name">audioRecv</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="start-param-audioSend"><span class="type-annotation">dynamic</span> <span class="parameter-name">audioSend</span> = <span class="default-value">false</span>, </span></li>
-<li><span class="parameter" id="start-param-videoRecv"><span class="type-annotation">dynamic</span> <span class="parameter-name">videoRecv</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="start-param-videoSend"><span class="type-annotation">dynamic</span> <span class="parameter-name">videoSend</span> = <span class="default-value">false</span>}</span></li>
+<li><span class="parameter" id="start-param-answer">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">answer</span>}</span></li>
 </ol>)
 
       
@@ -68,18 +65,13 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; start(dynamic roomId,
-    {audioRecv = true,
-    audioSend = false,
-    videoRecv = true,
-    videoSend = false}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; start(dynamic roomId, {RTCSessionDescription? answer}) async {
   var payload = {&quot;request&quot;: &quot;start&quot;, &#39;room&#39;: roomId};
-  RTCSessionDescription? offer = await this.createNullableAnswer(
-      audioRecv: audioRecv,
-      audioSend: audioSend,
-      videoRecv: videoRecv,
-      videoSend: videoSend);
-  if (offer != null) await this.send(data: payload, jsep: offer);
+  if (answer == null) {
+    answer = await this.createAnswer(
+        audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+  }
+  await this.send(data: payload, jsep: answer);
 }</code></pre>
 </section>
 
@@ -121,6 +113,7 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/pollingActive.html">pollingActive</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteStream.html">remoteStream</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteTrack.html">remoteTrack</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/renegotiationNeeded.html">renegotiationNeeded</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/typedMessages.html">typedMessages</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/webRTCHandle.html">webRTCHandle</a></li>
@@ -155,6 +148,7 @@
     <li><a href="../../janus_client/JanusVideoRoomPlugin/subscribeToStreams.html">subscribeToStreams</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/switchCamera.html">switchCamera</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/unpublish.html">unpublish</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/unsubscribe.html">unsubscribe</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/update.html">update</a></li>
 

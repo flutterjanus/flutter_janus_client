@@ -77,7 +77,9 @@
   _remoteTrackStreamController?.close();
   _dataStreamController?.close();
   _onDataStreamController?.close();
+  _renegotiationNeededController?.close();
   _wsStreamSubscription?.cancel();
+
   await stopAllTracksAndDispose(webRTCHandle?.localStream);
   await webRTCHandle?.peerConnection?.close();
   await webRTCHandle?.remoteStream?.dispose();
@@ -124,6 +126,7 @@
     <li><a href="../../janus_client/JanusPlugin/pollingActive.html">pollingActive</a></li>
     <li><a href="../../janus_client/JanusPlugin/remoteStream.html">remoteStream</a></li>
     <li><a href="../../janus_client/JanusPlugin/remoteTrack.html">remoteTrack</a></li>
+    <li><a href="../../janus_client/JanusPlugin/renegotiationNeeded.html">renegotiationNeeded</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
     <li><a href="../../janus_client/JanusPlugin/typedMessages.html">typedMessages</a></li>
     <li><a href="../../janus_client/JanusPlugin/webRTCHandle.html">webRTCHandle</a></li>

@@ -51,7 +51,7 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span> Function<span class="signature">(<span class="parameter" id="param-audioRecv">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">audioRecv</span>, </span><span class="parameter" id="param-audioSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">audioSend</span>, </span><span class="parameter" id="param-videoRecv"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">videoRecv</span>, </span><span class="parameter" id="param-videoSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">videoSend</span>}</span>)</span></span>&gt;</span></span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
 <span class="name ">joinSubscriber</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="joinSubscriber-param-roomId"><span class="type-annotation">dynamic</span> <span class="parameter-name">roomId</span>, </span></li>
 <li><span class="parameter" id="joinSubscriber-param-streams">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../janus_client/PublisherStream-class.html">PublisherStream</a></span>&gt;</span>?</span> <span class="parameter-name">streams</span>, </span></li>
 <li><span class="parameter" id="joinSubscriber-param-privateId"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">privateId</span>, </span></li>
@@ -72,12 +72,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;
-    Future&lt;void&gt; Function(
-        {String? audioRecv,
-        String? audioSend,
-        String? videoRecv,
-        String? videoSend})&gt; joinSubscriber(
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; joinSubscriber(
   dynamic roomId, {
   List&lt;PublisherStream&gt;? streams,
   int? privateId,
@@ -99,17 +94,6 @@
   }..removeWhere((key, value) =&gt; value == null);
   _handleRoomIdTypeDifference(payload);
   await this.send(data: payload);
-  return (
-      {audioRecv = true,
-      audioSend = false,
-      videoRecv = true,
-      videoSend = false}) async {
-    await this.start(roomId,
-        audioRecv: audioRecv,
-        audioSend: audioSend,
-        videoRecv: videoRecv,
-        videoSend: videoSend);
-  };
 }</code></pre>
 </section>
 
@@ -151,6 +135,7 @@
     <li class="inherited"><a href="../../janus_client/JanusPlugin/pollingActive.html">pollingActive</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteStream.html">remoteStream</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteTrack.html">remoteTrack</a></li>
+    <li class="inherited"><a href="../../janus_client/JanusPlugin/renegotiationNeeded.html">renegotiationNeeded</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/typedMessages.html">typedMessages</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/webRTCHandle.html">webRTCHandle</a></li>
@@ -185,6 +170,7 @@
     <li><a href="../../janus_client/JanusVideoRoomPlugin/subscribeToStreams.html">subscribeToStreams</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/switchCamera.html">switchCamera</a></li>
     <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+    <li><a href="../../janus_client/JanusVideoRoomPlugin/unpublish.html">unpublish</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/unsubscribe.html">unsubscribe</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/update.html">update</a></li>
 

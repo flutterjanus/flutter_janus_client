@@ -71,7 +71,7 @@
       &quot;transaction&quot;: transaction,
       ..._context._tokenMap,
       ..._context._apiMap
-    };
+    }..removeWhere((key, value) =&gt; value == null);
     Map&lt;String, dynamic&gt;? response;
     if (_transport is RestJanusTransport) {
       RestJanusTransport rest = (_transport as RestJanusTransport);

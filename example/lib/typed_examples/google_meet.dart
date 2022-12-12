@@ -124,7 +124,6 @@ class _VideoRoomState extends State<GoogleMeet> {
       return;
     }
     if (remotePlugin == null) {
-      print('remote plugin recreating');
       remotePlugin = await session?.attach<JanusVideoRoomPlugin>();
       remotePlugin?.messages?.listen((payload) async {
         JanusEvent event = JanusEvent.fromJson(payload.event);
@@ -182,8 +181,7 @@ class _VideoRoomState extends State<GoogleMeet> {
               feed: e['id'], mid: e['mid'], simulcast: e['simulcast'])))
           .expand((element) => element)
           .toList();
-      await remotePlugin?.joinSubscriber(myRoom,
-          streams: streams, privateId: myPvtId);
+      await remotePlugin?.joinSubscriber(myRoom, streams: streams, pin: myPin);
       return;
     }
     List<Map>? added = null, removed = null;
@@ -388,10 +386,37 @@ class _VideoRoomState extends State<GoogleMeet> {
     await screenPlugin?.unpublish();
     StreamRenderer? rendererRemoved;
     setState(() {
-      rendererRemoved = videoState.streamsToBeRendered.remove('screenshare');
+      rendererRemoved =
+          videoState.streamsToBeRendered.remove('localScreenShare');
     });
     await rendererRemoved?.dispose();
     await screenPlugin?.hangup();
+  }
+
+  switchCamera() async {
+    setState(() {
+      front = !front;
+    });
+    await videoPlugin?.switchCamera(deviceId: await getCameraDeviceId(front));
+    localVideoRenderer = StreamRenderer('local');
+    await localVideoRenderer.init();
+    localVideoRenderer.videoRenderer.srcObject =
+        videoPlugin?.webRTCHandle!.localStream;
+    setState(() {
+      videoState.streamsToBeRendered['local'] = localVideoRenderer;
+    });
+  }
+
+  mute(RTCPeerConnection? peerConnection, String kind, bool enabled) async {
+    var transreciever = (await peerConnection?.getTransceivers())
+        ?.where((element) => element.sender.track?.kind == kind)
+        .toList();
+    if (transreciever?.isEmpty == true) {
+      return;
+    }
+    await transreciever?.first.setDirection(enabled
+        ? TransceiverDirection.SendOnly
+        : TransceiverDirection.Inactive);
   }
 
   callEnd() async {
@@ -430,7 +455,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                     onPressed: () async {
                       if (joinForm.currentState?.validate() == true) {
                         myRoom = int.parse(room.text);
-                        myPin = pin.text.length > 0 ? pin.text : null;
+                        myPin = pin.text;
                         myUsername = username.text;
                         setState(() {
                           this.joined = true;
@@ -461,6 +486,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                   ),
                   TextFormField(
                     controller: pin,
+                    obscureText: true,
                     decoration: InputDecoration(label: Text('Pin')),
                   )
                 ]),
@@ -468,18 +494,6 @@ class _VideoRoomState extends State<GoogleMeet> {
             );
           }));
         });
-  }
-
-  mute(RTCPeerConnection? peerConnection, String kind, bool enabled) async {
-    var transreciever = (await peerConnection?.getTransceivers())
-        ?.where((element) => element.sender.track?.kind == kind)
-        .toList();
-    if (transreciever?.isEmpty == true) {
-      return;
-    }
-    await transreciever?.first.setDirection(enabled
-        ? TransceiverDirection.SendOnly
-        : TransceiverDirection.Inactive);
   }
 
   @override
@@ -555,24 +569,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                 Icons.switch_camera,
                 color: Colors.white,
               ),
-              onPressed: joined
-                  ? () async {
-                      setState(() {
-                        front = !front;
-                      });
-                      await videoPlugin?.switchCamera(
-                          deviceId: await getCameraDeviceId(front));
-                      localVideoRenderer = StreamRenderer('camera-audio');
-                      await localVideoRenderer.init();
-                      localVideoRenderer.videoRenderer.srcObject =
-                          videoPlugin?.webRTCHandle!.localStream;
-                      setState(() {
-                        videoState.streamsToBeRendered.remove(0);
-                        videoState.streamsToBeRendered['camera-audio'] =
-                            localVideoRenderer;
-                      });
-                    }
-                  : null)
+              onPressed: joined ? switchCamera : null)
         ],
         title: const Text('google meet clone'),
       ),
@@ -596,11 +593,12 @@ class _VideoRoomState extends State<GoogleMeet> {
                           style: TextStyle(color: Colors.black)),
                     ),
                   ),
-                  child: RTCVideoView(remoteStream.videoRenderer,
-                      filterQuality: FilterQuality.none,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                      mirror: true),
+                  child: RTCVideoView(
+                    remoteStream.videoRenderer,
+                    filterQuality: FilterQuality.none,
+                    objectFit:
+                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                  ),
                 ),
                 Align(
                   alignment: AlignmentDirectional.bottomStart,

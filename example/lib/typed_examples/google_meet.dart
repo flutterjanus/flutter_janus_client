@@ -244,12 +244,13 @@ class _VideoRoomState extends State<GoogleMeet> {
     }
     StreamRenderer renderer =
         videoState.streamsToBeRendered[feedId.toString()]!;
-    if (kind == 'audio') {
-      renderer.isAudioMuted = muted;
-    } else {
-      renderer.isVideoMuted = muted;
-    }
-    setState(() {});
+    setState(() {
+      if (kind == 'audio') {
+        renderer.isAudioMuted = muted;
+      } else {
+        renderer.isVideoMuted = muted;
+      }
+    });
   }
 
   attachSubscriberOnPublisherChange(List<dynamic>? publishers) async {
@@ -340,7 +341,6 @@ class _VideoRoomState extends State<GoogleMeet> {
       screenSharing = true;
     });
     initLocalMediaRenderer();
-    // screenPlugin = await attachPlugin();
     screenPlugin = await session?.attach<JanusVideoRoomPlugin>();
     screenPlugin?.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
@@ -370,8 +370,8 @@ class _VideoRoomState extends State<GoogleMeet> {
     localScreenSharingRenderer.videoRenderer.srcObject =
         localScreenSharingRenderer.mediaStream;
     setState(() {
-      videoState.streamsToBeRendered
-          .putIfAbsent('screenshare', () => localScreenSharingRenderer);
+      videoState.streamsToBeRendered.putIfAbsent(
+          localScreenSharingRenderer.id, () => localScreenSharingRenderer);
     });
     await screenPlugin?.joinPublisher(myRoom,
         displayName: username.text + "screenshare",
@@ -387,10 +387,11 @@ class _VideoRoomState extends State<GoogleMeet> {
     StreamRenderer? rendererRemoved;
     setState(() {
       rendererRemoved =
-          videoState.streamsToBeRendered.remove('localScreenShare');
+          videoState.streamsToBeRendered.remove(localScreenSharingRenderer.id);
     });
     await rendererRemoved?.dispose();
     await screenPlugin?.hangup();
+    screenPlugin = null;
   }
 
   switchCamera() async {

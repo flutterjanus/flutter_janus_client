@@ -76041,7 +76041,7 @@ case 3:return A.m(null,r)}})
 return A.n($async$aH,r)},
 cJ(){var s=0,r=A.o(t.z),q=this,p,o,n
 var $async$cJ=A.p(function(a,b){if(a===1)return A.l(b,r)
-while(true)switch(s){case 0:o=new A.mV($.q8.h(0,"janus_ws"))
+while(true)switch(s){case 0:o=new A.mV($.q8.h(0,"servercheap"))
 q.e=o
 o=A.xH(null,A.a([new A.hw("","","stun:stun.voip.eutelia.it:3478")],t.Sc),!0,B.de,!1,o,!1)
 q.d=o
@@ -82247,7 +82247,7 @@ $.N=null
 $.auo=1
 $.at3=1
 $.q8=function(){var s=t.N
-return A.Y(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","ws://107.152.35.248/websocket","onemandev_master_ws","wss://master-janus.onemandev.tech/websocket","onemandev_master_rest","https://master-janus.onemandev.tech/rest","onemandev_unified_rest","https://unified-janus.onemandev.tech/rest","onemandev_unified_ws","wss://unified-janus.onemandev.tech/websocket"],s,s)}()
+return A.Y(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","wss://proficientio.top/websocket"],s,s)}()
 $.asj=0
 $.aBv=A.v(t.N,t.JW)
 $.ar7=null

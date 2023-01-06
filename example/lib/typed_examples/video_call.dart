@@ -129,7 +129,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   }
 
   initJanusClient() async {
-    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    ws = WebSocketJanusTransport(url: servermap['servercheap']);
     j = JanusClient(
         transport: ws,
         iceServers: [

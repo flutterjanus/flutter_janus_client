@@ -150,6 +150,8 @@ class _VideoRoomState extends State<GoogleMeet> {
           'kind': event.track?.kind
         });
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
+        String displayName =
+            videoState.feedIdToDisplayStreamsMap[feedId]['display'];
         if (feedId != null) {
           if (videoState.streamsToBeRendered.containsKey(feedId.toString()) &&
               event.track?.kind == "audio") {
@@ -169,6 +171,8 @@ class _VideoRoomState extends State<GoogleMeet> {
                 await createLocalMediaStream(feedId.toString());
             localStream.mediaStream?.addTrack(event.track!);
             localStream.videoRenderer.srcObject = localStream.mediaStream;
+            localStream.publisherName = displayName;
+            localStream.publisherId = feedId.toString();
             setState(() {
               videoState.streamsToBeRendered
                   .putIfAbsent(feedId.toString(), () => localStream);
@@ -328,6 +332,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(
         mediaConstraints: {'video': true, 'audio': true});
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
+    localVideoRenderer.publisherName = "You";
     setState(() {
       videoState.streamsToBeRendered
           .putIfAbsent('local', () => localVideoRenderer);
@@ -369,12 +374,13 @@ class _VideoRoomState extends State<GoogleMeet> {
             useDisplayMediaDevices: true);
     localScreenSharingRenderer.videoRenderer.srcObject =
         localScreenSharingRenderer.mediaStream;
+    localScreenSharingRenderer.publisherName = "Your Screenshare";
     setState(() {
       videoState.streamsToBeRendered.putIfAbsent(
           localScreenSharingRenderer.id, () => localScreenSharingRenderer);
     });
     await screenPlugin?.joinPublisher(myRoom,
-        displayName: username.text + "screenshare",
+        displayName: username.text + "_screenshare",
         id: screenShareId,
         pin: myPin);
   }
@@ -403,6 +409,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     await localVideoRenderer.init();
     localVideoRenderer.videoRenderer.srcObject =
         videoPlugin?.webRTCHandle!.localStream;
+    localVideoRenderer.publisherName = "My Camera";
     setState(() {
       videoState.streamsToBeRendered['local'] = localVideoRenderer;
     });
@@ -590,7 +597,8 @@ class _VideoRoomState extends State<GoogleMeet> {
                   visible: remoteStream.isVideoMuted == false,
                   replacement: Container(
                     child: Center(
-                      child: Text("Video Paused By Owner",
+                      child: Text(
+                          "Video Paused By " + remoteStream.publisherName!,
                           style: TextStyle(color: Colors.black)),
                     ),
                   ),
@@ -607,6 +615,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Text(remoteStream.publisherName!),
                       Icon(remoteStream.isAudioMuted == true
                           ? Icons.mic_off
                           : Icons.mic),

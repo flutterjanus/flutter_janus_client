@@ -14,14 +14,22 @@ class _SipExampleState extends State<TypedSipExample> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   JanusSipPlugin? sip;
-  TextEditingController proxyController =
-      TextEditingController(text: "sip:sip.linphone.org");
-  TextEditingController usernameController =
-      TextEditingController(text: "sip:maksim11111@sip.linphone.org");
-  TextEditingController secretController =
-      TextEditingController(text: "1234567q");
-  TextEditingController callUriController =
-      TextEditingController(text: "sip:00918744849050@sip.theansr.com");
+  Map credentials = {
+    'creds1': {
+      'proxy': 'sip:sip.linphone.org',
+      'username': 'sip:maksim11111@sip.linphone.org',
+      'secret': '1234567q'
+    },
+    'creds2': {
+      'proxy': 'sip:sip.linphone.org',
+      'username': 'sip:educampus@sip.linphone.org',
+      'secret': '1234567q'
+    }
+  };
+  TextEditingController proxyController = TextEditingController(text: "");
+  TextEditingController usernameController = TextEditingController(text: "");
+  TextEditingController secretController = TextEditingController(text: "");
+  TextEditingController callUriController = TextEditingController(text: "");
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
@@ -69,6 +77,23 @@ class _SipExampleState extends State<TypedSipExample> {
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
+                    DropdownButtonFormField<Map>(
+                        decoration:
+                            InputDecoration(label: Text("Default credentials")),
+                        items: credentials.values.map((e) {
+                          return DropdownMenuItem<Map>(
+                            child: Text('${e['username']}'),
+                            value: e,
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value == null) {
+                            return;
+                          }
+                          proxyController.text = value['proxy'];
+                          usernameController.text = value['username'];
+                          secretController.text = value['secret'];
+                        }),
                     TextFormField(
                       decoration: InputDecoration(
                           labelText: "Sip Server URI",
@@ -130,6 +155,24 @@ class _SipExampleState extends State<TypedSipExample> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  DropdownButtonFormField<Map>(
+                      decoration:
+                          InputDecoration(label: Text("Default call URI")),
+                      items: credentials.values
+                          .where((e) {
+                            return e['username'] != usernameController.text;
+                          })
+                          .map((e) => DropdownMenuItem<Map>(
+                                child: Text('${e['username']}'),
+                                value: e,
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+                        callUriController.text = value['username'];
+                      }),
                   TextFormField(
                     decoration: InputDecoration(labelText: "sip URI to call"),
                     controller: callUriController,

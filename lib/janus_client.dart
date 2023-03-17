@@ -175,14 +175,15 @@ class JanusClient {
       bool isUnifiedPlan = true,
       String? token,
       bool? stringIds = false,
-
+      /// if you provide your own logger you will be responsible for managing all logging aspects and properties like log level and printing logs 
+      Logger? logger,
       /// forces creation of peer connection with plan-b sdb semantics
       @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.')
           bool usePlanB = false,
       Duration? pollingInterval,
-      loggerName = "JanusClient",
-      maxEvent = 10,
+      String loggerName = "JanusClient",
       Level loggerLevel = Level.ALL,
+      int maxEvent = 10,
       bool withCredentials = false}) {
     _stringIds = stringIds;
     _transport = transport;
@@ -190,7 +191,6 @@ class JanusClient {
     _iceServers = iceServers;
     _refreshInterval = refreshInterval;
     _apiSecret = apiSecret;
-    _loggerName = loggerName;
     _maxEvent = maxEvent;
     _loggerLevel = loggerLevel;
     _withCredentials = withCredentials;
@@ -198,12 +198,17 @@ class JanusClient {
     _token = token;
     _pollingInterval = pollingInterval ?? Duration(seconds: 1);
     _usePlanB = usePlanB;
-    _logger = Logger.detached(_loggerName);
-    _logger.level = _loggerLevel;
-    _logger.onRecord.listen((event) {
-      print(event);
-    });
     this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
+    if (logger == null) {
+      _logger = Logger.detached(loggerName);
+      _loggerName = loggerName;
+      _logger.level = _loggerLevel;
+      _logger.onRecord.listen((event) {
+        print(event);
+      });
+    } else {
+      _logger = logger;
+    }
   }
 
   Future<JanusSession> createSession() async {

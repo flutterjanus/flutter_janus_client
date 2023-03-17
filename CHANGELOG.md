@@ -1,3 +1,17 @@
+## 2.2.13
+
+- support for custom logger
+
+## 2.2.12
+
+- version downgrade for flutter_webrtc:0.9.22
+## 2.2.11
+
+- version downgrade for flutter_webrtc:0.9.22
+
+## 2.2.10
+
+- version bump for flutter_webrtc:0.9.24
 ## 2.2.9
 
 - type fix in AudioBridgeLeavingEvent (leaving)

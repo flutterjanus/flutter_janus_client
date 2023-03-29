@@ -711,13 +711,13 @@ class JanusPlugin {
       transceivers.forEach((t) {
         if ((t.sender.track != null && t.sender.track!.kind == "audio") ||
             (t.receiver.track != null && t.receiver.track!.kind == "audio")) {
-          if (audioTransceiver != null) {
+          if (audioTransceiver == null) {
             audioTransceiver = t;
           }
         }
         if ((t.sender.track != null && t.sender.track!.kind == "video") ||
             (t.receiver.track != null && t.receiver.track!.kind == "video")) {
-          if (videoTransceiver != null) {
+          if (videoTransceiver == null) {
             videoTransceiver = t;
           }
         }

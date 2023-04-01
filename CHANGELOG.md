@@ -1,3 +1,5 @@
+## 2.2.14
+- fix Searching transceivers returns wrong result [#120](https://github.com/flutterjanus/flutter_janus_client/pull/120)
 ## 2.2.13
 
 - support for custom logger

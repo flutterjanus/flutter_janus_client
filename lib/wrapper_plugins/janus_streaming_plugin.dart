@@ -180,34 +180,28 @@ class JanusStreamingPlugin extends JanusPlugin {
   @override
   void onCreate() {
     super.onCreate();
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data["streaming"] == "event" &&
-            typedEvent.event.plugindata?.data["result"] != null &&
-            typedEvent.event.plugindata?.data["result"]['status'] ==
-                'preparing') {
-          typedEvent.event.plugindata?.data = StreamingPluginPreparingEvent();
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["streaming"] == "event" &&
-            typedEvent.event.plugindata?.data["result"] != null &&
-            typedEvent.event.plugindata?.data["result"]['status'] ==
-                'stopping') {
-          typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
-          _typedMessagesSink?.add(typedEvent);
-        }
-
-        /// not tested
-        else if (typedEvent.event.plugindata?.data['streaming'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                typedEvent.event.plugindata?.data?['result']?['code'] !=
-                    null)) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+      if (data?["streaming"] == "event" &&
+          data?["result"] != null &&
+          data?["result"]['status'] == 'preparing') {
+        typedEvent.event.plugindata?.data = StreamingPluginPreparingEvent();
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["streaming"] == "event" &&
+          data?["result"] != null &&
+          data?["result"]['status'] == 'stopping') {
+        typedEvent.event.plugindata?.data = StreamingPluginStoppingEvent();
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['streaming'] == 'event' &&
+          (data?['error_code'] != null || data?['result']?['code'] != null)) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

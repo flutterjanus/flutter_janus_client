@@ -259,85 +259,63 @@ class JanusSipPlugin extends JanusPlugin {
   @override
   void onCreate() {
     super.onCreate();
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "registered") {
-          typedEvent.event.plugindata?.data =
-              SipRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "unregistered") {
-          typedEvent.event.plugindata?.data =
-              SipUnRegisteredEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "ringing") {
-          typedEvent.event.plugindata?.data =
-              SipRingingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "calling") {
-          typedEvent.event.plugindata?.data =
-              SipCallingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "proceeding") {
-          typedEvent.event.plugindata?.data =
-              SipProceedingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "accepted") {
-          typedEvent.event.plugindata?.data =
-              SipAcceptedEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "progress") {
-          typedEvent.event.plugindata?.data =
-              SipProgressEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "incomingcall") {
-          typedEvent.event.plugindata?.data =
-              SipIncomingCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "missed_call") {
-          typedEvent.event.plugindata?.data =
-              SipMissedCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?["sip"] == "event" &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "transfer") {
-          typedEvent.event.plugindata?.data =
-              SipTransferCallEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data?['result']?['code'] !=
-                null &&
-            typedEvent.event.plugindata?.data?["result"]?['event'] ==
-                "hangup" &&
-            typedEvent.event.plugindata?.data?['result']?['reason'] != null) {
-          typedEvent.event.plugindata?.data =
-              SipHangupEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['sip'] == 'event' &&
-            typedEvent.event.plugindata?.data['error_code'] != null) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+      if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "registered") {
+        typedEvent.event.plugindata?.data = SipRegisteredEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "unregistered") {
+        typedEvent.event.plugindata?.data = SipUnRegisteredEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "ringing") {
+        typedEvent.event.plugindata?.data =
+            SipRingingEvent.fromJson(typedEvent.event.plugindata?.data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "calling") {
+        typedEvent.event.plugindata?.data = SipCallingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "proceeding") {
+        typedEvent.event.plugindata?.data = SipProceedingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "accepted") {
+        typedEvent.event.plugindata?.data = SipAcceptedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "progress") {
+        typedEvent.event.plugindata?.data = SipProgressEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "incomingcall") {
+        typedEvent.event.plugindata?.data = SipIncomingCallEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "missed_call") {
+        typedEvent.event.plugindata?.data = SipMissedCallEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["sip"] == "event" &&
+          data?["result"]?['event'] == "transfer") {
+        typedEvent.event.plugindata?.data = SipTransferCallEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['result']?['code'] != null &&
+          data?["result"]?['event'] == "hangup" &&
+          data?['result']?['reason'] != null) {
+        typedEvent.event.plugindata?.data = SipHangupEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['sip'] == 'event' && data['error_code'] != null) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

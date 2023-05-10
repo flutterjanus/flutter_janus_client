@@ -362,59 +362,51 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   @override
   void onCreate() {
     super.onCreate();
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data["audiobridge"] == "joined") {
-          typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
-                "event" &&
-            typedEvent.event.plugindata?.data["participants"] != null) {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeNewParticipantsEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
-                "event" &&
-            typedEvent.event.plugindata?.data["result"] == "ok") {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeConfiguredEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
-                "event" &&
-            typedEvent.event.plugindata?.data["leaving"] != null) {
-          typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
-                "talking" ||
-            typedEvent.event.plugindata?.data["audiobridge"] ==
-                "stopped-talking") {
-          typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data["audiobridge"] ==
-            "destroyed") {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeDestroyedEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        }
-
-        /// not tested
-        else if (typedEvent.event.plugindata?.data['audiobridge'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                typedEvent.event.plugindata?.data?['result']?['code'] !=
-                    null)) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+
+      if (data?["audiobridge"] == "joined") {
+        typedEvent.event.plugindata?.data =
+            AudioBridgeJoinedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["audiobridge"] == "event") {
+        if (data?["participants"] != null) {
+          typedEvent.event.plugindata?.data =
+              AudioBridgeNewParticipantsEvent.fromJson(data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (data?["result"] == "ok") {
+          typedEvent.event.plugindata?.data =
+              AudioBridgeConfiguredEvent.fromJson(data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (data?["leaving"] != null) {
+          typedEvent.event.plugindata?.data =
+              AudioBridgeLeavingEvent.fromJson(data);
+          _typedMessagesSink?.add(typedEvent);
+        } else if (data?['error_code'] != null ||
+            data?['result']?['code'] != null) {
+          _typedMessagesSink?.addError(JanusError.fromMap(data));
+        }
+      } else if (data?["audiobridge"] == "talking" ||
+          data?["audiobridge"] == "stopped-talking") {
+        typedEvent.event.plugindata?.data =
+            AudioBridgeTalkingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?["audiobridge"] == "destroyed") {
+        typedEvent.event.plugindata?.data =
+            AudioBridgeDestroyedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['audiobridge'] == 'event' &&
+          (data?['error_code'] != null || data?['result']?['code'] != null)) {
+        _typedMessagesSink
+            ?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

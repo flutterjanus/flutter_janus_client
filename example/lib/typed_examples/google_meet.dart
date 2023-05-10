@@ -87,7 +87,7 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   initialize() async {
-    ws = WebSocketJanusTransport(url: servermap['servercheap']);
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     j = JanusClient(
         transport: ws!,
         isUnifiedPlan: true,
@@ -150,8 +150,8 @@ class _VideoRoomState extends State<GoogleMeet> {
           'kind': event.track?.kind
         });
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
-        String displayName =
-            videoState.feedIdToDisplayStreamsMap[feedId]['display'];
+        String? displayName =
+            videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
           if (videoState.streamsToBeRendered.containsKey(feedId.toString()) &&
               event.track?.kind == "audio") {

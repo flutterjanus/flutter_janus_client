@@ -98,53 +98,47 @@ class JanusVideoCallPlugin extends JanusPlugin {
 
   @override
   void onCreate() {
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            typedEvent.event.plugindata?.data['result'] != null &&
-            typedEvent.event.plugindata?.data['result']['event'] ==
-                'registered') {
-          typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            typedEvent.event.plugindata?.data['result'] != null &&
-            typedEvent.event.plugindata?.data['result']['event'] == 'calling') {
-          typedEvent.event.plugindata?.data =
-              VideoCallCallingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            typedEvent.event.plugindata?.data['result'] != null &&
-            typedEvent.event.plugindata?.data['result']['event'] ==
-                'incomingcall') {
-          typedEvent.event.plugindata?.data =
-              VideoCallIncomingCallEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            typedEvent.event.plugindata?.data['result'] != null &&
-            typedEvent.event.plugindata?.data['result']['event'] ==
-                'accepted') {
-          typedEvent.event.plugindata?.data = VideoCallAcceptedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            typedEvent.event.plugindata?.data['result'] != null &&
-            typedEvent.event.plugindata?.data['result']['event'] == 'hangup') {
-          typedEvent.event.plugindata?.data =
-              VideoCallHangupEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videocall'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                typedEvent.event.plugindata?.data?['result']?['code'] !=
-                    null)) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+      if (data?['videocall'] == 'event' &&
+          data?['result'] != null &&
+          data?['result']['event'] == 'registered') {
+        typedEvent.event.plugindata?.data =
+            VideoCallRegisteredEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videocall'] == 'event' &&
+          data?['result'] != null &&
+          data?['result']['event'] == 'calling') {
+        typedEvent.event.plugindata?.data =
+            VideoCallCallingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videocall'] == 'event' &&
+          data?['result'] != null &&
+          data?['result']['event'] == 'incomingcall') {
+        typedEvent.event.plugindata?.data =
+            VideoCallIncomingCallEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videocall'] == 'event' &&
+          data?['result'] != null &&
+          data?['result']['event'] == 'accepted') {
+        typedEvent.event.plugindata?.data =
+            VideoCallAcceptedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videocall'] == 'event' &&
+          data?['result'] != null &&
+          data?['result']['event'] == 'hangup') {
+        typedEvent.event.plugindata?.data = VideoCallHangupEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videocall'] == 'event' &&
+          (data?['error_code'] != null || data?['result']?['code'] != null)) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

@@ -281,59 +281,48 @@ class JanusVideoRoomPlugin extends JanusPlugin {
 
   @override
   void onCreate() {
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
-          typedEvent.event.plugindata?.data =
-              VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['unpublished'] != null&&typedEvent.event.plugindata?.data['unpublished'] is int) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomUnPublishedEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] ==
-                'updated' &&
-            typedEvent.event.plugindata?.data['streams'] != null) {
-          print('reaching here buddy');
-          typedEvent.event.plugindata?.data =
-              VideoRoomUpdatedEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['configured'] == "ok") {
-          typedEvent.event.plugindata?.data =
-              VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['publishers'] != null) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomNewPublisherEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['leaving'] != null &&
-            typedEvent.event.plugindata?.data['leaving'].runtimeType == int) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] ==
-                'attached' ||
-            typedEvent.event.plugindata?.data['streams'] != null) {
-          typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                typedEvent.event.plugindata?.data?['result']?['code'] !=
-                    null)) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
+          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+      if (data?['videoroom'] == 'joined') {
+        typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'event' &&
+          data?['unpublished'] != null &&
+          data?['unpublished'] is int) {
+        typedEvent.event.plugindata?.data =
+            VideoRoomUnPublishedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'updated' && data?['streams'] != null) {
+        typedEvent.event.plugindata?.data =
+            VideoRoomUpdatedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'event' && data?['configured'] == "ok") {
+        typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'event' && data?['publishers'] != null) {
+        typedEvent.event.plugindata?.data =
+            VideoRoomNewPublisherEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'event' &&
+          data?['leaving'] != null &&
+          data?['leaving'].runtimeType == int) {
+        typedEvent.event.plugindata?.data =
+            VideoRoomLeavingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'attached' || data?['streams'] != null) {
+        typedEvent.event.plugindata?.data =
+            VideoRoomAttachedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data?['videoroom'] == 'event' &&
+          (data?['error_code'] != null || data?['result']?['code'] != null)) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

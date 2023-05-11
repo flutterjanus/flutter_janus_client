@@ -10,9 +10,7 @@ class SipMissedCallEvent {
   SipMissedCallEvent.fromJson(Map<String, dynamic> json) {
     this.sip = json["sip"];
     this.callId = json["call_id"];
-    this.result = json["result"] == null
-        ? null
-        : SipMissedCallEventResult.fromJson(json["result"]);
+    this.result = json["result"] == null ? null : SipMissedCallEventResult.fromJson(json["result"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -30,8 +28,7 @@ class SipMissedCallEventResult {
   String? displayname;
   String? callee;
 
-  SipMissedCallEventResult(
-      {this.event, this.caller, this.displayname, this.callee});
+  SipMissedCallEventResult({this.event, this.caller, this.displayname, this.callee});
 
   SipMissedCallEventResult.fromJson(Map<String, dynamic> json) {
     this.event = json["event"];

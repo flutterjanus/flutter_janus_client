@@ -2,12 +2,7 @@ part of janus_client;
 
 class JanusAudioBridgePlugin extends JanusPlugin {
   JanusAudioBridgePlugin({handleId, context, transport, session})
-      : super(
-            context: context,
-            handleId: handleId,
-            plugin: JanusPlugins.AUDIO_BRIDGE,
-            session: session,
-            transport: transport);
+      : super(context: context, handleId: handleId, plugin: JanusPlugins.AUDIO_BRIDGE, session: session, transport: transport);
 
   ///
   /// [createRoom]<br>
@@ -95,13 +90,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   ///[newIsPrivate] : true|false, whether the room should appear in a list request<br>
   ///[permanent] : true|false, whether the room should be also removed from the config file, default=false
   ///
-  Future<dynamic> editRoom(dynamic roomId,
-      {String? secret,
-      String? newDescription,
-      String? newSecret,
-      String? newPin,
-      bool? newIsPrivate,
-      bool? permanent}) async {
+  Future<dynamic> editRoom(dynamic roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
     var payload = {
       "request": "edit",
       "room": roomId,
@@ -224,11 +213,9 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       "group": group
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(
-          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
     }
-    JanusEvent response =
-        JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
 
@@ -239,14 +226,8 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [participantId] unique numeric ID of the participant.<br>
   /// [mute] toggle mute status of the participant.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> muteParticipant(dynamic roomId, int participantId, bool mute,
-      {String? secret}) async {
-    var payload = {
-      "request": mute ? 'mute' : 'unmute',
-      "secret": secret,
-      "room": roomId,
-      "id": participantId
-    }..removeWhere((key, value) => value == null);
+  Future<dynamic> muteParticipant(dynamic roomId, int participantId, bool mute, {String? secret}) async {
+    var payload = {"request": mute ? 'mute' : 'unmute', "secret": secret, "room": roomId, "id": participantId}..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
@@ -259,11 +240,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [streamId] unique numeric ID of the RTP forwarder.<br>
   Future<RtpForwardStopped> stopRtpForward(dynamic roomId, int streamId) async {
-    var payload = {
-      "request": "stop_rtp_forward",
-      "room": roomId,
-      "stream_id": streamId
-    };
+    var payload = {"request": "stop_rtp_forward", "room": roomId, "stream_id": streamId};
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
@@ -276,14 +253,8 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [participantId] unique numeric ID of the participant.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> kickParticipant(dynamic roomId, int participantId,
-      {String? secret}) async {
-    var payload = {
-      "request": "kick",
-      "secret": secret,
-      "room": roomId,
-      "id": participantId
-    }..removeWhere((key, value) => value == null);
+  Future<dynamic> kickParticipant(dynamic roomId, int participantId, {String? secret}) async {
+    var payload = {"request": "kick", "secret": secret, "room": roomId, "id": participantId}..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
@@ -305,15 +276,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
   /// [srtpCrypto] key to use as crypto (base64 encoded key as in SDES); optional.<br>
   /// [adminKey] key to use if adminKey is set for rtp forward as well.<br>
   Future<RtpForwarderCreated> rtpForward(dynamic roomId, String host, int port,
-      {String? group,
-      String? adminKey,
-      String? ssrc,
-      String? codec,
-      String? ptype,
-      int? srtpSuite,
-      bool? alwaysOn,
-      String? hostFamily,
-      String? srtpCrypto}) async {
+      {String? group, String? adminKey, String? ssrc, String? codec, String? ptype, int? srtpSuite, bool? alwaysOn, String? hostFamily, String? srtpCrypto}) async {
     var payload = {
       "request": "rtp_forward",
       "room": roomId,
@@ -347,9 +310,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
-    return (response.plugindata?.data['participants'] as List<dynamic>)
-        .map((e) => AudioBridgeParticipants.fromJson(e))
-        .toList();
+    return (response.plugindata?.data['participants'] as List<dynamic>).map((e) => AudioBridgeParticipants.fromJson(e)).toList();
   }
 
   bool _onCreated = false;
@@ -368,44 +329,33 @@ class JanusAudioBridgePlugin extends JanusPlugin {
     _onCreated = true;
 
     messages?.listen((event) {
-      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
       var data = typedEvent.event.plugindata?.data;
-
-      if (data?["audiobridge"] == "joined") {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeJoinedEvent.fromJson(data);
+      if (data == null) return;
+      if (data["audiobridge"] == "joined") {
+        typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["audiobridge"] == "event") {
-        if (data?["participants"] != null) {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeNewParticipantsEvent.fromJson(data);
+      } else if (data["audiobridge"] == "event") {
+        if (data["participants"] != null) {
+          typedEvent.event.plugindata?.data = AudioBridgeNewParticipantsEvent.fromJson(data);
           _typedMessagesSink?.add(typedEvent);
-        } else if (data?["result"] == "ok") {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeConfiguredEvent.fromJson(data);
+        } else if (data["result"] == "ok") {
+          typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(data);
           _typedMessagesSink?.add(typedEvent);
-        } else if (data?["leaving"] != null) {
-          typedEvent.event.plugindata?.data =
-              AudioBridgeLeavingEvent.fromJson(data);
+        } else if (data["leaving"] != null) {
+          typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(data);
           _typedMessagesSink?.add(typedEvent);
-        } else if (data?['error_code'] != null ||
-            data?['result']?['code'] != null) {
+        } else if (data['error_code'] != null || data['result']?['code'] != null) {
           _typedMessagesSink?.addError(JanusError.fromMap(data));
         }
-      } else if (data?["audiobridge"] == "talking" ||
-          data?["audiobridge"] == "stopped-talking") {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeTalkingEvent.fromJson(data);
+      } else if (data["audiobridge"] == "talking" || data["audiobridge"] == "stopped-talking") {
+        typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["audiobridge"] == "destroyed") {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeDestroyedEvent.fromJson(data);
+      } else if (data["audiobridge"] == "destroyed") {
+        typedEvent.event.plugindata?.data = AudioBridgeDestroyedEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?['audiobridge'] == 'event' &&
-          (data?['error_code'] != null || data?['result']?['code'] != null)) {
-        _typedMessagesSink
-            ?.addError(JanusError.fromMap(data));
+      } else if (data['audiobridge'] == 'event' && (data['error_code'] != null || data['result']?['code'] != null)) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
       }
     });
   }

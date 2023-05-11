@@ -2,12 +2,7 @@ part of janus_client;
 
 class JanusTextRoomPlugin extends JanusPlugin {
   JanusTextRoomPlugin({handleId, context, transport, session})
-      : super(
-            context: context,
-            handleId: handleId,
-            plugin: JanusPlugins.TEXT_ROOM,
-            session: session,
-            transport: transport);
+      : super(context: context, handleId: handleId, plugin: JanusPlugins.TEXT_ROOM, session: session, transport: transport);
 
   bool _setup = false;
 
@@ -24,11 +19,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
         await this.handleRemoteJsep(event.jsep);
         var body = {"request": "ack"};
         await this.initDataChannel();
-        RTCSessionDescription answer = await this.createAnswer(
-            audioSend: false,
-            videoSend: false,
-            videoRecv: false,
-            audioRecv: false);
+        RTCSessionDescription answer = await this.createAnswer(audioSend: false, videoSend: false, videoRecv: false, audioRecv: false);
         await this.send(
           data: body,
           jsep: answer,
@@ -48,25 +39,15 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[token] : invitation token, in case the room has an ACL; optional.<br>
   ///[history] : true|false, whether to retrieve history messages when available (default=true).<br>
   ///
-  Future<void> joinRoom(int roomId, String username,
-      {String? pin, String? display, String? token, bool? history}) async {
+  Future<void> joinRoom(int roomId, String username, {String? pin, String? display, String? token, bool? history}) async {
     if (setupDone) {
       _context._logger.info('data channel is open, now trying to join');
-      var register = {
-        'textroom': "join",
-        'transaction': randomString(),
-        'room': roomId,
-        'username': username,
-        'display': display,
-        "pin": pin,
-        "token": token,
-        "history": history
-      }..removeWhere((key, value) => value == null);
+      var register = {'textroom': "join", 'transaction': randomString(), 'room': roomId, 'username': username, 'display': display, "pin": pin, "token": token, "history": history}
+        ..removeWhere((key, value) => value == null);
       _handleRoomIdTypeDifference(register);
       await this.sendData(stringify(register));
     } else {
-      _context._logger.shout(
-          'method was called before calling setup(), hence aborting further operation.');
+      _context._logger.shout('method was called before calling setup(), hence aborting further operation.');
       throw "method was called before calling setup(), hence aborting further operation.";
     }
   }
@@ -81,8 +62,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
       _handleRoomIdTypeDifference(payload);
       await this.sendData(stringify(payload));
     } else {
-      _context._logger.shout(
-          'method was called before calling setup(), hence aborting further operation.');
+      _context._logger.shout('method was called before calling setup(), hence aborting further operation.');
       throw "method was called before calling setup(), hence aborting further operation.";
     }
   }
@@ -92,25 +72,15 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[ack] : true|false, whether the sender wants an ack for the sent message(s); optional, true by default <br>.
   ///[to] : username to send the message to; optional, only needed in case of private messages. <br>
   ///[tos] : array of usernames to send the message to; optional, only needed in case of private messages. <br>
-  Future<void> sendMessage(dynamic roomId, String text,
-      {bool? ack, String? to, List<String>? tos}) async {
+  Future<void> sendMessage(dynamic roomId, String text, {bool? ack, String? to, List<String>? tos}) async {
     if (setupDone) {
-      var message = {
-        'transaction': randomString(),
-        "textroom": "message",
-        "room": roomId,
-        "text": text,
-        "to": to,
-        "tos": tos,
-        "ack": ack
-      }..removeWhere((key, value) => value == null);
+      var message = {'transaction': randomString(), "textroom": "message", "room": roomId, "text": text, "to": to, "tos": tos, "ack": ack}
+        ..removeWhere((key, value) => value == null);
       _handleRoomIdTypeDifference(message);
-      _context._logger
-          .fine('sending text message to room:$roomId with payload:$message');
+      _context._logger.fine('sending text message to room:$roomId with payload:$message');
       await this.sendData(stringify(message));
     } else {
-      _context._logger.shout(
-          'method was called before calling setup(), hence aborting further operation.');
+      _context._logger.shout('method was called before calling setup(), hence aborting further operation.');
       throw "method was called before calling setup(), hence aborting further operation.";
     }
   }
@@ -123,9 +93,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
     _context._logger.fine('list rooms invoked');
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
-    return (response.plugindata?.data?['list'] as List<dynamic>?)
-        ?.map((e) => JanusTextRoom.fromJson(e))
-        .toList();
+    return (response.plugindata?.data?['list'] as List<dynamic>?)?.map((e) => JanusTextRoom.fromJson(e)).toList();
   }
 
   Future<List<dynamic>?> listParticipants(dynamic roomId) async {
@@ -150,14 +118,8 @@ class JanusTextRoomPlugin extends JanusPlugin {
   /// [roomId] unique numeric ID of the room to stop the forwarder from.<br>
   /// [username] username of the participant to kick.<br>
   /// [secret] admin secret should be provided if configured.<br>
-  Future<dynamic> kickParticipant(dynamic roomId, String username,
-      {String? secret}) async {
-    var payload = {
-      "request": "kick",
-      "secret": secret,
-      "room": roomId,
-      "username": username
-    }..removeWhere((key, value) => value == null);
+  Future<dynamic> kickParticipant(dynamic roomId, String username, {String? secret}) async {
+    var payload = {"request": "kick", "secret": secret, "room": roomId, "username": username}..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
@@ -169,8 +131,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[roomId] : unique numeric ID, optional, chosen by plugin if missing.<br>
   ///[permanent] : true|false, whether the room should be also removed from the config file; default=false.<br>
   ///[secret] : password required to edit/destroy the room, optional.<br>
-  Future<dynamic> destroyRoom(
-      {int? roomId, String? secret, bool? permanent}) async {
+  Future<dynamic> destroyRoom({int? roomId, String? secret, bool? permanent}) async {
     var payload = {
       "textroom": "destroy",
       "room": roomId,
@@ -194,15 +155,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[isPrivate] : true|false, whether the room should appear in a list request.<br>
   ///[adminKey] : plugin administrator key; mandatory if configured.<br>
   ///[history] : number of messages to store as a history, and send back to new participants (default=0, no history)<br>
-  Future<dynamic> createRoom(
-      {String? roomId,
-      String? adminKey,
-      String? description,
-      String? secret,
-      String? pin,
-      bool? isPrivate,
-      int? history,
-      bool? permanent}) async {
+  Future<dynamic> createRoom({String? roomId, String? adminKey, String? description, String? secret, String? pin, bool? isPrivate, int? history, bool? permanent}) async {
     var payload = {
       "textroom": "create",
       "room": roomId,
@@ -232,14 +185,7 @@ class JanusTextRoomPlugin extends JanusPlugin {
   ///[newSecret] : new password required to edit/destroy the room, optional.<br>
   ///[pin] : password required to join the room, optional.<br>
   ///[isPrivate] : true|false, whether the room should appear in a list request.<br>
-  Future<dynamic> editRoom(
-      {String? roomId,
-      String? description,
-      String? secret,
-      String? newSecret,
-      String? pin,
-      bool? isPrivate,
-      bool? permanent}) async {
+  Future<dynamic> editRoom({String? roomId, String? description, String? secret, String? newSecret, String? pin, bool? isPrivate, bool? permanent}) async {
     var payload = {
       "textroom": "create",
       "room": roomId,

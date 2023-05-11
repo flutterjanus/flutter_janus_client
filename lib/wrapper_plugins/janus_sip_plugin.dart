@@ -4,13 +4,7 @@ enum SipHoldState { SENDONLY, RECVONLY, INACTIVE }
 
 class JanusSipPlugin extends JanusPlugin {
   bool _onCreated = false;
-  JanusSipPlugin({handleId, context, transport, session})
-      : super(
-            context: context,
-            handleId: handleId,
-            plugin: JanusPlugins.SIP,
-            session: session,
-            transport: transport);
+  JanusSipPlugin({handleId, context, transport, session}) : super(context: context, handleId: handleId, plugin: JanusPlugins.SIP, session: session, transport: transport);
 
   /// Register client to sip server
   /// [username] : SIP URI to register
@@ -42,40 +36,24 @@ class JanusSipPlugin extends JanusPlugin {
       "request": "register",
       "type": type,
       "send_register": sendRegister,
-      "force_udp":
-          forceUdp, //<true|false; if true, forces UDP for the SIP messaging; optional>,
-      "force_tcp":
-          forceTcp, //<true|false; if true, forces TCP for the SIP messaging; optional>,
-      "sips":
-          sips, //<true|false; if true, configures a SIPS URI too when registering; optional>,
-      "rfc2543_cancel":
-          rfc2543Cancel, //<true|false; if true, configures sip client to CANCEL pending INVITEs without having received a provisional response first; optional>,
+      "force_udp": forceUdp, //<true|false; if true, forces UDP for the SIP messaging; optional>,
+      "force_tcp": forceTcp, //<true|false; if true, forces TCP for the SIP messaging; optional>,
+      "sips": sips, //<true|false; if true, configures a SIPS URI too when registering; optional>,
+      "rfc2543_cancel": rfc2543Cancel, //<true|false; if true, configures sip client to CANCEL pending INVITEs without having received a provisional response first; optional>,
       "username": username,
       "secret": secret, //"<password to use to register; optional>",
-      "ha1_secret":
-          ha1Secret, //"<prehashed password to use to register; optional>",
-      "authuser":
-          authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
-      "display_name":
-          displayName, //"<display name to use when sending SIP REGISTER; optional>",
-      "user_agent":
-          userAgent, //"<user agent to use when sending SIP REGISTER; optional>",
-      "proxy":
-          proxy, //"<server to register at; optional, as won't be needed in case the REGISTER is not goint to be sent (e.g., guests)>",
-      "outbound_proxy":
-          outboundProxy, //"<outbound proxy to use, if any; optional>",
-      "headers":
-          headers, //"<object with key/value mappings (header name/value), to specify custom headers to add to the SIP REGISTER; optional>",
-      "contact_params":
-          contactParams, //"<array of key/value objects, to specify custom Contact URI params to add to the SIP REGISTER; optional>",
-      "incoming_header_prefixes":
-          incomingHeaderPrefixes, //"<array of strings, to specify custom (non-standard) headers to read on incoming SIP events; optional>",
-      "refresh":
-          refresh, //"<true|false; if true, only uses the SIP REGISTER as an update and not a new registration; optional>",
-      "master_id":
-          masterId, //"<ID of an already registered account, if this is an helper for multiple calls (more on that later); optional>",
-      "register_ttl":
-          registerTtl, //"<integer; number of seconds after which the registration should expire; optional>"
+      "ha1_secret": ha1Secret, //"<prehashed password to use to register; optional>",
+      "authuser": authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
+      "display_name": displayName, //"<display name to use when sending SIP REGISTER; optional>",
+      "user_agent": userAgent, //"<user agent to use when sending SIP REGISTER; optional>",
+      "proxy": proxy, //"<server to register at; optional, as won't be needed in case the REGISTER is not goint to be sent (e.g., guests)>",
+      "outbound_proxy": outboundProxy, //"<outbound proxy to use, if any; optional>",
+      "headers": headers, //"<object with key/value mappings (header name/value), to specify custom headers to add to the SIP REGISTER; optional>",
+      "contact_params": contactParams, //"<array of key/value objects, to specify custom Contact URI params to add to the SIP REGISTER; optional>",
+      "incoming_header_prefixes": incomingHeaderPrefixes, //"<array of strings, to specify custom (non-standard) headers to read on incoming SIP events; optional>",
+      "refresh": refresh, //"<true|false; if true, only uses the SIP REGISTER as an update and not a new registration; optional>",
+      "master_id": masterId, //"<ID of an already registered account, if this is an helper for multiple calls (more on that later); optional>",
+      "register_ttl": registerTtl, //"<integer; number of seconds after which the registration should expire; optional>"
     }..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
@@ -90,29 +68,15 @@ class JanusSipPlugin extends JanusPlugin {
   /// [srtp] : whether to mandate (sdes_mandatory) or offer (sdes_optional) SRTP support; optional
   ///
   /// [autoAcceptReInvites] : whether we should blindly accept re-INVITEs with a 200 OK instead of relaying the SDP to the application; optional, TRUE by default
-  Future<void> accept(
-      {String? srtp,
-      Map<String, dynamic>? headers,
-      bool? autoAcceptReInvites,
-      RTCSessionDescription? sessionDescription}) async {
-    var payload = {
-      "request": "accept",
-      "headers": headers,
-      "srtp": srtp,
-      "autoaccept_reinvites": autoAcceptReInvites
-    }..removeWhere((key, value) => value == null);
-    RTCSignalingState? signalingState =
-        this.webRTCHandle?.peerConnection?.signalingState;
-    if (sessionDescription == null &&
-        signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
-      sessionDescription = await this.createAnswer(
-          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+  Future<void> accept({String? srtp, Map<String, dynamic>? headers, bool? autoAcceptReInvites, RTCSessionDescription? sessionDescription}) async {
+    var payload = {"request": "accept", "headers": headers, "srtp": srtp, "autoaccept_reinvites": autoAcceptReInvites}..removeWhere((key, value) => value == null);
+    RTCSignalingState? signalingState = this.webRTCHandle?.peerConnection?.signalingState;
+    if (sessionDescription == null && signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
+      sessionDescription = await this.createAnswer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
     } else if (sessionDescription == null) {
-      sessionDescription = await this.createOffer(
-          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      sessionDescription = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
     }
-    JanusEvent response = JanusEvent.fromJson(
-        await this.send(data: payload, jsep: sessionDescription));
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: sessionDescription));
     JanusError.throwErrorFromEvent(response);
   }
 
@@ -128,8 +92,7 @@ class JanusSipPlugin extends JanusPlugin {
   Future<void> hangup({
     Map<String, dynamic>? headers,
   }) async {
-    var payload = {"request": "hangup", "headers": headers}
-      ..removeWhere((key, value) => value == null);
+    var payload = {"request": "hangup", "headers": headers}..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }
@@ -141,8 +104,7 @@ class JanusSipPlugin extends JanusPlugin {
     int? code,
     Map<String, dynamic>? headers,
   }) async {
-    var payload = {"request": "decline", "code": code, "headers": headers}
-      ..removeWhere((key, value) => value == null);
+    var payload = {"request": "decline", "code": code, "headers": headers}..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }
@@ -201,17 +163,13 @@ class JanusSipPlugin extends JanusPlugin {
       "srtp": srtp,
       "srtp_profile": srtpProfile,
       "secret": secret, //"<password to use to register; optional>",
-      "ha1_secret":
-          ha1Secret, //"<prehashed password to use to register; optional>",
-      "authuser":
-          authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
+      "ha1_secret": ha1Secret, //"<prehashed password to use to register; optional>",
+      "authuser": authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(
-          videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
     }
-    JanusEvent response =
-        JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
+    JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);
   }
 
@@ -222,8 +180,7 @@ class JanusSipPlugin extends JanusPlugin {
     String uri, {
     String? replace,
   }) async {
-    var payload = {"request": "transfer", "uri": uri, "replace": replace}
-      ..removeWhere((key, value) => value == null);
+    var payload = {"request": "transfer", "uri": uri, "replace": replace}..removeWhere((key, value) => value == null);
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
     JanusError.throwErrorFromEvent(response);
   }
@@ -264,53 +221,40 @@ class JanusSipPlugin extends JanusPlugin {
     }
     _onCreated = true;
     messages?.listen((event) {
-      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
       var data = typedEvent.event.plugindata?.data;
-      if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "registered") {
+      if (data == null) return;
+      if (data["sip"] == "event" && data["result"]?['event'] == "registered") {
         typedEvent.event.plugindata?.data = SipRegisteredEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "unregistered") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "unregistered") {
         typedEvent.event.plugindata?.data = SipUnRegisteredEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "ringing") {
-        typedEvent.event.plugindata?.data =
-            SipRingingEvent.fromJson(typedEvent.event.plugindata?.data);
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "ringing") {
+        typedEvent.event.plugindata?.data = SipRingingEvent.fromJson(typedEvent.event.plugindata?.data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "calling") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "calling") {
         typedEvent.event.plugindata?.data = SipCallingEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "proceeding") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "proceeding") {
         typedEvent.event.plugindata?.data = SipProceedingEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "accepted") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "accepted") {
         typedEvent.event.plugindata?.data = SipAcceptedEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "progress") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "progress") {
         typedEvent.event.plugindata?.data = SipProgressEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "incomingcall") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "incomingcall") {
         typedEvent.event.plugindata?.data = SipIncomingCallEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "missed_call") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "missed_call") {
         typedEvent.event.plugindata?.data = SipMissedCallEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?["sip"] == "event" &&
-          data?["result"]?['event'] == "transfer") {
+      } else if (data["sip"] == "event" && data["result"]?['event'] == "transfer") {
         typedEvent.event.plugindata?.data = SipTransferCallEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
-      } else if (data?['result']?['code'] != null &&
-          data?["result"]?['event'] == "hangup" &&
-          data?['result']?['reason'] != null) {
+      } else if (data['result']?['code'] != null && data["result"]?['event'] == "hangup" && data['result']?['reason'] != null) {
         typedEvent.event.plugindata?.data = SipHangupEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
       } else if (data['sip'] == 'event' && data['error_code'] != null) {

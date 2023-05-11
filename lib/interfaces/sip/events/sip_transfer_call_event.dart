@@ -8,9 +8,7 @@ class SipTransferCallEvent {
 
   SipTransferCallEvent.fromJson(Map<String, dynamic> json) {
     this.sip = json["sip"];
-    this.result = json["result"] == null
-        ? null
-        : SipTransferCallEventResult.fromJson(json["result"]);
+    this.result = json["result"] == null ? null : SipTransferCallEventResult.fromJson(json["result"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -29,13 +27,7 @@ class SipTransferCallEventResult {
   String? replaces;
   String? headers;
 
-  SipTransferCallEventResult(
-      {this.event,
-      this.referId,
-      this.referTo,
-      this.referredBy,
-      this.replaces,
-      this.headers});
+  SipTransferCallEventResult({this.event, this.referId, this.referTo, this.referredBy, this.replaces, this.headers});
 
   SipTransferCallEventResult.fromJson(Map<String, dynamic> json) {
     this.event = json["event"];

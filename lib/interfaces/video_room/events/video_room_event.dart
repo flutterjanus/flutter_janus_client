@@ -13,22 +13,14 @@ class VideoRoomEvent {
   VideoRoomEvent();
 
   @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is VideoRoomEvent &&
-          runtimeType == other.runtimeType &&
-          videoroom == other.videoroom &&
-          room == other.room);
+  bool operator ==(Object other) => identical(this, other) || (other is VideoRoomEvent && runtimeType == other.runtimeType && videoroom == other.videoroom && room == other.room);
 
   @override
   int get hashCode => videoroom.hashCode ^ room.hashCode;
 
   @override
   String toString() {
-    return 'VideoRoomEvent{' +
-        ' videoroom: $videoroom,' +
-        ' room: $room,' +
-        '}';
+    return 'VideoRoomEvent{' + ' videoroom: $videoroom,' + ' room: $room,' + '}';
   }
 
   Map<String, dynamic> toMap() {

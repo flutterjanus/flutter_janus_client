@@ -619,80 +619,82 @@ class JanusPlugin {
     this._context._logger.finest('using transrecievers in prepare transrecievers');
     RTCRtpTransceiver? audioTransceiver;
     RTCRtpTransceiver? videoTransceiver;
-    List<RTCRtpTransceiver> transceivers = await webRTCHandle!.peerConnection!.transceivers;
-    if (transceivers.length > 0) {
-      transceivers.forEach((t) {
-        if ((t.sender.track != null && t.sender.track!.kind == "audio") || (t.receiver.track != null && t.receiver.track!.kind == "audio")) {
-          if (audioTransceiver == null) {
-            audioTransceiver = t;
+    List<RTCRtpTransceiver>? transceivers;
+    try {
+      transceivers = await webRTCHandle?.peerConnection?.transceivers;
+      if (transceivers?.isNotEmpty == true) {
+        transceivers?.forEach((t) {
+          if ((t.sender.track != null && t.sender.track!.kind == "audio") || (t.receiver.track != null && t.receiver.track!.kind == "audio")) {
+            if (audioTransceiver == null) {
+              audioTransceiver = t;
+            }
           }
-        }
-        if ((t.sender.track != null && t.sender.track!.kind == "video") || (t.receiver.track != null && t.receiver.track!.kind == "video")) {
-          if (videoTransceiver == null) {
-            videoTransceiver = t;
+          if ((t.sender.track != null && t.sender.track!.kind == "video") || (t.receiver.track != null && t.receiver.track!.kind == "video")) {
+            if (videoTransceiver == null) {
+              videoTransceiver = t;
+            }
           }
-        }
-      });
-    }
+        });
+      }
 
-    if (!audioSend && !audioRecv) {
-      // Audio disabled: have we removed it?
-      if (audioTransceiver != null) {
-        audioTransceiver!.setDirection(TransceiverDirection.Inactive);
-        this._context._logger.finest("Setting audio transceiver to inactive:" + audioTransceiver.toString());
-      }
-    } else {
-      // Take care of audio m-line
-      if (audioSend && audioRecv) {
+      if (!audioSend && !audioRecv) {
+        // Audio disabled: have we removed it?
         if (audioTransceiver != null) {
-          audioTransceiver!.setDirection(TransceiverDirection.SendRecv);
-          this._context._logger.finest("Setting audio transceiver to sendrecv:" + audioTransceiver.toString());
+          await audioTransceiver?.setDirection(TransceiverDirection.Inactive);
+          this._context._logger.finest("Setting audio transceiver to inactive:" + audioTransceiver.toString());
         }
-      } else if (audioSend && !audioRecv) {
-        if (audioTransceiver != null) {
-          audioTransceiver!.setDirection(TransceiverDirection.SendOnly);
-          this._context._logger.finest("Setting audio transceiver to sendonly:" + audioTransceiver.toString());
-        }
-      } else if (!audioSend && audioRecv) {
-        if (audioTransceiver != null) {
-          audioTransceiver!.setDirection(TransceiverDirection.RecvOnly);
-          this._context._logger.finest("Setting audio transceiver to recvonly:" + audioTransceiver.toString());
-        } else {
-          // In theory, this is the only case where we might not have a transceiver yet
-          audioTransceiver =
-              await webRTCHandle!.peerConnection!.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeAudio, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
-          this._context._logger.finest("Adding recvonly audio transceiver:" + audioTransceiver.toString());
-        }
-      }
-    }
-    if (!videoSend && !videoRecv) {
-      // Video disabled: have we removed it?
-      if (videoTransceiver != null) {
-        videoTransceiver!.setDirection(TransceiverDirection.Inactive);
-        // Janus.log("Setting video transceiver to inactive:", videoTransceiver);
-      }
-    } else {
-      // Take care of video m-line
-      if (videoSend && videoRecv) {
-        if (videoTransceiver != null) {
-          videoTransceiver!.setDirection(TransceiverDirection.SendRecv);
-          // Janus.log("Setting video transceiver to sendrecv:", videoTransceiver);
-        }
-      } else if (videoSend && !videoRecv) {
-        if (videoTransceiver != null) {
-          videoTransceiver!.setDirection(TransceiverDirection.SendOnly);
-          // Janus.log("Setting video transceiver to sendonly:", videoTransceiver);
-        }
-      } else if (!videoSend && videoRecv) {
-        if (videoTransceiver != null) {
-          videoTransceiver!.setDirection(TransceiverDirection.RecvOnly);
-          // Janus.log("Setting video transceiver to recvonly:", videoTransceiver);
-        } else {
-          // In theory, this is the only case where we might not have a transceiver yet
-          videoTransceiver =
-              await webRTCHandle!.peerConnection!.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeAudio, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
+      } else {
+        // Take care of audio m-line
+        if (audioSend && audioRecv) {
+          if (audioTransceiver != null) {
+            await audioTransceiver?.setDirection(TransceiverDirection.SendRecv);
+            this._context._logger.finest("Setting audio transceiver to sendrecv:" + audioTransceiver.toString());
+          }
+        } else if (audioSend && !audioRecv) {
+          if (audioTransceiver != null) {
+            await audioTransceiver?.setDirection(TransceiverDirection.SendOnly);
+            this._context._logger.finest("Setting audio transceiver to sendonly:" + audioTransceiver.toString());
+          }
+        } else if (!audioSend && audioRecv) {
+          if (audioTransceiver != null) {
+            await audioTransceiver?.setDirection(TransceiverDirection.RecvOnly);
+            this._context._logger.finest("Setting audio transceiver to recvonly:" + audioTransceiver.toString());
+          } else {
+            // In theory, this is the only case where we might not have a transceiver yet
+            audioTransceiver = await webRTCHandle!.peerConnection
+                ?.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeAudio, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
+            this._context._logger.finest("Adding recvonly audio transceiver:" + audioTransceiver.toString());
+          }
         }
       }
+      if (!videoSend && !videoRecv) {
+        // Video disabled: have we removed it?
+        if (videoTransceiver != null) {
+          await videoTransceiver?.setDirection(TransceiverDirection.Inactive);
+          // Janus.log("Setting video transceiver to inactive:", videoTransceiver);
+        }
+      } else {
+        // Take care of video m-line
+        if (videoSend && videoRecv) {
+          if (videoTransceiver != null) {
+            await videoTransceiver?.setDirection(TransceiverDirection.SendRecv);
+          }
+        } else if (videoSend && !videoRecv) {
+          if (videoTransceiver != null) {
+            await videoTransceiver?.setDirection(TransceiverDirection.SendOnly);
+          }
+        } else if (!videoSend && videoRecv) {
+          if (videoTransceiver != null) {
+            await videoTransceiver?.setDirection(TransceiverDirection.RecvOnly);
+          } else {
+            // In theory, this is the only case where we might not have a transceiver yet
+            videoTransceiver = await webRTCHandle!.peerConnection
+                ?.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeVideo, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
+          }
+        }
+      }
+    } catch (err) {
+      this._context._logger.finest('transrecievers not found', err);
     }
   }
 }

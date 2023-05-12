@@ -49,6 +49,9 @@ class _VideoRoomState extends State<GoogleMeet> {
     super.didChangeDependencies();
     if (mounted) {
       await initialize();
+      selectedAudioInputDeviceId = (await audioInputs).first.deviceId;
+      selectedAudioOutputDeviceId = (await audioOutputs).first.deviceId;
+      selectedVideoInputDeviceId = (await videoInputs).first.deviceId;
     }
   }
 
@@ -127,11 +130,14 @@ class _VideoRoomState extends State<GoogleMeet> {
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
         String? displayName = videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
-          if (videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.track?.kind == "audio") {
-            var existingRenderer = videoState.streamsToBeRendered[feedId.toString()];
-            existingRenderer?.mediaStream?.addTrack(event.track!);
-            existingRenderer?.videoRenderer.srcObject = existingRenderer.mediaStream;
-            existingRenderer?.videoRenderer.muted = false;
+          var existingRenderer = videoState.streamsToBeRendered?[feedId.toString()];
+          if (existingRenderer != null && event.track?.kind == "audio") {
+            existingRenderer.mediaStream?.addTrack(event.track!);
+            existingRenderer.videoRenderer.srcObject = existingRenderer.mediaStream;
+            if (selectedAudioOutputDeviceId != null) {
+              existingRenderer.videoRenderer.audioOutput(selectedAudioOutputDeviceId!);
+            }
+            existingRenderer.videoRenderer.muted = false;
             setState(() {});
           }
           if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.track?.kind == "video") {
@@ -194,7 +200,7 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   manageMuteUIEvents(String mid, String kind, bool muted) async {
-    int? feedId = videoState.subStreamsToFeedIdMap[mid]?['feed_id'];
+    int? feedId = videoState.subStreamsToFeedIdMap?[mid]?['feed_id'];
     if (feedId == null) {
       return;
     }
@@ -271,11 +277,19 @@ class _VideoRoomState extends State<GoogleMeet> {
     await localVideoRenderer.init();
 
     localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(context: context, mediaConstraints: {
-      'audio': {
-        'deviceId': {'exact': selectedAudioInputDeviceId},
-      },
+      if (selectedAudioInputDeviceId != null)
+        'audio': {
+          'deviceId': {'exact': selectedAudioInputDeviceId},
+        },
+      if (selectedVideoInputDeviceId != null)
+        'video': {
+          'deviceId': {'exact': selectedVideoInputDeviceId},
+        }
     });
-    await Helper.selectAudioInput(selectedAudioInputDeviceId!);
+    if (!WebRTC.platformIsWeb) {
+      await Helper.selectAudioInput(selectedAudioInputDeviceId!);
+      // await Helper.
+    }
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
     localVideoRenderer.publisherName = "You";
     setState(() {
@@ -345,11 +359,20 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   mute(RTCPeerConnection? peerConnection, String kind, bool enabled) async {
-    var transreciever = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
-    if (transreciever?.isEmpty == true) {
-      return;
-    }
-    await transreciever?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
+    // var transreciever = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
+    // if (transreciever == null || transreciever.isEmpty == true) {
+    //   return;
+    // }
+    (await peerConnection?.senders)?.forEach((element) {
+      if (element.track?.kind == kind) {
+        element.track?.enabled = enabled;
+      }
+    });
+    // if (!WebRTC.platformIsWeb&&kind=='audio') {
+    //   Helper.setMicrophoneMute(!enabled, transreciever.first.sender.track!);
+    //   return;
+    // }
+    // await transreciever?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
   }
 
   callEnd() async {
@@ -377,9 +400,105 @@ class _VideoRoomState extends State<GoogleMeet> {
     remotePlugin = null;
   }
 
-  Future<List<MediaDeviceInfo>> audioInputDevices = navigator.mediaDevices.enumerateDevices();
+  var audioInputs = Helper.enumerateDevices('audioinput');
+  var audioOutputs = Helper.enumerateDevices('audiooutput');
+  var videoInputs = Helper.enumerateDevices('videoinput');
   String? selectedAudioInputDeviceId;
   String? selectedAudioOutputDeviceId;
+  String? selectedVideoInputDeviceId;
+  dynamic settingsDialog;
+
+  Future<dynamic> showSettingsDialog() async {
+    settingsDialog = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text('Settings'),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(this);
+                    },
+                    icon: Icon(Icons.close))
+              ]),
+              actionsAlignment: MainAxisAlignment.start,
+              actions: [],
+              insetPadding: EdgeInsets.zero,
+              scrollable: true,
+              content: Form(
+                key: joinForm,
+                child: Column(children: [
+                  Text('Video'),
+                  Divider(),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Video Input Device')),
+                            value: selectedVideoInputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedVideoInputDeviceId = value;
+                              });
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: videoInputs,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  Text('Audio'),
+                  Divider(),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Audio Input  Device')),
+                            value: selectedAudioInputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedAudioInputDeviceId = value;
+                              });
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: audioInputs,
+                  ),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Audio Output  Device')),
+                            value: selectedAudioOutputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              print(value);
+                              setState(() {
+                                selectedAudioOutputDeviceId = value;
+                              });
+                              if (!WebRTC.platformIsWeb) {
+                                await Helper.selectAudioOutput(selectedAudioOutputDeviceId!);
+                              }
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: audioOutputs,
+                  )
+                ]),
+              ),
+            );
+          }));
+        });
+  }
+
   Future<dynamic> showJoiningDialog() async {
     joiningDialog = await showDialog(
         context: context,
@@ -437,43 +556,6 @@ class _VideoRoomState extends State<GoogleMeet> {
                     obscureText: true,
                     decoration: InputDecoration(label: Text('Pin')),
                   ),
-                  FutureBuilder<List<MediaDeviceInfo>>(
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return DropdownButtonFormField<String?>(
-                            decoration: InputDecoration(label: Text('Audio Input  Device')),
-                            value: selectedAudioInputDeviceId,
-                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
-                            onChanged: (value) async {
-                              print(value);
-                              setState(() {
-                                selectedAudioInputDeviceId = value;
-                              });
-                            });
-                      }
-                      return CircularProgressIndicator();
-                    },
-                    future: Helper.enumerateDevices('audioinput'),
-                  ),
-                  FutureBuilder<List<MediaDeviceInfo>>(
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null) {
-                        return DropdownButtonFormField<String?>(
-                            decoration: InputDecoration(label: Text('Audio Output  Device')),
-                            value: selectedAudioOutputDeviceId,
-                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
-                            onChanged: (value) async {
-                              print(value);
-                              setState(() {
-                                selectedAudioOutputDeviceId = value;
-                              });
-                              await Helper.selectAudioOutput(selectedAudioOutputDeviceId!);
-                            });
-                      }
-                      return CircularProgressIndicator();
-                    },
-                    future: Helper.enumerateDevices('audiooutput'),
-                  )
                 ]),
               ),
             );
@@ -552,7 +634,13 @@ class _VideoRoomState extends State<GoogleMeet> {
                 Icons.switch_camera,
                 color: Colors.white,
               ),
-              onPressed: joined ? switchCamera : null)
+              onPressed: joined ? switchCamera : null),
+          IconButton(
+              icon: Icon(
+                Icons.settings,
+                color: Colors.white,
+              ),
+              onPressed: showSettingsDialog)
         ],
         title: const Text('google meet clone'),
       ),

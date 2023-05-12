@@ -411,6 +411,7 @@ class JanusPlugin {
       await webRTCHandle?.peerConnection?.setRemoteDescription(data);
     }
   }
+
   /// helper method for managing screen capture on web and desktop platforms
   Future<MediaStream?> getDisplayMediaStream(BuildContext context) async {
     MediaStream? screenStream;
@@ -426,7 +427,7 @@ class JanusPlugin {
               'deviceId': {'exact': source.id},
               'mandatory': {'frameRate': 30.0}
             },
-            'audio':true
+            'audio': true
           });
           stream.getVideoTracks()[0].onEnded = () {
             print('By adding a listener on onEnded you can: 1) catch stop video sharing on Web');

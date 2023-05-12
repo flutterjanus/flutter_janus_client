@@ -59,7 +59,6 @@ class EventMessage {
   }
 
 //</editor-fold>
-
 }
 
 class RTCIceServer {
@@ -180,7 +179,6 @@ class RemoteTrack {
   }
 
 //</editor-fold>
-
 }
 
 Uuid getUuid() {

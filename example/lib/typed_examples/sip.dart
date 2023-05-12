@@ -14,14 +14,14 @@ class _SipExampleState extends State<TypedSipExample> {
   late WebSocketJanusTransport ws;
   late JanusSession session;
   JanusSipPlugin? sip;
-  TextEditingController proxyController =
-      TextEditingController(text: "sip:sip.linphone.org");
-  TextEditingController usernameController =
-      TextEditingController(text: "sip:maksim11111@sip.linphone.org");
-  TextEditingController secretController =
-      TextEditingController(text: "1234567q");
-  TextEditingController callUriController =
-      TextEditingController(text: "sip:00918744849050@sip.theansr.com");
+  Map credentials = {
+    'creds1': {'proxy': 'sip:sip.linphone.org', 'username': 'sip:maksim11111@sip.linphone.org', 'secret': '1234567q'},
+    'creds2': {'proxy': 'sip:sip.linphone.org', 'username': 'sip:educampus@sip.linphone.org', 'secret': '1234567q'}
+  };
+  TextEditingController proxyController = TextEditingController(text: "");
+  TextEditingController usernameController = TextEditingController(text: "");
+  TextEditingController secretController = TextEditingController(text: "");
+  TextEditingController callUriController = TextEditingController(text: "");
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? remoteVideoStream;
   MediaStream? remoteAudioStream;
@@ -36,8 +36,7 @@ class _SipExampleState extends State<TypedSipExample> {
   dynamic _setState;
 
   Future<void> localMediaSetup() async {
-    MediaStream? temp = await sip?.initializeMediaDevices(
-        mediaConstraints: {'audio': true, 'video': false});
+    MediaStream? temp = await sip?.initializeMediaDevices(context: context, mediaConstraints: {'audio': true, 'video': false});
     localStream = temp;
   }
 
@@ -48,10 +47,8 @@ class _SipExampleState extends State<TypedSipExample> {
 
     await sip?.initializeWebRTCStack();
     await localMediaSetup();
-    var offer = await sip?.createOffer(
-        videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
-    await sip?.call(callUriController.text,
-        offer: offer, autoAcceptReInvites: false);
+    var offer = await sip?.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    await sip?.call(callUriController.text, offer: offer, autoAcceptReInvites: false);
   }
 
   openRegisterDialog() async {
@@ -69,10 +66,24 @@ class _SipExampleState extends State<TypedSipExample> {
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
                   children: [
+                    DropdownButtonFormField<Map>(
+                        decoration: InputDecoration(label: Text("Default credentials")),
+                        items: credentials.values.map((e) {
+                          return DropdownMenuItem<Map>(
+                            child: Text('${e['username']}'),
+                            value: e,
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          if (value == null) {
+                            return;
+                          }
+                          proxyController.text = value['proxy'];
+                          usernameController.text = value['username'];
+                          secretController.text = value['secret'];
+                        }),
                     TextFormField(
-                      decoration: InputDecoration(
-                          labelText: "Sip Server URI",
-                          hintText: "sip:host:port"),
+                      decoration: InputDecoration(labelText: "Sip Server URI", hintText: "sip:host:port"),
                       controller: proxyController,
                       validator: (val) {
                         if (val == '') {
@@ -81,9 +92,7 @@ class _SipExampleState extends State<TypedSipExample> {
                       },
                     ),
                     TextFormField(
-                      decoration: InputDecoration(
-                          labelText: "Sip username",
-                          hintText: "sip:test@host:port"),
+                      decoration: InputDecoration(labelText: "Sip username", hintText: "sip:test@host:port"),
                       controller: usernameController,
                       validator: (val) {
                         if (val == '') {
@@ -130,6 +139,23 @@ class _SipExampleState extends State<TypedSipExample> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  DropdownButtonFormField<Map>(
+                      decoration: InputDecoration(label: Text("Default call URI")),
+                      items: credentials.values
+                          .where((e) {
+                            return e['username'] != usernameController.text;
+                          })
+                          .map((e) => DropdownMenuItem<Map>(
+                                child: Text('${e['username']}'),
+                                value: e,
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value == null) {
+                          return;
+                        }
+                        callUriController.text = value['username'];
+                      }),
                   TextFormField(
                     decoration: InputDecoration(labelText: "sip URI to call"),
                     controller: callUriController,
@@ -142,9 +168,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         : null,
                     child: Text("Call"),
                   ),
-                  Visibility(
-                      visible: !enableCallButton,
-                      child: Text("status:$statusMessage")),
+                  Visibility(visible: !enableCallButton, child: Text("status:$statusMessage")),
                   Visibility(
                     visible: !enableCallButton,
                     child: ElevatedButton(
@@ -155,9 +179,7 @@ class _SipExampleState extends State<TypedSipExample> {
                           statusMessage = "";
                         });
                       },
-                      style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all(Colors.red)),
+                      style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.red)),
                       child: Text("Hangup"),
                     ),
                   )
@@ -176,15 +198,7 @@ class _SipExampleState extends State<TypedSipExample> {
 
   initJanusClient() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(
-        transport: ws,
-        iceServers: [
-          RTCIceServer(
-              urls: "stun:stun.voip.eutelia.it:3478",
-              username: "",
-              credential: "")
-        ],
-        isUnifiedPlan: true);
+    j = JanusClient(transport: ws, iceServers: [RTCIceServer(urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")], isUnifiedPlan: true);
     session = await j.createSession();
     sip = await session.attach<JanusSipPlugin>();
     await _remoteVideoRenderer.initialize();
@@ -213,8 +227,7 @@ class _SipExampleState extends State<TypedSipExample> {
         setState(() {
           isIncomingCall = true;
         });
-        var dialog =
-            await showIncomingCallDialog(data.result?.callee, even.jsep);
+        var dialog = await showIncomingCallDialog(data.result?.callee, even.jsep);
         setState(() {
           incomingDialog = dialog;
         });
@@ -318,11 +331,7 @@ class _SipExampleState extends State<TypedSipExample> {
   Future<void> registerUser() async {
     if (formKey.currentState?.validate() == true) {
       print('registering user...');
-      await sip?.register(usernameController.text,
-          forceUdp: true,
-          rfc2543Cancel: true,
-          proxy: proxyController.text,
-          secret: secretController.text);
+      await sip?.register(usernameController.text, forceUdp: true, rfc2543Cancel: true, proxy: proxyController.text, secret: secretController.text);
     }
   }
 
@@ -332,8 +341,7 @@ class _SipExampleState extends State<TypedSipExample> {
     Navigator.of(context).pop();
   }
 
-  Future<dynamic> showIncomingCallDialog(
-      String? caller, RTCSessionDescription? remoteOffer) async {
+  Future<dynamic> showIncomingCallDialog(String? caller, RTCSessionDescription? remoteOffer) async {
     await sip?.handleRemoteJsep(remoteOffer);
     return showDialog(
         context: context,
@@ -344,22 +352,16 @@ class _SipExampleState extends State<TypedSipExample> {
               ElevatedButton(
                   onPressed: () async {
                     await localMediaSetup();
-                    Navigator.of(context, rootNavigator: true)
-                        .pop(incomingDialog);
+                    Navigator.of(context, rootNavigator: true).pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
                     // since in this example for calling we are using offer so we have to send answer to complete the circle
-                    var answer = await sip?.createAnswer(
-                        audioRecv: true,
-                        audioSend: true,
-                        videoRecv: false,
-                        videoSend: false);
+                    var answer = await sip?.createAnswer(audioRecv: true, audioSend: true, videoRecv: false, videoSend: false);
                     await sip?.accept(sessionDescription: answer);
                   },
                   child: Text('Accept')),
               ElevatedButton(
                   onPressed: () async {
-                    Navigator.of(context, rootNavigator: true)
-                        .pop(incomingDialog);
+                    Navigator.of(context, rootNavigator: true).pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
                     await sip?.decline();
                   },
@@ -381,8 +383,7 @@ class _SipExampleState extends State<TypedSipExample> {
                   RTCVideoView(
                     _remoteVideoRenderer,
                     mirror: true,
-                    objectFit:
-                        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                   )
                 ],
               ),

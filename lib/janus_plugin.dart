@@ -469,15 +469,46 @@ class JanusPlugin {
       await webRTCHandle?.peerConnection?.setRemoteDescription(data);
     }
   }
+  /// helper method for managing screen capture on web and desktop platforms
+  Future<MediaStream?> getDisplayMediaStream(BuildContext context) async {
+    MediaStream? screenStream;
+    if (WebRTC.platformIsDesktop) {
+      final source = await showDialog<DesktopCapturerSource>(
+        context: context,
+        builder: (context) => ScreenSelectDialog(),
+      );
+      if (source != null) {
+        try {
+          var stream = await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
+            'video': {
+              'deviceId': {'exact': source.id},
+              'mandatory': {'frameRate': 30.0}
+            },
+            'audio':true
+          });
+          stream.getVideoTracks()[0].onEnded = () {
+            print('By adding a listener on onEnded you can: 1) catch stop video sharing on Web');
+          };
+          screenStream = stream;
+        } catch (e) {
+          print(e);
+        }
+      }
+    } else if (WebRTC.platformIsWeb) {
+      screenStream = await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
+        'audio': false,
+        'video': true,
+      });
+    }
+    return screenStream;
+  }
 
   /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
   /// [useDisplayMediaDevices] : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
   /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.
   /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView
-  Future<MediaStream?> initializeMediaDevices(
-      {bool? useDisplayMediaDevices = false,
-      Map<String, dynamic>? mediaConstraints}) async {
+  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, required BuildContext context, Map<String, dynamic>? mediaConstraints}) async {
     await _disposeMediaStreams(ignoreRemote: true);
     List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
     List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
@@ -501,8 +532,7 @@ class JanusPlugin {
     _context._logger.fine(mediaConstraints);
     if (webRTCHandle != null) {
       if (useDisplayMediaDevices == true) {
-        webRTCHandle!.localStream =
-            await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+        webRTCHandle!.localStream = await getDisplayMediaStream(context);
       } else {
         webRTCHandle!.localStream =
             await navigator.mediaDevices.getUserMedia(mediaConstraints);

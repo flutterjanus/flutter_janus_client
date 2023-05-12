@@ -87,7 +87,7 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   initialize() async {
-    ws = WebSocketJanusTransport(url: servermap['servercheap']);
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     j = JanusClient(
         transport: ws!,
         isUnifiedPlan: true,
@@ -150,6 +150,8 @@ class _VideoRoomState extends State<GoogleMeet> {
           'kind': event.track?.kind
         });
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
+        String? displayName =
+            videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
           if (videoState.streamsToBeRendered.containsKey(feedId.toString()) &&
               event.track?.kind == "audio") {
@@ -325,8 +327,14 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin = await attachPlugin(pop: true);
     eventMessagesHandler();
     await localVideoRenderer.init();
-    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(
-        mediaConstraints: {'video': true, 'audio': true});
+
+    localVideoRenderer.mediaStream = await videoPlugin
+        ?.initializeMediaDevices(context: context, mediaConstraints: {
+      'audio': {
+        'deviceId': {'exact': selectedAudioInputDeviceId},
+      },
+    });
+    await Helper.selectAudioInput(selectedAudioInputDeviceId!);
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
     setState(() {
       videoState.streamsToBeRendered
@@ -363,18 +371,20 @@ class _VideoRoomState extends State<GoogleMeet> {
       screenPlugin?.handleRemoteJsep(event.jsep);
     });
     await localScreenSharingRenderer.init();
-    localScreenSharingRenderer.mediaStream = await screenPlugin
-        ?.initializeMediaDevices(
+    localScreenSharingRenderer.mediaStream =
+        await screenPlugin?.initializeMediaDevices(
+            context: context,
             mediaConstraints: {'video': true, 'audio': true},
             useDisplayMediaDevices: true);
     localScreenSharingRenderer.videoRenderer.srcObject =
         localScreenSharingRenderer.mediaStream;
+    localScreenSharingRenderer.publisherName = "Your Screenshare";
     setState(() {
       videoState.streamsToBeRendered.putIfAbsent(
           localScreenSharingRenderer.id, () => localScreenSharingRenderer);
     });
     await screenPlugin?.joinPublisher(myRoom,
-        displayName: username.text + "screenshare",
+        displayName: username.text + "_screenshare",
         id: screenShareId,
         pin: myPin);
   }
@@ -403,6 +413,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     await localVideoRenderer.init();
     localVideoRenderer.videoRenderer.srcObject =
         videoPlugin?.webRTCHandle!.localStream;
+    localVideoRenderer.publisherName = "My Camera";
     setState(() {
       videoState.streamsToBeRendered['local'] = localVideoRenderer;
     });
@@ -445,26 +456,45 @@ class _VideoRoomState extends State<GoogleMeet> {
     remotePlugin = null;
   }
 
+  Future<List<MediaDeviceInfo>> audioInputDevices =
+      navigator.mediaDevices.enumerateDevices();
+  String? selectedAudioInputDeviceId;
+  String? selectedAudioOutputDeviceId;
   Future<dynamic> showJoiningDialog() async {
     joiningDialog = await showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return StatefulBuilder(builder: ((context, setState) {
             return AlertDialog(
+              title: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Join Room'),
+                    IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(this);
+                        },
+                        icon: Icon(Icons.close))
+                  ]),
+              actionsAlignment: MainAxisAlignment.start,
               actions: [
-                TextButton(
-                    onPressed: () async {
-                      if (joinForm.currentState?.validate() == true) {
-                        myRoom = int.parse(room.text);
-                        myPin = pin.text;
-                        myUsername = username.text;
-                        setState(() {
-                          this.joined = true;
-                        });
-                        await joinRoom();
-                      }
-                    },
-                    child: Text('Join'))
+                Center(
+                  child: TextButton(
+                      onPressed: () async {
+                        if (joinForm.currentState?.validate() == true) {
+                          myRoom = int.parse(room.text);
+                          myPin = pin.text;
+                          myUsername = username.text;
+                          setState(() {
+                            this.joined = true;
+                          });
+                          await joinRoom();
+                        }
+                      },
+                      child: Text('Join')),
+                )
               ],
               insetPadding: EdgeInsets.zero,
               scrollable: true,
@@ -489,6 +519,54 @@ class _VideoRoomState extends State<GoogleMeet> {
                     controller: pin,
                     obscureText: true,
                     decoration: InputDecoration(label: Text('Pin')),
+                  ),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(
+                                label: Text('Audio Input  Device')),
+                            value: selectedAudioInputDeviceId,
+                            items: snapshot.data
+                                ?.map((e) => DropdownMenuItem(
+                                    value: e.deviceId,
+                                    child: Text('${e.label}')))
+                                .toList(),
+                            onChanged: (value) async {
+                              print(value);
+                              setState(() {
+                                selectedAudioInputDeviceId = value;
+                              });
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: Helper.enumerateDevices('audioinput'),
+                  ),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(
+                                label: Text('Audio Output  Device')),
+                            value: selectedAudioOutputDeviceId,
+                            items: snapshot.data
+                                ?.map((e) => DropdownMenuItem(
+                                    value: e.deviceId,
+                                    child: Text('${e.label}')))
+                                .toList(),
+                            onChanged: (value) async {
+                              print(value);
+                              setState(() {
+                                selectedAudioOutputDeviceId = value;
+                              });
+                              await Helper.selectAudioOutput(
+                                  selectedAudioOutputDeviceId!);
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: Helper.enumerateDevices('audiooutput'),
                   )
                 ]),
               ),
@@ -590,7 +668,8 @@ class _VideoRoomState extends State<GoogleMeet> {
                   visible: remoteStream.isVideoMuted == false,
                   replacement: Container(
                     child: Center(
-                      child: Text("Video Paused By Owner",
+                      child: Text(
+                          "Video Paused By " + remoteStream.publisherName!,
                           style: TextStyle(color: Colors.black)),
                     ),
                   ),
@@ -607,6 +686,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      Text(remoteStream.publisherName!),
                       Icon(remoteStream.isAudioMuted == true
                           ? Icons.mic_off
                           : Icons.mic),

@@ -62,7 +62,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
     //     await navigator.mediaDevices.enumerateDevices();
     // MediaDeviceInfo microphone =
     //     devices.firstWhere((element) => element.kind == "audioinput");
-    await pluginHandle?.initializeMediaDevices(
+    await pluginHandle?.initializeMediaDevices(context: context,
         mediaConstraints: {"audio": true, "video": false});
     pluginHandle?.joinRoom(myRoom, display: "Shivansh");
 

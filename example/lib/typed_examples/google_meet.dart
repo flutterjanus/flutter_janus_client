@@ -171,6 +171,8 @@ class _VideoRoomState extends State<GoogleMeet> {
                 await createLocalMediaStream(feedId.toString());
             localStream.mediaStream?.addTrack(event.track!);
             localStream.videoRenderer.srcObject = localStream.mediaStream;
+            localStream.publisherName = displayName;
+            localStream.publisherId = feedId.toString();
             setState(() {
               videoState.streamsToBeRendered
                   .putIfAbsent(feedId.toString(), () => localStream);
@@ -336,6 +338,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     });
     await Helper.selectAudioInput(selectedAudioInputDeviceId!);
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
+    localVideoRenderer.publisherName = "You";
     setState(() {
       videoState.streamsToBeRendered
           .putIfAbsent('local', () => localVideoRenderer);

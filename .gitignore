@@ -6,7 +6,6 @@
 build/*
 .idea
 janus_client.iml
-.vscode
 flutter_janus_client.iml
 .last_build_id
 .metadata

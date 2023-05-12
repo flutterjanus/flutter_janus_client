@@ -17,21 +17,14 @@ class AudioBridgeEvent {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is AudioBridgeEvent &&
-          runtimeType == other.runtimeType &&
-          audiobridge == other.audiobridge &&
-          room == other.room);
+      identical(this, other) || (other is AudioBridgeEvent && runtimeType == other.runtimeType && audiobridge == other.audiobridge && room == other.room);
 
   @override
   int get hashCode => audiobridge.hashCode ^ room.hashCode;
 
   @override
   String toString() {
-    return 'VideoRoomEvent{' +
-        'audiobridge: $audiobridge,' +
-        ' room: $room,' +
-        '}';
+    return 'VideoRoomEvent{' + 'audiobridge: $audiobridge,' + ' room: $room,' + '}';
   }
 
   Map<String, dynamic> toMap() {

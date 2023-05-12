@@ -8,9 +8,7 @@ class SipUnRegisteredEvent {
 
   SipUnRegisteredEvent.fromJson(Map<String, dynamic> json) {
     this.sip = json["sip"];
-    this.result = json["result"] == null
-        ? null
-        : SipUnRegisteredEventResult.fromJson(json["result"]);
+    this.result = json["result"] == null ? null : SipUnRegisteredEventResult.fromJson(json["result"]);
   }
 
   Map<String, dynamic> toJson() {

@@ -121,16 +121,11 @@ class JanusClientInfo {
     _authToken = json['auth_token'];
     _eventHandlers = json['event_handlers'];
     _opaqueidInApi = json['opaqueid_in_api'];
-    _dependencies = json['dependencies'] != null
-        ? Dependencies.fromJson(json['dependencies'])
-        : null;
-    _transports = json['transports'] != null
-        ? Transports.fromJson(json['transports'])
-        : null;
+    _dependencies = json['dependencies'] != null ? Dependencies.fromJson(json['dependencies']) : null;
+    _transports = json['transports'] != null ? Transports.fromJson(json['transports']) : null;
     _events = json['events'];
     _loggers = json['loggers'];
-    _plugins =
-        json['plugins'] != null ? Plugins.fromJson(json['plugins']) : null;
+    _plugins = json['plugins'] != null ? Plugins.fromJson(json['plugins']) : null;
   }
 
   String? _janus;
@@ -417,36 +412,16 @@ class Plugins {
   }
 
   Plugins.fromJson(dynamic json) {
-    _januspluginaudiobridge = json['janus.plugin.audiobridge'] != null
-        ? JanusPluginAudiobridge.fromJson(json['janus.plugin.audiobridge'])
-        : null;
-    _januspluginrecordplay = json['janus.plugin.recordplay'] != null
-        ? JanusPluginRecordplay.fromJson(json['janus.plugin.recordplay'])
-        : null;
-    _janusplugintextroom = json['janus.plugin.textroom'] != null
-        ? JanusPluginTextroom.fromJson(json['janus.plugin.textroom'])
-        : null;
-    _januspluginnosip = json['janus.plugin.nosip'] != null
-        ? JanusPluginNosip.fromJson(json['janus.plugin.nosip'])
-        : null;
-    _januspluginvoicemail = json['janus.plugin.voicemail'] != null
-        ? JanusPluginVoicemail.fromJson(json['janus.plugin.voicemail'])
-        : null;
-    _januspluginsip = json['janus.plugin.sip'] != null
-        ? JanusPluginSip.fromJson(json['janus.plugin.sip'])
-        : null;
-    _januspluginvideocall = json['janus.plugin.videocall'] != null
-        ? JanusPluginVideocall.fromJson(json['janus.plugin.videocall'])
-        : null;
-    _januspluginstreaming = json['janus.plugin.streaming'] != null
-        ? JanusPluginStreaming.fromJson(json['janus.plugin.streaming'])
-        : null;
-    _januspluginechotest = json['janus.plugin.echotest'] != null
-        ? JanusPluginEchotest.fromJson(json['janus.plugin.echotest'])
-        : null;
-    _januspluginvideoroom = json['janus.plugin.videoroom'] != null
-        ? JanusPluginVideoroom.fromJson(json['janus.plugin.videoroom'])
-        : null;
+    _januspluginaudiobridge = json['janus.plugin.audiobridge'] != null ? JanusPluginAudiobridge.fromJson(json['janus.plugin.audiobridge']) : null;
+    _januspluginrecordplay = json['janus.plugin.recordplay'] != null ? JanusPluginRecordplay.fromJson(json['janus.plugin.recordplay']) : null;
+    _janusplugintextroom = json['janus.plugin.textroom'] != null ? JanusPluginTextroom.fromJson(json['janus.plugin.textroom']) : null;
+    _januspluginnosip = json['janus.plugin.nosip'] != null ? JanusPluginNosip.fromJson(json['janus.plugin.nosip']) : null;
+    _januspluginvoicemail = json['janus.plugin.voicemail'] != null ? JanusPluginVoicemail.fromJson(json['janus.plugin.voicemail']) : null;
+    _januspluginsip = json['janus.plugin.sip'] != null ? JanusPluginSip.fromJson(json['janus.plugin.sip']) : null;
+    _januspluginvideocall = json['janus.plugin.videocall'] != null ? JanusPluginVideocall.fromJson(json['janus.plugin.videocall']) : null;
+    _januspluginstreaming = json['janus.plugin.streaming'] != null ? JanusPluginStreaming.fromJson(json['janus.plugin.streaming']) : null;
+    _januspluginechotest = json['janus.plugin.echotest'] != null ? JanusPluginEchotest.fromJson(json['janus.plugin.echotest']) : null;
+    _januspluginvideoroom = json['janus.plugin.videoroom'] != null ? JanusPluginVideoroom.fromJson(json['janus.plugin.videoroom']) : null;
   }
 
   JanusPluginAudiobridge? _januspluginaudiobridge;
@@ -473,8 +448,7 @@ class Plugins {
     JanusPluginVideoroom? januspluginvideoroom,
   }) =>
       Plugins(
-        januspluginaudiobridge:
-            januspluginaudiobridge ?? _januspluginaudiobridge,
+        januspluginaudiobridge: januspluginaudiobridge ?? _januspluginaudiobridge,
         januspluginrecordplay: januspluginrecordplay ?? _januspluginrecordplay,
         janusplugintextroom: janusplugintextroom ?? _janusplugintextroom,
         januspluginnosip: januspluginnosip ?? _januspluginnosip,
@@ -1204,15 +1178,9 @@ class Transports {
   }
 
   Transports.fromJson(dynamic json) {
-    _janustransporthttp = json['janus.transport.http'] != null
-        ? JanusTransportHttp.fromJson(json['janus.transport.http'])
-        : null;
-    _janustransportnanomsg = json['janus.transport.nanomsg'] != null
-        ? JanusTransportNanomsg.fromJson(json['janus.transport.nanomsg'])
-        : null;
-    _janustransportwebsockets = json['janus.transport.websockets'] != null
-        ? JanusTransportWebsockets.fromJson(json['janus.transport.websockets'])
-        : null;
+    _janustransporthttp = json['janus.transport.http'] != null ? JanusTransportHttp.fromJson(json['janus.transport.http']) : null;
+    _janustransportnanomsg = json['janus.transport.nanomsg'] != null ? JanusTransportNanomsg.fromJson(json['janus.transport.nanomsg']) : null;
+    _janustransportwebsockets = json['janus.transport.websockets'] != null ? JanusTransportWebsockets.fromJson(json['janus.transport.websockets']) : null;
   }
 
   JanusTransportHttp? _janustransporthttp;
@@ -1227,16 +1195,14 @@ class Transports {
       Transports(
         janustransporthttp: janustransporthttp ?? _janustransporthttp,
         janustransportnanomsg: janustransportnanomsg ?? _janustransportnanomsg,
-        janustransportwebsockets:
-            janustransportwebsockets ?? _janustransportwebsockets,
+        janustransportwebsockets: janustransportwebsockets ?? _janustransportwebsockets,
       );
 
   JanusTransportHttp? get janustransporthttp => _janustransporthttp;
 
   JanusTransportNanomsg? get janustransportnanomsg => _janustransportnanomsg;
 
-  JanusTransportWebsockets? get janustransportwebsockets =>
-      _janustransportwebsockets;
+  JanusTransportWebsockets? get janustransportwebsockets => _janustransportwebsockets;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};

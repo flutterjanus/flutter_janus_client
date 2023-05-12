@@ -38,16 +38,14 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
     await publishVideo.initDataChannel();
-    await publishVideo.initializeMediaDevices(
-        mediaConstraints: {'audio': true, 'video': true});
+    await publishVideo.initializeMediaDevices(mediaConstraints: {'audio': true, 'video': true});
     _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
   }
 
   makeCall() async {
     await localMediaSetup();
     await publishVideo.initDataChannel();
-    var offer = await publishVideo.createOffer(
-        audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
+    var offer = await publishVideo.createOffer(audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
     await publishVideo.call(nameController.text, offer: offer);
     nameController.text = "";
   }
@@ -105,8 +103,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
-                  decoration: InputDecoration(
-                      labelText: "Name Of Registered User to call"),
+                  decoration: InputDecoration(labelText: "Name Of Registered User to call"),
                   controller: nameController,
                 ),
                 ElevatedButton(
@@ -130,15 +127,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
 
   initJanusClient() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(
-        transport: ws,
-        iceServers: [
-          RTCIceServer(
-              urls: "stun:stun.voip.eutelia.it:3478",
-              username: "",
-              credential: "")
-        ],
-        isUnifiedPlan: true);
+    j = JanusClient(transport: ws, iceServers: [RTCIceServer(urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")], isUnifiedPlan: true);
     session = await j.createSession();
     publishVideo = await session.attach<JanusVideoCallPlugin>();
     await _remoteVideoRenderer.initialize();
@@ -151,10 +140,8 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         messages.add(event.text);
       });
     });
-    publishVideo.webRTCHandle?.peerConnection?.onConnectionState =
-        (connectionState) async {
-      if (connectionState ==
-          RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+    publishVideo.webRTCHandle?.peerConnection?.onConnectionState = (connectionState) async {
+      if (connectionState == RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
         print('connection established');
       }
     };
@@ -177,8 +164,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         await makeCallDialog();
       }
       if (data is VideoCallIncomingCallEvent) {
-        incomingDialog =
-            await showIncomingCallDialog(data.result!.username!, even.jsep);
+        incomingDialog = await showIncomingCallDialog(data.result!.username!, even.jsep);
       }
       if (data is VideoCallAcceptedEvent) {
         setState(() {
@@ -247,8 +233,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     Navigator.of(context).pop();
   }
 
-  Future<dynamic> showIncomingCallDialog(
-      String caller, RTCSessionDescription? jsep) async {
+  Future<dynamic> showIncomingCallDialog(String caller, RTCSessionDescription? jsep) async {
     return showDialog(
         context: context,
         builder: (context) {
@@ -259,11 +244,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    var answer = await publishVideo.createAnswer(
-                        audioRecv: true,
-                        audioSend: true,
-                        videoRecv: true,
-                        videoSend: true);
+                    var answer = await publishVideo.createAnswer(audioRecv: true, audioSend: true, videoRecv: true, videoSend: true);
                     await publishVideo.acceptCall(answer: answer);
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);
@@ -271,8 +252,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   child: Text('Accept')),
               ElevatedButton(
                   onPressed: () async {
-                    Navigator.of(context, rootNavigator: true)
-                        .pop(incomingDialog);
+                    Navigator.of(context, rootNavigator: true).pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
                     await publishVideo.hangup();
                   },
@@ -296,9 +276,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
           icon: Icon(Icons.input),
           itemBuilder: (BuildContext context) {
             if (_mediaDevicesList != null) {
-              return _mediaDevicesList!
-                  .where((device) => device.kind == 'audioinput')
-                  .map((device) {
+              return _mediaDevicesList!.where((device) => device.kind == 'audioinput').map((device) {
                 return PopupMenuItem<String>(
                   value: device.deviceId,
                   child: Text(device.label),
@@ -337,13 +315,11 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                 front = !front;
               });
               //  note:- deviceId is important for web browsers
-              await publishVideo.switchCamera(
-                  deviceId: await getCameraDeviceId(front));
+              await publishVideo.switchCamera(deviceId: await getCameraDeviceId(front));
 
               // everytime we make changes in stream we update in ui and renderer like this.
               setState(() {
-                _localRenderer.srcObject =
-                    publishVideo.webRTCHandle?.localStream;
+                _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
               });
             })
       ]),
@@ -359,8 +335,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     RTCVideoView(
                       _remoteVideoRenderer,
                       mirror: true,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                     )
                   ],
                 ),
@@ -371,8 +346,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                     child: RTCVideoView(
                       _localRenderer,
                       mirror: true,
-                      objectFit:
-                          RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
                     ),
                   ))
             ],
@@ -384,8 +358,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
               Expanded(
                   flex: 2,
                   child: ListView(
-                    children: List.generate(
-                        messages.length, (index) => Text('${messages[index]}')),
+                    children: List.generate(messages.length, (index) => Text('${messages[index]}')),
                   )),
               Flexible(
                   child: Row(
@@ -393,8 +366,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   Flexible(
                       child: TextFormField(
                     controller: messageController,
-                    decoration:
-                        InputDecoration(label: Text('Data channel message')),
+                    decoration: InputDecoration(label: Text('Data channel message')),
                   )),
                   Flexible(
                       child: TextButton(
@@ -416,8 +388,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
           child: Container(
             width: MediaQuery.of(context).size.width,
             height: 60,
-            decoration: BoxDecoration(
-                color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
+            decoration: BoxDecoration(color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

@@ -412,12 +412,14 @@ class JanusPlugin {
     }
   }
 
-  /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
+  ///Helper method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
   /// [useDisplayMediaDevices] : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
-  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.
-  /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView
-  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, Map<String, dynamic>? mediaConstraints}) async {
+  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.<br>
+  /// [simulcastSendEncodings] : this list is used to specify encoding for simulcasting or (svc if room codec is vp9)<br>
+  /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView <br><br>
+  /// keep in mind this method exist to help in getting started with this library quickly,educational purposes or for basic functionalities, for custom use cases it is recommended to rely on your own implementation of this method using PeerConnection
+  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, List<RTCRtpEncoding>? simulcastSendEncodings, Map<String, dynamic>? mediaConstraints}) async {
     await _disposeMediaStreams(ignoreRemote: true);
     List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
     List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
@@ -448,9 +450,21 @@ class JanusPlugin {
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.finest('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
-          _context._logger.finest('adding track in peerconnection');
-          _context._logger.finest(element.toString());
-          await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+          if (element.kind == 'audio') {
+            _context._logger.finest('adding audio track in peerconnection');
+            await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+            return;
+          }
+          if (simulcastSendEncodings == null) {
+            _context._logger.finest('adding video track in peerconnection');
+            await webRTCHandle?.peerConnection?.addTrack(element, webRTCHandle!.localStream!);
+          } else {
+            _context._logger.finest('simulcasting enabled, using TransReceiver with custom sendEncodings');
+            await webRTCHandle!.peerConnection!.addTransceiver(
+                track: element,
+                kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+                init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendOnly, sendEncodings: simulcastSendEncodings));
+          }
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);

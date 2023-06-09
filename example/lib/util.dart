@@ -9,6 +9,7 @@ class StreamRenderer {
   String? publisherName;
   String? mid;
   bool? isAudioMuted;
+  List<bool> selectedQuality=[false,false,true];
   bool? isVideoMuted;
 
   Future<void> dispose() async {

@@ -140,8 +140,10 @@ class _VideoRoomState extends State<GoogleMeet> {
             localStream.mediaStream = await createLocalMediaStream(feedId.toString());
             localStream.mediaStream?.addTrack(event.track!);
             localStream.videoRenderer.srcObject = localStream.mediaStream;
+            localStream.videoRenderer.onResize = () => {setState(() {})};
             localStream.publisherName = displayName;
             localStream.publisherId = feedId.toString();
+            localStream.mid = event.mid;
             setState(() {
               videoState.streamsToBeRendered.putIfAbsent(feedId.toString(), () => localStream);
             });
@@ -252,13 +254,13 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin?.renegotiationNeeded?.listen((event) async {
       if (videoPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await videoPlugin?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await videoPlugin?.createOffer(audioRecv: false, videoRecv: false, audioSend: audioEnabled, videoSend: videoEnabled);
       await videoPlugin?.configure(sessionDescription: offer);
     });
     screenPlugin?.renegotiationNeeded?.listen((event) async {
       if (screenPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await screenPlugin?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await screenPlugin?.createOffer(audioRecv: false, videoRecv: false, audioSend: true, videoSend: true);
       await screenPlugin?.configure(sessionDescription: offer);
     });
   }
@@ -269,9 +271,24 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin = await attachPlugin(pop: true);
     eventMessagesHandler();
     await localVideoRenderer.init();
-    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(mediaConstraints: {'video': true, 'audio': true});
+    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(simulcastSendEncodings: [
+      RTCRtpEncoding(active: true, rid: 'h', maxBitrate: 4000000),
+      RTCRtpEncoding(active: true, rid: 'm', maxBitrate: 1000000, scaleResolutionDownBy: 2),
+      RTCRtpEncoding(active: true, rid: 'l', maxBitrate: 1000000, scaleResolutionDownBy: 3),
+    ], mediaConstraints: {
+      'video': {
+        'width': {'ideal': 1920},
+        'height': {'ideal': 1080}
+      },
+      'audio': true
+    });
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
     localVideoRenderer.publisherName = "You";
+    localVideoRenderer.publisherId = myId.toString();
+    localVideoRenderer.videoRenderer.onResize = () {
+      // to update widthxheight when it renders
+      setState(() {});
+    };
     setState(() {
       videoState.streamsToBeRendered.putIfAbsent('local', () => localVideoRenderer);
     });
@@ -300,7 +317,15 @@ class _VideoRoomState extends State<GoogleMeet> {
       screenPlugin?.handleRemoteJsep(event.jsep);
     });
     await localScreenSharingRenderer.init();
-    localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(mediaConstraints: {'video': true, 'audio': true}, useDisplayMediaDevices: true);
+    localScreenSharingRenderer.publisherId = myId.toString();
+    localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(mediaConstraints: {
+      'video': true,
+      'audio': true
+    }, simulcastSendEncodings: [
+      RTCRtpEncoding(active: true, rid: 'h', maxBitrate: 4000000),
+      RTCRtpEncoding(active: true, rid: 'm', maxBitrate: 1000000, scaleResolutionDownBy: 2),
+      RTCRtpEncoding(active: true, rid: 'l', maxBitrate: 1000000, scaleResolutionDownBy: 3),
+    ], useDisplayMediaDevices: true);
     localScreenSharingRenderer.videoRenderer.srcObject = localScreenSharingRenderer.mediaStream;
     localScreenSharingRenderer.publisherName = "Your Screenshare";
     setState(() {
@@ -338,11 +363,18 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   mute(RTCPeerConnection? peerConnection, String kind, bool enabled) async {
-    var transreciever = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
-    if (transreciever?.isEmpty == true) {
+    var transrecievers = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
+    if (transrecievers?.isEmpty == true) {
       return;
     }
-    await transreciever?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
+    await transrecievers?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
+    // below method mutes/disables mid based on janus but no brief notification is received from janus
+    // await videoPlugin?.send(data: {
+    //   "request" : "configure",
+    //   "streams": [
+    //     {"mid": transrecievers?.first.mid, "send": enabled},
+    //   ],
+    // });
   }
 
   callEnd() async {
@@ -513,11 +545,46 @@ class _VideoRoomState extends State<GoogleMeet> {
                       child: Text("Video Paused By " + remoteStream.publisherName!, style: TextStyle(color: Colors.black)),
                     ),
                   ),
-                  child: RTCVideoView(
-                    remoteStream.videoRenderer,
-                    filterQuality: FilterQuality.none,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  ),
+                  child: Stack(children: [
+                    RTCVideoView(
+                      remoteStream.videoRenderer,
+                      filterQuality: FilterQuality.none,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    ),
+                    Visibility(
+                      child: PositionedDirectional(
+                          child: ToggleButtons(
+                            direction: Axis.horizontal,
+                            onPressed: (int index) async {
+                              setState(() {
+                                // The button that is tapped is set to true, and the others to false.
+                                for (int i = 0; i < remoteStream.selectedQuality.length; i++) {
+                                  remoteStream.selectedQuality[i] = i == index;
+                                }
+                              });
+                              await remotePlugin?.send(data: {'request': "configure", 'mid': remoteStream.mid, 'substream': index});
+                            },
+                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            selectedBorderColor: Colors.red[700],
+                            selectedColor: Colors.white,
+                            fillColor: Colors.red[200],
+                            color: Colors.red[400],
+                            constraints: const BoxConstraints(
+                              minHeight: 20.0,
+                              minWidth: 50.0,
+                            ),
+                            isSelected: remoteStream.selectedQuality,
+                            children: [Text('Low'), Text('Medium'), Text('High')],
+                          ),
+                          top: 120,
+                          start: 20),
+                      visible: remoteStream.publisherId != myId.toString(),
+                    ),
+                    Align(
+                      child: Text('${remoteStream.videoRenderer.videoWidth}X${remoteStream.videoRenderer.videoHeight}'),
+                      alignment: Alignment.bottomLeft,
+                    )
+                  ]),
                 ),
                 Align(
                   alignment: AlignmentDirectional.bottomStart,

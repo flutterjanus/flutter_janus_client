@@ -2,12 +2,7 @@ part of janus_client;
 
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session})
-      : super(
-            context: context,
-            handleId: handleId,
-            plugin: JanusPlugins.VIDEO_ROOM,
-            session: session,
-            transport: transport);
+      : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
 
   ///  This allows you to modify the room description, secret, pin and whether it's private or not:
   ///  you won't be able to modify other more static properties, like the room ID, the sampling rate,
@@ -46,34 +41,16 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// Used to destroy an existing video room, whether created dynamically or statically
-  Future<dynamic> destroyRoom(dynamic roomId,
-      {String? secret, bool? permanent}) async {
-    var payload = {
-      "request": "destroy",
-      "room": roomId,
-      if (secret != null) "secret": secret,
-      if (permanent != null) "permanent": permanent
-    };
+  Future<dynamic> destroyRoom(dynamic roomId, {String? secret, bool? permanent}) async {
+    var payload = {"request": "destroy", "room": roomId, if (secret != null) "secret": secret, if (permanent != null) "permanent": permanent};
     _handleRoomIdTypeDifference(payload);
     return (await this.send(data: payload));
   }
 
   ///  Used to create a new video room
   Future<dynamic> createRoom(dynamic roomId,
-      {bool permanent = false,
-      String? pin,
-      Map<String, dynamic>? extras,
-      List<String>? allowed,
-      String? isPrivate,
-      String description = '',
-      String? secret}) async {
-    var payload = {
-      "request": "create",
-      "room": roomId,
-      "permanent": permanent,
-      "description": description,
-      ...?extras
-    };
+      {bool permanent = false, String? pin, Map<String, dynamic>? extras, List<String>? allowed, String? isPrivate, String description = '', String? secret}) async {
+    var payload = {"request": "create", "room": roomId, "permanent": permanent, "description": description, ...?extras};
     if (allowed != null) payload["allowed"] = allowed;
     if (isPrivate != null) payload["is_private"] = isPrivate;
     if (secret != null) payload['secret'] = secret;
@@ -83,20 +60,16 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   /// get list of participants in a existing video room
-  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(
-      dynamic roomId) async {
+  Future<VideoRoomListParticipantsResponse?> getRoomParticipants(dynamic roomId) async {
     var payload = {"request": "listparticipants", "room": roomId};
     Map data = await this.send(data: payload);
     _handleRoomIdTypeDifference(payload);
-    return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(
-        data, VideoRoomListParticipantsResponse.fromJson);
+    return _getPluginDataFromPayload<VideoRoomListParticipantsResponse>(data, VideoRoomListParticipantsResponse.fromJson);
   }
 
   // prevent duplication
   T? _getPluginDataFromPayload<T>(dynamic data, T Function(dynamic) fromJson) {
-    if (data.containsKey('janus') &&
-        data['janus'] == 'success' &&
-        data.containsKey('plugindata')) {
+    if (data.containsKey('janus') && data['janus'] == 'success' && data.containsKey('plugindata')) {
       var dat = data['plugindata']['data'];
       return dat;
     } else {
@@ -108,13 +81,11 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   Future<VideoRoomListResponse?> getRooms() async {
     var payload = {"request": "list"};
     Map data = await this.send(data: payload);
-    return _getPluginDataFromPayload<VideoRoomListResponse>(
-        data, VideoRoomListResponse.fromJson);
+    return _getPluginDataFromPayload<VideoRoomListResponse>(data, VideoRoomListResponse.fromJson);
   }
 
   /// joins the [JanusVideoRoom] as a media publisher on provided [roomId] with its name as [displayName] and optionally can provide your own [id].
-  Future<void> joinPublisher(dynamic roomId,
-      {String? pin, int? id, String? token, String? displayName}) async {
+  Future<void> joinPublisher(dynamic roomId, {String? pin, int? id, String? token, String? displayName}) async {
     var payload = {
       "request": "join",
       "ptype": "publisher",
@@ -128,22 +99,14 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await this.send(data: payload);
   }
 
-  Future<void> subscribeToStreams(List<PublisherStream> streams,
-      {RTCSessionDescription? offer}) async {
+  Future<void> subscribeToStreams(List<PublisherStream> streams, {RTCSessionDescription? offer}) async {
     if (streams.length > 0) {
-      var payload = {
-        'request': "subscribe",
-        'streams': streams
-            .map((e) => e.toMap()..removeWhere((key, value) => value == null))
-            .toList()
-      };
+      var payload = {'request': "subscribe", 'streams': streams.map((e) => e.toMap()..removeWhere((key, value) => value == null)).toList()};
       await this.send(data: payload, jsep: offer);
     }
   }
 
-  Future<void> update(
-      {List<SubscriberUpdateStream>? subscribe,
-      List<SubscriberUpdateStream>? unsubscribe}) async {
+  Future<void> update({List<SubscriberUpdateStream>? subscribe, List<SubscriberUpdateStream>? unsubscribe}) async {
     if (subscribe?.isEmpty == true && unsubscribe?.isEmpty == true) {
       return;
     }
@@ -151,14 +114,10 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       'request': "update",
     };
     if (subscribe?.isNotEmpty == true) {
-      payload['subscribe'] = subscribe
-          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
-          .toList();
+      payload['subscribe'] = subscribe?.map((e) => e.toMap()..removeWhere((key, value) => value == null)).toList();
     }
     if (unsubscribe?.isNotEmpty == true) {
-      payload['unsubscribe'] = unsubscribe
-          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
-          .toList();
+      payload['unsubscribe'] = unsubscribe?.map((e) => e.toMap()..removeWhere((key, value) => value == null)).toList();
     }
     await this.send(data: payload);
   }
@@ -166,8 +125,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   Future<void> start(dynamic roomId, {RTCSessionDescription? answer}) async {
     var payload = {"request": "start", 'room': roomId};
     if (answer == null) {
-      answer = await this.createAnswer(
-          audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+      answer = await this.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
     }
     await this.send(data: payload, jsep: answer);
   }
@@ -189,9 +147,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "token": token,
       "feed": feedId,
       "private_id": privateId,
-      "streams": streams
-          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
-          .toList(),
+      "streams": streams?.map((e) => e.toMap()..removeWhere((key, value) => value == null)).toList(),
     }..removeWhere((key, value) => value == null);
     _handleRoomIdTypeDifference(payload);
     await this.send(data: payload);
@@ -222,8 +178,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "descriptions": descriptions
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(
-          audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
     }
     await this.send(data: payload, jsep: offer);
   }
@@ -257,12 +212,8 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   }
 
   Future<void> unsubscribe({List<UnsubscribeStreams>? streams}) async {
-    var payload = {
-      "request": "unsubscribe",
-      "streams": streams
-          ?.map((e) => e.toMap()..removeWhere((key, value) => value == null))
-          .toList()
-    }..removeWhere((key, value) => value == null);
+    var payload = {"request": "unsubscribe", "streams": streams?.map((e) => e.toMap()..removeWhere((key, value) => value == null)).toList()}
+      ..removeWhere((key, value) => value == null);
     await this.send(data: payload);
   }
 
@@ -281,59 +232,38 @@ class JanusVideoRoomPlugin extends JanusPlugin {
 
   @override
   void onCreate() {
-    if (!_onCreated) {
-      _onCreated = true;
-      messages?.listen((event) {
-        TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(
-            event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-        if (typedEvent.event.plugindata?.data['videoroom'] == 'joined') {
-          typedEvent.event.plugindata?.data =
-              VideoRoomJoinedEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['unpublished'] != null&&typedEvent.event.plugindata?.data['unpublished'] is int) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomUnPublishedEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] ==
-                'updated' &&
-            typedEvent.event.plugindata?.data['streams'] != null) {
-          print('reaching here buddy');
-          typedEvent.event.plugindata?.data =
-              VideoRoomUpdatedEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['configured'] == "ok") {
-          typedEvent.event.plugindata?.data =
-              VideoRoomConfigured.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['publishers'] != null) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomNewPublisherEvent.fromJson(
-                  typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            typedEvent.event.plugindata?.data['leaving'] != null &&
-            typedEvent.event.plugindata?.data['leaving'].runtimeType == int) {
-          typedEvent.event.plugindata?.data =
-              VideoRoomLeavingEvent.fromJson(typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] ==
-                'attached' ||
-            typedEvent.event.plugindata?.data['streams'] != null) {
-          typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(
-              typedEvent.event.plugindata?.data);
-          _typedMessagesSink?.add(typedEvent);
-        } else if (typedEvent.event.plugindata?.data['videoroom'] == 'event' &&
-            (typedEvent.event.plugindata?.data['error_code'] != null ||
-                typedEvent.event.plugindata?.data?['result']?['code'] !=
-                    null)) {
-          _typedMessagesSink
-              ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-        }
-      });
+    if (_onCreated) {
+      return;
     }
+    _onCreated = true;
+    messages?.listen((event) {
+      TypedEvent<JanusEvent> typedEvent = TypedEvent<JanusEvent>(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+      var data = typedEvent.event.plugindata?.data;
+      if (data == null) return;
+      if (data['videoroom'] == 'joined') {
+        typedEvent.event.plugindata?.data = VideoRoomJoinedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'event' && data['unpublished'] != null && data['unpublished'] is int) {
+        typedEvent.event.plugindata?.data = VideoRoomUnPublishedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'updated' && data['streams'] != null) {
+        typedEvent.event.plugindata?.data = VideoRoomUpdatedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'event' && data['configured'] == "ok") {
+        typedEvent.event.plugindata?.data = VideoRoomConfigured.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'event' && data['publishers'] != null) {
+        typedEvent.event.plugindata?.data = VideoRoomNewPublisherEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'event' && data['leaving'] != null && data['leaving'].runtimeType == int) {
+        typedEvent.event.plugindata?.data = VideoRoomLeavingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'attached' || data['streams'] != null) {
+        typedEvent.event.plugindata?.data = VideoRoomAttachedEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videoroom'] == 'event' && (data['error_code'] != null || data['result']?['code'] != null)) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    });
   }
 }

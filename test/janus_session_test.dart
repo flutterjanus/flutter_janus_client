@@ -3,8 +3,7 @@
 import 'package:janus_client/janus_client.dart';
 
 void main() async {
-  WebSocketJanusTransport ws = WebSocketJanusTransport(
-      url: 'wss://master-janus.onemandev.tech/websocket');
+  WebSocketJanusTransport ws = WebSocketJanusTransport(url: 'wss://master-janus.onemandev.tech/websocket');
   JanusClient j = JanusClient(transport: ws);
   // RestJanusTransport rest =
   // RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');

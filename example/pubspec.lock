@@ -155,7 +155,7 @@ packages:
       name: flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.24"
+    version: "0.9.22"
   glob:
     dependency: transitive
     description:
@@ -190,7 +190,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.2.10"
+    version: "2.2.14"
   js:
     dependency: transitive
     description:

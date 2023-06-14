@@ -141,7 +141,7 @@ packages:
       name: flutter_webrtc
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.24"
+    version: "0.9.22"
   glob:
     dependency: transitive
     description:

@@ -8,9 +8,7 @@ class SipRegisteredEvent {
 
   SipRegisteredEvent.fromJson(Map<String, dynamic> json) {
     this.sip = json["sip"];
-    this.result = json["result"] == null
-        ? null
-        : SipRegisteredEventResult.fromJson(json["result"]);
+    this.result = json["result"] == null ? null : SipRegisteredEventResult.fromJson(json["result"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -27,8 +25,7 @@ class SipRegisteredEventResult {
   bool? registerSent;
   int? masterId;
 
-  SipRegisteredEventResult(
-      {this.event, this.username, this.registerSent, this.masterId});
+  SipRegisteredEventResult({this.event, this.username, this.registerSent, this.masterId});
 
   SipRegisteredEventResult.fromJson(Map<String, dynamic> json) {
     this.event = json["event"] as String?;

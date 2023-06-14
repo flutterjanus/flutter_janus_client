@@ -8,8 +8,7 @@ class VideoCallHangupEvent {
 
   VideoCallHangupEvent.fromJson(dynamic json) {
     videocall = json['videocall'];
-    result =
-        json['result'] != null ? HangupResult.fromJson(json['result']) : null;
+    result = json['result'] != null ? HangupResult.fromJson(json['result']) : null;
   }
   String? videocall;
   HangupResult? result;

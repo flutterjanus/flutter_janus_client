@@ -52,25 +52,14 @@ class PublisherStream {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is PublisherStream &&
-          runtimeType == other.runtimeType &&
-          simulcast == other.simulcast &&
-          svc == other.svc &&
-          feed == other.feed &&
-          mid == other.mid);
+      (other is PublisherStream && runtimeType == other.runtimeType && simulcast == other.simulcast && svc == other.svc && feed == other.feed && mid == other.mid);
 
   @override
-  int get hashCode =>
-      simulcast.hashCode ^ svc.hashCode ^ feed.hashCode ^ mid.hashCode;
+  int get hashCode => simulcast.hashCode ^ svc.hashCode ^ feed.hashCode ^ mid.hashCode;
 
   @override
   String toString() {
-    return 'PublisherStream{' +
-        ' simulcast: $simulcast,' +
-        ' svc: $svc,' +
-        ' feed: $feed,' +
-        ' mid: $mid,' +
-        '}';
+    return 'PublisherStream{' + ' simulcast: $simulcast,' + ' svc: $svc,' + ' feed: $feed,' + ' mid: $mid,' + '}';
   }
 
   Map<String, dynamic> toMap() {
@@ -134,21 +123,16 @@ class SubscriberUpdateStream {
 
   String toJson() => json.encode(toMap());
 
-  factory SubscriberUpdateStream.fromJson(String source) =>
-      SubscriberUpdateStream.fromMap(json.decode(source));
+  factory SubscriberUpdateStream.fromJson(String source) => SubscriberUpdateStream.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'SubscriberUpdateStream(feed: $feed, mid: $mid, crossrefid: $crossrefid)';
+  String toString() => 'SubscriberUpdateStream(feed: $feed, mid: $mid, crossrefid: $crossrefid)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is SubscriberUpdateStream &&
-        other.feed == feed &&
-        other.mid == mid &&
-        other.crossrefid == crossrefid;
+    return other is SubscriberUpdateStream && other.feed == feed && other.mid == mid && other.crossrefid == crossrefid;
   }
 
   @override
@@ -244,8 +228,7 @@ class Streams {
 
   String toJson() => json.encode(toMap());
 
-  factory Streams.fromJson(String source) =>
-      Streams.fromMap(json.decode(source));
+  factory Streams.fromJson(String source) => Streams.fromMap(json.decode(source));
 
   @override
   String toString() {
@@ -326,21 +309,16 @@ class UnsubscribeStreams {
 
   String toJson() => json.encode(toMap());
 
-  factory UnsubscribeStreams.fromJson(String source) =>
-      UnsubscribeStreams.fromMap(json.decode(source));
+  factory UnsubscribeStreams.fromJson(String source) => UnsubscribeStreams.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'UnsubscribeStreams(feed: $feed, mid: $mid, subMid: $subMid)';
+  String toString() => 'UnsubscribeStreams(feed: $feed, mid: $mid, subMid: $subMid)';
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
-    return other is UnsubscribeStreams &&
-        other.feed == feed &&
-        other.mid == mid &&
-        other.subMid == subMid;
+    return other is UnsubscribeStreams && other.feed == feed && other.mid == mid && other.subMid == subMid;
   }
 
   @override

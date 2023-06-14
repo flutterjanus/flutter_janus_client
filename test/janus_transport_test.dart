@@ -6,26 +6,19 @@ import 'dart:io';
 import 'package:janus_client/janus_client.dart';
 
 void main() {
-  RestJanusTransport rest =
-      RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
+  RestJanusTransport rest = RestJanusTransport(url: 'https://master-janus.onemandev.tech/rest');
 
-  WebSocketJanusTransport ws = WebSocketJanusTransport(
-      url: 'wss://master-janus.onemandev.tech/websocket');
+  WebSocketJanusTransport ws = WebSocketJanusTransport(url: 'wss://master-janus.onemandev.tech/websocket');
   ws.connect();
   group('RestJanusTransport', () {
     test('Create a new Session', () async {
-      var response =
-          await rest.post({"janus": "create", "transaction": "sdhbds"});
+      var response = await rest.post({"janus": "create", "transaction": "sdhbds"});
       rest.sessionId = response['data']['id'];
       expect(response['janus'], 'success');
     });
 
     test('Attach A Plugin', () async {
-      Map<String, dynamic> request = {
-        "janus": "attach",
-        "plugin": "janus.plugin.videoroom",
-        "transaction": "random for attaching plugin"
-      };
+      Map<String, dynamic> request = {"janus": "attach", "plugin": "janus.plugin.videoroom", "transaction": "random for attaching plugin"};
       var response = await rest.post(request);
 
       expect(response['janus'], 'success');
@@ -47,11 +40,7 @@ void main() {
   });
   group('WebSocketJanusTransport', () {
     test('Attach A Plugin', () async {
-      Map<String, dynamic> request = {
-        "janus": "attach",
-        "plugin": "janus.plugin.videoroom",
-        "transaction": "random for attaching plugin"
-      };
+      Map<String, dynamic> request = {"janus": "attach", "plugin": "janus.plugin.videoroom", "transaction": "random for attaching plugin"};
       ws.sink!.add(request);
       ws.stream.listen((event) {
         if (event['transaction'] == request['transaction']) {

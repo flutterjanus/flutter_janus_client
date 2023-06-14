@@ -9,6 +9,7 @@ class StreamRenderer {
   String? publisherName;
   String? mid;
   bool? isAudioMuted;
+  List<bool> selectedQuality=[false,false,true];
   bool? isVideoMuted;
 
   Future<void> dispose() async {
@@ -58,22 +59,16 @@ class GenericVideoRoomManagedPlugin {
   void Function(void Function()) setState = (func) {};
   GenericVideoRoomManagedPlugin({this.myRoom, this.myPin});
 
-  Future<void> unSubscribeStreamMedia(
-      VideoRoomPluginStateManager mediaState, int id,
-      {Map? subscriptionMap}) async {
+  Future<void> unSubscribeStreamMedia(VideoRoomPluginStateManager mediaState, int id, {Map? subscriptionMap}) async {
     var feed = mediaState.feedIdToDisplayStreamsMap[id];
     if (feed == null) return;
     mediaState.feedIdToDisplayStreamsMap.remove(id);
     await mediaState.streamsToBeRendered[id]?.dispose();
     mediaState.streamsToBeRendered.remove(id);
-    mediaState.unSubscribeStreams =
-        (feed['streams'] as List<Streams>).map((stream) {
-      return SubscriberUpdateStream(
-          feed: id, mid: stream.mid, crossrefid: null);
+    mediaState.unSubscribeStreams = (feed['streams'] as List<Streams>).map((stream) {
+      return SubscriberUpdateStream(feed: id, mid: stream.mid, crossrefid: null);
     }).toList();
-    if (remoteMediaHandle != null)
-      await remoteMediaHandle?.update(
-          unsubscribe: mediaState.unSubscribeStreams);
+    if (remoteMediaHandle != null) await remoteMediaHandle?.update(unsubscribe: mediaState.unSubscribeStreams);
     mediaState.unSubscribeStreams = [];
     if (subscriptionMap != null) {
       subscriptionMap.remove(id);
@@ -82,47 +77,32 @@ class GenericVideoRoomManagedPlugin {
     mediaState.feedIdToMidSubscriptionMap.remove(id);
   }
 
-  subscribeToMedia(VideoRoomPluginStateManager mediaState,
-      List<Map<dynamic, dynamic>> sources) async {
+  subscribeToMedia(VideoRoomPluginStateManager mediaState, List<Map<dynamic, dynamic>> sources) async {
     if (sources.length == 0) return;
-    var streams = (sources)
-        .map((e) => PublisherStream(mid: e['mid'], feed: e['feed']))
-        .toList();
+    var streams = (sources).map((e) => PublisherStream(mid: e['mid'], feed: e['feed'])).toList();
     if (remoteMediaHandle != null) {
-      await remoteMediaHandle?.update(
-          subscribe: mediaState.subscribeStreams,
-          unsubscribe: mediaState.unSubscribeStreams);
+      await remoteMediaHandle?.update(subscribe: mediaState.subscribeStreams, unsubscribe: mediaState.unSubscribeStreams);
       mediaState.subscribeStreams = [];
       mediaState.unSubscribeStreams = [];
       return;
     }
     remoteMediaHandle = await this.session?.attach<JanusVideoRoomPlugin>();
     remoteMediaHandle?.renegotiationNeeded?.listen((event) async {
-      if (remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState !=
-              RTCSignalingState.RTCSignalingStateHaveRemoteOffer ||
-          remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState !=
-              RTCSignalingState.RTCSignalingStateHaveRemotePrAnswer) return;
+      if (remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateHaveRemoteOffer ||
+          remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateHaveRemotePrAnswer) return;
       print('retrying to connect subscribers');
-      await remoteMediaHandle?.start(myRoom,
-          answer: await remoteMediaHandle?.createAnswer(
-              audioRecv: true,
-              audioSend: false,
-              videoRecv: true,
-              videoSend: false));
+      await remoteMediaHandle?.start(myRoom, answer: await remoteMediaHandle?.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false));
     });
 
-    await remoteMediaHandle?.joinSubscriber(myRoom,
-        streams: streams, pin: myPin);
+    await remoteMediaHandle?.joinSubscriber(myRoom, streams: streams, pin: myPin);
     remoteMediaHandle?.typedMessages?.listen((event) async {
       Object data = event.event.plugindata?.data;
       await remoteMediaHandle?.handleRemoteJsep(event.jsep);
       if (data is VideoRoomUpdatedEvent) {
         data.streams?.forEach((element) {
           // to avoid duplicate subscriptions
-          if (mediaState.feedIdToMidSubscriptionMap[element.feedId] == null)
-            mediaState.feedIdToMidSubscriptionMap[element.feedId] = {};
-          mediaState.feedIdToMidSubscriptionMap[element.feedId][element.mid] =
-              true;
+          if (mediaState.feedIdToMidSubscriptionMap[element.feedId] == null) mediaState.feedIdToMidSubscriptionMap[element.feedId] = {};
+          mediaState.feedIdToMidSubscriptionMap[element.feedId][element.mid] = true;
         });
         print('videoroom updated event triggered');
 
@@ -131,16 +111,10 @@ class GenericVideoRoomManagedPlugin {
       if (data is VideoRoomAttachedEvent) {
         data.streams?.forEach((element) {
           // to avoid duplicate subscriptions
-          if (mediaState.feedIdToMidSubscriptionMap[element.feedId] == null)
-            mediaState.feedIdToMidSubscriptionMap[element.feedId] = {};
-          mediaState.feedIdToMidSubscriptionMap[element.feedId][element.mid] =
-              true;
+          if (mediaState.feedIdToMidSubscriptionMap[element.feedId] == null) mediaState.feedIdToMidSubscriptionMap[element.feedId] = {};
+          mediaState.feedIdToMidSubscriptionMap[element.feedId][element.mid] = true;
         });
-        var answer = await remoteMediaHandle?.createAnswer(
-            audioRecv: true,
-            audioSend: false,
-            videoRecv: true,
-            videoSend: false);
+        var answer = await remoteMediaHandle?.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
         await remoteMediaHandle?.start(myRoom, answer: answer);
       }
       remoteMediaHandle?.remoteTrack?.listen((event) async {
@@ -181,36 +155,27 @@ class GenericVideoRoomManagedPlugin {
     return;
   }
 
-  updateStateWithPublisherMediaInfo(VideoRoomPluginStateManager mediaState,
-      dynamic data, List<dynamic> ownIds) {
+  updateStateWithPublisherMediaInfo(VideoRoomPluginStateManager mediaState, dynamic data, List<dynamic> ownIds) {
     List<Map<dynamic, dynamic>> publisherStreams = [];
     for (Publishers publisher in data.publishers ?? []) {
       if (ownIds.contains(publisher.id)) {
         continue;
       }
-      mediaState.feedIdToDisplayStreamsMap[publisher.id!] = {
-        "id": publisher.id,
-        "display": publisher.display,
-        "streams": publisher.streams
-      };
+      mediaState.feedIdToDisplayStreamsMap[publisher.id!] = {"id": publisher.id, "display": publisher.display, "streams": publisher.streams};
       for (Streams stream in publisher.streams ?? []) {
-        if (mediaState.feedIdToMidSubscriptionMap[publisher.id] != null &&
-            mediaState.feedIdToMidSubscriptionMap[publisher.id]?[stream.mid] ==
-                true) {
+        if (mediaState.feedIdToMidSubscriptionMap[publisher.id] != null && mediaState.feedIdToMidSubscriptionMap[publisher.id]?[stream.mid] == true) {
           continue;
         }
         publisherStreams.add({"feed": publisher.id, ...stream.toMap()});
         if (publisher.id != null && stream.mid != null) {
-          mediaState.subStreamsToFeedIdMap
-              .putIfAbsent(stream.mid, () => publisher.id);
+          mediaState.subStreamsToFeedIdMap.putIfAbsent(stream.mid, () => publisher.id);
         }
       }
     }
     return publisherStreams;
   }
 
-  init(VideoRoomPluginStateManager mediaState, JanusSession? session,
-      List<dynamic> ownIds, void Function(void Function()) setState) async {
+  init(VideoRoomPluginStateManager mediaState, JanusSession? session, List<dynamic> ownIds, void Function(void Function()) setState) async {
     this.session = session;
     this.setState = setState;
     mediaHandle = await this.session?.attach<JanusVideoRoomPlugin>();
@@ -221,16 +186,9 @@ class GenericVideoRoomManagedPlugin {
         // if (afterJoined != null) {
         //   await afterJoined();
         // } else {
-        (await mediaHandle?.configure(
-            bitrate: 3000000,
-            sessionDescription: await mediaHandle?.createOffer(
-                audioRecv: false,
-                audioSend: false,
-                videoSend: true,
-                videoRecv: false)));
+        (await mediaHandle?.configure(bitrate: 3000000, sessionDescription: await mediaHandle?.createOffer(audioRecv: false, audioSend: false, videoSend: true, videoRecv: false)));
         // }
-        List<Map<dynamic, dynamic>> publisherStreams =
-            updateStateWithPublisherMediaInfo(mediaState, data, ownIds);
+        List<Map<dynamic, dynamic>> publisherStreams = updateStateWithPublisherMediaInfo(mediaState, data, ownIds);
         subscribeToMedia(
           mediaState,
           publisherStreams,
@@ -238,8 +196,7 @@ class GenericVideoRoomManagedPlugin {
       }
       if (data is VideoRoomNewPublisherEvent) {
         print(data.publishers);
-        List<Map<dynamic, dynamic>> publisherStreams =
-            updateStateWithPublisherMediaInfo(mediaState, data, ownIds);
+        List<Map<dynamic, dynamic>> publisherStreams = updateStateWithPublisherMediaInfo(mediaState, data, ownIds);
         subscribeToMedia(
           mediaState,
           publisherStreams,
@@ -262,11 +219,9 @@ class GenericVideoRoomManagedPlugin {
       }
     });
     mediaHandle?.renegotiationNeeded?.listen((event) async {
-      if (mediaHandle?.webRTCHandle?.peerConnection?.signalingState !=
-          RTCSignalingState.RTCSignalingStateStable) return;
+      if (mediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await mediaHandle?.createOffer(
-          audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await mediaHandle?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
       await mediaHandle?.configure(sessionDescription: offer);
     });
   }

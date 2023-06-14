@@ -9,7 +9,7 @@ class VideoRoomUpdatedEvent extends VideoRoomEvent {
     super.room = 0;
   }
 
- VideoRoomUpdatedEvent.fromJson(dynamic json) {
+  VideoRoomUpdatedEvent.fromJson(dynamic json) {
     videoroom = json['videoroom'];
     room = json['room'];
     if (json['streams'] != null) {

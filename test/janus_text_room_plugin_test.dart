@@ -7,8 +7,7 @@ class _MyHttpOverrides extends HttpOverrides {}
 void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = _MyHttpOverrides();
-  WebSocketJanusTransport ws =
-      WebSocketJanusTransport(url: 'wss://janus.conf.meetecho.com/ws');
+  WebSocketJanusTransport ws = WebSocketJanusTransport(url: 'wss://janus.conf.meetecho.com/ws');
   JanusClient client = JanusClient(transport: ws);
   JanusSession session = await client.createSession();
   late JanusTextRoomPlugin textRoomPlugin;

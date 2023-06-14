@@ -72,19 +72,15 @@
   &#47;&#47; if (message != null) {
   if (webRTCHandle!.peerConnection != null) {
     this._context._logger.finest(&#39;before send RTCDataChannelMessage&#39;);
-    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] ==
-        null) {
-      throw Exception(
-          &quot;You Must  call initDataChannel method! before you can send any data channel message&quot;);
+    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] == null) {
+      throw Exception(&quot;You Must  call initDataChannel method! before you can send any data channel message&quot;);
     }
-    RTCDataChannel dataChannel =
-        webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!;
+    RTCDataChannel dataChannel = webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!;
     if (dataChannel.state == RTCDataChannelState.RTCDataChannelOpen) {
       return await dataChannel.send(RTCDataChannelMessage(message));
     }
   } else {
-    throw Exception(
-        &quot;You Must Initialize Peer Connection followed by initDataChannel()&quot;);
+    throw Exception(&quot;You Must Initialize Peer Connection followed by initDataChannel()&quot;);
   }
   &#47;&#47; } else {
   &#47;&#47;   throw Exception(&quot;message must be provided!&quot;);
@@ -173,7 +169,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

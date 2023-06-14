@@ -75,8 +75,7 @@
     _handleRoomIdTypeDifference(payload);
     await this.sendData(stringify(payload));
   } else {
-    _context._logger.shout(
-        &#39;method was called before calling setup(), hence aborting further operation.&#39;);
+    _context._logger.shout(&#39;method was called before calling setup(), hence aborting further operation.&#39;);
     throw &quot;method was called before calling setup(), hence aborting further operation.&quot;;
   }
 }</code></pre>
@@ -174,7 +173,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

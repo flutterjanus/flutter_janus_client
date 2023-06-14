@@ -62,7 +62,7 @@
 <li><span class="parameter" id="call-param-headers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">headers</span>, </span></li>
 <li><span class="parameter" id="call-param-srtpProfile"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">srtpProfile</span>, </span></li>
 <li><span class="parameter" id="call-param-autoAcceptReInvites"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">autoAcceptReInvites</span>, </span></li>
-<li><span class="parameter" id="call-param-offer"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
+<li><span class="parameter" id="call-param-offer"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
 </ol>)
 
       
@@ -106,17 +106,13 @@
     &quot;srtp&quot;: srtp,
     &quot;srtp_profile&quot;: srtpProfile,
     &quot;secret&quot;: secret, &#47;&#47;&quot;&lt;password to use to register; optional&gt;&quot;,
-    &quot;ha1_secret&quot;:
-        ha1Secret, &#47;&#47;&quot;&lt;prehashed password to use to register; optional&gt;&quot;,
-    &quot;authuser&quot;:
-        authuser, &#47;&#47;&quot;&lt;username to use to authenticate (overrides the one in the SIP URI); optional&gt;&quot;,
+    &quot;ha1_secret&quot;: ha1Secret, &#47;&#47;&quot;&lt;prehashed password to use to register; optional&gt;&quot;,
+    &quot;authuser&quot;: authuser, &#47;&#47;&quot;&lt;username to use to authenticate (overrides the one in the SIP URI); optional&gt;&quot;,
   }..removeWhere((key, value) =&gt; value == null);
   if (offer == null) {
-    offer = await this.createOffer(
-        videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
   }
-  JanusEvent response =
-      JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
+  JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>
 </section>
@@ -212,7 +208,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

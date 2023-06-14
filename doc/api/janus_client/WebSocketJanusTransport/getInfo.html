@@ -78,9 +78,7 @@ Future&lt;dynamic&gt; getInfo() async {
   payload[&#39;transaction&#39;] = transaction;
   payload[&#39;janus&#39;] = &#39;info&#39;;
   sink!.add(stringify(payload));
-  return parse(await stream.firstWhere(
-      (element) =&gt; (parse(element)[&#39;transaction&#39;] == payload[&#39;transaction&#39;]),
-      orElse: () =&gt; {}));
+  return parse(await stream.firstWhere((element) =&gt; (parse(element)[&#39;transaction&#39;] == payload[&#39;transaction&#39;]), orElse: () =&gt; {}));
 }</code></pre>
 </section>
 
@@ -148,7 +146,7 @@ Future&lt;dynamic&gt; getInfo() async {
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

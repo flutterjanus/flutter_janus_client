@@ -76,9 +76,7 @@
   _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
-  return (response.plugindata?.data[&#39;participants&#39;] as List&lt;dynamic&gt;)
-      .map((e) =&gt; AudioBridgeParticipants.fromJson(e))
-      .toList();
+  return (response.plugindata?.data[&#39;participants&#39;] as List&lt;dynamic&gt;).map((e) =&gt; AudioBridgeParticipants.fromJson(e)).toList();
 }</code></pre>
 </section>
 
@@ -172,7 +170,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

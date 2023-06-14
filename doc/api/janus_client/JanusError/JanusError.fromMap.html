@@ -60,22 +60,18 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">factory JanusError.fromMap(Map&lt;String, dynamic&gt; map) {
-  if (map[&#39;result&#39;] != null &amp;&amp;
-      map[&#39;result&#39;]?.containsKey(&#39;code&#39;) &amp;&amp;
-      map[&#39;result&#39;]?.containsKey(&#39;reason&#39;)) {
+  if (map[&#39;result&#39;] != null &amp;&amp; map[&#39;result&#39;]?.containsKey(&#39;code&#39;) &amp;&amp; map[&#39;result&#39;]?.containsKey(&#39;reason&#39;)) {
     return JanusError(
       event: map[&#39;result&#39;]?[&#39;event&#39;] as String?,
       errorCode: map[&#39;result&#39;]?[&#39;code&#39;] as int,
       error: map[&#39;result&#39;]?[&#39;reason&#39;] as String,
-      pluginName:
-          map.entries.where((element) =&gt; element.value == &#39;event&#39;).first.key,
+      pluginName: map.entries.where((element) =&gt; element.value == &#39;event&#39;).first.key,
     );
   }
   return JanusError(
     errorCode: map[&#39;error_code&#39;] as int,
     error: map[&#39;error&#39;] as String,
-    pluginName:
-        map.entries.where((element) =&gt; element.value == &#39;event&#39;).first.key,
+    pluginName: map.entries.where((element) =&gt; element.value == &#39;event&#39;).first.key,
   );
 }</code></pre>
 </section>
@@ -142,7 +138,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

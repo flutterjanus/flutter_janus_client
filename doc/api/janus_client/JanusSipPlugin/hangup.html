@@ -71,8 +71,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; hangup({
   Map&lt;String, dynamic&gt;? headers,
 }) async {
-  var payload = {&quot;request&quot;: &quot;hangup&quot;, &quot;headers&quot;: headers}
-    ..removeWhere((key, value) =&gt; value == null);
+  var payload = {&quot;request&quot;: &quot;hangup&quot;, &quot;headers&quot;: headers}..removeWhere((key, value) =&gt; value == null);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>
@@ -169,7 +168,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

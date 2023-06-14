@@ -75,11 +75,7 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
       await this.handleRemoteJsep(event.jsep);
       var body = {&quot;request&quot;: &quot;ack&quot;};
       await this.initDataChannel();
-      RTCSessionDescription answer = await this.createAnswer(
-          audioSend: false,
-          videoSend: false,
-          videoRecv: false,
-          audioRecv: false);
+      RTCSessionDescription answer = await this.createAnswer(audioSend: false, videoSend: false, videoRecv: false, audioRecv: false);
       await this.send(
         data: body,
         jsep: answer,
@@ -182,7 +178,7 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

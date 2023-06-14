@@ -72,11 +72,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;RtpForwardStopped&gt; stopRtpForward(dynamic roomId, int streamId) async {
-  var payload = {
-    &quot;request&quot;: &quot;stop_rtp_forward&quot;,
-    &quot;room&quot;: roomId,
-    &quot;stream_id&quot;: streamId
-  };
+  var payload = {&quot;request&quot;: &quot;stop_rtp_forward&quot;, &quot;room&quot;: roomId, &quot;stream_id&quot;: streamId};
   _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
@@ -174,7 +170,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

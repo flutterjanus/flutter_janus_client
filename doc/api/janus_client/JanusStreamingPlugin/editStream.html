@@ -75,13 +75,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;StreamingMountEdited?&gt; editStream(int id,
-    {String? secret,
-    String? description,
-    String? metadata,
-    String? newSecret,
-    bool? newIsPrivate,
-    bool? permanent,
-    String? newPin}) async {
+    {String? secret, String? description, String? metadata, String? newSecret, bool? newIsPrivate, bool? permanent, String? newPin}) async {
   var payload = {
     &quot;request&quot;: &quot;edit&quot;,
     &quot;id&quot;: id,
@@ -192,7 +186,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -80,13 +80,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom(dynamic roomId,
-    {String? secret,
-    String? newDescription,
-    String? newSecret,
-    String? newPin,
-    bool? newIsPrivate,
-    bool? permanent}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom(dynamic roomId, {String? secret, String? newDescription, String? newSecret, String? newPin, bool? newIsPrivate, bool? permanent}) async {
   var payload = {
     &quot;request&quot;: &quot;edit&quot;,
     &quot;room&quot;: roomId,
@@ -194,7 +188,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

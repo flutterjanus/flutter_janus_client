@@ -52,7 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
-<span class="name ">initDataChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initDataChannel-param-rtcDataChannelInit">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCDataChannelInit-class.html">RTCDataChannelInit</a>?</span> <span class="parameter-name">rtcDataChannelInit</span>}</span></li>
+<span class="name ">initDataChannel</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="initDataChannel-param-rtcDataChannelInit">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCDataChannelInit-class.html">RTCDataChannelInit</a>?</span> <span class="parameter-name">rtcDataChannelInit</span>}</span></li>
 </ol>)
 
       
@@ -70,34 +70,27 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; initDataChannel({RTCDataChannelInit? rtcDataChannelInit}) async {
   if (webRTCHandle!.peerConnection != null) {
-    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null)
-      return;
+    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) return;
     if (rtcDataChannelInit == null) {
       rtcDataChannelInit = RTCDataChannelInit();
       rtcDataChannelInit.ordered = true;
       rtcDataChannelInit.protocol = &#39;janus-protocol&#39;;
     }
-    webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] =
-        await webRTCHandle!.peerConnection!.createDataChannel(
-            _context._dataChannelDefaultLabel, rtcDataChannelInit);
-    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] !=
-        null) {
-      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!
-          .onDataChannelState = (state) {
+    webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] = await webRTCHandle!.peerConnection!.createDataChannel(_context._dataChannelDefaultLabel, rtcDataChannelInit);
+    if (webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel] != null) {
+      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onDataChannelState = (state) {
         if (!_onDataStreamController!.isClosed) {
           _onDataStreamController!.sink.add(state);
         }
       };
-      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!
-          .onMessage = (RTCDataChannelMessage message) {
+      webRTCHandle!.dataChannel[_context._dataChannelDefaultLabel]!.onMessage = (RTCDataChannelMessage message) {
         if (!_dataStreamController!.isClosed) {
           _dataStreamController!.sink.add(message);
         }
       };
     }
   } else {
-    throw Exception(
-        &quot;You Must Initialize Peer Connection before even attempting data channel creation!&quot;);
+    throw Exception(&quot;You Must Initialize Peer Connection before even attempting data channel creation!&quot;);
   }
 }</code></pre>
 </section>
@@ -183,7 +176,7 @@ It is mainly used for Janus TextRoom and can be used for other plugins with data
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

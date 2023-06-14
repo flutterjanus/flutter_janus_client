@@ -62,9 +62,7 @@
   <pre class="language-dart"><code class="language-dart">SipRingingEvent.fromJson(Map&lt;String, dynamic&gt; json) {
   this.sip = json[&quot;sip&quot;];
   this.callId = json[&quot;call_id&quot;];
-  this.result = json[&quot;result&quot;] == null
-      ? null
-      : SipRingingEventResult.fromJson(json[&quot;result&quot;]);
+  this.result = json[&quot;result&quot;] == null ? null : SipRingingEventResult.fromJson(json[&quot;result&quot;]);
 }</code></pre>
 </section>
 
@@ -126,7 +124,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

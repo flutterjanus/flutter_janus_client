@@ -75,14 +75,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; muteParticipant(dynamic roomId, int participantId, bool mute,
-    {String? secret}) async {
-  var payload = {
-    &quot;request&quot;: mute ? &#39;mute&#39; : &#39;unmute&#39;,
-    &quot;secret&quot;: secret,
-    &quot;room&quot;: roomId,
-    &quot;id&quot;: participantId
-  }..removeWhere((key, value) =&gt; value == null);
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; muteParticipant(dynamic roomId, int participantId, bool mute, {String? secret}) async {
+  var payload = {&quot;request&quot;: mute ? &#39;mute&#39; : &#39;unmute&#39;, &quot;secret&quot;: secret, &quot;room&quot;: roomId, &quot;id&quot;: participantId}..removeWhere((key, value) =&gt; value == null);
   _handleRoomIdTypeDifference(payload);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
@@ -180,7 +174,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

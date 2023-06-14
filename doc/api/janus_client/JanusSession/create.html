@@ -66,12 +66,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; create() async {
   try {
     String transaction = getUuid().v4();
-    Map&lt;String, dynamic&gt; request = {
-      &quot;janus&quot;: &quot;create&quot;,
-      &quot;transaction&quot;: transaction,
-      ..._context._tokenMap,
-      ..._context._apiMap
-    }..removeWhere((key, value) =&gt; value == null);
+    Map&lt;String, dynamic&gt; request = {&quot;janus&quot;: &quot;create&quot;, &quot;transaction&quot;: transaction, ..._context._tokenMap, ..._context._apiMap}..removeWhere((key, value) =&gt; value == null);
     Map&lt;String, dynamic&gt;? response;
     if (_transport is RestJanusTransport) {
       RestJanusTransport rest = (_transport as RestJanusTransport);
@@ -90,8 +85,7 @@
         ws.connect();
       }
       ws.sink!.add(stringify(request));
-      response = parse(await ws.stream.firstWhere(
-          (element) =&gt; (parse(element)[&#39;transaction&#39;] == transaction)));
+      response = parse(await ws.stream.firstWhere((element) =&gt; (parse(element)[&#39;transaction&#39;] == transaction)));
       if (response!.containsKey(&#39;janus&#39;) &amp;&amp; response.containsKey(&#39;data&#39;)) {
         _sessionId = response[&#39;data&#39;][&#39;id&#39;] as int?;
         ws.sessionId = sessionId;
@@ -99,11 +93,9 @@
     }
     _keepAlive();
   } on WebSocketChannelException catch (e) {
-    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; +
-        e.message!;
+    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; + e.message!;
   } catch (e) {
-    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; +
-        e.toString();
+    throw &quot;Connection to given url can&#39;t be established\n reason:-&quot; + e.toString();
   }
 }</code></pre>
 </section>
@@ -165,7 +157,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -68,13 +68,11 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; initializeWebRTCStack() async {
   if (_webRtcConfiguration == null) {
-    _context._logger.shout(
-        &#39;initializeWebRTCStack:-configuration is null call init before calling me&#39;);
+    _context._logger.shout(&#39;initializeWebRTCStack:-configuration is null call init before calling me&#39;);
     return;
   }
   _context._logger.finest(&#39;webRTC stack intialized&#39;);
-  RTCPeerConnection peerConnection =
-      await createPeerConnection(_webRtcConfiguration!, {});
+  RTCPeerConnection peerConnection = await createPeerConnection(_webRtcConfiguration!, {});
   peerConnection.onRenegotiationNeeded = () {
     _renegotiationNeededController?.sink.add(true);
   };
@@ -167,7 +165,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

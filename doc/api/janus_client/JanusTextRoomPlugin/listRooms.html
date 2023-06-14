@@ -71,9 +71,7 @@
   _context._logger.fine(&#39;list rooms invoked&#39;);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
-  return (response.plugindata?.data?[&#39;list&#39;] as List&lt;dynamic&gt;?)
-      ?.map((e) =&gt; JanusTextRoom.fromJson(e))
-      .toList();
+  return (response.plugindata?.data?[&#39;list&#39;] as List&lt;dynamic&gt;?)?.map((e) =&gt; JanusTextRoom.fromJson(e)).toList();
 }</code></pre>
 </section>
 
@@ -169,7 +167,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

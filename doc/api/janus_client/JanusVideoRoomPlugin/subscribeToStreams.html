@@ -53,7 +53,7 @@
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
 <span class="name ">subscribeToStreams</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="subscribeToStreams-param-streams"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../janus_client/PublisherStream-class.html">PublisherStream</a></span>&gt;</span></span> <span class="parameter-name">streams</span>, </span></li>
-<li><span class="parameter" id="subscribeToStreams-param-offer">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
+<li><span class="parameter" id="subscribeToStreams-param-offer">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
 </ol>)
 
       
@@ -65,15 +65,9 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; subscribeToStreams(List&lt;PublisherStream&gt; streams,
-    {RTCSessionDescription? offer}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; subscribeToStreams(List&lt;PublisherStream&gt; streams, {RTCSessionDescription? offer}) async {
   if (streams.length &gt; 0) {
-    var payload = {
-      &#39;request&#39;: &quot;subscribe&quot;,
-      &#39;streams&#39;: streams
-          .map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
-          .toList()
-    };
+    var payload = {&#39;request&#39;: &quot;subscribe&quot;, &#39;streams&#39;: streams.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null)).toList()};
     await this.send(data: payload, jsep: offer);
   }
 }</code></pre>
@@ -174,7 +168,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -99,12 +99,7 @@ the <a href="../../janus_client/TypedEvent/hashCode.html">hashCode</a> method as
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
-bool operator ==(Object other) =&gt;
-    identical(this, other) ||
-    (other is TypedEvent &amp;&amp;
-        runtimeType == other.runtimeType &amp;&amp;
-        event == other.event &amp;&amp;
-        jsep == other.jsep);</code></pre>
+bool operator ==(Object other) =&gt; identical(this, other) || (other is TypedEvent &amp;&amp; runtimeType == other.runtimeType &amp;&amp; event == other.event &amp;&amp; jsep == other.jsep);</code></pre>
 </section>
 
 
@@ -165,7 +160,7 @@ bool operator ==(Object other) =&gt;
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

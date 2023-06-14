@@ -53,7 +53,7 @@
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a></span>
 <span class="name ">send</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="send-param-data">{<span class="type-annotation">dynamic</span> <span class="parameter-name">data</span>, </span></li>
-<li><span class="parameter" id="send-param-jsep"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">jsep</span>}</span></li>
+<li><span class="parameter" id="send-param-jsep"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">jsep</span>}</span></li>
 </ol>)
 
       
@@ -72,13 +72,7 @@
   try {
     String transaction = getUuid().v4();
     Map&lt;String, dynamic&gt;? response;
-    Map&lt;String, dynamic&gt; request = {
-      &quot;janus&quot;: &quot;message&quot;,
-      &quot;body&quot;: data,
-      &quot;transaction&quot;: transaction,
-      ..._context._apiMap,
-      ..._context._tokenMap
-    };
+    Map&lt;String, dynamic&gt; request = {&quot;janus&quot;: &quot;message&quot;, &quot;body&quot;: data, &quot;transaction&quot;: transaction, ..._context._apiMap, ..._context._tokenMap};
     if (jsep != null) {
       _context._logger.finest(&quot;sending jsep&quot;);
       _context._logger.finest(jsep.toMap());
@@ -86,8 +80,7 @@
     }
     if (_transport is RestJanusTransport) {
       RestJanusTransport rest = (_transport as RestJanusTransport);
-      response = (await rest.post(request, handleId: handleId))
-          as Map&lt;String, dynamic&gt;;
+      response = (await rest.post(request, handleId: handleId)) as Map&lt;String, dynamic&gt;;
     } else if (_transport is WebSocketJanusTransport) {
       WebSocketJanusTransport ws = (_transport as WebSocketJanusTransport);
       if (!ws.isConnected) {
@@ -183,7 +176,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

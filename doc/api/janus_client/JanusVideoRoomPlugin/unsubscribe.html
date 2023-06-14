@@ -65,12 +65,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; unsubscribe({List&lt;UnsubscribeStreams&gt;? streams}) async {
-  var payload = {
-    &quot;request&quot;: &quot;unsubscribe&quot;,
-    &quot;streams&quot;: streams
-        ?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
-        .toList()
-  }..removeWhere((key, value) =&gt; value == null);
+  var payload = {&quot;request&quot;: &quot;unsubscribe&quot;, &quot;streams&quot;: streams?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null)).toList()}
+    ..removeWhere((key, value) =&gt; value == null);
   await this.send(data: payload);
 }</code></pre>
 </section>
@@ -170,7 +166,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

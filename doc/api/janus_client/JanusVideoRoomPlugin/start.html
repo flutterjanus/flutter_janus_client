@@ -53,7 +53,7 @@
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
 <span class="name ">start</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="start-param-roomId"><span class="type-annotation">dynamic</span> <span class="parameter-name">roomId</span>, </span></li>
-<li><span class="parameter" id="start-param-answer">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">answer</span>}</span></li>
+<li><span class="parameter" id="start-param-answer">{<span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">answer</span>}</span></li>
 </ol>)
 
       
@@ -68,8 +68,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; start(dynamic roomId, {RTCSessionDescription? answer}) async {
   var payload = {&quot;request&quot;: &quot;start&quot;, &#39;room&#39;: roomId};
   if (answer == null) {
-    answer = await this.createAnswer(
-        audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+    answer = await this.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
   }
   await this.send(data: payload, jsep: answer);
 }</code></pre>
@@ -170,7 +169,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

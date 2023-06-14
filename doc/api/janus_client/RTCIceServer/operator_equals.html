@@ -100,12 +100,7 @@ the <a href="../../janus_client/RTCIceServer/hashCode.html">hashCode</a> method 
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 bool operator ==(Object other) =&gt;
-    identical(this, other) ||
-    (other is RTCIceServer &amp;&amp;
-        runtimeType == other.runtimeType &amp;&amp;
-        username == other.username &amp;&amp;
-        credential == other.credential &amp;&amp;
-        urls == other.urls);</code></pre>
+    identical(this, other) || (other is RTCIceServer &amp;&amp; runtimeType == other.runtimeType &amp;&amp; username == other.username &amp;&amp; credential == other.credential &amp;&amp; urls == other.urls);</code></pre>
 </section>
 
 
@@ -167,7 +162,7 @@ bool operator ==(Object other) =&gt;
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -69,8 +69,7 @@
   <pre class="language-dart"><code class="language-dart">void connect() {
   try {
     isConnected = true;
-    channel = WebSocketChannel.connect(Uri.parse(url!),
-        protocols: [&#39;janus-protocol&#39;]);
+    channel = WebSocketChannel.connect(Uri.parse(url!), protocols: [&#39;janus-protocol&#39;]);
   } catch (e) {
     print(e.toString());
     print(&#39;something went wrong&#39;);
@@ -146,7 +145,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

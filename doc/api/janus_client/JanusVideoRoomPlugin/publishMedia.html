@@ -61,7 +61,7 @@
 <li><span class="parameter" id="publishMedia-param-audioLevelAverage"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">audioLevelAverage</span>, </span></li>
 <li><span class="parameter" id="publishMedia-param-audioActivePackets"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">audioActivePackets</span>, </span></li>
 <li><span class="parameter" id="publishMedia-param-descriptions"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span>&gt;</span></span>&gt;</span>?</span> <span class="parameter-name">descriptions</span>, </span></li>
-<li><span class="parameter" id="publishMedia-param-offer"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
+<li><span class="parameter" id="publishMedia-param-offer"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
 </ol>)
 
       
@@ -100,8 +100,7 @@
     &quot;descriptions&quot;: descriptions
   }..removeWhere((key, value) =&gt; value == null);
   if (offer == null) {
-    offer = await this.createOffer(
-        audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+    offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
   }
   await this.send(data: payload, jsep: offer);
 }</code></pre>
@@ -202,7 +201,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

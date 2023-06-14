@@ -76,8 +76,7 @@
   }
   if (kIsWeb) {
     if (deviceId == null) {
-      _context._logger.finest(
-          &#39;deviceId not provided,hence switching to default last deviceId should be of back camera ideally&#39;);
+      _context._logger.finest(&#39;deviceId not provided,hence switching to default last deviceId should be of back camera ideally&#39;);
       deviceId = videoDevices.last.deviceId;
     }
     await _disposeMediaStreams(ignoreRemote: true);
@@ -87,8 +86,7 @@
       },
       &#39;audio&#39;: true
     });
-    List&lt;RTCRtpSender&gt; senders =
-        (await webRTCHandle!.peerConnection!.getSenders());
+    List&lt;RTCRtpSender&gt; senders = (await webRTCHandle!.peerConnection!.getSenders());
     webRTCHandle!.localStream?.getTracks().forEach((element) async {
       senders.forEach((sender) async {
         if (sender.track?.kind == element.kind) {
@@ -99,10 +97,8 @@
     return true;
   } else {
     if (webRTCHandle?.localStream != null) {
-      _context._logger.finest(
-          &#39;using helper to switch camera, only works in android and ios&#39;);
-      return Helper.switchCamera(
-          webRTCHandle!.localStream!.getVideoTracks().first);
+      _context._logger.finest(&#39;using helper to switch camera, only works in android and ios&#39;);
+      return Helper.switchCamera(webRTCHandle!.localStream!.getVideoTracks().first);
     }
     return false;
   }
@@ -190,7 +186,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -101,12 +101,7 @@ the <a href="../../janus_client/RemoteTrack/hashCode.html">hashCode</a> method a
   <pre class="language-dart"><code class="language-dart">@override
 bool operator ==(Object other) =&gt;
     identical(this, other) ||
-    (other is RemoteTrack &amp;&amp;
-        runtimeType == other.runtimeType &amp;&amp;
-        stream == other.stream &amp;&amp;
-        track == other.track &amp;&amp;
-        mid == other.mid &amp;&amp;
-        flowing == other.flowing);</code></pre>
+    (other is RemoteTrack &amp;&amp; runtimeType == other.runtimeType &amp;&amp; stream == other.stream &amp;&amp; track == other.track &amp;&amp; mid == other.mid &amp;&amp; flowing == other.flowing);</code></pre>
 </section>
 
 
@@ -169,7 +164,7 @@ bool operator ==(Object other) =&gt;
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

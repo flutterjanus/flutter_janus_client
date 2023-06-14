@@ -70,54 +70,33 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 void onCreate() {
-  if (!_onCreated) {
-    _onCreated = true;
-    messages?.listen((event) {
-      TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(
-          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-      if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;] != null &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;][&#39;event&#39;] ==
-              &#39;registered&#39;) {
-        typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(
-            typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;] != null &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;][&#39;event&#39;] == &#39;calling&#39;) {
-        typedEvent.event.plugindata?.data =
-            VideoCallCallingEvent.fromJson(typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;] != null &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;][&#39;event&#39;] ==
-              &#39;incomingcall&#39;) {
-        typedEvent.event.plugindata?.data =
-            VideoCallIncomingCallEvent.fromJson(
-                typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;] != null &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;][&#39;event&#39;] ==
-              &#39;accepted&#39;) {
-        typedEvent.event.plugindata?.data = VideoCallAcceptedEvent.fromJson(
-            typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;] != null &amp;&amp;
-          typedEvent.event.plugindata?.data[&#39;result&#39;][&#39;event&#39;] == &#39;hangup&#39;) {
-        typedEvent.event.plugindata?.data =
-            VideoCallHangupEvent.fromJson(typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp;
-          (typedEvent.event.plugindata?.data[&#39;error_code&#39;] != null ||
-              typedEvent.event.plugindata?.data?[&#39;result&#39;]?[&#39;code&#39;] !=
-                  null)) {
-        _typedMessagesSink
-            ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-      }
-    });
+  if (_onCreated) {
+    return;
   }
+  _onCreated = true;
+  messages?.listen((event) {
+    TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+    var data = typedEvent.event.plugindata?.data;
+    if (data == null) return;
+    if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; data[&#39;result&#39;] != null &amp;&amp; data[&#39;result&#39;][&#39;event&#39;] == &#39;registered&#39;) {
+      typedEvent.event.plugindata?.data = VideoCallRegisteredEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; data[&#39;result&#39;] != null &amp;&amp; data[&#39;result&#39;][&#39;event&#39;] == &#39;calling&#39;) {
+      typedEvent.event.plugindata?.data = VideoCallCallingEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; data[&#39;result&#39;] != null &amp;&amp; data[&#39;result&#39;][&#39;event&#39;] == &#39;incomingcall&#39;) {
+      typedEvent.event.plugindata?.data = VideoCallIncomingCallEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; data[&#39;result&#39;] != null &amp;&amp; data[&#39;result&#39;][&#39;event&#39;] == &#39;accepted&#39;) {
+      typedEvent.event.plugindata?.data = VideoCallAcceptedEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; data[&#39;result&#39;] != null &amp;&amp; data[&#39;result&#39;][&#39;event&#39;] == &#39;hangup&#39;) {
+      typedEvent.event.plugindata?.data = VideoCallHangupEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;videocall&#39;] == &#39;event&#39; &amp;&amp; (data[&#39;error_code&#39;] != null || data[&#39;result&#39;]?[&#39;code&#39;] != null)) {
+      _typedMessagesSink?.addError(JanusError.fromMap(data));
+    }
+  });
 }</code></pre>
 </section>
 
@@ -206,7 +185,7 @@ void onCreate() {
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

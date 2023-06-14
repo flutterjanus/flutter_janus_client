@@ -60,15 +60,9 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Transports.fromJson(dynamic json) {
-  _janustransporthttp = json[&#39;janus.transport.http&#39;] != null
-      ? JanusTransportHttp.fromJson(json[&#39;janus.transport.http&#39;])
-      : null;
-  _janustransportnanomsg = json[&#39;janus.transport.nanomsg&#39;] != null
-      ? JanusTransportNanomsg.fromJson(json[&#39;janus.transport.nanomsg&#39;])
-      : null;
-  _janustransportwebsockets = json[&#39;janus.transport.websockets&#39;] != null
-      ? JanusTransportWebsockets.fromJson(json[&#39;janus.transport.websockets&#39;])
-      : null;
+  _janustransporthttp = json[&#39;janus.transport.http&#39;] != null ? JanusTransportHttp.fromJson(json[&#39;janus.transport.http&#39;]) : null;
+  _janustransportnanomsg = json[&#39;janus.transport.nanomsg&#39;] != null ? JanusTransportNanomsg.fromJson(json[&#39;janus.transport.nanomsg&#39;]) : null;
+  _janustransportwebsockets = json[&#39;janus.transport.websockets&#39;] != null ? JanusTransportWebsockets.fromJson(json[&#39;janus.transport.websockets&#39;]) : null;
 }</code></pre>
 </section>
 
@@ -131,7 +125,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

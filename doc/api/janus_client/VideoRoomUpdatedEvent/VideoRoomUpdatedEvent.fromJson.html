@@ -60,15 +60,15 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">VideoRoomUpdatedEvent.fromJson(dynamic json) {
-   videoroom = json[&#39;videoroom&#39;];
-   room = json[&#39;room&#39;];
-   if (json[&#39;streams&#39;] != null) {
-     streams = [];
-     json[&#39;streams&#39;].forEach((v) {
-       streams?.add(AttachedStreams.fromJson(v));
-     });
-   }
- }</code></pre>
+  videoroom = json[&#39;videoroom&#39;];
+  room = json[&#39;room&#39;];
+  if (json[&#39;streams&#39;] != null) {
+    streams = [];
+    json[&#39;streams&#39;].forEach((v) {
+      streams?.add(AttachedStreams.fromJson(v));
+    });
+  }
+}</code></pre>
 </section>
 
 
@@ -130,7 +130,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

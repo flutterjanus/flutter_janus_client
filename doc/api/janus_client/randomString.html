@@ -63,10 +63,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">randomString(
-    {int len = 10,
-    String charSet =
-        &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&amp;*()_+&#39;}) {
+  <pre class="language-dart"><code class="language-dart">randomString({int len = 10, String charSet = &#39;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&amp;*()_+&#39;}) {
   var randomString = &#39;&#39;;
   for (var i = 0; i &lt; len; i++) {
     var randomPoz = (Math.Random().nextInt(charSet.length - 1)).floor();
@@ -234,7 +231,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -95,16 +95,11 @@
   _authToken = json[&#39;auth_token&#39;];
   _eventHandlers = json[&#39;event_handlers&#39;];
   _opaqueidInApi = json[&#39;opaqueid_in_api&#39;];
-  _dependencies = json[&#39;dependencies&#39;] != null
-      ? Dependencies.fromJson(json[&#39;dependencies&#39;])
-      : null;
-  _transports = json[&#39;transports&#39;] != null
-      ? Transports.fromJson(json[&#39;transports&#39;])
-      : null;
+  _dependencies = json[&#39;dependencies&#39;] != null ? Dependencies.fromJson(json[&#39;dependencies&#39;]) : null;
+  _transports = json[&#39;transports&#39;] != null ? Transports.fromJson(json[&#39;transports&#39;]) : null;
   _events = json[&#39;events&#39;];
   _loggers = json[&#39;loggers&#39;];
-  _plugins =
-      json[&#39;plugins&#39;] != null ? Plugins.fromJson(json[&#39;plugins&#39;]) : null;
+  _plugins = json[&#39;plugins&#39;] != null ? Plugins.fromJson(json[&#39;plugins&#39;]) : null;
 }</code></pre>
 </section>
 
@@ -204,7 +199,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

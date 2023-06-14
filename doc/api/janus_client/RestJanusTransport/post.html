@@ -73,9 +73,7 @@
     suffixUrl = suffixUrl + &quot;&#47;$sessionId&#47;$handleId&quot;;
   }
   try {
-    var response =
-        (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body)))
-            .body;
+    var response = (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body))).body;
     return parse(response);
   } on JsonCyclicError {
     return null;
@@ -146,7 +144,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

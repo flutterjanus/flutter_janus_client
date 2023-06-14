@@ -82,14 +82,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom(
-    {String? roomId,
-    String? description,
-    String? secret,
-    String? newSecret,
-    String? pin,
-    bool? isPrivate,
-    bool? permanent}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; editRoom({String? roomId, String? description, String? secret, String? newSecret, String? pin, bool? isPrivate, bool? permanent}) async {
   var payload = {
     &quot;textroom&quot;: &quot;create&quot;,
     &quot;room&quot;: roomId,
@@ -200,7 +193,7 @@ Notice that, in general, all users can create rooms. If you want to limit this f
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -63,10 +63,7 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;String&gt; getCameraDeviceId(front) async {
-  List&lt;MediaDeviceInfo&gt; videoDevices =
-      (await navigator.mediaDevices.enumerateDevices())
-          .where((element) =&gt; element.kind == &#39;videoinput&#39;)
-          .toList();
+  List&lt;MediaDeviceInfo&gt; videoDevices = (await navigator.mediaDevices.enumerateDevices()).where((element) =&gt; element.kind == &#39;videoinput&#39;).toList();
   if (videoDevices.isEmpty) {
     throw Exception(&quot;No camera found&quot;);
   }
@@ -235,7 +232,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

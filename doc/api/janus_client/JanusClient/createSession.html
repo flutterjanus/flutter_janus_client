@@ -66,10 +66,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;JanusSession&gt; createSession() async {
   _logger.info(&quot;Creating Session&quot;);
   _logger.fine(&quot;fine message&quot;);
-  JanusSession session = JanusSession(
-      refreshInterval: _refreshInterval,
-      transport: _transport,
-      context: this);
+  JanusSession session = JanusSession(refreshInterval: _refreshInterval, transport: _transport, context: this);
   try {
     await session.create();
   } catch (e) {
@@ -135,7 +132,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

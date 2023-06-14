@@ -88,9 +88,7 @@
     &quot;token&quot;: token,
     &quot;feed&quot;: feedId,
     &quot;private_id&quot;: privateId,
-    &quot;streams&quot;: streams
-        ?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
-        .toList(),
+    &quot;streams&quot;: streams?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null)).toList(),
   }..removeWhere((key, value) =&gt; value == null);
   _handleRoomIdTypeDifference(payload);
   await this.send(data: payload);
@@ -192,7 +190,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

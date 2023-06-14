@@ -51,7 +51,7 @@
     <section class="multi-line-signature">
       
 
-<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a></span>&gt;</span></span>
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a></span>&gt;</span></span>
 <span class="name ">createOffer</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="createOffer-param-audioRecv">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">audioRecv</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="createOffer-param-videoRecv"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">videoRecv</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="createOffer-param-audioSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">audioSend</span> = <span class="default-value">true</span>, </span></li>
@@ -71,25 +71,13 @@ It supports both style of offer creation that is plan-b and unified.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;RTCSessionDescription&gt; createOffer(
-    {bool audioRecv: true,
-    bool videoRecv: true,
-    bool audioSend: true,
-    bool videoSend: true}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;RTCSessionDescription&gt; createOffer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
   dynamic offerOptions;
   if (_context._isUnifiedPlan &amp;&amp; !_context._usePlanB) {
-    await _prepareTranscievers(
-        audioRecv: audioRecv,
-        audioSend: audioSend,
-        videoRecv: videoRecv,
-        videoSend: videoSend);
-    offerOptions = {
-      &quot;offerToReceiveAudio&quot;: audioRecv,
-      &quot;offerToReceiveVideo&quot;: videoRecv
-    };
+    await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
+    offerOptions = {&quot;offerToReceiveAudio&quot;: audioRecv, &quot;offerToReceiveVideo&quot;: videoRecv};
   }
-  RTCSessionDescription offer =
-      await webRTCHandle!.peerConnection!.createOffer(offerOptions ?? {});
+  RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions ?? {});
   await webRTCHandle!.peerConnection!.setLocalDescription(offer);
   return offer;
 }</code></pre>
@@ -176,7 +164,7 @@ It supports both style of offer creation that is plan-b and unified.</p>
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

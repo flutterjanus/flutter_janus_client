@@ -71,60 +71,41 @@
   <pre class="language-dart"><code class="language-dart">@override
 void onCreate() {
   super.onCreate();
-  if (!_onCreated) {
-    _onCreated = true;
-    messages?.listen((event) {
-      TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(
-          event: JanusEvent.fromJson(event.event), jsep: event.jsep);
-      if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] == &quot;joined&quot;) {
-        typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(
-            typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-              &quot;event&quot; &amp;&amp;
-          typedEvent.event.plugindata?.data[&quot;participants&quot;] != null) {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeNewParticipantsEvent.fromJson(
-                typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-              &quot;event&quot; &amp;&amp;
-          typedEvent.event.plugindata?.data[&quot;result&quot;] == &quot;ok&quot;) {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeConfiguredEvent.fromJson(
-                typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-              &quot;event&quot; &amp;&amp;
-          typedEvent.event.plugindata?.data[&quot;leaving&quot;] != null) {
-        typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(
-            typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-              &quot;talking&quot; ||
-          typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-              &quot;stopped-talking&quot;) {
-        typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(
-            typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      } else if (typedEvent.event.plugindata?.data[&quot;audiobridge&quot;] ==
-          &quot;destroyed&quot;) {
-        typedEvent.event.plugindata?.data =
-            AudioBridgeDestroyedEvent.fromJson(
-                typedEvent.event.plugindata?.data);
-        _typedMessagesSink?.add(typedEvent);
-      }
-
-      &#47;&#47;&#47; not tested
-      else if (typedEvent.event.plugindata?.data[&#39;audiobridge&#39;] == &#39;event&#39; &amp;&amp;
-          (typedEvent.event.plugindata?.data[&#39;error_code&#39;] != null ||
-              typedEvent.event.plugindata?.data?[&#39;result&#39;]?[&#39;code&#39;] !=
-                  null)) {
-        _typedMessagesSink
-            ?.addError(JanusError.fromMap(typedEvent.event.plugindata?.data));
-      }
-    });
+  if (_onCreated) {
+    return;
   }
+  _onCreated = true;
+
+  messages?.listen((event) {
+    TypedEvent&lt;JanusEvent&gt; typedEvent = TypedEvent&lt;JanusEvent&gt;(event: JanusEvent.fromJson(event.event), jsep: event.jsep);
+    var data = typedEvent.event.plugindata?.data;
+    if (data == null) return;
+    if (data[&quot;audiobridge&quot;] == &quot;joined&quot;) {
+      typedEvent.event.plugindata?.data = AudioBridgeJoinedEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&quot;audiobridge&quot;] == &quot;event&quot;) {
+      if (data[&quot;participants&quot;] != null) {
+        typedEvent.event.plugindata?.data = AudioBridgeNewParticipantsEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data[&quot;result&quot;] == &quot;ok&quot;) {
+        typedEvent.event.plugindata?.data = AudioBridgeConfiguredEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data[&quot;leaving&quot;] != null) {
+        typedEvent.event.plugindata?.data = AudioBridgeLeavingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data[&#39;error_code&#39;] != null || data[&#39;result&#39;]?[&#39;code&#39;] != null) {
+        _typedMessagesSink?.addError(JanusError.fromMap(data));
+      }
+    } else if (data[&quot;audiobridge&quot;] == &quot;talking&quot; || data[&quot;audiobridge&quot;] == &quot;stopped-talking&quot;) {
+      typedEvent.event.plugindata?.data = AudioBridgeTalkingEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&quot;audiobridge&quot;] == &quot;destroyed&quot;) {
+      typedEvent.event.plugindata?.data = AudioBridgeDestroyedEvent.fromJson(data);
+      _typedMessagesSink?.add(typedEvent);
+    } else if (data[&#39;audiobridge&#39;] == &#39;event&#39; &amp;&amp; (data[&#39;error_code&#39;] != null || data[&#39;result&#39;]?[&#39;code&#39;] != null)) {
+      _typedMessagesSink?.addError(JanusError.fromMap(data));
+    }
+  });
 }</code></pre>
 </section>
 
@@ -218,7 +199,7 @@ void onCreate() {
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

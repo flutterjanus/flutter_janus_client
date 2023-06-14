@@ -100,11 +100,7 @@ the <a href="../../janus_client/AudioBridgeEvent/hashCode.html">hashCode</a> met
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">@override
 bool operator ==(Object other) =&gt;
-    identical(this, other) ||
-    (other is AudioBridgeEvent &amp;&amp;
-        runtimeType == other.runtimeType &amp;&amp;
-        audiobridge == other.audiobridge &amp;&amp;
-        room == other.room);</code></pre>
+    identical(this, other) || (other is AudioBridgeEvent &amp;&amp; runtimeType == other.runtimeType &amp;&amp; audiobridge == other.audiobridge &amp;&amp; room == other.room);</code></pre>
 </section>
 
 
@@ -165,7 +161,7 @@ bool operator ==(Object other) =&gt;
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

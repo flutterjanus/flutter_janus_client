@@ -75,20 +75,8 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; createRoom(dynamic roomId,
-    {bool permanent = false,
-    String? pin,
-    Map&lt;String, dynamic&gt;? extras,
-    List&lt;String&gt;? allowed,
-    String? isPrivate,
-    String description = &#39;&#39;,
-    String? secret}) async {
-  var payload = {
-    &quot;request&quot;: &quot;create&quot;,
-    &quot;room&quot;: roomId,
-    &quot;permanent&quot;: permanent,
-    &quot;description&quot;: description,
-    ...?extras
-  };
+    {bool permanent = false, String? pin, Map&lt;String, dynamic&gt;? extras, List&lt;String&gt;? allowed, String? isPrivate, String description = &#39;&#39;, String? secret}) async {
+  var payload = {&quot;request&quot;: &quot;create&quot;, &quot;room&quot;: roomId, &quot;permanent&quot;: permanent, &quot;description&quot;: description, ...?extras};
   if (allowed != null) payload[&quot;allowed&quot;] = allowed;
   if (isPrivate != null) payload[&quot;is_private&quot;] = isPrivate;
   if (secret != null) payload[&#39;secret&#39;] = secret;
@@ -193,7 +181,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

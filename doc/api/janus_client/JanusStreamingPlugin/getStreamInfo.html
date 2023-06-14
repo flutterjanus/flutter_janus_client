@@ -68,13 +68,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;StreamingMountPointInfo?&gt; getStreamInfo(int id,
-    {String? secret}) async {
-  var payload = {
-    &quot;request&quot;: &quot;info&quot;,
-    &quot;id&quot;: id,
-    if (secret != null) &quot;secret&quot;: secret
-  };
+  <pre class="language-dart"><code class="language-dart">Future&lt;StreamingMountPointInfo?&gt; getStreamInfo(int id, {String? secret}) async {
+  var payload = {&quot;request&quot;: &quot;info&quot;, &quot;id&quot;: id, if (secret != null) &quot;secret&quot;: secret};
   var response = await this.send(data: payload);
   if (response[&#39;info&#39;] != null) {
     return StreamingMountPointInfo.fromJson(response[&#39;info&#39;]);
@@ -174,7 +169,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

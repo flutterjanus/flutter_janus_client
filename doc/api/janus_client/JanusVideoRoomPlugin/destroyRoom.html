@@ -69,14 +69,8 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; destroyRoom(dynamic roomId,
-    {String? secret, bool? permanent}) async {
-  var payload = {
-    &quot;request&quot;: &quot;destroy&quot;,
-    &quot;room&quot;: roomId,
-    if (secret != null) &quot;secret&quot;: secret,
-    if (permanent != null) &quot;permanent&quot;: permanent
-  };
+  <pre class="language-dart"><code class="language-dart">Future&lt;dynamic&gt; destroyRoom(dynamic roomId, {String? secret, bool? permanent}) async {
+  var payload = {&quot;request&quot;: &quot;destroy&quot;, &quot;room&quot;: roomId, if (secret != null) &quot;secret&quot;: secret, if (permanent != null) &quot;permanent&quot;: permanent};
   _handleRoomIdTypeDifference(payload);
   return (await this.send(data: payload));
 }</code></pre>
@@ -177,7 +171,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

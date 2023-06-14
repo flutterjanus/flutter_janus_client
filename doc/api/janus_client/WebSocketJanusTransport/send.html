@@ -75,9 +75,7 @@
       data[&#39;handle_id&#39;] = handleId;
     }
     sink!.add(stringify(data));
-    return parse(await stream.firstWhere(
-        (element) =&gt; (parse(element)[&#39;transaction&#39;] == data[&#39;transaction&#39;]),
-        orElse: () =&gt; {}));
+    return parse(await stream.firstWhere((element) =&gt; (parse(element)[&#39;transaction&#39;] == data[&#39;transaction&#39;]), orElse: () =&gt; {}));
   } else {
     throw &quot;transaction key missing in body&quot;;
   }
@@ -148,7 +146,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

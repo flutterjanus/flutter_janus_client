@@ -65,9 +65,7 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; update(
-    {List&lt;SubscriberUpdateStream&gt;? subscribe,
-    List&lt;SubscriberUpdateStream&gt;? unsubscribe}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; update({List&lt;SubscriberUpdateStream&gt;? subscribe, List&lt;SubscriberUpdateStream&gt;? unsubscribe}) async {
   if (subscribe?.isEmpty == true &amp;&amp; unsubscribe?.isEmpty == true) {
     return;
   }
@@ -75,14 +73,10 @@
     &#39;request&#39;: &quot;update&quot;,
   };
   if (subscribe?.isNotEmpty == true) {
-    payload[&#39;subscribe&#39;] = subscribe
-        ?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
-        .toList();
+    payload[&#39;subscribe&#39;] = subscribe?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null)).toList();
   }
   if (unsubscribe?.isNotEmpty == true) {
-    payload[&#39;unsubscribe&#39;] = unsubscribe
-        ?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null))
-        .toList();
+    payload[&#39;unsubscribe&#39;] = unsubscribe?.map((e) =&gt; e.toMap()..removeWhere((key, value) =&gt; value == null)).toList();
   }
   await this.send(data: payload);
 }</code></pre>
@@ -183,7 +177,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

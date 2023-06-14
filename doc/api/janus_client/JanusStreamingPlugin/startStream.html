@@ -67,12 +67,10 @@
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; startStream() async {
-  if (webRTCHandle?.peerConnection?.iceConnectionState ==
-      RTCIceConnectionState.RTCIceConnectionStateConnected) {
+  if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
     await send(data: {&quot;request&quot;: &quot;start&quot;});
   } else {
-    RTCSessionDescription answer = await createAnswer(
-        videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
+    RTCSessionDescription answer = await createAnswer(videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
     await send(data: {&quot;request&quot;: &quot;start&quot;}, jsep: answer);
   }
 }</code></pre>
@@ -169,7 +167,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

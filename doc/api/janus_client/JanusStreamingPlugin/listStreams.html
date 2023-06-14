@@ -69,13 +69,8 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;List&lt;StreamingMountPoint&gt;&gt; listStreams() async {
   var payload = {&quot;request&quot;: &quot;list&quot;};
   var response = await this.send(data: payload);
-  if (response[&#39;janus&#39;] == &#39;success&#39; &amp;&amp;
-      response[&#39;plugindata&#39;] != null &amp;&amp;
-      response[&#39;plugindata&#39;][&#39;data&#39;] != null &amp;&amp;
-      response[&#39;plugindata&#39;][&#39;data&#39;][&#39;list&#39;] != null) {
-    return (response[&#39;plugindata&#39;][&#39;data&#39;][&#39;list&#39;] as List&lt;dynamic&gt;)
-        .map((e) =&gt; StreamingMountPoint.fromJson(e))
-        .toList();
+  if (response[&#39;janus&#39;] == &#39;success&#39; &amp;&amp; response[&#39;plugindata&#39;] != null &amp;&amp; response[&#39;plugindata&#39;][&#39;data&#39;] != null &amp;&amp; response[&#39;plugindata&#39;][&#39;data&#39;][&#39;list&#39;] != null) {
+    return (response[&#39;plugindata&#39;][&#39;data&#39;][&#39;list&#39;] as List&lt;dynamic&gt;).map((e) =&gt; StreamingMountPoint.fromJson(e)).toList();
   }
   return [];
 }</code></pre>
@@ -172,7 +167,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

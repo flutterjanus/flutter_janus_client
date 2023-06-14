@@ -67,13 +67,11 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;VideoRoomListParticipantsResponse?&gt; getRoomParticipants(
-    dynamic roomId) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;VideoRoomListParticipantsResponse?&gt; getRoomParticipants(dynamic roomId) async {
   var payload = {&quot;request&quot;: &quot;listparticipants&quot;, &quot;room&quot;: roomId};
   Map data = await this.send(data: payload);
   _handleRoomIdTypeDifference(payload);
-  return _getPluginDataFromPayload&lt;VideoRoomListParticipantsResponse&gt;(
-      data, VideoRoomListParticipantsResponse.fromJson);
+  return _getPluginDataFromPayload&lt;VideoRoomListParticipantsResponse&gt;(data, VideoRoomListParticipantsResponse.fromJson);
 }</code></pre>
 </section>
 
@@ -172,7 +170,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -74,8 +74,7 @@
   String uri, {
   String? replace,
 }) async {
-  var payload = {&quot;request&quot;: &quot;transfer&quot;, &quot;uri&quot;: uri, &quot;replace&quot;: replace}
-    ..removeWhere((key, value) =&gt; value == null);
+  var payload = {&quot;request&quot;: &quot;transfer&quot;, &quot;uri&quot;: uri, &quot;replace&quot;: replace}..removeWhere((key, value) =&gt; value == null);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>
@@ -172,7 +171,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

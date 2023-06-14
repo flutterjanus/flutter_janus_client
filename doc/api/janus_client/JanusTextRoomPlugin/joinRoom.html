@@ -79,25 +79,15 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinRoom(int roomId, String username,
-    {String? pin, String? display, String? token, bool? history}) async {
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; joinRoom(int roomId, String username, {String? pin, String? display, String? token, bool? history}) async {
   if (setupDone) {
     _context._logger.info(&#39;data channel is open, now trying to join&#39;);
-    var register = {
-      &#39;textroom&#39;: &quot;join&quot;,
-      &#39;transaction&#39;: randomString(),
-      &#39;room&#39;: roomId,
-      &#39;username&#39;: username,
-      &#39;display&#39;: display,
-      &quot;pin&quot;: pin,
-      &quot;token&quot;: token,
-      &quot;history&quot;: history
-    }..removeWhere((key, value) =&gt; value == null);
+    var register = {&#39;textroom&#39;: &quot;join&quot;, &#39;transaction&#39;: randomString(), &#39;room&#39;: roomId, &#39;username&#39;: username, &#39;display&#39;: display, &quot;pin&quot;: pin, &quot;token&quot;: token, &quot;history&quot;: history}
+      ..removeWhere((key, value) =&gt; value == null);
     _handleRoomIdTypeDifference(register);
     await this.sendData(stringify(register));
   } else {
-    _context._logger.shout(
-        &#39;method was called before calling setup(), hence aborting further operation.&#39;);
+    _context._logger.shout(&#39;method was called before calling setup(), hence aborting further operation.&#39;);
     throw &quot;method was called before calling setup(), hence aborting further operation.&quot;;
   }
 }</code></pre>
@@ -195,7 +185,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

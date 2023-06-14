@@ -55,7 +55,7 @@
 <span class="name ">accept</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="accept-param-srtp">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">srtp</span>, </span></li>
 <li><span class="parameter" id="accept-param-headers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Map-class.html">Map</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span>, <span class="type-parameter">dynamic</span>&gt;</span>?</span> <span class="parameter-name">headers</span>, </span></li>
 <li><span class="parameter" id="accept-param-autoAcceptReInvites"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">autoAcceptReInvites</span>, </span></li>
-<li><span class="parameter" id="accept-param-sessionDescription"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.10/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">sessionDescription</span>}</span></li>
+<li><span class="parameter" id="accept-param-sessionDescription"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">sessionDescription</span>}</span></li>
 </ol>)
 
       
@@ -74,29 +74,15 @@
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; accept(
-    {String? srtp,
-    Map&lt;String, dynamic&gt;? headers,
-    bool? autoAcceptReInvites,
-    RTCSessionDescription? sessionDescription}) async {
-  var payload = {
-    &quot;request&quot;: &quot;accept&quot;,
-    &quot;headers&quot;: headers,
-    &quot;srtp&quot;: srtp,
-    &quot;autoaccept_reinvites&quot;: autoAcceptReInvites
-  }..removeWhere((key, value) =&gt; value == null);
-  RTCSignalingState? signalingState =
-      this.webRTCHandle?.peerConnection?.signalingState;
-  if (sessionDescription == null &amp;&amp;
-      signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
-    sessionDescription = await this.createAnswer(
-        videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; accept({String? srtp, Map&lt;String, dynamic&gt;? headers, bool? autoAcceptReInvites, RTCSessionDescription? sessionDescription}) async {
+  var payload = {&quot;request&quot;: &quot;accept&quot;, &quot;headers&quot;: headers, &quot;srtp&quot;: srtp, &quot;autoaccept_reinvites&quot;: autoAcceptReInvites}..removeWhere((key, value) =&gt; value == null);
+  RTCSignalingState? signalingState = this.webRTCHandle?.peerConnection?.signalingState;
+  if (sessionDescription == null &amp;&amp; signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
+    sessionDescription = await this.createAnswer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
   } else if (sessionDescription == null) {
-    sessionDescription = await this.createOffer(
-        videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    sessionDescription = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
   }
-  JanusEvent response = JanusEvent.fromJson(
-      await this.send(data: payload, jsep: sessionDescription));
+  JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: sessionDescription));
   JanusError.throwErrorFromEvent(response);
 }</code></pre>
 </section>
@@ -192,7 +178,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

@@ -115,40 +115,24 @@
     &quot;request&quot;: &quot;register&quot;,
     &quot;type&quot;: type,
     &quot;send_register&quot;: sendRegister,
-    &quot;force_udp&quot;:
-        forceUdp, &#47;&#47;&lt;true|false; if true, forces UDP for the SIP messaging; optional&gt;,
-    &quot;force_tcp&quot;:
-        forceTcp, &#47;&#47;&lt;true|false; if true, forces TCP for the SIP messaging; optional&gt;,
-    &quot;sips&quot;:
-        sips, &#47;&#47;&lt;true|false; if true, configures a SIPS URI too when registering; optional&gt;,
-    &quot;rfc2543_cancel&quot;:
-        rfc2543Cancel, &#47;&#47;&lt;true|false; if true, configures sip client to CANCEL pending INVITEs without having received a provisional response first; optional&gt;,
+    &quot;force_udp&quot;: forceUdp, &#47;&#47;&lt;true|false; if true, forces UDP for the SIP messaging; optional&gt;,
+    &quot;force_tcp&quot;: forceTcp, &#47;&#47;&lt;true|false; if true, forces TCP for the SIP messaging; optional&gt;,
+    &quot;sips&quot;: sips, &#47;&#47;&lt;true|false; if true, configures a SIPS URI too when registering; optional&gt;,
+    &quot;rfc2543_cancel&quot;: rfc2543Cancel, &#47;&#47;&lt;true|false; if true, configures sip client to CANCEL pending INVITEs without having received a provisional response first; optional&gt;,
     &quot;username&quot;: username,
     &quot;secret&quot;: secret, &#47;&#47;&quot;&lt;password to use to register; optional&gt;&quot;,
-    &quot;ha1_secret&quot;:
-        ha1Secret, &#47;&#47;&quot;&lt;prehashed password to use to register; optional&gt;&quot;,
-    &quot;authuser&quot;:
-        authuser, &#47;&#47;&quot;&lt;username to use to authenticate (overrides the one in the SIP URI); optional&gt;&quot;,
-    &quot;display_name&quot;:
-        displayName, &#47;&#47;&quot;&lt;display name to use when sending SIP REGISTER; optional&gt;&quot;,
-    &quot;user_agent&quot;:
-        userAgent, &#47;&#47;&quot;&lt;user agent to use when sending SIP REGISTER; optional&gt;&quot;,
-    &quot;proxy&quot;:
-        proxy, &#47;&#47;&quot;&lt;server to register at; optional, as won&#39;t be needed in case the REGISTER is not goint to be sent (e.g., guests)&gt;&quot;,
-    &quot;outbound_proxy&quot;:
-        outboundProxy, &#47;&#47;&quot;&lt;outbound proxy to use, if any; optional&gt;&quot;,
-    &quot;headers&quot;:
-        headers, &#47;&#47;&quot;&lt;object with key&#47;value mappings (header name&#47;value), to specify custom headers to add to the SIP REGISTER; optional&gt;&quot;,
-    &quot;contact_params&quot;:
-        contactParams, &#47;&#47;&quot;&lt;array of key&#47;value objects, to specify custom Contact URI params to add to the SIP REGISTER; optional&gt;&quot;,
-    &quot;incoming_header_prefixes&quot;:
-        incomingHeaderPrefixes, &#47;&#47;&quot;&lt;array of strings, to specify custom (non-standard) headers to read on incoming SIP events; optional&gt;&quot;,
-    &quot;refresh&quot;:
-        refresh, &#47;&#47;&quot;&lt;true|false; if true, only uses the SIP REGISTER as an update and not a new registration; optional&gt;&quot;,
-    &quot;master_id&quot;:
-        masterId, &#47;&#47;&quot;&lt;ID of an already registered account, if this is an helper for multiple calls (more on that later); optional&gt;&quot;,
-    &quot;register_ttl&quot;:
-        registerTtl, &#47;&#47;&quot;&lt;integer; number of seconds after which the registration should expire; optional&gt;&quot;
+    &quot;ha1_secret&quot;: ha1Secret, &#47;&#47;&quot;&lt;prehashed password to use to register; optional&gt;&quot;,
+    &quot;authuser&quot;: authuser, &#47;&#47;&quot;&lt;username to use to authenticate (overrides the one in the SIP URI); optional&gt;&quot;,
+    &quot;display_name&quot;: displayName, &#47;&#47;&quot;&lt;display name to use when sending SIP REGISTER; optional&gt;&quot;,
+    &quot;user_agent&quot;: userAgent, &#47;&#47;&quot;&lt;user agent to use when sending SIP REGISTER; optional&gt;&quot;,
+    &quot;proxy&quot;: proxy, &#47;&#47;&quot;&lt;server to register at; optional, as won&#39;t be needed in case the REGISTER is not goint to be sent (e.g., guests)&gt;&quot;,
+    &quot;outbound_proxy&quot;: outboundProxy, &#47;&#47;&quot;&lt;outbound proxy to use, if any; optional&gt;&quot;,
+    &quot;headers&quot;: headers, &#47;&#47;&quot;&lt;object with key&#47;value mappings (header name&#47;value), to specify custom headers to add to the SIP REGISTER; optional&gt;&quot;,
+    &quot;contact_params&quot;: contactParams, &#47;&#47;&quot;&lt;array of key&#47;value objects, to specify custom Contact URI params to add to the SIP REGISTER; optional&gt;&quot;,
+    &quot;incoming_header_prefixes&quot;: incomingHeaderPrefixes, &#47;&#47;&quot;&lt;array of strings, to specify custom (non-standard) headers to read on incoming SIP events; optional&gt;&quot;,
+    &quot;refresh&quot;: refresh, &#47;&#47;&quot;&lt;true|false; if true, only uses the SIP REGISTER as an update and not a new registration; optional&gt;&quot;,
+    &quot;master_id&quot;: masterId, &#47;&#47;&quot;&lt;ID of an already registered account, if this is an helper for multiple calls (more on that later); optional&gt;&quot;,
+    &quot;register_ttl&quot;: registerTtl, &#47;&#47;&quot;&lt;integer; number of seconds after which the registration should expire; optional&gt;&quot;
   }..removeWhere((key, value) =&gt; value == null);
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload));
   JanusError.throwErrorFromEvent(response);
@@ -246,7 +230,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

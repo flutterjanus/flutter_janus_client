@@ -56,11 +56,12 @@
 <li><span class="parameter" id="-param-isUnifiedPlan"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isUnifiedPlan</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
 <li><span class="parameter" id="-param-stringIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">stringIds</span> = <span class="default-value">false</span>, </span></li>
+<li><span class="parameter" id="-param-logger"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.1.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span></li>
 <li><span class="parameter" id="-param-usePlanB"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">usePlanB</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-pollingInterval"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">pollingInterval</span>, </span></li>
-<li><span class="parameter" id="-param-loggerName"><span class="type-annotation">dynamic</span> <span class="parameter-name">loggerName</span> = <span class="default-value">&quot;JanusClient&quot;</span>, </span></li>
-<li><span class="parameter" id="-param-maxEvent"><span class="type-annotation">dynamic</span> <span class="parameter-name">maxEvent</span> = <span class="default-value">10</span>, </span></li>
+<li><span class="parameter" id="-param-loggerName"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">loggerName</span> = <span class="default-value">&quot;JanusClient&quot;</span>, </span></li>
 <li><span class="parameter" id="-param-loggerLevel"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.1.0/logging/Level-class.html">Level</a></span> <span class="parameter-name">loggerLevel</span> = <span class="default-value">Level.ALL</span>, </span></li>
+<li><span class="parameter" id="-param-maxEvent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxEvent</span> = <span class="default-value">10</span>, </span></li>
 <li><span class="parameter" id="-param-withCredentials"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withCredentials</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
     </section>
@@ -86,13 +87,15 @@ By default roomId should be numeric in nature although if you have configured <c
     String? token,
     bool? stringIds = false,
 
+    &#47;&#47;&#47; if you provide your own logger you will be responsible for managing all logging aspects and properties like log level and printing logs
+    Logger? logger,
+
     &#47;&#47;&#47; forces creation of peer connection with plan-b sdb semantics
-    @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;)
-        bool usePlanB = false,
+    @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;) bool usePlanB = false,
     Duration? pollingInterval,
-    loggerName = &quot;JanusClient&quot;,
-    maxEvent = 10,
+    String loggerName = &quot;JanusClient&quot;,
     Level loggerLevel = Level.ALL,
+    int maxEvent = 10,
     bool withCredentials = false}) {
   _stringIds = stringIds;
   _transport = transport;
@@ -100,7 +103,6 @@ By default roomId should be numeric in nature although if you have configured <c
   _iceServers = iceServers;
   _refreshInterval = refreshInterval;
   _apiSecret = apiSecret;
-  _loggerName = loggerName;
   _maxEvent = maxEvent;
   _loggerLevel = loggerLevel;
   _withCredentials = withCredentials;
@@ -108,12 +110,17 @@ By default roomId should be numeric in nature although if you have configured <c
   _token = token;
   _pollingInterval = pollingInterval ?? Duration(seconds: 1);
   _usePlanB = usePlanB;
-  _logger = Logger.detached(_loggerName);
-  _logger.level = _loggerLevel;
-  _logger.onRecord.listen((event) {
-    print(event);
-  });
   this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
+  if (logger == null) {
+    _logger = Logger.detached(loggerName);
+    _loggerName = loggerName;
+    _logger.level = _loggerLevel;
+    _logger.onRecord.listen((event) {
+      print(event);
+    });
+  } else {
+    _logger = logger;
+  }
 }</code></pre>
 </section>
 
@@ -172,7 +179,7 @@ By default roomId should be numeric in nature although if you have configured <c
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

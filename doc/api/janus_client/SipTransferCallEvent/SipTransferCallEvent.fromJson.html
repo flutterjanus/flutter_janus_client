@@ -61,9 +61,7 @@
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">SipTransferCallEvent.fromJson(Map&lt;String, dynamic&gt; json) {
   this.sip = json[&quot;sip&quot;];
-  this.result = json[&quot;result&quot;] == null
-      ? null
-      : SipTransferCallEventResult.fromJson(json[&quot;result&quot;]);
+  this.result = json[&quot;result&quot;] == null ? null : SipTransferCallEventResult.fromJson(json[&quot;result&quot;]);
 }</code></pre>
 </section>
 
@@ -124,7 +122,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.9
+      2.2.14
   </span>
 
   

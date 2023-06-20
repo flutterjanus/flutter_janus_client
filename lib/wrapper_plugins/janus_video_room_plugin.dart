@@ -125,7 +125,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   Future<void> start(dynamic roomId, {RTCSessionDescription? answer}) async {
     var payload = {"request": "start", 'room': roomId};
     if (answer == null) {
-      answer = await this.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+      answer = await this.createAnswer();
     }
     await this.send(data: payload, jsep: answer);
   }
@@ -178,7 +178,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "descriptions": descriptions
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      offer = await this.createOffer(audioRecv: false, videoRecv: false);
     }
     await this.send(data: payload, jsep: offer);
   }

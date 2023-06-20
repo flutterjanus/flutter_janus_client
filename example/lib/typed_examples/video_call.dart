@@ -45,7 +45,10 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   makeCall() async {
     await localMediaSetup();
     await publishVideo.initDataChannel();
-    var offer = await publishVideo.createOffer(audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
+    var offer = await publishVideo.createOffer(
+      audioRecv: true,
+      videoRecv: true,
+    );
     await publishVideo.call(nameController.text, offer: offer);
     nameController.text = "";
   }
@@ -244,7 +247,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    var answer = await publishVideo.createAnswer(audioRecv: true, audioSend: true, videoRecv: true, videoSend: true);
+                    var answer = await publishVideo.createAnswer();
                     await publishVideo.acceptCall(answer: answer);
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);

@@ -1,3 +1,10 @@
+## 2.3.0
+- breaking changes in createOffer and createAnswer (removed dead code prepareTransReceiver)
+- fixed audio and video mute events not working due to #120 raised by @liemfs 
+
+## 2.2.15
+- added support for simulcasting in `initMediaDevice`
+- flutter webrtc 0.9.34
 ## 2.2.14
 - fix Searching transceivers returns wrong result [#120](https://github.com/flutterjanus/flutter_janus_client/pull/120)
 ## 2.2.13

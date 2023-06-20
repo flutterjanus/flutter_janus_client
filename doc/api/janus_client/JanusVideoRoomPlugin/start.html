@@ -68,7 +68,7 @@
   <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; start(dynamic roomId, {RTCSessionDescription? answer}) async {
   var payload = {&quot;request&quot;: &quot;start&quot;, &#39;room&#39;: roomId};
   if (answer == null) {
-    answer = await this.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+    answer = await this.createAnswer();
   }
   await this.send(data: payload, jsep: answer);
 }</code></pre>
@@ -120,7 +120,6 @@
     <li class="section-title"><a href="../../janus_client/JanusVideoRoomPlugin-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/configure.html">configure</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/createNullableAnswer.html">createNullableAnswer</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/createRoom.html">createRoom</a></li>
     <li><a href="../../janus_client/JanusVideoRoomPlugin/destroyRoom.html">destroyRoom</a></li>
@@ -169,7 +168,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.14
+      2.3.0
   </span>
 
   

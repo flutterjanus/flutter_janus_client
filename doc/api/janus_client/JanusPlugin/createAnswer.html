@@ -52,11 +52,7 @@
       
 
 <span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="https://pub.dev/documentation/webrtc_interface/1.0.11/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a></span>&gt;</span></span>
-<span class="name ">createAnswer</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="createAnswer-param-audioRecv">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">audioRecv</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="createAnswer-param-videoRecv"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">videoRecv</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="createAnswer-param-audioSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">audioSend</span> = <span class="default-value">true</span>, </span></li>
-<li><span class="parameter" id="createAnswer-param-videoSend"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">videoSend</span> = <span class="default-value">true</span>}</span></li>
-</ol>)
+<span class="name ">createAnswer</span>(<wbr>)
 
       
 
@@ -71,20 +67,14 @@ It supports both style of answer creation that is plan-b and unified.</p>
     
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">Future&lt;RTCSessionDescription&gt; createAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
-  dynamic offerOptions;
-  if (_context._isUnifiedPlan &amp;&amp; !_context._usePlanB) {
-    await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
-  } else {
-    offerOptions = {&quot;offerToReceiveAudio&quot;: audioRecv, &quot;offerToReceiveVideo&quot;: videoRecv};
-  }
+  <pre class="language-dart"><code class="language-dart">Future&lt;RTCSessionDescription&gt; createAnswer() async {
   try {
-    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
+    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
     await webRTCHandle!.peerConnection!.setLocalDescription(offer);
     return offer;
   } catch (e) {
     &#47;&#47;    handling kstable exception most ugly way but currently there&#39;s no other workaround, it just works
-    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
+    RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
     await webRTCHandle!.peerConnection!.setLocalDescription(offer);
     return offer;
   }
@@ -136,7 +126,6 @@ It supports both style of answer creation that is plan-b and unified.</p>
 
     <li class="section-title"><a href="../../janus_client/JanusPlugin-class.html#instance-methods">Methods</a></li>
     <li><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
-    <li><a href="../../janus_client/JanusPlugin/createNullableAnswer.html">createNullableAnswer</a></li>
     <li><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
     <li><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
@@ -172,7 +161,7 @@ It supports both style of answer creation that is plan-b and unified.</p>
 <footer>
   <span class="no-break">
     janus_client
-      2.2.14
+      2.3.0
   </span>
 
   

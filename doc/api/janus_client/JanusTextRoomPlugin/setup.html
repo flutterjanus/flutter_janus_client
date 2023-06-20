@@ -75,7 +75,7 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
       await this.handleRemoteJsep(event.jsep);
       var body = {&quot;request&quot;: &quot;ack&quot;};
       await this.initDataChannel();
-      RTCSessionDescription answer = await this.createAnswer(audioSend: false, videoSend: false, videoRecv: false, audioRecv: false);
+      RTCSessionDescription answer = await this.createAnswer();
       await this.send(
         data: body,
         jsep: answer,
@@ -132,7 +132,6 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
 
     <li class="section-title"><a href="../../janus_client/JanusTextRoomPlugin-class.html#instance-methods">Methods</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/createNullableAnswer.html">createNullableAnswer</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/createRoom.html">createRoom</a></li>
     <li><a href="../../janus_client/JanusTextRoomPlugin/destroyRoom.html">destroyRoom</a></li>
@@ -178,7 +177,7 @@ setup is a method to be called very early to negotiate open PeerConnection on wh
 <footer>
   <span class="no-break">
     janus_client
-      2.2.14
+      2.3.0
   </span>
 
   

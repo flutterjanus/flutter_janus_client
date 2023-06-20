@@ -78,9 +78,9 @@
   var payload = {&quot;request&quot;: &quot;accept&quot;, &quot;headers&quot;: headers, &quot;srtp&quot;: srtp, &quot;autoaccept_reinvites&quot;: autoAcceptReInvites}..removeWhere((key, value) =&gt; value == null);
   RTCSignalingState? signalingState = this.webRTCHandle?.peerConnection?.signalingState;
   if (sessionDescription == null &amp;&amp; signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
-    sessionDescription = await this.createAnswer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    sessionDescription = await this.createAnswer();
   } else if (sessionDescription == null) {
-    sessionDescription = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    sessionDescription = await this.createOffer(videoRecv: false, audioRecv: true);
   }
   JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: sessionDescription));
   JanusError.throwErrorFromEvent(response);
@@ -134,7 +134,6 @@
     <li><a href="../../janus_client/JanusSipPlugin/accept.html">accept</a></li>
     <li><a href="../../janus_client/JanusSipPlugin/call.html">call</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
-    <li class="inherited"><a href="../../janus_client/JanusPlugin/createNullableAnswer.html">createNullableAnswer</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
     <li><a href="../../janus_client/JanusSipPlugin/decline.html">decline</a></li>
     <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
@@ -178,7 +177,7 @@
 <footer>
   <span class="no-break">
     janus_client
-      2.2.14
+      2.3.0
   </span>
 
   

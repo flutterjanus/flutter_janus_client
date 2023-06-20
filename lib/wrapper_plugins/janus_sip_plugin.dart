@@ -72,9 +72,9 @@ class JanusSipPlugin extends JanusPlugin {
     var payload = {"request": "accept", "headers": headers, "srtp": srtp, "autoaccept_reinvites": autoAcceptReInvites}..removeWhere((key, value) => value == null);
     RTCSignalingState? signalingState = this.webRTCHandle?.peerConnection?.signalingState;
     if (sessionDescription == null && signalingState == RTCSignalingState.RTCSignalingStateHaveRemoteOffer) {
-      sessionDescription = await this.createAnswer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      sessionDescription = await this.createAnswer();
     } else if (sessionDescription == null) {
-      sessionDescription = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      sessionDescription = await this.createOffer(videoRecv: false, audioRecv: true);
     }
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: sessionDescription));
     JanusError.throwErrorFromEvent(response);
@@ -167,7 +167,7 @@ class JanusSipPlugin extends JanusPlugin {
       "authuser": authuser, //"<username to use to authenticate (overrides the one in the SIP URI); optional>",
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      offer = await this.createOffer(videoRecv: false, audioRecv: true);
     }
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);

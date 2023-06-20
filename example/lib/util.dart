@@ -9,7 +9,7 @@ class StreamRenderer {
   String? publisherName;
   String? mid;
   bool? isAudioMuted;
-  List<bool> selectedQuality=[false,false,true];
+  List<bool> selectedQuality = [false, false, true];
   bool? isVideoMuted;
 
   Future<void> dispose() async {
@@ -91,7 +91,7 @@ class GenericVideoRoomManagedPlugin {
       if (remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateHaveRemoteOffer ||
           remoteMediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateHaveRemotePrAnswer) return;
       print('retrying to connect subscribers');
-      await remoteMediaHandle?.start(myRoom, answer: await remoteMediaHandle?.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false));
+      await remoteMediaHandle?.start(myRoom, answer: await remoteMediaHandle?.createAnswer());
     });
 
     await remoteMediaHandle?.joinSubscriber(myRoom, streams: streams, pin: myPin);
@@ -114,7 +114,7 @@ class GenericVideoRoomManagedPlugin {
           if (mediaState.feedIdToMidSubscriptionMap[element.feedId] == null) mediaState.feedIdToMidSubscriptionMap[element.feedId] = {};
           mediaState.feedIdToMidSubscriptionMap[element.feedId][element.mid] = true;
         });
-        var answer = await remoteMediaHandle?.createAnswer(audioRecv: true, audioSend: false, videoRecv: true, videoSend: false);
+        var answer = await remoteMediaHandle?.createAnswer();
         await remoteMediaHandle?.start(myRoom, answer: answer);
       }
       remoteMediaHandle?.remoteTrack?.listen((event) async {
@@ -186,7 +186,7 @@ class GenericVideoRoomManagedPlugin {
         // if (afterJoined != null) {
         //   await afterJoined();
         // } else {
-        (await mediaHandle?.configure(bitrate: 3000000, sessionDescription: await mediaHandle?.createOffer(audioRecv: false, audioSend: false, videoSend: true, videoRecv: false)));
+        (await mediaHandle?.configure(bitrate: 3000000, sessionDescription: await mediaHandle?.createOffer(audioRecv: false, videoRecv: false)));
         // }
         List<Map<dynamic, dynamic>> publisherStreams = updateStateWithPublisherMediaInfo(mediaState, data, ownIds);
         subscribeToMedia(
@@ -221,7 +221,10 @@ class GenericVideoRoomManagedPlugin {
     mediaHandle?.renegotiationNeeded?.listen((event) async {
       if (mediaHandle?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await mediaHandle?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await mediaHandle?.createOffer(
+        audioRecv: false,
+        videoRecv: false,
+      );
       await mediaHandle?.configure(sessionDescription: offer);
     });
   }

@@ -45,7 +45,7 @@ class JanusVideoCallPlugin extends JanusPlugin {
   Future<void> call(String userName, {RTCSessionDescription? offer}) async {
     var payload = {"request": "call", "username": userName};
     if (offer == null) {
-      offer = await createOffer(audioSend: true, videoSend: true, audioRecv: true, videoRecv: true);
+      offer = await createOffer(audioRecv: true, videoRecv: true);
     }
     await this.send(data: payload, jsep: offer);
   }
@@ -67,7 +67,7 @@ class JanusVideoCallPlugin extends JanusPlugin {
   Future<void> acceptCall({RTCSessionDescription? answer}) async {
     var payload = {"request": "accept"};
     if (answer == null) {
-      answer = await createAnswer(audioSend: true, videoSend: true, audioRecv: true, videoRecv: true);
+      answer = await createAnswer();
     }
     await this.send(data: payload, jsep: answer);
   }

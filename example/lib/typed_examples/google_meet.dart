@@ -66,7 +66,7 @@ class _VideoRoomState extends State<GoogleMeet> {
         if (pop) {
           Navigator.of(context).pop(joiningDialog);
         }
-        (await videoPlugin.configure(bitrate: 3000000, sessionDescription: await videoPlugin.createOffer(audioRecv: false, audioSend: true, videoSend: true, videoRecv: false)));
+        (await videoPlugin.configure(bitrate: 3000000, sessionDescription: await videoPlugin.createOffer(audioRecv: false, videoRecv: false)));
       }
       if (data is VideoRoomLeavingEvent) {
         unSubscribeTo(data.leaving!);
@@ -80,7 +80,7 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   initialize() async {
-    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    ws = WebSocketJanusTransport(url: servermap['servercheap']);
     j = JanusClient(transport: ws!, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")], loggerLevel: Level.FINE);
     session = await j?.createSession();
     initLocalMediaRenderer();
@@ -254,13 +254,16 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin?.renegotiationNeeded?.listen((event) async {
       if (videoPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await videoPlugin?.createOffer(audioRecv: false, videoRecv: false, audioSend: audioEnabled, videoSend: videoEnabled);
+      var offer = await videoPlugin?.createOffer(
+        audioRecv: false,
+        videoRecv: false,
+      );
       await videoPlugin?.configure(sessionDescription: offer);
     });
     screenPlugin?.renegotiationNeeded?.listen((event) async {
       if (screenPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await screenPlugin?.createOffer(audioRecv: false, videoRecv: false, audioSend: true, videoSend: true);
+      var offer = await screenPlugin?.createOffer(audioRecv: false, videoRecv: false);
       await screenPlugin?.configure(sessionDescription: offer);
     });
   }
@@ -305,8 +308,7 @@ class _VideoRoomState extends State<GoogleMeet> {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
         myPvtId = data.privateId;
-        (await screenPlugin?.configure(
-            bitrate: 3000000, sessionDescription: await screenPlugin?.createOffer(audioRecv: false, audioSend: true, videoSend: true, videoRecv: false)));
+        (await screenPlugin?.configure(bitrate: 3000000, sessionDescription: await screenPlugin?.createOffer(audioRecv: false, videoRecv: false)));
       }
       if (data is VideoRoomLeavingEvent) {
         unSubscribeTo(data.leaving!);

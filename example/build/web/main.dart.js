@@ -82785,7 +82785,7 @@ $.M=null
 $.av_=1
 $.atF=1
 $.qb=function(){var s=t.N
-return A.W(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","ws://proficientio.top/websocket","onemandev_master_ws","wss://master-janus.onemandev.tech/websocket","onemandev_master_rest","https://master-janus.onemandev.tech/rest","onemandev_unified_rest","https://unified-janus.onemandev.tech/rest","onemandev_unified_ws","wss://unified-janus.onemandev.tech/websocket"],s,s)}()
+return A.W(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","wss://proficientio.top/websocket","onemandev_master_ws","wss://master-janus.onemandev.tech/websocket","onemandev_master_rest","https://master-janus.onemandev.tech/rest","onemandev_unified_rest","https://unified-janus.onemandev.tech/rest","onemandev_unified_ws","wss://unified-janus.onemandev.tech/websocket"],s,s)}()
 $.asV=0
 $.aC4=A.w(t.N,t.JW)
 $.arH=null

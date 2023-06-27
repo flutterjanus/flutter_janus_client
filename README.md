@@ -16,6 +16,8 @@ it easily integrates into your flutter application and allows you to build webrt
 
 ## [Take away apple specific pain for building flutter app](https://github.com/flutterjanus/flutter_janus_client/wiki/Take-away-Apple-IOS-and-macOS-related-pain-from-me-%F0%9F%92%AF-(building-for-apple))
 
+## [screen share example](https://github.com/flutterjanus/screenshare_example)
+
 ## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/index.html)
 ## News & Updates
 - Introduced support for simulcast

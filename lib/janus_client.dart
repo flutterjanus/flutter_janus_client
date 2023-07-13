@@ -1,7 +1,6 @@
 /// This is a preliminary API providing most WebRTC Operations out of the box using [Janus Server](https://janus.conf.meetecho.com/)
 library janus_client;
 
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
@@ -164,7 +163,7 @@ class JanusClient {
 
   /// JanusClient
   ///
-  /// setting usePlanB forces creation of peer connection with plan-b sdb semantics,
+  /// setting usePlanB forces creation of peer connection with plan-b sdp semantics,
   /// and would cause isUnifiedPlan to have no effect on sdpSemantics config
   /// By default roomId should be numeric in nature although if you have configured [stringIds] to true for room or janus, then you can have non-numeric roomIds.
   JanusClient(
@@ -175,10 +174,8 @@ class JanusClient {
       bool isUnifiedPlan = true,
       String? token,
       bool? stringIds = false,
-
       /// if you provide your own logger you will be responsible for managing all logging aspects and properties like log level and printing logs
       Logger? logger,
-
       /// forces creation of peer connection with plan-b sdb semantics
       @Deprecated('set this option to true if you using legacy janus plugins with no unified-plan support only.') bool usePlanB = false,
       Duration? pollingInterval,

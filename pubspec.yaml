@@ -1,10 +1,10 @@
 name: janus_client
 description: A feature rich Janus Webrtc package
-version: 2.3.0
+version: 2.3.1
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
-  sdk: ">=2.15.0 <3.0.0"
+  sdk: ">=2.15.0 <3.10.6"
   flutter: ">=1.10.0"
 
 dependencies:
@@ -12,15 +12,13 @@ dependencies:
     sdk: flutter
   flutter:
     sdk: flutter
-  flutter_webrtc: ^0.9.22
+  flutter_webrtc: ^0.9.36
   path_provider: ^2.0.11
-  http: ^0.13.4
+  http: ^1.1.0
   web_socket_channel: ^2.2.0
-  stream_channel: ^2.1.0
   uuid: ^3.0.6
   logging: ^1.0.2
-  collection: ^1.15.0
-  dartdoc: ^6.0.0
+  dartdoc: ^6.2.2
 
 dev_dependencies:
   flutter_test:

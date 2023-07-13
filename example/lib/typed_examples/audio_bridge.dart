@@ -12,7 +12,7 @@ class TypedAudioRoomV2 extends StatefulWidget {
 }
 
 class _AudioRoomState extends State<TypedAudioRoomV2> {
-  JanusClient? j;
+  JanusClient? client;
   JanusSession? session;
   JanusAudioBridgePlugin? pluginHandle;
   late WebSocketJanusTransport ws;
@@ -44,14 +44,14 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
 
   Future<void> initPlatformState() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(
+    client = JanusClient(
         withCredentials: true,
         isUnifiedPlan: true,
         stringIds: false,
         apiSecret: "SecureIt",
         transport: ws,
         iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
-    session = await j?.createSession();
+    session = await client?.createSession();
     pluginHandle = await session?.attach<JanusAudioBridgePlugin>();
     // List<MediaDeviceInfo> devices =
     //     await navigator.mediaDevices.enumerateDevices();

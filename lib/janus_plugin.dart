@@ -525,7 +525,7 @@ class JanusPlugin {
 
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object
   /// It supports both style of offer creation that is plan-b and unified.
-  Future<RTCSessionDescription> createOffer({bool audioRecv: true, bool videoRecv: true}) async {
+  Future<RTCSessionDescription> createOffer({bool audioRecv = true, bool videoRecv = true}) async {
     dynamic offerOptions;
     offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions ?? {});

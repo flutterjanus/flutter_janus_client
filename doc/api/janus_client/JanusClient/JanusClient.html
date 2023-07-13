@@ -11,7 +11,7 @@
   
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
   
   <link rel="stylesheet" href="../../static-assets/github.css?v1">
   <link rel="stylesheet" href="../../static-assets/styles.css?v1">
@@ -21,12 +21,12 @@
 </head>
 
 
-<body data-base-href="../../" data-using-base-href="false">
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
 
 <div id="overlay-under-drawer"></div>
 
 <header id="title">
-  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../../index.html">janus_client</a></li>
     <li><a href="../../janus_client/janus_client-library.html">janus_client</a></li>
@@ -37,18 +37,27 @@
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
 </header>
-
 <main>
-
 
   <div id="dartdoc-main-content" class="main-content">
       <div>
 <h1><span class="kind-constructor">JanusClient</span> constructor 
-    <a href="https://dart.dev/null-safety" class="feature feature-null-safety" title="Supports the null safety language feature.">Null safety</a>
 </h1></div>
 
     <section class="multi-line-signature">
+      
       <span class="name ">JanusClient</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="-param-transport">{<span>required</span> <span class="type-annotation"><a href="../../janus_client/JanusTransport-class.html">JanusTransport</a></span> <span class="parameter-name">transport</span>, </span></li>
 <li><span class="parameter" id="-param-iceServers"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/List-class.html">List</a><span class="signature">&lt;<wbr><span class="type-parameter"><a href="../../janus_client/RTCIceServer-class.html">RTCIceServer</a></span>&gt;</span>?</span> <span class="parameter-name">iceServers</span>, </span></li>
 <li><span class="parameter" id="-param-refreshInterval"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">refreshInterval</span> = <span class="default-value">50</span>, </span></li>
@@ -56,11 +65,11 @@
 <li><span class="parameter" id="-param-isUnifiedPlan"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">isUnifiedPlan</span> = <span class="default-value">true</span>, </span></li>
 <li><span class="parameter" id="-param-token"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">token</span>, </span></li>
 <li><span class="parameter" id="-param-stringIds"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">stringIds</span> = <span class="default-value">false</span>, </span></li>
-<li><span class="parameter" id="-param-logger"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.1.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span></li>
+<li><span class="parameter" id="-param-logger"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.2.0/logging/Logger-class.html">Logger</a>?</span> <span class="parameter-name">logger</span>, </span></li>
 <li><span class="parameter" id="-param-usePlanB"><span>@<a href="https://api.flutter.dev/flutter/dart-core/Deprecated-class.html">Deprecated</a>(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;)</span> <span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">usePlanB</span> = <span class="default-value">false</span>, </span></li>
 <li><span class="parameter" id="-param-pollingInterval"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/Duration-class.html">Duration</a>?</span> <span class="parameter-name">pollingInterval</span>, </span></li>
 <li><span class="parameter" id="-param-loggerName"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a></span> <span class="parameter-name">loggerName</span> = <span class="default-value">&quot;JanusClient&quot;</span>, </span></li>
-<li><span class="parameter" id="-param-loggerLevel"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.1.0/logging/Level-class.html">Level</a></span> <span class="parameter-name">loggerLevel</span> = <span class="default-value">Level.ALL</span>, </span></li>
+<li><span class="parameter" id="-param-loggerLevel"><span class="type-annotation"><a href="https://pub.dev/documentation/logging/1.2.0/logging/Level-class.html">Level</a></span> <span class="parameter-name">loggerLevel</span> = <span class="default-value">Level.ALL</span>, </span></li>
 <li><span class="parameter" id="-param-maxEvent"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a></span> <span class="parameter-name">maxEvent</span> = <span class="default-value">10</span>, </span></li>
 <li><span class="parameter" id="-param-withCredentials"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a></span> <span class="parameter-name">withCredentials</span> = <span class="default-value">false</span>}</span></li>
 </ol>)
@@ -69,7 +78,7 @@
     
 <section class="desc markdown">
   <p>JanusClient</p>
-<p>setting usePlanB forces creation of peer connection with plan-b sdb semantics,
+<p>setting usePlanB forces creation of peer connection with plan-b sdp semantics,
 and would cause isUnifiedPlan to have no effect on sdpSemantics config
 By default roomId should be numeric in nature although if you have configured <code>stringIds</code> to true for room or janus, then you can have non-numeric roomIds.</p>
 </section>
@@ -86,10 +95,8 @@ By default roomId should be numeric in nature although if you have configured <c
     bool isUnifiedPlan = true,
     String? token,
     bool? stringIds = false,
-
     &#47;&#47;&#47; if you provide your own logger you will be responsible for managing all logging aspects and properties like log level and printing logs
     Logger? logger,
-
     &#47;&#47;&#47; forces creation of peer connection with plan-b sdb semantics
     @Deprecated(&#39;set this option to true if you using legacy janus plugins with no unified-plan support only.&#39;) bool usePlanB = false,
     Duration? pollingInterval,
@@ -149,20 +156,20 @@ By default roomId should be numeric in nature although if you have configured <c
           <li><a href="../../janus_client/JanusClient/JanusClient.html">JanusClient</a></li>
 
 
-    <li class="section-title inherited">
-      <a href="../../janus_client/JanusClient-class.html#instance-properties">Properties</a>
-    </li>
-    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></li>
-    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
+        <li class="section-title inherited">
+          <a href="../../janus_client/JanusClient-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
 
-    <li class="section-title"><a href="../../janus_client/JanusClient-class.html#instance-methods">Methods</a></li>
-    <li><a href="../../janus_client/JanusClient/createSession.html">createSession</a></li>
-    <li><a href="../../janus_client/JanusClient/getInfo.html">getInfo</a></li>
-    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
-    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+        <li class="section-title"><a href="../../janus_client/JanusClient-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../janus_client/JanusClient/createSession.html">createSession</a></li>
+          <li><a href="../../janus_client/JanusClient/getInfo.html">getInfo</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
 
-    <li class="section-title inherited"><a href="../../janus_client/JanusClient-class.html#operators">Operators</a></li>
-    <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
+        <li class="section-title inherited"><a href="../../janus_client/JanusClient-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
 
 
 
@@ -179,7 +186,7 @@ By default roomId should be numeric in nature although if you have configured <c
 <footer>
   <span class="no-break">
     janus_client
-      2.3.0
+      2.3.1
   </span>
 
   

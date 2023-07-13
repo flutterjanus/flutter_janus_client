@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="generator" content="made with love by dartdoc 6.0.0">
+  <meta name="generator" content="made with love by dartdoc 6.2.2">
   <meta name="description" content="janus_client API docs, for the Dart programming language.">
   <title>janus_client - Dart API docs</title>
 
@@ -12,7 +12,7 @@
   
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
   
   <link rel="stylesheet" href="static-assets/github.css?v1">
   <link rel="stylesheet" href="static-assets/styles.css?v1">
@@ -22,12 +22,12 @@
 </head>
 
 
-<body data-base-href="" data-using-base-href="false">
+<body data-base-href="" data-using-base-href="false" class="light-theme">
 
 <div id="overlay-under-drawer"></div>
 
 <header id="title">
-  <button id="sidenav-left-toggle" type="button">&nbsp;</button>
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="https://github.com/shivanshtalwar0/flutter_janus_client">janus_client package</a></li>
   </ol>
@@ -35,23 +35,44 @@
   <form class="search navbar-right" role="search">
     <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
   </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
 </header>
-
 <main>
-
 
   <div id="dartdoc-main-content" class="main-content">
       
 <section class="desc markdown">
-  <p><a href="https://ko-fi.com/U7U11OZL8"><img src="https://www.ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a></p><!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<p><a href="#contributors-"><img src="https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square" alt="All Contributors"></a></p><!-- ALL-CONTRIBUTORS-BADGE:END -->
+  <p><a href="https://ko-fi.com/U7U11OZL8"><img src="https://www.ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a></p>
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 <p><a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;"></a></p>
 <h1 id="janus_client-pub-packagehttpsimgshieldsiopubvjanus_clientsvghttpspubdartlangorgpackagesjanus_clientgitterhttpsbadgesgitterimflutter_janus_clientlobbysvghttpsgitterimflutter_janus_clientlobbyutm_sourcebadgeutm_mediumbadgeutm_campaignpr-badge">janus_client <a href="https://pub.dartlang.org/packages/janus_client"><img src="https://img.shields.io/pub/v/janus_client.svg" alt="pub package"></a><a href="https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge"><img src="https://badges.gitter.im/flutter_janus_client/Lobby.svg" alt="Gitter"></a></h1>
 <p>It is a feature rich flutter package, which offers all webrtc operations supported by <a href="https://janus.conf.meetecho.com/">Janus: the general purpose WebRTC server</a>,
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.</p>
+<h2 id="what-it-will-do">What it will do?</h2>
+<ul>
+<li>It will help you in establishing communication with Janus server using either REST or Websocket depending on what you prefer</li>
+<li>It will provide you meaningful APIs for individual plugins so you can express your app logic without worrying about internals</li>
+</ul>
+<h2 id="what-it-will-not-do">What it will not do?</h2>
+<p>It will not manage every aspect of WebRTC for you by that we mean we only provide core functionalities and features when it comes to WebRTC, since this library uses flutter_webrtc for managing all of webrtc stack so you will need to refer its documentation when there's some use cases which we do not cover or does not exist in examples. This is done intentionally by design to give developers complete flexibility while also making sure library is lightweight and does not become a bloatware.
+A classic example of that would be changing output device on a native device for example you want to switch from speaker to headsets or bluetooth audio device you will need to use <code>flutter_webrtc</code>'s <code>Helper</code> utility class:-</p>
+<pre class="language-dart"><code class="language-dart">Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
+</code></pre>
 <h2 id="demo-of-janusclienthttpsflutterjanusgithubioflutter_janus_clientexamplebuildweb"><a href="https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/">Demo of JanusClient</a></h2>
 <h2 id="wikihttpsgithubcomflutterjanusflutter_janus_clientwiki"><a href="https://github.com/flutterjanus/flutter_janus_client/wiki">Wiki</a></h2>
 <h2 id="take-away-apple-specific-pain-for-building-flutter-apphttpsgithubcomflutterjanusflutter_janus_clientwikitake-away-apple-ios-and-macos-related-pain-from-me-f09f92af-building-for-apple"><a href="https://github.com/flutterjanus/flutter_janus_client/wiki/Take-away-Apple-IOS-and-macOS-related-pain-from-me-%F0%9F%92%AF-(building-for-apple)">Take away apple specific pain for building flutter app</a></h2>
+<h2 id="screen-share-examplehttpsgithubcomflutterjanusscreenshare_example"><a href="https://github.com/flutterjanus/screenshare_example">screen share example</a></h2>
 <h2 id="apireferencehttpsflutterjanusgithubioflutter_janus_clientdocapiindexhtml"><a href="https://flutterjanus.github.io/flutter_janus_client/doc/api/index.html">APIReference</a></h2>
 <h2 id="news--updates">News &amp; Updates</h2>
 <ul>
@@ -67,9 +88,124 @@ it easily integrates into your flutter application and allows you to build webrt
 <li>Supports null-safety</li>
 </ul>
 <h2 id="feature-status">Feature Status</h2>
-<table><thead><tr><th>Feature</th><th>Support</th><th>Well Tested</th><th>Unified Plan</th><th>Example</th></tr></thead><tbody><tr><td>WebSocket</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Rest/Http API</td><td>Yes</td><td>Yes</td><td>-</td><td>Yes</td></tr><tr><td>Video Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Video Call Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Streaming Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Audio Room Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Sip Plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr><tr><td>Text Room Plugin</td><td>Yes</td><td>No</td><td>-</td><td>Yes</td></tr><tr><td>ScreenSharing using VideoRoom plugin</td><td>Yes</td><td>No</td><td>Yes</td><td>Yes</td></tr></tbody></table>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Support</th>
+<th>Well Tested</th>
+<th>Unified Plan</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WebSocket</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>-</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Rest/Http API</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>-</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Video Room Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Video Call Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Streaming Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Audio Room Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Sip Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Text Room Plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>-</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>ScreenSharing using VideoRoom plugin</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
 <h2 id="platform-support-table">Platform Support Table</h2>
-<table><thead><tr><th>Platform</th><th>Support</th><th>Well Tested</th></tr></thead><tbody><tr><td>Browser(Web)</td><td>Yes</td><td>Yes</td></tr><tr><td>MacOs</td><td>Yes</td><td>No</td></tr><tr><td>Android</td><td>Yes</td><td>Yes</td></tr><tr><td>Ios</td><td>Yes</td><td>No</td></tr><tr><td>Linux</td><td>Yes</td><td>No</td></tr><tr><td>Windows</td><td>Yes</td><td>No</td></tr></tbody></table>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Support</th>
+<th>Well Tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Browser(Web)</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>MacOs</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Android</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Ios</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Linux</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Windows</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
 <h2 id="todo">Todo</h2>
 <ul>
 <li>Documentation of some remaining plugins</li>
@@ -81,24 +217,29 @@ it easily integrates into your flutter application and allows you to build webrt
 as it is very unstable and hard to maintain it was deprecated and will not recieve any fixes or feature updates.
 It is highly recommended you migrate your code to latest version that is 2.X.X (stable)</p>
 <h2 id="contributors-">Contributors ✨</h2>
-<p>Thanks goes to these wonderful people (<a href="https://allcontributors.org/docs/en/emoji-key">emoji key</a>):</p><!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section --><!-- prettier-ignore-start --><!-- markdownlint-disable --><table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/shivanshtalwar0"><img src="https://avatars.githubusercontent.com/u/26632663?v=4?s=100" width="100px;" alt="Shivansh Talwar"><br><sub><b>Shivansh Talwar</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=shivanshtalwar0" title="Code">💻</a> <a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=shivanshtalwar0" title="Documentation">📖</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/kzawadi"><img src="https://avatars.githubusercontent.com/u/12481289?v=4?s=100" width="100px;" alt="Kelvin Zawadi"><br><sub><b>Kelvin Zawadi</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=kzawadi" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LifeNow"><img src="https://avatars.githubusercontent.com/u/18676202?v=4?s=100" width="100px;" alt="Eugene"><br><sub><b>Eugene</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=LifeNow" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/igala"><img src="https://avatars.githubusercontent.com/u/454390?v=4?s=100" width="100px;" alt="Igal Avraham"><br><sub><b>Igal Avraham</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=igala" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://vigikaran.me/"><img src="https://avatars.githubusercontent.com/u/9039584?v=4?s=100" width="100px;" alt="Vigikaran"><br><sub><b>Vigikaran</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=vigikaran" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/UserSense"><img src="https://avatars.githubusercontent.com/u/65860664?v=4?s=100" width="100px;" alt="UserSense"><br><sub><b>UserSense</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=UserSense" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/baihua666"><img src="https://avatars.githubusercontent.com/u/5125983?v=4?s=100" width="100px;" alt="baihua666"><br><sub><b>baihua666</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/issues?q=author%3Abaihua666" title="Bug reports">🐛</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ngoluuduythai"><img src="https://avatars.githubusercontent.com/u/12238262?v=4?s=100" width="100px;" alt="ngoluuduythai"><br><sub><b>ngoluuduythai</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=ngoluuduythai" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.facebook.com/sakshamgupta12"><img src="https://avatars.githubusercontent.com/u/14076514?v=4?s=100" width="100px;" alt="Saksham Gupta"><br><sub><b>Saksham Gupta</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=sakshamgupta05" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/chu06"><img src="https://avatars.githubusercontent.com/u/129312223?v=4?s=100" width="100px;" alt="chu06"><br><sub><b>chu06</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=chu06" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table><!-- markdownlint-restore --><!-- prettier-ignore-end --><!-- ALL-CONTRIBUTORS-LIST:END -->
+<p>Thanks goes to these wonderful people (<a href="https://allcontributors.org/docs/en/emoji-key">emoji key</a>):</p>
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- markdownlint-disable -->
+
+
+<a href="https://github.com/shivanshtalwar0"><img src="https://avatars.githubusercontent.com/u/26632663?v=4?s=100" width="100px;" alt="Shivansh Talwar"><br><sub><b>Shivansh Talwar</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=shivanshtalwar0" title="Code">💻</a> <a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=shivanshtalwar0" title="Documentation">📖</a>
+<a href="https://github.com/kzawadi"><img src="https://avatars.githubusercontent.com/u/12481289?v=4?s=100" width="100px;" alt="Kelvin Zawadi"><br><sub><b>Kelvin Zawadi</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=kzawadi" title="Code">💻</a>
+<a href="https://github.com/LifeNow"><img src="https://avatars.githubusercontent.com/u/18676202?v=4?s=100" width="100px;" alt="Eugene"><br><sub><b>Eugene</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=LifeNow" title="Code">💻</a>
+<a href="https://github.com/igala"><img src="https://avatars.githubusercontent.com/u/454390?v=4?s=100" width="100px;" alt="Igal Avraham"><br><sub><b>Igal Avraham</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=igala" title="Code">💻</a>
+<a href="http://vigikaran.me/"><img src="https://avatars.githubusercontent.com/u/9039584?v=4?s=100" width="100px;" alt="Vigikaran"><br><sub><b>Vigikaran</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=vigikaran" title="Code">💻</a>
+<a href="https://github.com/UserSense"><img src="https://avatars.githubusercontent.com/u/65860664?v=4?s=100" width="100px;" alt="UserSense"><br><sub><b>UserSense</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=UserSense" title="Code">💻</a>
+<a href="https://github.com/baihua666"><img src="https://avatars.githubusercontent.com/u/5125983?v=4?s=100" width="100px;" alt="baihua666"><br><sub><b>baihua666</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/issues?q=author%3Abaihua666" title="Bug reports">🐛</a>
+
+
+<a href="https://github.com/ngoluuduythai"><img src="https://avatars.githubusercontent.com/u/12238262?v=4?s=100" width="100px;" alt="ngoluuduythai"><br><sub><b>ngoluuduythai</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=ngoluuduythai" title="Code">💻</a>
+<a href="https://www.facebook.com/sakshamgupta12"><img src="https://avatars.githubusercontent.com/u/14076514?v=4?s=100" width="100px;" alt="Saksham Gupta"><br><sub><b>Saksham Gupta</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=sakshamgupta05" title="Code">💻</a>
+<a href="https://github.com/chu06"><img src="https://avatars.githubusercontent.com/u/129312223?v=4?s=100" width="100px;" alt="chu06"><br><sub><b>chu06</b></sub></a><br><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=chu06" title="Code">💻</a>
+
+
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 <p>This project follows the <a href="https://github.com/all-contributors/all-contributors">all-contributors</a> specification. Contributions of any kind welcome!</p>
 <h2 id="wait-theres-more-the-javascript-client">Wait there's more... The Javascript Client!</h2>
 <p>If you loved the api style and architecture of flutter_janus_client and you wishing to have something similar for your next javascript project involving webrtc features.
@@ -159,7 +300,7 @@ or you can straight away use it by installing from npm <code>npm i typed_janus_j
 <footer>
   <span class="no-break">
     janus_client
-      2.3.0
+      2.3.1
   </span>
 
   

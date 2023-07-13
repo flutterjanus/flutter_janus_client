@@ -27,6 +27,7 @@ dependencies:
   cupertino_icons: ^1.0.4
   prompt_dialog: ^1.0.9
   flutter_foreground_task: ^3.10.0
+  permission_handler: ^10.4.3
 
 
 

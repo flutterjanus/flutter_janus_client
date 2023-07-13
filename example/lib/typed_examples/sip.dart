@@ -89,6 +89,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     TextFormField(
@@ -98,6 +99,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     TextFormField(
@@ -110,6 +112,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     Padding(padding: EdgeInsets.all(9)),

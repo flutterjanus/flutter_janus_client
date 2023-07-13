@@ -10,7 +10,7 @@ class TypedStreamingV2 extends StatefulWidget {
 }
 
 class _StreamingState extends State<TypedStreamingV2> {
-  late JanusClient j;
+  late JanusClient client;
   late RestJanusTransport rest;
   late WebSocketJanusTransport ws;
   late JanusSession session;
@@ -67,7 +67,7 @@ class _StreamingState extends State<TypedStreamingV2> {
     setState(() {
       rest = RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-      j = JanusClient(
+      client = JanusClient(
         transport: ws,
         iceServers: [
           RTCIceServer(username: '', credential: '', urls: 'stun:stun.l.google.com:19302'),
@@ -75,7 +75,7 @@ class _StreamingState extends State<TypedStreamingV2> {
         isUnifiedPlan: true,
       );
     });
-    session = await j.createSession();
+    session = await client.createSession();
     plugin = await session.attach<JanusStreamingPlugin>();
     var streamList = await plugin.listStreams();
     setState(() {

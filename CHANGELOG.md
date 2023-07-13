@@ -1,3 +1,5 @@
+## 2.3.1
+- dependency upgrade and improvements
 ## 2.3.0
 - breaking changes in createOffer and createAnswer (removed dead code prepareTransReceiver)
 - fixed audio and video mute events not working due to #120 raised by @liemfs 

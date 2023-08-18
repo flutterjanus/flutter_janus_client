@@ -81,7 +81,10 @@ class _VideoRoomState extends State<GoogleMeet> {
 
   initialize() async {
     ws = WebSocketJanusTransport(url: servermap['servercheap']);
-    client = JanusClient(transport: ws!, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")], loggerLevel: Level.FINE);
+    client = JanusClient(transport: ws!, 
+    withCredentials: true,
+    apiSecret: "janusrocks",
+    isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")], loggerLevel: Level.FINE);
     session = await client?.createSession();
     initLocalMediaRenderer();
   }

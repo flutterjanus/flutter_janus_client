@@ -83280,7 +83280,7 @@ return A.n(null,r)}})
 return A.o($async$rl,r)},
 pw(){var s=0,r=A.p(t.H),q=this,p
 var $async$pw=A.q(function(a,b){if(a===1)return A.m(b,r)
-while(true)switch(s){case 0:p=new A.nh($.qI.h(0,"janus_ws"))
+while(true)switch(s){case 0:p=new A.nh($.qI.h(0,"servercheap"))
 q.r=p
 p=A.yz("SecureIt",A.b([new A.hJ("","","stun:stun1.l.google.com:19302")],t.Sc),!0,B.dG,!1,p,!0)
 q.d=p
@@ -92034,7 +92034,7 @@ $.azI=1
 $.azl=!1
 $.ay9=1
 $.qI=function(){var s=t.N
-return A.S(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","wss://proficientio.top/websocket","onemandev_master_ws","wss://master-janus.onemandev.tech/websocket","onemandev_master_rest","https://master-janus.onemandev.tech/rest","onemandev_unified_rest","https://unified-janus.onemandev.tech/rest","onemandev_unified_ws","wss://unified-janus.onemandev.tech/websocket"],s,s)}()
+return A.S(["janus_ws","wss://janus.conf.meetecho.com/ws","janus_rest","https://janus.conf.meetecho.com/janus","servercheap","ws://107.152.35.248:8188"],s,s)}()
 $.axj=0
 $.aI9=A.w(t.N,t.JW)
 $.avY=null

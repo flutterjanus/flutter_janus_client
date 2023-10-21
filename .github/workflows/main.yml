@@ -15,7 +15,7 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter config --enable-web
-      - run: flutter pub get
+      - run: cd example && flutter pub get
       - run: flutter build web --release
       - run: |
           cd build/web

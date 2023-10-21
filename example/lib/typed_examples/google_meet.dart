@@ -80,11 +80,14 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   initialize() async {
-    ws = WebSocketJanusTransport(url: servermap['servercheap']);
-    client = JanusClient(transport: ws!, 
-    withCredentials: true,
-    apiSecret: "janusrocks",
-    isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")], loggerLevel: Level.FINE);
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
+    client = JanusClient(
+        transport: ws!,
+        withCredentials: true,
+        apiSecret: "janusrocks",
+        isUnifiedPlan: true,
+        iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")],
+        loggerLevel: Level.FINE);
     session = await client?.createSession();
     initLocalMediaRenderer();
   }
@@ -92,11 +95,12 @@ class _VideoRoomState extends State<GoogleMeet> {
   Future<void> unSubscribeTo(int id) async {
     var feed = videoState.feedIdToDisplayStreamsMap[id];
     if (feed == null) return;
+
+    videoState.feedIdToDisplayStreamsMap.remove(id.toString());
+    await videoState.streamsToBeRendered[id]?.dispose();
     setState(() {
       videoState.streamsToBeRendered.remove(id.toString());
     });
-    videoState.feedIdToDisplayStreamsMap.remove(id.toString());
-    await videoState.streamsToBeRendered[id]?.dispose();
     var unsubscribeStreams = (feed['streams'] as List<dynamic>).map((stream) {
       return SubscriberUpdateStream(feed: id, mid: stream['mid'], crossrefid: null);
     }).toList();
@@ -130,14 +134,14 @@ class _VideoRoomState extends State<GoogleMeet> {
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
         String? displayName = videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
-          if (videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.track?.kind == "audio") {
+          if (videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.flowing == true && event.track?.kind == "audio") {
             var existingRenderer = videoState.streamsToBeRendered[feedId.toString()];
             existingRenderer?.mediaStream?.addTrack(event.track!);
             existingRenderer?.videoRenderer.srcObject = existingRenderer.mediaStream;
             existingRenderer?.videoRenderer.muted = false;
             setState(() {});
           }
-          if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.track?.kind == "video") {
+          if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.flowing == true && event.track?.kind == "video") {
             var localStream = StreamRenderer(feedId.toString());
             await localStream.init();
             localStream.mediaStream = await createLocalMediaStream(feedId.toString());
@@ -203,12 +207,12 @@ class _VideoRoomState extends State<GoogleMeet> {
     if (feedId == null) {
       return;
     }
-    StreamRenderer renderer = videoState.streamsToBeRendered[feedId.toString()]!;
+    StreamRenderer? renderer = videoState.streamsToBeRendered[feedId.toString()];
     setState(() {
       if (kind == 'audio') {
-        renderer.isAudioMuted = muted;
+        renderer?.isAudioMuted = muted;
       } else {
-        renderer.isVideoMuted = muted;
+        renderer?.isVideoMuted = muted;
       }
     });
   }
@@ -278,13 +282,13 @@ class _VideoRoomState extends State<GoogleMeet> {
     eventMessagesHandler();
     await localVideoRenderer.init();
     localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(simulcastSendEncodings: [
-      RTCRtpEncoding(active: true, rid: 'h', maxBitrate: 4000000),
-      RTCRtpEncoding(active: true, rid: 'm', maxBitrate: 1000000, scaleResolutionDownBy: 2),
-      RTCRtpEncoding(active: true, rid: 'l', maxBitrate: 1000000, scaleResolutionDownBy: 3),
+      RTCRtpEncoding(active: true, rid: 'h',scalabilityMode: 'L1T2',maxBitrate: 2000000,numTemporalLayers: 0, minBitrate: 1000000, ),
+      RTCRtpEncoding(active: true, rid: 'm',scalabilityMode: 'L1T2', maxBitrate: 1000000,scaleResolutionDownBy: 2),
+      RTCRtpEncoding(active: true, rid: 'l',scalabilityMode: 'L1T2', maxBitrate: 524288, scaleResolutionDownBy: 2),
     ], mediaConstraints: {
       'video': {
-        'width': {'ideal': 1920},
-        'height': {'ideal': 1080}
+        'width': {'ideal': 1280},
+        'height': {'ideal': 720}
       },
       'audio': true
     });
@@ -326,11 +330,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(mediaConstraints: {
       'video': true,
       'audio': true
-    }, simulcastSendEncodings: [
-      RTCRtpEncoding(active: true, rid: 'h', maxBitrate: 4000000),
-      RTCRtpEncoding(active: true, rid: 'm', maxBitrate: 1000000, scaleResolutionDownBy: 2),
-      RTCRtpEncoding(active: true, rid: 'l', maxBitrate: 1000000, scaleResolutionDownBy: 3),
-    ], useDisplayMediaDevices: true);
+    }, useDisplayMediaDevices: true);
     localScreenSharingRenderer.videoRenderer.srcObject = localScreenSharingRenderer.mediaStream;
     localScreenSharingRenderer.publisherName = "Your Screenshare";
     setState(() {

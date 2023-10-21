@@ -20,7 +20,7 @@ A classic example of that would be changing output device on a native device for
 Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
 ```
 
-## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client)
+## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/)
 
 
 ## [Wiki](https://github.com/flutterjanus/flutter_janus_client/wiki)

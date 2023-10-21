@@ -15,7 +15,7 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter config --enable-web
-      - run: cd example && flutter pub get && flutter build web --release
+      - run: cd example && flutter pub get && flutter build web --release  --base-href "/flutter_janus_client/" && dart doc .
       - run: |
           cd example/build/web
           git init

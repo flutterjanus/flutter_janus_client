@@ -20,8 +20,9 @@ A classic example of that would be changing output device on a native device for
 Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
 ```
 
-## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/)
+## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/)
 
+## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/)
 
 ## [Wiki](https://github.com/flutterjanus/flutter_janus_client/wiki)
 
@@ -29,7 +30,6 @@ Helper.selectAudioOutput(deviceIdOfBluetoothDevice)
 
 ## [screen share example](https://github.com/flutterjanus/screenshare_example)
 
-## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/index.html)
 ## News & Updates
 - Introduced support for simulcast
 - videoroom and screenshare improvements (screenshare tested on android and chrome)

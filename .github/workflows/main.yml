@@ -17,6 +17,7 @@ jobs:
       - run: flutter config --enable-web
       - run: cd example && flutter pub get && flutter build web --release  --base-href "/flutter_janus_client/" && dart doc .
       - run: |
+          cp -r doc example/build/web
           cd example/build/web
           git init
           # type configurations: your user.email and user.name followed lines 

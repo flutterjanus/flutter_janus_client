@@ -17,7 +17,7 @@ jobs:
       - run: flutter config --enable-web
       - run: cd example && flutter pub get && flutter build web --base-href "/flutter_janus_client/example/build/web/#/"
       - run: |
-          cd build/web
+          cd example/build/web
           git init
           # type configurations: your user.email and user.name followed lines 
           # git config --global user.email your_email 

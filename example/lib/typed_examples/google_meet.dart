@@ -13,7 +13,7 @@ class GoogleMeet extends StatefulWidget {
 }
 
 class _VideoRoomState extends State<GoogleMeet> {
-  JanusClient? j;
+  JanusClient? client;
   RestJanusTransport? rest;
   WebSocketJanusTransport? ws;
   JanusSession? session;
@@ -69,7 +69,7 @@ class _VideoRoomState extends State<GoogleMeet> {
         if (pop) {
           Navigator.of(context).pop(joiningDialog);
         }
-        (await videoPlugin.configure(bitrate: 3000000, sessionDescription: await videoPlugin.createOffer(audioRecv: false, audioSend: true, videoSend: true, videoRecv: false)));
+        (await videoPlugin.configure(bitrate: 3000000, sessionDescription: await videoPlugin.createOffer(audioRecv: false, videoRecv: false)));
       }
       if (data is VideoRoomLeavingEvent) {
         unSubscribeTo(data.leaving!);
@@ -84,19 +84,26 @@ class _VideoRoomState extends State<GoogleMeet> {
 
   initialize() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(transport: ws!, isUnifiedPlan: true, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")], loggerLevel: Level.FINE);
-    session = await j?.createSession();
+    client = JanusClient(
+        transport: ws!,
+        withCredentials: true,
+        apiSecret: "janusrocks",
+        isUnifiedPlan: true,
+        iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")],
+        loggerLevel: Level.FINE);
+    session = await client?.createSession();
     initLocalMediaRenderer();
   }
 
   Future<void> unSubscribeTo(int id) async {
     var feed = videoState.feedIdToDisplayStreamsMap[id];
     if (feed == null) return;
+
+    videoState.feedIdToDisplayStreamsMap.remove(id.toString());
+    await videoState.streamsToBeRendered[id]?.dispose();
     setState(() {
       videoState.streamsToBeRendered.remove(id.toString());
     });
-    videoState.feedIdToDisplayStreamsMap.remove(id.toString());
-    await videoState.streamsToBeRendered[id]?.dispose();
     var unsubscribeStreams = (feed['streams'] as List<dynamic>).map((stream) {
       return SubscriberUpdateStream(feed: id, mid: stream['mid'], crossrefid: null);
     }).toList();
@@ -130,7 +137,7 @@ class _VideoRoomState extends State<GoogleMeet> {
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
         String? displayName = videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
-          var existingRenderer = videoState.streamsToBeRendered?[feedId.toString()];
+          var existingRenderer = videoState.streamsToBeRendered[feedId.toString()];
           if (existingRenderer != null && event.track?.kind == "audio") {
             existingRenderer.mediaStream?.addTrack(event.track!);
             existingRenderer.videoRenderer.srcObject = existingRenderer.mediaStream;
@@ -140,14 +147,16 @@ class _VideoRoomState extends State<GoogleMeet> {
             existingRenderer.videoRenderer.muted = false;
             setState(() {});
           }
-          if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.track?.kind == "video") {
+          if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.flowing == true && event.track?.kind == "video") {
             var localStream = StreamRenderer(feedId.toString());
             await localStream.init();
             localStream.mediaStream = await createLocalMediaStream(feedId.toString());
             localStream.mediaStream?.addTrack(event.track!);
             localStream.videoRenderer.srcObject = localStream.mediaStream;
+            localStream.videoRenderer.onResize = () => {setState(() {})};
             localStream.publisherName = displayName;
             localStream.publisherId = feedId.toString();
+            localStream.mid = event.mid;
             setState(() {
               videoState.streamsToBeRendered.putIfAbsent(feedId.toString(), () => localStream);
             });
@@ -204,12 +213,12 @@ class _VideoRoomState extends State<GoogleMeet> {
     if (feedId == null) {
       return;
     }
-    StreamRenderer renderer = videoState.streamsToBeRendered[feedId.toString()]!;
+    StreamRenderer? renderer = videoState.streamsToBeRendered[feedId.toString()];
     setState(() {
       if (kind == 'audio') {
-        renderer.isAudioMuted = muted;
+        renderer?.isAudioMuted = muted;
       } else {
-        renderer.isVideoMuted = muted;
+        renderer?.isVideoMuted = muted;
       }
     });
   }
@@ -258,13 +267,16 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin?.renegotiationNeeded?.listen((event) async {
       if (videoPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await videoPlugin?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await videoPlugin?.createOffer(
+        audioRecv: false,
+        videoRecv: false,
+      );
       await videoPlugin?.configure(sessionDescription: offer);
     });
     screenPlugin?.renegotiationNeeded?.listen((event) async {
       if (screenPlugin?.webRTCHandle?.peerConnection?.signalingState != RTCSignalingState.RTCSignalingStateStable) return;
       print('retrying to connect publisher');
-      var offer = await screenPlugin?.createOffer(audioRecv: false, audioSend: true, videoRecv: false, videoSend: true);
+      var offer = await screenPlugin?.createOffer(audioRecv: false, videoRecv: false);
       await screenPlugin?.configure(sessionDescription: offer);
     });
   }
@@ -276,7 +288,13 @@ class _VideoRoomState extends State<GoogleMeet> {
     eventMessagesHandler();
     await localVideoRenderer.init();
 
-    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(context: context, mediaConstraints: {
+    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(context: context,
+    simulcastSendEncodings: [
+      RTCRtpEncoding(active: true, rid: 'h',scalabilityMode: 'L1T2',maxBitrate: 2000000,numTemporalLayers: 0, minBitrate: 1000000, ),
+      RTCRtpEncoding(active: true, rid: 'm',scalabilityMode: 'L1T2', maxBitrate: 1000000,scaleResolutionDownBy: 2),
+      RTCRtpEncoding(active: true, rid: 'l',scalabilityMode: 'L1T2', maxBitrate: 524288, scaleResolutionDownBy: 2),
+    ],
+     mediaConstraints: {
       if (selectedAudioInputDeviceId != null)
         'audio': {
           'deviceId': {'exact': selectedAudioInputDeviceId},
@@ -292,6 +310,11 @@ class _VideoRoomState extends State<GoogleMeet> {
     }
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
     localVideoRenderer.publisherName = "You";
+    localVideoRenderer.publisherId = myId.toString();
+    localVideoRenderer.videoRenderer.onResize = () {
+      // to update widthxheight when it renders
+      setState(() {});
+    };
     setState(() {
       videoState.streamsToBeRendered.putIfAbsent('local', () => localVideoRenderer);
     });
@@ -308,8 +331,7 @@ class _VideoRoomState extends State<GoogleMeet> {
       Object data = event.event.plugindata?.data;
       if (data is VideoRoomJoinedEvent) {
         myPvtId = data.privateId;
-        (await screenPlugin?.configure(
-            bitrate: 3000000, sessionDescription: await screenPlugin?.createOffer(audioRecv: false, audioSend: true, videoSend: true, videoRecv: false)));
+        (await screenPlugin?.configure(bitrate: 3000000, sessionDescription: await screenPlugin?.createOffer(audioRecv: false, videoRecv: false)));
       }
       if (data is VideoRoomLeavingEvent) {
         unSubscribeTo(data.leaving!);
@@ -320,8 +342,11 @@ class _VideoRoomState extends State<GoogleMeet> {
       screenPlugin?.handleRemoteJsep(event.jsep);
     });
     await localScreenSharingRenderer.init();
-    localScreenSharingRenderer.mediaStream =
-        await screenPlugin?.initializeMediaDevices(context: context, mediaConstraints: {'video': true, 'audio': true}, useDisplayMediaDevices: true);
+    localScreenSharingRenderer.publisherId = myId.toString();
+    localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(context: context,mediaConstraints: {
+      'video': true,
+      'audio': true
+    }, useDisplayMediaDevices: true);
     localScreenSharingRenderer.videoRenderer.srcObject = localScreenSharingRenderer.mediaStream;
     localScreenSharingRenderer.publisherName = "Your Screenshare";
     setState(() {
@@ -359,20 +384,18 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   mute(RTCPeerConnection? peerConnection, String kind, bool enabled) async {
-    // var transreciever = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
-    // if (transreciever == null || transreciever.isEmpty == true) {
-    //   return;
-    // }
-    (await peerConnection?.senders)?.forEach((element) {
-      if (element.track?.kind == kind) {
-        element.track?.enabled = enabled;
-      }
-    });
-    // if (!WebRTC.platformIsWeb&&kind=='audio') {
-    //   Helper.setMicrophoneMute(!enabled, transreciever.first.sender.track!);
-    //   return;
-    // }
-    // await transreciever?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
+    var transrecievers = (await peerConnection?.getTransceivers())?.where((element) => element.sender.track?.kind == kind).toList();
+    if (transrecievers?.isEmpty == true) {
+      return;
+    }
+    await transrecievers?.first.setDirection(enabled ? TransceiverDirection.SendOnly : TransceiverDirection.Inactive);
+    // below method mutes/disables mid based on janus but no brief notification is received from janus
+    // await videoPlugin?.send(data: {
+    //   "request" : "configure",
+    //   "streams": [
+    //     {"mid": transrecievers?.first.mid, "send": enabled},
+    //   ],
+    // });
   }
 
   callEnd() async {
@@ -660,11 +683,46 @@ class _VideoRoomState extends State<GoogleMeet> {
                       child: Text("Video Paused By " + remoteStream.publisherName!, style: TextStyle(color: Colors.black)),
                     ),
                   ),
-                  child: RTCVideoView(
-                    remoteStream.videoRenderer,
-                    filterQuality: FilterQuality.none,
-                    objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
-                  ),
+                  child: Stack(children: [
+                    RTCVideoView(
+                      remoteStream.videoRenderer,
+                      filterQuality: FilterQuality.none,
+                      objectFit: RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+                    ),
+                    Visibility(
+                      child: PositionedDirectional(
+                          child: ToggleButtons(
+                            direction: Axis.horizontal,
+                            onPressed: (int index) async {
+                              setState(() {
+                                // The button that is tapped is set to true, and the others to false.
+                                for (int i = 0; i < remoteStream.selectedQuality.length; i++) {
+                                  remoteStream.selectedQuality[i] = i == index;
+                                }
+                              });
+                              await remotePlugin?.send(data: {'request': "configure", 'mid': remoteStream.mid, 'substream': index});
+                            },
+                            borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            selectedBorderColor: Colors.red[700],
+                            selectedColor: Colors.white,
+                            fillColor: Colors.red[200],
+                            color: Colors.red[400],
+                            constraints: const BoxConstraints(
+                              minHeight: 20.0,
+                              minWidth: 50.0,
+                            ),
+                            isSelected: remoteStream.selectedQuality,
+                            children: [Text('Low'), Text('Medium'), Text('High')],
+                          ),
+                          top: 120,
+                          start: 20),
+                      visible: remoteStream.publisherId != myId.toString(),
+                    ),
+                    Align(
+                      child: Text('${remoteStream.videoRenderer.videoWidth}X${remoteStream.videoRenderer.videoHeight}'),
+                      alignment: Alignment.bottomLeft,
+                    )
+                  ]),
                 ),
                 Align(
                   alignment: AlignmentDirectional.bottomStart,

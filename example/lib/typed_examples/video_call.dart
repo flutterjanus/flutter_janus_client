@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:janus_client_example/conf.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class TypedVideoCallV2Example extends StatefulWidget {
   @override
@@ -11,7 +12,7 @@ class TypedVideoCallV2Example extends StatefulWidget {
 }
 
 class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
-  late JanusClient j;
+  late JanusClient client;
   late WebSocketJanusTransport ws;
   late JanusSession session;
   late JanusVideoCallPlugin publishVideo;
@@ -19,6 +20,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   TextEditingController messageController = TextEditingController();
+  GlobalKey<FormState> formKey = GlobalKey();
   MediaStream? remoteVideoStream;
   AlertDialog? incomingDialog;
   AlertDialog? registerDialog;
@@ -28,8 +30,42 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   bool front = true;
   bool speakerOn = false;
   List<MediaDeviceInfo>? _mediaDevicesList;
-  Future<void> _refreshMediaDevices() async {
-    var devices = await navigator.mediaDevices.enumerateDevices();
+
+  @override
+  void initState() {
+    super.initState();
+    initJanusClient();
+    loadDevices();
+    navigator.mediaDevices.ondevicechange = (event) async {
+      loadDevices();
+    };
+  }
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    await _localRenderer.initialize();
+    await _remoteVideoRenderer.initialize();
+  }
+
+  _selectAudioInput(String deviceId) async {
+    print(deviceId);
+    await Helper.selectAudioInput(deviceId);
+  }
+
+  Future<void> loadDevices() async {
+    if (WebRTC.platformIsAndroid || WebRTC.platformIsIOS) {
+      //Ask for runtime permissions if necessary.
+      var status = await Permission.bluetooth.request();
+      if (status.isPermanentlyDenied) {
+        print('BLEpermdisabled');
+      }
+      status = await Permission.bluetoothConnect.request();
+      if (status.isPermanentlyDenied) {
+        print('ConnectPermdisabled');
+      }
+    }
+    final devices = await navigator.mediaDevices.enumerateDevices();
     setState(() {
       _mediaDevicesList = devices;
     });
@@ -45,7 +81,10 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   makeCall() async {
     await localMediaSetup();
     await publishVideo.initDataChannel();
-    var offer = await publishVideo.createOffer(audioSend: true, audioRecv: true, videoRecv: true, videoSend: true);
+    var offer = await publishVideo.createOffer(
+      audioRecv: true,
+      videoRecv: true,
+    );
     await publishVideo.call(nameController.text, offer: offer);
     nameController.text = "";
   }
@@ -72,6 +111,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                         if (val == '') {
                           return 'username can\'t be empty! ';
                         }
+                        return null;
                       },
                       onFieldSubmitted: (v) {
                         registerUser();
@@ -118,17 +158,10 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         });
   }
 
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    await _localRenderer.initialize();
-    await _remoteVideoRenderer.initialize();
-  }
-
   initJanusClient() async {
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    j = JanusClient(transport: ws, iceServers: [RTCIceServer(urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")], isUnifiedPlan: true);
-    session = await j.createSession();
+    client = JanusClient(transport: ws, iceServers: [RTCIceServer(urls: "stun:stun.voip.eutelia.it:3478", username: "", credential: "")], isUnifiedPlan: true);
+    session = await client.createSession();
     publishVideo = await session.attach<JanusVideoCallPlugin>();
     await _remoteVideoRenderer.initialize();
     MediaStream? tempVideo = await createLocalMediaStream('remoteVideoStream');
@@ -205,20 +238,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
     await openRegisterDialog();
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    initJanusClient();
-    _refreshMediaDevices();
-    navigator.mediaDevices.ondevicechange = (event) async {
-      print('++++++ ondevicechange ++++++');
-      _refreshMediaDevices();
-    };
-  }
-
-  GlobalKey<FormState> formKey = GlobalKey();
-
   Future<void> registerUser() async {
     if (formKey.currentState?.validate() == true) {
       await publishVideo.register(nameController.text);
@@ -244,7 +263,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
                   onPressed: () async {
                     await localMediaSetup();
                     await publishVideo.handleRemoteJsep(jsep);
-                    var answer = await publishVideo.createAnswer(audioRecv: true, audioSend: true, videoRecv: true, videoSend: true);
+                    var answer = await publishVideo.createAnswer();
                     await publishVideo.acceptCall(answer: answer);
                     Navigator.of(context).pop(incomingDialog);
                     Navigator.of(context).pop(callDialog);
@@ -260,11 +279,6 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             ],
           );
         });
-  }
-
-  _selectAudioInput(String deviceId) async {
-    print(deviceId);
-    await Helper.selectAudioInput(deviceId);
   }
 
   @override

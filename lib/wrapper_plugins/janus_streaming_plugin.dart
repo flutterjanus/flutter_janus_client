@@ -124,7 +124,7 @@ class JanusStreamingPlugin extends JanusPlugin {
     if (webRTCHandle?.peerConnection?.iceConnectionState == RTCIceConnectionState.RTCIceConnectionStateConnected) {
       await send(data: {"request": "start"});
     } else {
-      RTCSessionDescription answer = await createAnswer(videoRecv: true, audioRecv: true, audioSend: false, videoSend: false);
+      RTCSessionDescription answer = await createAnswer();
       await send(data: {"request": "start"}, jsep: answer);
     }
   }

@@ -47,7 +47,7 @@ class _SipExampleState extends State<TypedSipExample> {
 
     await sip?.initializeWebRTCStack();
     await localMediaSetup();
-    var offer = await sip?.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+    var offer = await sip?.createOffer(videoRecv: false, audioRecv: true);
     await sip?.call(callUriController.text, offer: offer, autoAcceptReInvites: false);
   }
 
@@ -89,6 +89,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     TextFormField(
@@ -98,6 +99,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     TextFormField(
@@ -110,6 +112,7 @@ class _SipExampleState extends State<TypedSipExample> {
                         if (val == '') {
                           return 'uri can\'t be empty! ';
                         }
+                        return null;
                       },
                     ),
                     Padding(padding: EdgeInsets.all(9)),
@@ -355,7 +358,7 @@ class _SipExampleState extends State<TypedSipExample> {
                     Navigator.of(context, rootNavigator: true).pop(incomingDialog);
                     Navigator.of(context, rootNavigator: true).pop(callDialog);
                     // since in this example for calling we are using offer so we have to send answer to complete the circle
-                    var answer = await sip?.createAnswer(audioRecv: true, audioSend: true, videoRecv: false, videoSend: false);
+                    var answer = await sip?.createAnswer();
                     await sip?.accept(sessionDescription: answer);
                   },
                   child: Text('Accept')),

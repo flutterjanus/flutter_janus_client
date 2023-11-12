@@ -1,6 +1,6 @@
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 <a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
@@ -9,15 +9,29 @@
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
 
-## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/example/build/web/#/)
+## What it will do?
+- It will help you in establishing communication with Janus server using either REST or Websocket depending on what you prefer 
+- It will provide you meaningful APIs for individual plugins so you can express your app logic without worrying about internals
 
+## What it will not do?
+ It will not manage every aspect of WebRTC for you by that we mean we only provide core functionalities and features when it comes to WebRTC, since this library uses flutter_webrtc for managing all of webrtc stack so you will need to refer its documentation when there's some use cases which we do not cover or does not exist in examples. This is done intentionally by design to give developers complete flexibility while also making sure library is lightweight and does not become a bloatware.
+A classic example of that would be changing output device on a native device for example you want to switch from speaker to headsets or bluetooth audio device you will need to use `flutter_webrtc`'s `Helper` utility class:-   
+```dart 
+Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
+```
+
+## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/)
+
+## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/)
 
 ## [Wiki](https://github.com/flutterjanus/flutter_janus_client/wiki)
 
 ## [Take away apple specific pain for building flutter app](https://github.com/flutterjanus/flutter_janus_client/wiki/Take-away-Apple-IOS-and-macOS-related-pain-from-me-%F0%9F%92%AF-(building-for-apple))
 
-## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/index.html)
+## [screen share example](https://github.com/flutterjanus/screenshare_example)
+
 ## News & Updates
+- Introduced support for simulcast
 - videoroom and screenshare improvements (screenshare tested on android and chrome)
 - sip plugin wrapper added with sip calling example
 - Added errorHandler for typedMessage Stream for better development flow
@@ -84,6 +98,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ngoluuduythai"><img src="https://avatars.githubusercontent.com/u/12238262?v=4?s=100" width="100px;" alt="ngoluuduythai"/><br /><sub><b>ngoluuduythai</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=ngoluuduythai" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.facebook.com/sakshamgupta12"><img src="https://avatars.githubusercontent.com/u/14076514?v=4?s=100" width="100px;" alt="Saksham Gupta"/><br /><sub><b>Saksham Gupta</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=sakshamgupta05" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/chu06"><img src="https://avatars.githubusercontent.com/u/129312223?v=4?s=100" width="100px;" alt="chu06"/><br /><sub><b>chu06</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=chu06" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/musagil"><img src="https://avatars.githubusercontent.com/u/7420090?v=4?s=100" width="100px;" alt="Musagil Musabayli"/><br /><sub><b>Musagil Musabayli</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=musagil" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

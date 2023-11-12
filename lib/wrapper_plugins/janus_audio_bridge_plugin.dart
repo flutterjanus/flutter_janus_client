@@ -46,7 +46,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       bool? record,
       String? recordFile,
       String? recordDir,
-      String? defaultPreBuffering,
+      int? defaultPreBuffering,
       String? allowRtpParticipants,
       int? samplingRate,
       List<String>? groups,
@@ -137,7 +137,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       String? token,
       bool? muted,
       String? codec,
-      String? preBuffer,
+      int? preBuffer,
       int? quality,
       int? volume,
       int? spatialPosition,
@@ -213,7 +213,7 @@ class JanusAudioBridgePlugin extends JanusPlugin {
       "group": group
     }..removeWhere((key, value) => value == null);
     if (offer == null) {
-      offer = await this.createOffer(videoSend: false, videoRecv: false, audioSend: true, audioRecv: true);
+      offer = await this.createOffer(videoRecv: false, audioRecv: true);
     }
     JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
     JanusError.throwErrorFromEvent(response);

@@ -446,12 +446,15 @@ class JanusPlugin {
     return screenStream;
   }
 
-  /// method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
+  ///Helper method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
   /// [useDisplayMediaDevices] : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
-  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.
-  /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView
-  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, required BuildContext context, Map<String, dynamic>? mediaConstraints}) async {
+  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.<br>
+  /// [simulcastSendEncodings] : this list is used to specify encoding for simulcasting or (svc if room codec is vp9)<br>
+  /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView <br><br>
+  /// keep in mind this method exist to help in getting started with this library quickly,educational purposes or for basic functionalities, for custom use cases it is recommended to rely on your own implementation of this method using PeerConnection
+  Future<MediaStream?> initializeMediaDevices(
+      {bool? useDisplayMediaDevices = false, required BuildContext context, List<RTCRtpEncoding>? simulcastSendEncodings, Map<String, dynamic>? mediaConstraints}) async {
     await _disposeMediaStreams(ignoreRemote: true);
     List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
     List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
@@ -482,9 +485,21 @@ class JanusPlugin {
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.finest('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
-          _context._logger.finest('adding track in peerconnection');
-          _context._logger.finest(element.toString());
-          await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+          if (element.kind == 'audio') {
+            _context._logger.finest('adding audio track in peerconnection');
+            await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+            return;
+          }
+          if (simulcastSendEncodings == null) {
+            _context._logger.finest('adding video track in peerconnection');
+            await webRTCHandle?.peerConnection?.addTrack(element, webRTCHandle!.localStream!);
+          } else {
+            _context._logger.finest('simulcasting enabled, using TransReceiver with custom sendEncodings');
+            await webRTCHandle!.peerConnection!.addTransceiver(
+                track: element,
+                kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
+                init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendOnly, sendEncodings: simulcastSendEncodings));
+          }
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);
@@ -545,12 +560,9 @@ class JanusPlugin {
 
   /// This method is used to create webrtc offer, sets local description on internal PeerConnection object
   /// It supports both style of offer creation that is plan-b and unified.
-  Future<RTCSessionDescription> createOffer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
+  Future<RTCSessionDescription> createOffer({bool audioRecv = true, bool videoRecv = true}) async {
     dynamic offerOptions;
-    if (_context._isUnifiedPlan && !_context._usePlanB) {
-      await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
-      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
-    }
+    offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
     RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createOffer(offerOptions ?? {});
     await webRTCHandle!.peerConnection!.setLocalDescription(offer);
     return offer;
@@ -558,38 +570,16 @@ class JanusPlugin {
 
   /// This method is used to create webrtc answer, sets local description on internal PeerConnection object
   /// It supports both style of answer creation that is plan-b and unified.
-  Future<RTCSessionDescription> createAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
-    dynamic offerOptions;
-    if (_context._isUnifiedPlan && !_context._usePlanB) {
-      await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
-    } else {
-      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
-    }
+  Future<RTCSessionDescription> createAnswer() async {
     try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
     } catch (e) {
       //    handling kstable exception most ugly way but currently there's no other workaround, it just works
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
+      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
       await webRTCHandle!.peerConnection!.setLocalDescription(offer);
       return offer;
-    }
-  }
-
-  Future<RTCSessionDescription?> createNullableAnswer({bool audioRecv: true, bool videoRecv: true, bool audioSend: true, bool videoSend: true}) async {
-    dynamic offerOptions;
-    if (_context._isUnifiedPlan && !_context._usePlanB) {
-      await _prepareTranscievers(audioRecv: audioRecv, audioSend: audioSend, videoRecv: videoRecv, videoSend: videoSend);
-    } else {
-      offerOptions = {"offerToReceiveAudio": audioRecv, "offerToReceiveVideo": videoRecv};
-    }
-    try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer(offerOptions ?? {});
-      await webRTCHandle!.peerConnection!.setLocalDescription(offer);
-      return offer;
-    } catch (e) {
-      return null;
     }
   }
 
@@ -613,88 +603,5 @@ class JanusPlugin {
     // } else {
     //   throw Exception("message must be provided!");
     // }
-  }
-
-  Future _prepareTranscievers({bool audioRecv: false, bool videoRecv: false, bool audioSend: true, bool videoSend: true}) async {
-    this._context._logger.finest('using transrecievers in prepare transrecievers');
-    RTCRtpTransceiver? audioTransceiver;
-    RTCRtpTransceiver? videoTransceiver;
-    List<RTCRtpTransceiver>? transceivers;
-    try {
-      transceivers = await webRTCHandle?.peerConnection?.transceivers;
-      if (transceivers?.isNotEmpty == true) {
-        transceivers?.forEach((t) {
-          if ((t.sender.track != null && t.sender.track!.kind == "audio") || (t.receiver.track != null && t.receiver.track!.kind == "audio")) {
-            if (audioTransceiver == null) {
-              audioTransceiver = t;
-            }
-          }
-          if ((t.sender.track != null && t.sender.track!.kind == "video") || (t.receiver.track != null && t.receiver.track!.kind == "video")) {
-            if (videoTransceiver == null) {
-              videoTransceiver = t;
-            }
-          }
-        });
-      }
-
-      if (!audioSend && !audioRecv) {
-        // Audio disabled: have we removed it?
-        if (audioTransceiver != null) {
-          await audioTransceiver?.setDirection(TransceiverDirection.Inactive);
-          this._context._logger.finest("Setting audio transceiver to inactive:" + audioTransceiver.toString());
-        }
-      } else {
-        // Take care of audio m-line
-        if (audioSend && audioRecv) {
-          if (audioTransceiver != null) {
-            await audioTransceiver?.setDirection(TransceiverDirection.SendRecv);
-            this._context._logger.finest("Setting audio transceiver to sendrecv:" + audioTransceiver.toString());
-          }
-        } else if (audioSend && !audioRecv) {
-          if (audioTransceiver != null) {
-            await audioTransceiver?.setDirection(TransceiverDirection.SendOnly);
-            this._context._logger.finest("Setting audio transceiver to sendonly:" + audioTransceiver.toString());
-          }
-        } else if (!audioSend && audioRecv) {
-          if (audioTransceiver != null) {
-            await audioTransceiver?.setDirection(TransceiverDirection.RecvOnly);
-            this._context._logger.finest("Setting audio transceiver to recvonly:" + audioTransceiver.toString());
-          } else {
-            // In theory, this is the only case where we might not have a transceiver yet
-            audioTransceiver = await webRTCHandle!.peerConnection
-                ?.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeAudio, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
-            this._context._logger.finest("Adding recvonly audio transceiver:" + audioTransceiver.toString());
-          }
-        }
-      }
-      if (!videoSend && !videoRecv) {
-        // Video disabled: have we removed it?
-        if (videoTransceiver != null) {
-          await videoTransceiver?.setDirection(TransceiverDirection.Inactive);
-          // Janus.log("Setting video transceiver to inactive:", videoTransceiver);
-        }
-      } else {
-        // Take care of video m-line
-        if (videoSend && videoRecv) {
-          if (videoTransceiver != null) {
-            await videoTransceiver?.setDirection(TransceiverDirection.SendRecv);
-          }
-        } else if (videoSend && !videoRecv) {
-          if (videoTransceiver != null) {
-            await videoTransceiver?.setDirection(TransceiverDirection.SendOnly);
-          }
-        } else if (!videoSend && videoRecv) {
-          if (videoTransceiver != null) {
-            await videoTransceiver?.setDirection(TransceiverDirection.RecvOnly);
-          } else {
-            // In theory, this is the only case where we might not have a transceiver yet
-            videoTransceiver = await webRTCHandle!.peerConnection
-                ?.addTransceiver(kind: RTCRtpMediaType.RTCRtpMediaTypeVideo, init: RTCRtpTransceiverInit(direction: TransceiverDirection.RecvOnly));
-          }
-        }
-      }
-    } catch (err) {
-      this._context._logger.finest('transrecievers not found', err);
-    }
   }
 }

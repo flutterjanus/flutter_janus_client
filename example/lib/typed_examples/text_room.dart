@@ -9,7 +9,7 @@ class TypedTextRoom extends StatefulWidget {
 }
 
 class _TextRoomExampleState extends State<TypedTextRoom> {
-  late JanusClient janusClient;
+  late JanusClient client;
   late JanusSession session;
   late JanusTextRoomPlugin textRoom;
   List<dynamic> textMessages = [];
@@ -25,9 +25,9 @@ class _TextRoomExampleState extends State<TypedTextRoom> {
   initializeClient() async {
     rest = RestJanusTransport(url: servermap['janus_rest']);
     ws = WebSocketJanusTransport(url: servermap['janus_ws']);
-    janusClient =
+    client =
         JanusClient(withCredentials: true, apiSecret: "SecureIt", transport: ws, iceServers: [RTCIceServer(urls: "stun:stun1.l.google.com:19302", username: "", credential: "")]);
-    session = await janusClient.createSession();
+    session = await client.createSession();
     textRoom = await session.attach<JanusTextRoomPlugin>();
   }
 

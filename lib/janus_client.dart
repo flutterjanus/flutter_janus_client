@@ -138,7 +138,6 @@ class JanusClient {
   late List<RTCIceServer>? _iceServers = [];
   late int _refreshInterval;
   late bool _isUnifiedPlan;
-  late String _loggerName;
   late bool _usePlanB;
   late Logger _logger;
   late Level _loggerLevel;
@@ -199,7 +198,6 @@ class JanusClient {
     this._pollingInterval = pollingInterval ?? Duration(seconds: 1);
     if (logger == null) {
       _logger = Logger.detached(loggerName);
-      _loggerName = loggerName;
       _logger.level = _loggerLevel;
       _logger.onRecord.listen((event) {
         print(event);

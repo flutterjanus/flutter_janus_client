@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="API docs for the configure method from the JanusAudioBridgePlugin class, for the Dart programming language.">
+  <title>configure method - JanusAudioBridgePlugin class - janus_client library - Dart API</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../../static-assets/github.css?v1">
+  <link rel="stylesheet" href="../../static-assets/styles.css?v1">
+  <link rel="icon" href="../../static-assets/favicon.png?v1">
+
+  
+</head>
+
+
+<body data-base-href="../../" data-using-base-href="false" class="light-theme">
+
+<div id="overlay-under-drawer"></div>
+
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li><a href="../../index.html">janus_client</a></li>
+    <li><a href="../../janus_client/janus_client-library.html">janus_client</a></li>
+    <li><a href="../../janus_client/JanusAudioBridgePlugin-class.html">JanusAudioBridgePlugin</a></li>
+    <li class="self-crumb">configure method</li>
+  </ol>
+  <div class="self-name">configure</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <div class="toggle" id="theme-button">
+    <label for="theme">
+      <input type="checkbox" id="theme" value="light-theme">
+      <span id="dark-theme-button" class="material-symbols-outlined">
+        brightness_4
+      </span>
+      <span id="light-theme-button" class="material-symbols-outlined">
+        brightness_5
+      </span>
+    </label>
+  </div>
+</header>
+<main>
+
+  <div id="dartdoc-main-content" class="main-content">
+      <div>
+<h1><span class="kind-method">configure</span> method 
+</h1></div>
+
+    <section class="multi-line-signature">
+      
+
+<span class="returntype"><a href="https://api.flutter.dev/flutter/dart-async/Future-class.html">Future</a><span class="signature">&lt;<wbr><span class="type-parameter">void</span>&gt;</span></span>
+<span class="name ">configure</span>(<wbr><ol class="parameter-list"><li><span class="parameter" id="configure-param-muted">{<span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">muted</span>, </span></li>
+<li><span class="parameter" id="configure-param-bitrate"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">bitrate</span>, </span></li>
+<li><span class="parameter" id="configure-param-display"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">display</span>, </span></li>
+<li><span class="parameter" id="configure-param-preBuffer"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">preBuffer</span>, </span></li>
+<li><span class="parameter" id="configure-param-quality"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">quality</span>, </span></li>
+<li><span class="parameter" id="configure-param-volume"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">volume</span>, </span></li>
+<li><span class="parameter" id="configure-param-spatialPosition"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/int-class.html">int</a>?</span> <span class="parameter-name">spatialPosition</span>, </span></li>
+<li><span class="parameter" id="configure-param-record"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/bool-class.html">bool</a>?</span> <span class="parameter-name">record</span>, </span></li>
+<li><span class="parameter" id="configure-param-filename"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">filename</span>, </span></li>
+<li><span class="parameter" id="configure-param-group"><span class="type-annotation"><a href="https://api.flutter.dev/flutter/dart-core/String-class.html">String</a>?</span> <span class="parameter-name">group</span>, </span></li>
+<li><span class="parameter" id="configure-param-offer"><span class="type-annotation"><a href="https://pub.dev/documentation/webrtc_interface/1.1.0/webrtc_interface/RTCSessionDescription-class.html">RTCSessionDescription</a>?</span> <span class="parameter-name">offer</span>}</span></li>
+</ol>)
+
+      
+
+    </section>
+    
+<section class="desc markdown">
+  <p><a href="../../janus_client/JanusAudioBridgePlugin/configure.html">configure</a></p>
+<p>muted instructs the plugin to mute or unmute the participant; quality changes the complexity of the Opus encoder for the participant; record can be used to record this participant's contribution to a Janus .mjr file, and filename to provide a basename for the path to save the file to (notice that this is different from the recording of a whole room: this feature only records the packets this user is sending, and is not related to the mixer stuff). A successful request will result in a ok event:<br><br>
+<code>muted</code> : true|false, whether to unmute or mute<br>
+<code>display</code> : new display name to have in the room"<br>
+<code>preBuffer</code> : new number of packets to buffer before decoding this participant (see "join" for more info)<br>
+<code>bitrate</code> : new bitrate to use for the Opus stream (see "join" for more info)<br>
+<code>quality</code> : new Opus-related complexity to use (see "join" for more info)<br>
+<code>expectedLoss</code> : new value for the expected loss (see "join" for more info)<br>
+<code>volume</code> : new volume percent value (see "join" for more info)<br>
+<code>spatialPosition</code> : in case spatial audio is enabled for the room, new panning of this participant (0=left, 50=center, 100=right)<br>
+<code>record</code> : true|false, whether to record this user's contribution to a .mjr file (mixer not involved)<br>
+<code>filename</code> : basename of the file to record to, -audio.mjr will be added by the plugin<br>
+<code>group</code> : new group to assign to this participant, if enabled in the room (for forwarding purposes)<br>
+<code>offer</code>: provide your own webrtc offer by default sends with audiosendrecv only</p>
+</section>
+
+
+    
+<section class="summary source-code" id="source">
+  <h2><span>Implementation</span></h2>
+  <pre class="language-dart"><code class="language-dart">Future&lt;void&gt; configure(
+    {bool? muted,
+    int? bitrate,
+    String? display,
+    int? preBuffer,
+    int? quality,
+    int? volume,
+    int? spatialPosition,
+    bool? record,
+    String? filename,
+    String? group,
+    RTCSessionDescription? offer}) async {
+  var payload = {
+    &quot;request&quot;: &quot;configure&quot;,
+    &quot;muted&quot;: muted,
+    &quot;display&quot;: display,
+    &quot;bitrate&quot;: bitrate,
+    &quot;prebuffer&quot;: preBuffer,
+    &quot;quality&quot;: quality,
+    &quot;volume&quot;: volume,
+    &quot;spatial_position&quot;: spatialPosition,
+    &quot;record&quot;: record,
+    &quot;filename&quot;: filename,
+    &quot;group&quot;: group
+  }..removeWhere((key, value) =&gt; value == null);
+  if (offer == null) {
+    offer = await this.createOffer(videoRecv: false, audioRecv: true);
+  }
+  JanusEvent response = JanusEvent.fromJson(await this.send(data: payload, jsep: offer));
+  JanusError.throwErrorFromEvent(response);
+}</code></pre>
+</section>
+
+
+  </div> <!-- /.main-content -->
+
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+  <li><a href="../../index.html">janus_client</a></li>
+  <li><a href="../../janus_client/janus_client-library.html">janus_client</a></li>
+  <li><a href="../../janus_client/JanusAudioBridgePlugin-class.html">JanusAudioBridgePlugin</a></li>
+  <li class="self-crumb">configure method</li>
+</ol>
+
+
+    <h5>JanusAudioBridgePlugin class</h5>
+    <ol>
+
+        <li class="section-title"><a href="../../janus_client/JanusAudioBridgePlugin-class.html#constructors">Constructors</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/JanusAudioBridgePlugin.html">JanusAudioBridgePlugin</a></li>
+
+
+        <li class="section-title inherited">
+          <a href="../../janus_client/JanusAudioBridgePlugin-class.html#instance-properties">Properties</a>
+        </li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/data.html">data</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/handleId.html">handleId</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/hashCode.html">hashCode</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/localStream.html">localStream</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/messages.html">messages</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/onData.html">onData</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/plugin.html">plugin</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/pollingActive.html">pollingActive</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteStream.html">remoteStream</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/remoteTrack.html">remoteTrack</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/renegotiationNeeded.html">renegotiationNeeded</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/runtimeType.html">runtimeType</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/typedMessages.html">typedMessages</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/webRTCHandle.html">webRTCHandle</a></li>
+
+        <li class="section-title"><a href="../../janus_client/JanusAudioBridgePlugin-class.html#instance-methods">Methods</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/configure.html">configure</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/createAnswer.html">createAnswer</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/createOffer.html">createOffer</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/createRoom.html">createRoom</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/dispose.html">dispose</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/editRoom.html">editRoom</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/exists.html">exists</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/getAudioInputDevices.html">getAudioInputDevices</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/getVideoInputDevices.html">getVideoInputDevices</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/handleRemoteJsep.html">handleRemoteJsep</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/hangup.html">hangup</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/initDataChannel.html">initDataChannel</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeMediaDevices.html">initializeMediaDevices</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/initializeWebRTCStack.html">initializeWebRTCStack</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/joinRoom.html">joinRoom</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/kickParticipant.html">kickParticipant</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/listParticipants.html">listParticipants</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/muteParticipant.html">muteParticipant</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/noSuchMethod.html">noSuchMethod</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/onCreate.html">onCreate</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/rtpForward.html">rtpForward</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/send.html">send</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/sendData.html">sendData</a></li>
+          <li><a href="../../janus_client/JanusAudioBridgePlugin/stopRtpForward.html">stopRtpForward</a></li>
+          <li class="inherited"><a href="../../janus_client/JanusPlugin/switchCamera.html">switchCamera</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/toString.html">toString</a></li>
+
+        <li class="section-title inherited"><a href="../../janus_client/JanusAudioBridgePlugin-class.html#operators">Operators</a></li>
+          <li class="inherited"><a href="https://api.flutter.dev/flutter/dart-core/Object/operator_equals.html">operator ==</a></li>
+
+
+
+
+</ol>
+
+  </div><!--/.sidebar-offcanvas-->
+
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div><!--/.sidebar-offcanvas-->
+
+</main>
+
+<footer>
+  <span class="no-break">
+    janus_client
+      2.3.1
+  </span>
+
+  
+</footer>
+
+
+
+<script src="../../static-assets/highlight.pack.js?v1"></script>
+<script src="../../static-assets/docs.dart.js"></script>
+
+
+
+</body>
+
+</html>
+

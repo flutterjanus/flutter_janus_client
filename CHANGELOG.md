@@ -1,3 +1,6 @@
+## 2.3.2
+- flutter_webrtc=> 0.9.46
+- #145 make prebuffer as int
 ## 2.3.1
 - dependency upgrade and improvements
 ## 2.3.0

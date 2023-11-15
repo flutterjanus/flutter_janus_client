@@ -1,7 +1,9 @@
 /// This is a preliminary API providing most WebRTC Operations out of the box using [Janus Server](https://janus.conf.meetecho.com/)
+
 library janus_client;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'dart:async';
 import 'dart:io';
@@ -127,6 +129,8 @@ part './interfaces/sip/events/sip_hangup_event.dart';
 part './interfaces/sip/events/sip_proceeding_event.dart';
 
 part './interfaces/sip/events/sip_calling_event.dart';
+
+part './widgets/screen_select_dialog.dart';
 
 class JanusClient {
   late JanusTransport _transport;

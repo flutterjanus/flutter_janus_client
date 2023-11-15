@@ -74,7 +74,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
   Future<void> localMediaSetup() async {
     await _localRenderer.initialize();
     await publishVideo.initDataChannel();
-    await publishVideo.initializeMediaDevices(mediaConstraints: {'audio': true, 'video': true});
+    await publishVideo.initializeMediaDevices(context: context, mediaConstraints: {'audio': true, 'video': true});
     _localRenderer.srcObject = publishVideo.webRTCHandle?.localStream;
   }
 

@@ -36,7 +36,7 @@ class _SipExampleState extends State<TypedSipExample> {
   dynamic _setState;
 
   Future<void> localMediaSetup() async {
-    MediaStream? temp = await sip?.initializeMediaDevices(mediaConstraints: {'audio': true, 'video': false});
+    MediaStream? temp = await sip?.initializeMediaDevices(context: context, mediaConstraints: {'audio': true, 'video': false});
     localStream = temp;
   }
 

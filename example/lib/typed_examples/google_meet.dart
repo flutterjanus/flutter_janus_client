@@ -49,6 +49,9 @@ class _VideoRoomState extends State<GoogleMeet> {
     super.didChangeDependencies();
     if (mounted) {
       await initialize();
+      selectedAudioInputDeviceId = (await audioInputs).first.deviceId;
+      selectedAudioOutputDeviceId = (await audioOutputs).first.deviceId;
+      selectedVideoInputDeviceId = (await videoInputs).first.deviceId;
     }
   }
 
@@ -134,11 +137,14 @@ class _VideoRoomState extends State<GoogleMeet> {
         int? feedId = videoState.subStreamsToFeedIdMap[event.mid]?['feed_id'];
         String? displayName = videoState.feedIdToDisplayStreamsMap[feedId]?['display'];
         if (feedId != null) {
-          if (videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.flowing == true && event.track?.kind == "audio") {
-            var existingRenderer = videoState.streamsToBeRendered[feedId.toString()];
-            existingRenderer?.mediaStream?.addTrack(event.track!);
-            existingRenderer?.videoRenderer.srcObject = existingRenderer.mediaStream;
-            existingRenderer?.videoRenderer.muted = false;
+          var existingRenderer = videoState.streamsToBeRendered[feedId.toString()];
+          if (existingRenderer != null && event.track?.kind == "audio") {
+            existingRenderer.mediaStream?.addTrack(event.track!);
+            existingRenderer.videoRenderer.srcObject = existingRenderer.mediaStream;
+            if (selectedAudioOutputDeviceId != null) {
+              existingRenderer.videoRenderer.audioOutput(selectedAudioOutputDeviceId!);
+            }
+            existingRenderer.videoRenderer.muted = false;
             setState(() {});
           }
           if (!videoState.streamsToBeRendered.containsKey(feedId.toString()) && event.flowing == true && event.track?.kind == "video") {
@@ -203,7 +209,7 @@ class _VideoRoomState extends State<GoogleMeet> {
   }
 
   manageMuteUIEvents(String mid, String kind, bool muted) async {
-    int? feedId = videoState.subStreamsToFeedIdMap[mid]?['feed_id'];
+    int? feedId = videoState.subStreamsToFeedIdMap?[mid]?['feed_id'];
     if (feedId == null) {
       return;
     }
@@ -281,17 +287,27 @@ class _VideoRoomState extends State<GoogleMeet> {
     videoPlugin = await attachPlugin(pop: true);
     eventMessagesHandler();
     await localVideoRenderer.init();
-    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(simulcastSendEncodings: [
+
+    localVideoRenderer.mediaStream = await videoPlugin?.initializeMediaDevices(context: context,
+    simulcastSendEncodings: [
       RTCRtpEncoding(active: true, rid: 'h',scalabilityMode: 'L1T2',maxBitrate: 2000000,numTemporalLayers: 0, minBitrate: 1000000, ),
       RTCRtpEncoding(active: true, rid: 'm',scalabilityMode: 'L1T2', maxBitrate: 1000000,scaleResolutionDownBy: 2),
       RTCRtpEncoding(active: true, rid: 'l',scalabilityMode: 'L1T2', maxBitrate: 524288, scaleResolutionDownBy: 2),
-    ], mediaConstraints: {
-      'video': {
-        'width': {'ideal': 1280},
-        'height': {'ideal': 720}
-      },
-      'audio': true
+    ],
+     mediaConstraints: {
+      if (selectedAudioInputDeviceId != null)
+        'audio': {
+          'deviceId': {'exact': selectedAudioInputDeviceId},
+        },
+      if (selectedVideoInputDeviceId != null)
+        'video': {
+          'deviceId': {'exact': selectedVideoInputDeviceId},
+        }
     });
+    if (!WebRTC.platformIsWeb) {
+      await Helper.selectAudioInput(selectedAudioInputDeviceId!);
+      // await Helper.
+    }
     localVideoRenderer.videoRenderer.srcObject = localVideoRenderer.mediaStream;
     localVideoRenderer.publisherName = "You";
     localVideoRenderer.publisherId = myId.toString();
@@ -327,7 +343,7 @@ class _VideoRoomState extends State<GoogleMeet> {
     });
     await localScreenSharingRenderer.init();
     localScreenSharingRenderer.publisherId = myId.toString();
-    localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(mediaConstraints: {
+    localScreenSharingRenderer.mediaStream = await screenPlugin?.initializeMediaDevices(context: context,mediaConstraints: {
       'video': true,
       'audio': true
     }, useDisplayMediaDevices: true);
@@ -407,26 +423,137 @@ class _VideoRoomState extends State<GoogleMeet> {
     remotePlugin = null;
   }
 
-  Future<dynamic> showJoiningDialog() async {
-    joiningDialog = await showDialog(
+  var audioInputs = Helper.enumerateDevices('audioinput');
+  var audioOutputs = Helper.enumerateDevices('audiooutput');
+  var videoInputs = Helper.enumerateDevices('videoinput');
+  String? selectedAudioInputDeviceId;
+  String? selectedAudioOutputDeviceId;
+  String? selectedVideoInputDeviceId;
+  dynamic settingsDialog;
+
+  Future<dynamic> showSettingsDialog() async {
+    settingsDialog = await showDialog(
         context: context,
+        barrierDismissible: false,
         builder: (context) {
           return StatefulBuilder(builder: ((context, setState) {
             return AlertDialog(
-              actions: [
-                TextButton(
-                    onPressed: () async {
-                      if (joinForm.currentState?.validate() == true) {
-                        myRoom = int.parse(room.text);
-                        myPin = pin.text;
-                        myUsername = username.text;
-                        setState(() {
-                          this.joined = true;
-                        });
-                        await joinRoom();
-                      }
+              title: Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text('Settings'),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(this);
                     },
-                    child: Text('Join'))
+                    icon: Icon(Icons.close))
+              ]),
+              actionsAlignment: MainAxisAlignment.start,
+              actions: [],
+              insetPadding: EdgeInsets.zero,
+              scrollable: true,
+              content: Form(
+                key: joinForm,
+                child: Column(children: [
+                  Text('Video'),
+                  Divider(),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Video Input Device')),
+                            value: selectedVideoInputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedVideoInputDeviceId = value;
+                              });
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: videoInputs,
+                  ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 10),
+                  ),
+                  Text('Audio'),
+                  Divider(),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Audio Input  Device')),
+                            value: selectedAudioInputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                selectedAudioInputDeviceId = value;
+                              });
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: audioInputs,
+                  ),
+                  FutureBuilder<List<MediaDeviceInfo>>(
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null) {
+                        return DropdownButtonFormField<String?>(
+                            decoration: InputDecoration(label: Text('Audio Output  Device')),
+                            value: selectedAudioOutputDeviceId,
+                            items: snapshot.data?.map((e) => DropdownMenuItem(value: e.deviceId, child: Text('${e.label}'))).toList(),
+                            onChanged: (value) async {
+                              print(value);
+                              setState(() {
+                                selectedAudioOutputDeviceId = value;
+                              });
+                              if (!WebRTC.platformIsWeb) {
+                                await Helper.selectAudioOutput(selectedAudioOutputDeviceId!);
+                              }
+                            });
+                      }
+                      return CircularProgressIndicator();
+                    },
+                    future: audioOutputs,
+                  )
+                ]),
+              ),
+            );
+          }));
+        });
+  }
+
+  Future<dynamic> showJoiningDialog() async {
+    joiningDialog = await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return StatefulBuilder(builder: ((context, setState) {
+            return AlertDialog(
+              title: Row(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text('Join Room'),
+                IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(this);
+                    },
+                    icon: Icon(Icons.close))
+              ]),
+              actionsAlignment: MainAxisAlignment.start,
+              actions: [
+                Center(
+                  child: TextButton(
+                      onPressed: () async {
+                        if (joinForm.currentState?.validate() == true) {
+                          myRoom = int.parse(room.text);
+                          myPin = pin.text;
+                          myUsername = username.text;
+                          setState(() {
+                            this.joined = true;
+                          });
+                          await joinRoom();
+                        }
+                      },
+                      child: Text('Join')),
+                )
               ],
               insetPadding: EdgeInsets.zero,
               scrollable: true,
@@ -451,7 +578,7 @@ class _VideoRoomState extends State<GoogleMeet> {
                     controller: pin,
                     obscureText: true,
                     decoration: InputDecoration(label: Text('Pin')),
-                  )
+                  ),
                 ]),
               ),
             );
@@ -530,7 +657,13 @@ class _VideoRoomState extends State<GoogleMeet> {
                 Icons.switch_camera,
                 color: Colors.white,
               ),
-              onPressed: joined ? switchCamera : null)
+              onPressed: joined ? switchCamera : null),
+          IconButton(
+              icon: Icon(
+                Icons.settings,
+                color: Colors.white,
+              ),
+              onPressed: showSettingsDialog)
         ],
         title: const Text('google meet clone'),
       ),

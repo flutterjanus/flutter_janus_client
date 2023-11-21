@@ -24,11 +24,12 @@ class _SipExampleState extends State<TypedSipExample> {
   TextEditingController callUriController = TextEditingController(text: "");
   RTCVideoRenderer _remoteVideoRenderer = RTCVideoRenderer();
   MediaStream? remoteVideoStream;
-  MediaStream? remoteAudioStream;
   dynamic incomingDialog;
   MediaStream? localStream;
   bool enableCallButton = true;
   bool isIncomingCall = false;
+  bool micMuted = false;
+  bool speakerState = true;
 
   dynamic registerDialog;
   dynamic callDialog;
@@ -37,7 +38,32 @@ class _SipExampleState extends State<TypedSipExample> {
 
   Future<void> localMediaSetup() async {
     MediaStream? temp = await sip?.initializeMediaDevices(mediaConstraints: {'audio': true, 'video': false});
+
     localStream = temp;
+  }
+
+  Future<void> speakerPhoneState(bool speakerOn) async {
+    var receivers = await sip?.webRTCHandle?.peerConnection?.receivers;
+    receivers?.forEach((element) {
+      if (element.track?.kind == 'audio') {
+        element.track?.enabled = speakerOn;
+      }
+    });
+    setState(() {
+      speakerState = speakerOn;
+    });
+  }
+
+  Future<void> muteSelfAudio(bool mute) async {
+    var senders = await sip?.webRTCHandle?.peerConnection?.senders;
+    senders?.forEach((element) {
+      if (element.track?.kind == 'audio') {
+        element.track?.enabled = mute;
+      }
+    });
+    setState(() {
+      micMuted = mute;
+    });
   }
 
   makeCall() async {
@@ -407,18 +433,45 @@ class _SipExampleState extends State<TypedSipExample> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: Padding(
-            child: CircleAvatar(
-                backgroundColor: Colors.red,
-                radius: 30,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                  child: Padding(
                 child: IconButton(
-                    icon: Icon(Icons.call_end),
-                    color: Colors.white,
-                    onPressed: () async {
-                      await sip?.hangup();
-                      destroy();
-                    })),
-            padding: EdgeInsets.all(10),
+                    icon: Icon(speakerState ? Icons.volume_up : Icons.volume_off),
+                    color: Colors.blue,
+                    onPressed: () {
+                      this.speakerPhoneState(!speakerState);
+                    }),
+                padding: EdgeInsets.all(25),
+              )),
+              Flexible(
+                  child: Padding(
+                child: CircleAvatar(
+                    backgroundColor: Colors.red,
+                    radius: 30,
+                    child: IconButton(
+                        icon: Icon(Icons.call_end),
+                        color: Colors.white,
+                        onPressed: () async {
+                          await sip?.hangup();
+                          destroy();
+                        })),
+                padding: EdgeInsets.all(10),
+              )),
+              Flexible(
+                  child: Padding(
+                child: IconButton(
+                    icon: Icon(micMuted ? Icons.mic : Icons.mic_off),
+                    color: Colors.blue,
+                    onPressed: () {
+                      this.muteSelfAudio(!micMuted);
+                    }),
+                padding: EdgeInsets.all(25),
+              ))
+            ],
           ),
         )
       ]),
@@ -426,7 +479,6 @@ class _SipExampleState extends State<TypedSipExample> {
   }
 
   Future<void> stopTracks() async {
-    await stopAllTracksAndDispose(remoteAudioStream);
     await stopAllTracksAndDispose(remoteVideoStream);
   }
 

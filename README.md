@@ -9,16 +9,17 @@
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
 
-## What it will do?
-- It will help you in establishing communication with Janus server using either REST or Websocket depending on what you prefer 
-- It will provide you meaningful APIs for individual plugins so you can express your app logic without worrying about internals
-
-## What it will not do?
- It will not manage every aspect of WebRTC for you by that we mean we only provide core functionalities and features when it comes to WebRTC, since this library uses flutter_webrtc for managing all of webrtc stack so you will need to refer its documentation when there's some use cases which we do not cover or does not exist in examples. This is done intentionally by design to give developers complete flexibility while also making sure library is lightweight and does not become a bloatware.
+> [!NOTE]
+> ## What it will do?
+> - It will help you in establishing communication with Janus server using either REST or Websocket depending on what you prefer 
+> - It will provide you meaningful APIs for individual plugins so you can express your app logic without worrying about internals
+> ## What it will not do?
+> It will not manage every aspect of WebRTC for you by that we mean we only provide core functionalities and features when it comes to WebRTC, since this library uses flutter_webrtc for managing all of webrtc stack so you will need to refer its documentation when there's some use cases which we do not cover or does not exist in examples. This is done intentionally by design to give developers complete flexibility while also making sure library is lightweight and does not become a bloatware.
 A classic example of that would be changing output device on a native device for example you want to switch from speaker to headsets or bluetooth audio device you will need to use `flutter_webrtc`'s `Helper` utility class:-   
-```dart 
-Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
-```
+>```dart 
+>Helper.selectAudioOutput(deviceIdOfBluetoothDevice) 
+>``` 
+
 
 ## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/)
 

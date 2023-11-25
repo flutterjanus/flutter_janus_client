@@ -1,5 +1,81 @@
 part of janus_client;
 
+enum ConfigureStreamQuality { LOW, MEDIUM, HIGH }
+
+class ConfigureStream {
+  String? mid;
+  bool? send;
+  int? fallback;
+  int? audio_level_average;
+  int? audio_active_packets;
+  int? min_delay;
+  int? max_delay;
+  ConfigureStreamQuality? substream;
+  ConfigureStreamQuality? temporal;
+  ConfigureStreamQuality? spatial_layer;
+  ConfigureStreamQuality? temporal_layer;
+
+  ConfigureStream({
+    this.mid,
+    this.substream,
+    this.temporal,
+    this.spatial_layer,
+    this.temporal_layer,
+    this.send,
+    this.fallback,
+    this.audio_level_average,
+    this.audio_active_packets,
+    this.min_delay,
+    this.max_delay,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'mid': mid,
+      'send': send,
+      'substream': substream?.index,
+      'temporal': temporal?.index,
+      'spatial_layer': spatial_layer?.index,
+      'temporal_layer': temporal_layer?.index,
+      'fallback': fallback,
+      'audio_level_average': audio_level_average,
+      'audio_active_packets': audio_active_packets,
+      'min_delay': min_delay,
+      'max_delay': max_delay,
+    }..removeWhere((key, value) => value == null);
+  }
+
+  factory ConfigureStream.fromMap(Map<String, dynamic> map) {
+    return ConfigureStream(
+      mid: map['mid'],
+      substream: map['substream'] != null ? ConfigureStreamQuality.values[map['substream']] : null,
+      temporal: map['temporal'] != null ? ConfigureStreamQuality.values[map['temporal']] : null,
+      spatial_layer: map['spatial_layer'] != null ? ConfigureStreamQuality.values[map['spatial_layer']] : null,
+      temporal_layer: map['temporal_layer'] != null ? ConfigureStreamQuality.values[map['temporal_layer']] : null,
+      send: map['send'],
+      fallback: map['fallback']?.toInt(),
+      audio_level_average: map['audio_level_average']?.toInt(),
+      audio_active_packets: map['audio_active_packets']?.toInt(),
+      min_delay: map['min_delay']?.toInt(),
+      max_delay: map['max_delay']?.toInt(),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory ConfigureStream.fromJson(String source) => ConfigureStream.fromMap(json.decode(source));
+
+  @override
+  String toString() {
+    return '''ConfigureStream(mid: $mid, 
+    substream: $substream,
+    temporal: $temporal,
+    spatial_layer: $spatial_layer,
+    temporal_layer: $temporal_layer,
+    send: $send, fallback: $fallback, audio_level_average: $audio_level_average, audio_active_packets: $audio_active_packets, min_delay: $min_delay, max_delay: $max_delay)''';
+  }
+}
+
 class JanusVideoRoomPlugin extends JanusPlugin {
   JanusVideoRoomPlugin({handleId, context, transport, session})
       : super(context: context, handleId: handleId, plugin: JanusPlugins.VIDEO_ROOM, session: session, transport: transport);
@@ -192,7 +268,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       dynamic audioActivePackets,
       int? audioLevelAverage,
       List<Map<String, String>>? descriptions,
-      List<Map<String, dynamic>>? streams,
+      List<ConfigureStream>? streams,
       bool? restart,
       RTCSessionDescription? sessionDescription}) async {
     var payload = {
@@ -204,7 +280,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
       "display": display,
       "audio_active_packets": audioActivePackets,
       "audio_level_average": audioLevelAverage,
-      "streams": streams,
+      "streams": streams?.map((e) => e.toMap()).toList(),
       "restart": restart,
       "descriptions": descriptions
     }..removeWhere((key, value) => value == null);

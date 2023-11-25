@@ -9,7 +9,8 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Janus Client Menu")),
+        appBar: AppBar(
+          title: Text("Janus Client Menu")),
         body: SafeArea(
           child: SingleChildScrollView(
             child: DefaultTextStyle(

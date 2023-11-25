@@ -341,8 +341,10 @@ class JanusPlugin {
     _onDataStreamController?.close();
     _renegotiationNeededController?.close();
     _wsStreamSubscription?.cancel();
-
     await stopAllTracksAndDispose(webRTCHandle?.localStream);
+    (await webRTCHandle?.peerConnection?.getTransceivers())?.forEach((element) async {
+      await element.stop();
+    });
     await webRTCHandle?.peerConnection?.close();
     await webRTCHandle?.remoteStream?.dispose();
     await webRTCHandle?.localStream?.dispose();
@@ -450,21 +452,10 @@ class JanusPlugin {
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.finest('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
-          if (element.kind == 'audio') {
-            _context._logger.finest('adding audio track in peerconnection');
-            await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
-            return;
-          }
-          if (simulcastSendEncodings == null) {
-            _context._logger.finest('adding video track in peerconnection');
-            await webRTCHandle?.peerConnection?.addTrack(element, webRTCHandle!.localStream!);
-          } else {
-            _context._logger.finest('simulcasting enabled, using TransReceiver with custom sendEncodings');
-            await webRTCHandle!.peerConnection!.addTransceiver(
-                track: element,
-                kind: RTCRtpMediaType.RTCRtpMediaTypeVideo,
-                init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendOnly, sendEncodings: simulcastSendEncodings));
-          }
+          await webRTCHandle!.peerConnection!.addTransceiver(
+              track: element,
+              kind: element.kind == 'audio' ? RTCRtpMediaType.RTCRtpMediaTypeAudio : RTCRtpMediaType.RTCRtpMediaTypeVideo,
+              init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendOnly, sendEncodings: element.kind == 'video' ? simulcastSendEncodings : null));
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);

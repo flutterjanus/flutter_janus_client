@@ -9,7 +9,10 @@ class StreamRenderer {
   String? publisherName;
   String? mid;
   bool? isAudioMuted;
-  List<bool> selectedQuality = [false, false, true];
+  List<bool> subStreamButtonState = [false, false, true];
+  List<bool> temporalButtonState = [false, true];
+  ConfigureStreamQuality subStream = ConfigureStreamQuality.HIGH;
+  ConfigureStreamQuality temporal = ConfigureStreamQuality.MEDIUM;
   bool? isVideoMuted;
 
   Future<void> dispose() async {
@@ -20,10 +23,13 @@ class StreamRenderer {
 
   StreamRenderer(this.id);
 
-  Future<void> init() async {
+  Future<void> init(void Function(void Function()) setState) async {
     mediaStream = await createLocalMediaStream('mediaStream_$id');
     isAudioMuted = false;
     isVideoMuted = false;
+    videoRenderer.onResize = () {
+      setState(() {});
+    };
     await videoRenderer.initialize();
     videoRenderer.srcObject = mediaStream;
   }

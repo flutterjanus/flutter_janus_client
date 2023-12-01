@@ -303,6 +303,11 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await super.hangup();
     await this.send(data: {"request": "leave"});
   }
+  /// sends hangup request on current 
+  Future<void> hangupWithoutDisposing() async {
+    await super.hangup();
+    await this.send(data: {"request": "leave"});
+  }
 
   bool _onCreated = false;
 

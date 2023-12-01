@@ -59,3 +59,8 @@ example/.flutter-plugins-dependencies
 
 
 build/path_provider_android
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+example/macos/Flutter/GeneratedPluginRegistrant.swift
+example/windows/flutter/generated_plugin_registrant.cc

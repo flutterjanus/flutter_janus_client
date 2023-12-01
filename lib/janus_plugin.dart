@@ -284,7 +284,7 @@ class JanusPlugin {
     return;
   }
 
-  /// You can check whether a room exists using the exists
+  /// You can check whethe  r a room exists using the exists
   Future<dynamic> exists(int roomId) async {
     var payload = {"request": "exists", "room": roomId};
     return (await this.send(data: payload));

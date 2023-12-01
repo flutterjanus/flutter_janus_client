@@ -303,9 +303,10 @@ class JanusVideoRoomPlugin extends JanusPlugin {
     await super.hangup();
     await this.send(data: {"request": "leave"});
   }
+
   /// sends hangup request on current  active [JanusVideoRoomPlugin] to tear off active PeerConnection in-effect leaving the room. without disposing localstream
   Future<void> hangupWithoutDisposing() async {
-    await super.hangup();
+    await super.hangupWithoutLocalStreamDisposing();
     await this.send(data: {"request": "leave"});
   }
 

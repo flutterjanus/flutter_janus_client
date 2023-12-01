@@ -296,7 +296,8 @@ class JanusPlugin {
     }
   }
 
-   Future<void> hangupWithoutDisposing() async {
+  /// hangs up the call Diposes remote media streams only
+  Future<void> hangupWithoutLocalStreamDisposing() async {
     _cancelPollingTimer();
     await _disposeRemoteMediaStreamsOnly();
   }
@@ -331,7 +332,7 @@ class JanusPlugin {
     }
   }
 
-    Future<void> _disposeRemoteMediaStreamsOnly({ignoreRemote = false}) async {
+  Future<void> _disposeRemoteMediaStreamsOnly({ignoreRemote = false}) async {
     if (webRTCHandle!.remoteStream != null && !ignoreRemote) {
       webRTCHandle?.remoteStream?.getTracks().forEach((element) async {
         await element.stop();
@@ -356,7 +357,7 @@ class JanusPlugin {
     _renegotiationNeededController?.close();
     _wsStreamSubscription?.cancel();
     await stopAllTracksAndDispose(webRTCHandle?.localStream);
-      (await webRTCHandle?.peerConnection?.getTransceivers())?.forEach((element) async {
+    (await webRTCHandle?.peerConnection?.getTransceivers())?.forEach((element) async {
       await element.stop();
     });
     await webRTCHandle?.peerConnection?.close();
@@ -365,8 +366,8 @@ class JanusPlugin {
     await webRTCHandle?.peerConnection?.dispose();
   }
 
-  /// Call this function when you want to dispose 
-   Future<void> disposeOnlyRemoteStreamWithPlugin() async {
+  /// Call this function when you want to dispose
+  Future<void> disposeOnlyRemoteStreamWithPlugin() async {
     this.pollingActive = false;
     _pollingTimer?.cancel();
     _streamController?.close();
@@ -386,11 +387,12 @@ class JanusPlugin {
   }
 
   /// Call this method when you want to indect localstream from outside
-  Future<MediaStream?> injectMedia(MediaStream? injectedLocalStream,
-      {bool? useDisplayMediaDevices = false,
-      Map<String, dynamic>? mediaConstraints,}) async {
+  Future<MediaStream?> injectMedia(
+    MediaStream? injectedLocalStream, {
+    bool? useDisplayMediaDevices = false,
+    Map<String, dynamic>? mediaConstraints,
+  }) async {
     await _disposeMediaStreams(ignoreRemote: true);
-
 
     _context._logger.fine(mediaConstraints);
     if (webRTCHandle != null) {
@@ -404,13 +406,11 @@ class JanusPlugin {
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
           _context._logger.finest('adding track in peerconnection');
           _context._logger.finest(element.toString());
-          await webRTCHandle!.peerConnection!
-              .addTrack(element, webRTCHandle!.localStream!);
+          await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);
-        await webRTCHandle!.peerConnection!
-            .addStream(webRTCHandle!.localStream!);
+        await webRTCHandle!.peerConnection!.addStream(webRTCHandle!.localStream!);
       }
       return webRTCHandle!.localStream;
     } else {
@@ -418,7 +418,6 @@ class JanusPlugin {
       return null;
     }
   }
-
 
   /// this method Initialize data channel on handle's internal peer connection object.
   /// It is mainly used for Janus TextRoom and can be used for other plugins with data channel support

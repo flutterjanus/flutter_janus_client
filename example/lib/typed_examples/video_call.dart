@@ -203,6 +203,7 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
         setState(() {
           ringing = false;
         });
+        await publishVideo.handleRemoteJsep(even.jsep);
       }
       if (data is VideoCallCallingEvent) {
         Navigator.of(context).pop(callDialog);
@@ -210,10 +211,19 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
           ringing = true;
         });
       }
+      if (data is VideoCallUpdateEvent) {
+        if (even.jsep != null) {
+          if (even.jsep?.type == "answer") {
+            publishVideo.handleRemoteJsep(even.jsep);
+          } else {
+            var answer = await publishVideo.createAnswer();
+            await publishVideo.set(jsep: answer);
+          }
+        }
+      }
       if (data is VideoCallHangupEvent) {
         await destroy();
       }
-      await publishVideo.handleRemoteJsep(even.jsep);
     }, onError: (error) async {
       if (error is JanusError) {
         var dialog;
@@ -397,25 +407,25 @@ class _VideoCallV2ExampleState extends State<TypedVideoCallV2Example> {
             ],
           ))
         ]),
-        Align(
-          alignment: Alignment.topLeft,
-          child: Container(
-            width: MediaQuery.of(context).size.width,
-            height: 60,
-            decoration: BoxDecoration(color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Visibility(
-                    visible: ringing,
-                    child: Text(
+        Visibility(
+            visible: ringing,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: 60,
+                decoration: BoxDecoration(color: ringing ? Colors.green : Colors.grey.withOpacity(0.3)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
                       "Ringing...",
                       style: TextStyle(color: Colors.white),
-                    )),
-              ],
-            ),
-          ),
-        ),
+                    ),
+                  ],
+                ),
+              ),
+            )),
         Align(
           alignment: Alignment.bottomCenter,
           child: Padding(

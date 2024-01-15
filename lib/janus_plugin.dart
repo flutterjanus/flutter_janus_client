@@ -56,6 +56,10 @@ class JanusPlugin {
   StreamSubscription? _wsStreamSubscription;
   late bool pollingActive;
 
+  RTCPeerConnection? get peerConnection {
+    return webRTCHandle?.peerConnection;
+  }
+
   JanusPlugin({this.handleId, required JanusClient context, required JanusTransport transport, required JanusSession session, this.plugin}) {
     _context = context;
     _session = session;
@@ -416,16 +420,22 @@ class JanusPlugin {
 
   ///Helper method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
-  /// [useDisplayMediaDevices] : setting this true will give you capabilities to stream your device screen over PeerConnection.<br>
-  /// [mediaConstraints] : using this map you can specify media contraits such as resolution and fps etc.<br>
-  /// [simulcastSendEncodings] : this list is used to specify encoding for simulcasting or (svc if room codec is vp9)<br>
+  /// [useDisplayMediaDevices] : It can be used to capture your device screen.<br>
+  /// [mediaConstraints] : Using this map you can specify media contraits such as resolution and fps etc.<br>
+  /// [simulcastSendEncodings] : This list is used to specify encoding for simulcasting or (svc if room codec is vp9)<br>
+  /// [transceiverDirection] : It will be ignored if you don't specify [simulcastSendEncodings]
   /// you can use this method to get the stream and show live preview of your camera to RTCVideoRendererView <br><br>
   /// keep in mind this method exist to help in getting started with this library quickly,educational purposes or for basic functionalities, for custom use cases it is recommended to rely on your own implementation of this method using PeerConnection
-  Future<MediaStream?> initializeMediaDevices({bool? useDisplayMediaDevices = false, List<RTCRtpEncoding>? simulcastSendEncodings, Map<String, dynamic>? mediaConstraints}) async {
+  Future<MediaStream?> initializeMediaDevices({
+    Map<String, dynamic>? mediaConstraints,
+    bool useDisplayMediaDevices = false,
+    TransceiverDirection? transceiverDirection = TransceiverDirection.SendOnly,
+    List<RTCRtpEncoding>? simulcastSendEncodings,
+  }) async {
     await _disposeMediaStreams(ignoreRemote: true);
     List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
     List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
-    if (videoDevices.isEmpty && audioDevices.isEmpty) {
+    if (videoDevices.isEmpty && audioDevices.isEmpty && !useDisplayMediaDevices) {
       throw Exception("No device found for media generation");
     }
     if (mediaConstraints == null) {
@@ -452,10 +462,15 @@ class JanusPlugin {
       if (_context._isUnifiedPlan && !_context._usePlanB) {
         _context._logger.finest('using unified plan');
         webRTCHandle!.localStream!.getTracks().forEach((element) async {
+          if (simulcastSendEncodings == null) {
+            await webRTCHandle!.peerConnection!.addTrack(element, webRTCHandle!.localStream!);
+            return;
+          }
           await webRTCHandle!.peerConnection!.addTransceiver(
               track: element,
               kind: element.kind == 'audio' ? RTCRtpMediaType.RTCRtpMediaTypeAudio : RTCRtpMediaType.RTCRtpMediaTypeVideo,
-              init: RTCRtpTransceiverInit(direction: TransceiverDirection.SendOnly, sendEncodings: element.kind == 'video' ? simulcastSendEncodings : null));
+              init: RTCRtpTransceiverInit(
+                  streams: [webRTCHandle!.localStream!], direction: transceiverDirection, sendEncodings: element.kind == 'video' ? simulcastSendEncodings : null));
         });
       } else {
         _localStreamController!.sink.add(webRTCHandle!.localStream);
@@ -528,14 +543,14 @@ class JanusPlugin {
   /// It supports both style of answer creation that is plan-b and unified.
   Future<RTCSessionDescription> createAnswer() async {
     try {
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
-      await webRTCHandle!.peerConnection!.setLocalDescription(offer);
-      return offer;
+      RTCSessionDescription answer = await webRTCHandle!.peerConnection!.createAnswer();
+      await webRTCHandle!.peerConnection!.setLocalDescription(answer);
+      return answer;
     } catch (e) {
       //    handling kstable exception most ugly way but currently there's no other workaround, it just works
-      RTCSessionDescription offer = await webRTCHandle!.peerConnection!.createAnswer();
-      await webRTCHandle!.peerConnection!.setLocalDescription(offer);
-      return offer;
+      RTCSessionDescription answer = await webRTCHandle!.peerConnection!.createAnswer();
+      await webRTCHandle!.peerConnection!.setLocalDescription(answer);
+      return answer;
     }
   }
 

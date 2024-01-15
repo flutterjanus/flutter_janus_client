@@ -6,3 +6,11 @@ class VideoCallCallingEvent extends VideoCallEvent {
     result = json['result'] != null ? Result.fromJson(json['result']) : null;
   }
 }
+
+class VideoCallUpdateEvent {
+  String videocall = 'videocall';
+  dynamic result;
+  VideoCallUpdateEvent.fromJson(dynamic json) {
+    videocall = json['videocall'];
+  }
+}

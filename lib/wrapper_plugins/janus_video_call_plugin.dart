@@ -28,6 +28,28 @@ class JanusVideoCallPlugin extends JanusPlugin {
     await this.send(data: payload);
   }
 
+  /// Register User / Call Participant
+  ///
+  ///    `sends request with payload as:  `
+  ///    `{"request": "register", "username": userName}`
+  ///
+  /// since it is asynchronous request result can only be extracted from event messages
+  ///
+  Future<void> set({RTCSessionDescription? jsep, bool? audio, bool? video, int? bitrate, bool? record, String? filename, int? substream, int? temporal, int? fallback}) async {
+    var payload = {
+      "request": "set",
+      "audio": audio,
+      "video": video,
+      "bitrate": bitrate,
+      "record": record,
+      "filename": filename,
+      "substream": substream,
+      "temporal": temporal,
+      "fallback": fallback
+    }..removeWhere((key, value) => value == null);
+    await this.send(data: payload, jsep: jsep);
+  }
+
   /// Call other participant
   ///
   ///    `sends request with payload as:  `
@@ -104,6 +126,9 @@ class JanusVideoCallPlugin extends JanusPlugin {
         _typedMessagesSink?.add(typedEvent);
       } else if (data['videocall'] == 'event' && data['result'] != null && data['result']['event'] == 'calling') {
         typedEvent.event.plugindata?.data = VideoCallCallingEvent.fromJson(data);
+        _typedMessagesSink?.add(typedEvent);
+      } else if (data['videocall'] == 'event' && data['result'] != null && data['result']['event'] == 'update') {
+        typedEvent.event.plugindata?.data = VideoCallUpdateEvent.fromJson(data);
         _typedMessagesSink?.add(typedEvent);
       } else if (data['videocall'] == 'event' && data['result'] != null && data['result']['event'] == 'incomingcall') {
         typedEvent.event.plugindata?.data = VideoCallIncomingCallEvent.fromJson(data);

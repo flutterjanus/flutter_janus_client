@@ -205,9 +205,6 @@ randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
 }
 
 Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
-  stream?.getTracks().forEach((element) async {
-    await element.stop();
-  });
   await stream?.dispose();
 }
 

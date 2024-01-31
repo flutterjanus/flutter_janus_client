@@ -1,3 +1,6 @@
+## 2.3.3
+- bug fixes (#151,#152,#153)
+- webrtc deps upgraded
 ## 2.3.2
 - flutter_webrtc=> 0.9.46
 - #145 make prebuffer as int

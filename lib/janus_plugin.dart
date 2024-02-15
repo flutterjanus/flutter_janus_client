@@ -256,11 +256,28 @@ class JanusPlugin {
       return;
     }
     try {
-      var longpoll = _transport!.url! + "/" + _session!.sessionId.toString() + "?rid=" + new DateTime.now().millisecondsSinceEpoch.toString();
-      if (_context._maxEvent != null) longpoll = longpoll + "&maxev=" + _context._maxEvent.toString();
-      if (_context._token != null) longpoll = longpoll + "&token=" + _context._token!;
-      if (_context._apiSecret != null) longpoll = longpoll + "&apisecret=" + _context._apiSecret!;
-      List<dynamic> json = parse((await http.get(Uri.parse(longpoll))).body);
+      Map<String, String> queryParameters = {};
+      queryParameters["rid"] = new DateTime.now().millisecondsSinceEpoch.toString();
+      if (_context._maxEvent != null) {
+        queryParameters["maxev"] = _context._maxEvent.toString();
+      }
+      if (_context._token != null){
+        queryParameters["token"] = _context._token!;
+      }
+      if (_context._apiSecret != null) {
+        queryParameters["apisecret"] = _context._apiSecret!;
+      }
+      var response = (await http.get(Uri.https(extractDomainFromUrl(_transport!.url!), "janus/"+_session!.sessionId.toString(), queryParameters)));
+      if (response.statusCode != 200 || response.body.isEmpty){
+        var errorMessage = "polling is failed from janus with error code : ${response.statusCode} , header : ${response.headers}";
+        print(response.body);
+        print(response.statusCode);
+        print(errorMessage);
+        _context._logger.severe(errorMessage);
+        throw errorMessage;
+      }
+      var decodedResponse = parse(response.body);
+      List<dynamic> json = ((decodedResponse != null && decodedResponse.isNotEmpty)) ? decodedResponse : [];
       json.forEach((element) {
         if (!_streamController!.isClosed) {
           _streamController!.add(element);

@@ -192,7 +192,22 @@ stringify(dynamic) {
 
 parse(dynamic) {
   JsonDecoder jsonDecoder = JsonDecoder();
+  if(dynamic == null || dynamic.toString().isEmpty) dynamic = "{}";
   return jsonDecoder.convert(dynamic);
+}
+
+String extractDomainFromUrl(String url) {
+  if (url.startsWith('https://')) {
+    url = url.substring('https://'.length);
+  } else if (url.startsWith('http://')) {
+    url = url.substring('http://'.length);
+  }
+  int pathIndex = url.indexOf('/');
+  if (pathIndex != -1) {
+    return url.substring(0, pathIndex);
+  } else {
+    return url;
+  }
 }
 
 randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {

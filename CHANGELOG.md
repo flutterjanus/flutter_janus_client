@@ -1,3 +1,6 @@
+## 2.3.4
+- bug fixes in sip and http_polling [#159](https://github.com/flutterjanus/flutter_janus_client/pull/159)
+- flutter_webrtc upgraded to version: ^0.9.48+hotfix.1
 ## 2.3.3
 - bug fixes (#151,#152,#153)
 - webrtc deps upgraded

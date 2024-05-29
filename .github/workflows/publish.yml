@@ -10,7 +10,7 @@ jobs:
       - name: Install Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.16.0'
+          flutter-version: '3.3.0'
       - name: Install dependencies
         run: flutter pub get
       - name: Check Publish Warnings

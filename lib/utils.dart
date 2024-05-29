@@ -100,8 +100,8 @@ class RTCIceServer {
 
   Map<String, dynamic> toMap() {
     return {
-      'username': this.username,
-      'credential': this.credential,
+      if (username != null) 'username': this.username,
+      if (credential != null) 'credential': this.credential,
       'urls': this.urls,
     };
   }

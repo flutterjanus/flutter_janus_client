@@ -19,11 +19,7 @@ dependencies:
   uuid: ^3.0.6
   logging: ^1.0.2
   dartdoc: ^6.2.2
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

@@ -1,3 +1,6 @@
+## 2.3.5
+- bug fixes in RTCIceServer without crdentials [#164](https://github.com/flutterjanus/flutter_janus_client/pull/164)
+- flutter_webrtc upgraded to version: 0.10.6
 ## 2.3.4
 - bug fixes in sip and http_polling [#159](https://github.com/flutterjanus/flutter_janus_client/pull/159)
 - flutter_webrtc upgraded to version: ^0.9.48+hotfix.1

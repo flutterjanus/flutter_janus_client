@@ -22,7 +22,7 @@ dependencies:
   web_socket_channel: ^3.0.0
   uuid: ^4.4.0
   logging: ^1.0.2
-  dartdoc: ^6.3.0
+  dartdoc: ^8.0.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

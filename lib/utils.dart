@@ -1,4 +1,4 @@
-part of janus_client;
+part of 'janus_client.dart';
 
 class JanusWebRTCHandle {
   MediaStream? remoteStream;
@@ -38,7 +38,12 @@ class EventMessage {
   }
 
   @override
-  bool operator ==(Object other) => identical(this, other) || (other is EventMessage && runtimeType == other.runtimeType && event == other.event && jsep == other.jsep);
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EventMessage &&
+          runtimeType == other.runtimeType &&
+          event == other.event &&
+          jsep == other.jsep);
 
   @override
   int get hashCode => event.hashCode ^ jsep.hashCode;
@@ -76,14 +81,23 @@ class RTCIceServer {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is RTCIceServer && runtimeType == other.runtimeType && username == other.username && credential == other.credential && urls == other.urls);
+      identical(this, other) ||
+      (other is RTCIceServer &&
+          runtimeType == other.runtimeType &&
+          username == other.username &&
+          credential == other.credential &&
+          urls == other.urls);
 
   @override
   int get hashCode => username.hashCode ^ credential.hashCode ^ urls.hashCode;
 
   @override
   String toString() {
-    return 'RTCIceServer{' + ' username: $username,' + ' credential: $credential,' + ' urls: $urls,' + '}';
+    return 'RTCIceServer{' +
+        ' username: $username,' +
+        ' credential: $credential,' +
+        ' urls: $urls,' +
+        '}';
   }
 
   RTCIceServer copyWith({
@@ -154,10 +168,16 @@ class RemoteTrack {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is RemoteTrack && runtimeType == other.runtimeType && stream == other.stream && track == other.track && mid == other.mid && flowing == other.flowing);
+      (other is RemoteTrack &&
+          runtimeType == other.runtimeType &&
+          stream == other.stream &&
+          track == other.track &&
+          mid == other.mid &&
+          flowing == other.flowing);
 
   @override
-  int get hashCode => stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
+  int get hashCode =>
+      stream.hashCode ^ track.hashCode ^ mid.hashCode ^ flowing.hashCode;
 
   factory RemoteTrack.fromMap(Map<String, dynamic> map) {
     return new RemoteTrack(
@@ -192,7 +212,7 @@ stringify(dynamic) {
 
 parse(dynamic) {
   JsonDecoder jsonDecoder = JsonDecoder();
-  if(dynamic == null || dynamic.toString().isEmpty) dynamic = "{}";
+  if (dynamic == null || dynamic.toString().isEmpty) dynamic = "{}";
   return jsonDecoder.convert(dynamic);
 }
 
@@ -210,7 +230,10 @@ String extractDomainFromUrl(String url) {
   }
 }
 
-randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
+randomString(
+    {int len = 10,
+    String charSet =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#\$%^&*()_+'}) {
   var randomString = '';
   for (var i = 0; i < len; i++) {
     var randomPoz = (Math.Random().nextInt(charSet.length - 1)).floor();
@@ -224,7 +247,10 @@ Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
 }
 
 Future<String> getCameraDeviceId(front) async {
-  List<MediaDeviceInfo> videoDevices = (await navigator.mediaDevices.enumerateDevices()).where((element) => element.kind == 'videoinput').toList();
+  List<MediaDeviceInfo> videoDevices =
+      (await navigator.mediaDevices.enumerateDevices())
+          .where((element) => element.kind == 'videoinput')
+          .toList();
   if (videoDevices.isEmpty) {
     throw Exception("No camera found");
   }

@@ -1,4 +1,4 @@
-part of janus_client;
+part of 'janus_client.dart';
 
 abstract class JanusTransport {
   String? url;
@@ -30,7 +30,9 @@ class RestJanusTransport extends JanusTransport {
       suffixUrl = suffixUrl + "/$sessionId/$handleId";
     }
     try {
-      var response = (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body))).body;
+      var response =
+          (await http.post(Uri.parse(url! + suffixUrl), body: stringify(body)))
+              .body;
       return parse(response);
     } on JsonCyclicError {
       return null;
@@ -89,7 +91,9 @@ class WebSocketJanusTransport extends JanusTransport {
         data['handle_id'] = handleId;
       }
       sink!.add(stringify(data));
-      return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == data['transaction']), orElse: () => {}));
+      return parse(await stream.firstWhere(
+          (element) => (parse(element)['transaction'] == data['transaction']),
+          orElse: () => {}));
     } else {
       throw "transaction key missing in body";
     }
@@ -105,14 +109,17 @@ class WebSocketJanusTransport extends JanusTransport {
     payload['transaction'] = transaction;
     payload['janus'] = 'info';
     sink!.add(stringify(payload));
-    return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == payload['transaction']), orElse: () => {}));
+    return parse(await stream.firstWhere(
+        (element) => (parse(element)['transaction'] == payload['transaction']),
+        orElse: () => {}));
   }
 
   /// this method is internally called by plugin to establish connection with provided websocket uri.
   void connect() {
     try {
       isConnected = true;
-      channel = WebSocketChannel.connect(Uri.parse(url!), protocols: ['janus-protocol']);
+      channel = WebSocketChannel.connect(Uri.parse(url!),
+          protocols: ['janus-protocol']);
     } catch (e) {
       print(e.toString());
       print('something went wrong');

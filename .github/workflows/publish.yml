@@ -1,22 +1,23 @@
-name: Publish to pub.dev
-
 on:
-  push:
-    tags:
-    - '[0-9]+.[0-9]+.[0-9]+*' # tag pattern on pub.dev: 'v'
-
-# Publish using custom workflow
+  release:
+    branches:
+      - master
 jobs:
-  publish:
-    permissions:
-      id-token: write # Required for authentication using OIDC
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: dart-lang/setup-dart@v1
+      - uses: actions/checkout@v2
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.1'
       - name: Install dependencies
         run: flutter pub get
-      # Here you can insert custom steps you need
-      # - run: dart tool/generate-code.dart
+      - name: Check Publish Warnings
+        run: dart pub publish --dry-run
       - name: Publish
-        run: flutter pub publish --force
+        uses: k-paxian/dart-package-publisher@v1.5.1
+        with:
+          credentialJson: ${{ secrets.CREDENTIAL_JSON }}
+          flutter: true
+          skipTests: true

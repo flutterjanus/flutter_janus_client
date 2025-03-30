@@ -136,10 +136,10 @@ class _StreamingState extends State<TypedStreamingV2> {
 
   cleanUpWebRTCStuff() {
     remoteAudioStreams.forEach((key, value) {
-      stopAllTracksAndDispose(value);
+      stopAllTracks(value);
     });
     remoteVideoStreams.forEach((key, value) {
-      stopAllTracksAndDispose(value);
+      stopAllTracks(value);
     });
     remoteAudioRenderers.forEach((key, value) async {
       value.srcObject = null;

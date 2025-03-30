@@ -1,10 +1,10 @@
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+# janus_client 
+[![januscaler](https://img.shields.io/badge/powered_by-JanuScaler-b?style=for-the-badge&logo=Januscaler&logoColor=%238884ED&label=Powered%20By&labelColor=white&color=%238884ED)](https://januscaler.com)  
 
-<a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>
-# janus_client [![pub package](https://img.shields.io/pub/v/janus_client.svg)](https://pub.dartlang.org/packages/janus_client)[![Gitter](https://badges.gitter.im/flutter_janus_client/Lobby.svg)](https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![pub package](https://img.shields.io/pub/v/janus_client.svg)](https://pub.dartlang.org/packages/janus_client)[![Gitter](https://badges.gitter.im/flutter_janus_client/Lobby.svg)](https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
 it easily integrates into your flutter application and allows you to build webrtc features and functionality with clean and maintainable code.
@@ -56,26 +56,21 @@ A classic example of that would be changing output device on a native device for
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 | ScreenSharing using VideoRoom plugin  | Yes     | No          | Yes          | Yes     |
 
-## Platform Support Table
-| Platform           | Support | Well Tested|
-|-------------------|---------|-------------|
-| Browser(Web)      | Yes     | Yes         |
-| MacOs             | Yes     | No          |
-| Android           | Yes     | Yes         | 
-| Ios               | Yes     | No          | 
-| Linux             | Yes     | No          | 
-| Windows           | Yes     | No          | 
+# WebRTC Feature Support & Testing Matrix
 
+| Feature        | Android  | iOS  | Windows  | Linux  | macOS  | Browser  |
+|---------------|---------|------|---------|--------|--------|---------|
+| **VideoRoom** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) | ✅ (🟢) |
+| **VideoCall** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **SIP**       | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **AudioRoom** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **Streaming** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
 
-## Todo
-- Documentation of some remaining plugins
-- Polishing of examples
-- Unit Test cases for all plugins
-
-## Deprecated Api v1(0.0.x)
-If by any chance you are looking for (although you shouldn't) old api then you can switch to v1 branch,
-as it is very unstable and hard to maintain it was deprecated and will not recieve any fixes or feature updates.
-It is highly recommended you migrate your code to latest version that is 2.X.X (stable)
+## Legend:
+- ✅ = Supported
+- ❌ =  Supported
+- 🟢 = Tested
+- 🟡 =  Not fully Tested
 
 ## Contributors ✨
 
@@ -100,6 +95,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://www.facebook.com/sakshamgupta12"><img src="https://avatars.githubusercontent.com/u/14076514?v=4?s=100" width="100px;" alt="Saksham Gupta"/><br /><sub><b>Saksham Gupta</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=sakshamgupta05" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/chu06"><img src="https://avatars.githubusercontent.com/u/129312223?v=4?s=100" width="100px;" alt="chu06"/><br /><sub><b>chu06</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=chu06" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/musagil"><img src="https://avatars.githubusercontent.com/u/7420090?v=4?s=100" width="100px;" alt="Musagil Musabayli"/><br /><sub><b>Musagil Musabayli</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=musagil" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mazen930"><img src="https://avatars.githubusercontent.com/u/33043493?v=4?s=100" width="100px;" alt="Mazen Amr"/><br /><sub><b>Mazen Amr</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=mazen930" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Clon1998"><img src="https://avatars.githubusercontent.com/u/10357775?v=4?s=100" width="100px;" alt="Patrick Schmidt"/><br /><sub><b>Patrick Schmidt</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=Clon1998" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -116,3 +113,8 @@ If you loved the api style and architecture of flutter_janus_client and you wish
 then worry not because we have got you covered. we have written wrapper on top of our good old `janus.js`, you might ask why? well the answer to that question is it does not support
 type bindings hence no rich ide support, so we proudly presents [typed_janus_js(feature rich promisified and reactive wrapper on top of janus.js)](https://github.com/flutterjanus/JanusJs)
 or you can straight away use it by installing from npm `npm i typed_janus_js`.
+
+## Donations 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/U7U11OZL8)  
+
+<a href="https://www.buymeacoffee.com/gr20hjk" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" style="height: 51px !important;width: 217px !important;" ></a>

@@ -2,9 +2,9 @@ PODS:
   - Flutter (1.0.0)
   - flutter_foreground_task (0.0.1):
     - Flutter
-  - flutter_webrtc (0.9.36):
+  - flutter_webrtc (0.12.6):
     - Flutter
-    - WebRTC-SDK (= 114.5735.08)
+    - WebRTC-SDK (= 125.6422.06)
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -13,9 +13,7 @@ PODS:
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - shared_preferences_ios (0.0.1):
-    - Flutter
-  - WebRTC-SDK (114.5735.08)
+  - WebRTC-SDK (125.6422.06)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -24,7 +22,6 @@ DEPENDENCIES:
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
-  - shared_preferences_ios (from `.symlinks/plugins/shared_preferences_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -43,19 +40,16 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   shared_preferences_foundation:
     :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
-  shared_preferences_ios:
-    :path: ".symlinks/plugins/shared_preferences_ios/ios"
 
 SPEC CHECKSUMS:
-  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_foreground_task: 21ef182ab0a29a3005cc72cd70e5f45cb7f7f817
-  flutter_webrtc: 55df3aaa802114dad390191a46c2c8d535751268
-  path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
+  flutter_webrtc: 90260f83024b1b96d239a575ea4e3708e79344d1
+  path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: e76247795d700c14ea09e3a2d8855d41ee80a2e6
-  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
-  shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
-  WebRTC-SDK: c24d2a6c9f571f2ed42297cb8ffba9557093142b
+  shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78
+  WebRTC-SDK: 79942c006ea64f6fb48d7da8a4786dfc820bc1db
 
 PODFILE CHECKSUM: 87ebe17c0a601b2b23484129373d6100af2eb36d
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.16.2

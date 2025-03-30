@@ -16,7 +16,8 @@ class StreamRenderer {
   bool? isVideoMuted;
 
   Future<void> dispose() async {
-    await stopAllTracksAndDispose(mediaStream);
+    await stopAllTracks(mediaStream);
+    await mediaStream?.dispose();
     videoRenderer.srcObject = null;
     await videoRenderer.dispose();
   }

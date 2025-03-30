@@ -192,7 +192,7 @@ stringify(dynamic) {
 
 parse(dynamic) {
   JsonDecoder jsonDecoder = JsonDecoder();
-  if(dynamic == null || dynamic.toString().isEmpty) dynamic = "{}";
+  if (dynamic == null || dynamic.toString().isEmpty) dynamic = "{}";
   return jsonDecoder.convert(dynamic);
 }
 
@@ -219,8 +219,10 @@ randomString({int len = 10, String charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgh
   return randomString + Timeline.now.toString();
 }
 
-Future<void> stopAllTracksAndDispose(MediaStream? stream) async {
-  await stream?.dispose();
+Future<void> stopAllTracks(MediaStream? stream) async {
+  for (MediaStreamTrack track in stream?.getTracks() ?? []) {
+    await track.stop();
+  }
 }
 
 Future<String> getCameraDeviceId(front) async {

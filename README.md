@@ -1,8 +1,3 @@
-
-
-
-
-
 # janus_client 
 [![januscaler](https://img.shields.io/badge/powered_by-JanuScaler-b?style=for-the-badge&logo=Januscaler&logoColor=%238884ED&label=Powered%20By&labelColor=white&color=%238884ED)](https://januscaler.com)  
 
@@ -61,26 +56,21 @@ A classic example of that would be changing output device on a native device for
 | Text Room Plugin  | Yes     | No          | -          | Yes     |
 | ScreenSharing using VideoRoom plugin  | Yes     | No          | Yes          | Yes     |
 
-## Platform Support Table
-| Platform           | Support | Well Tested|
-|-------------------|---------|-------------|
-| Browser(Web)      | Yes     | Yes         |
-| MacOs             | Yes     | No          |
-| Android           | Yes     | Yes         | 
-| Ios               | Yes     | No          | 
-| Linux             | Yes     | No          | 
-| Windows           | Yes     | No          | 
+# WebRTC Feature Support & Testing Matrix
 
+| Feature        | Android  | iOS  | Windows  | Linux  | macOS  | Browser  |
+|---------------|---------|------|---------|--------|--------|---------|
+| **VideoRoom** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) | ✅ (🟢) |
+| **VideoCall** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **SIP**       | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **AudioRoom** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
+| **Streaming** | ✅ (🟢) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟡) | ✅ (🟢) |
 
-## Todo
-- Documentation of some remaining plugins
-- Polishing of examples
-- Unit Test cases for all plugins
-
-## Deprecated Api v1(0.0.x)
-If by any chance you are looking for (although you shouldn't) old api then you can switch to v1 branch,
-as it is very unstable and hard to maintain it was deprecated and will not recieve any fixes or feature updates.
-It is highly recommended you migrate your code to latest version that is 2.X.X (stable)
+## Legend:
+- ✅ = Supported
+- ❌ =  Supported
+- 🟢 = Tested
+- 🟡 =  Not fully Tested
 
 ## Contributors ✨
 

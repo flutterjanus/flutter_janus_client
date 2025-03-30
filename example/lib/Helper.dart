@@ -112,7 +112,8 @@ class RemoteStream {
   dynamic mid;
 
   Future<void> dispose() async {
-    await stopAllTracksAndDispose(video);
+    await stopAllTracks(video);
+    await video.dispose();
     videoRenderer.srcObject = null;
     await videoRenderer.dispose();
   }

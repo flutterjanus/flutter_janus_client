@@ -178,8 +178,8 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
                 // This bool value toggles the switch.
                 value: speakerOn,
                 thumbColor: CupertinoColors.systemBlue,
-                trackColor: CupertinoColors.systemRed.withOpacity(0.14),
-                activeColor: CupertinoColors.systemRed.withOpacity(0.64),
+                inactiveTrackColor: CupertinoColors.systemRed.withOpacity(0.14),
+                activeTrackColor: CupertinoColors.systemRed.withOpacity(0.64),
                 onChanged: (bool? value) async {
                   // This is called when the user toggles the switch.
                   setState(() {

@@ -362,7 +362,7 @@ class JanusPlugin {
     _onDataStreamController?.close();
     _renegotiationNeededController?.close();
     _wsStreamSubscription?.cancel();
-    await stopAllTracksAndDispose(webRTCHandle?.localStream);
+    await stopAllTracks(webRTCHandle?.localStream);
     (await webRTCHandle?.peerConnection?.getTransceivers())?.forEach((element) async {
       await element.stop();
     });

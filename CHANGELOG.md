@@ -1,3 +1,6 @@
+## 2.3.6
+- flutter_webrtc upgraded to version: 0.13.0
+- refactor method `stopAllTracksAndDispose` to `stopAllTracks`
 ## 2.3.5
 - bug fixes in RTCIceServer without crdentials [#164](https://github.com/flutterjanus/flutter_janus_client/pull/164)
 - flutter_webrtc upgraded to version: 0.10.6

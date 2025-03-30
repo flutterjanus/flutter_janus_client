@@ -424,7 +424,9 @@ class _VideoRoomState extends State<GoogleMeet> {
     setState(() {
       screenSharing = false;
     });
-    await screenPlugin?.unpublish();
+    (localScreenSharingRenderer.mediaStream?.getTracks())?.forEach((track){
+      track.stop();
+    });
     StreamRenderer? rendererRemoved;
     setState(() {
       rendererRemoved = videoState.streamsToBeRendered.remove(localScreenSharingRenderer.id);

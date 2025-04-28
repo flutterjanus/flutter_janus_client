@@ -5,43 +5,74 @@ on:
       - demo_v2
   workflow_dispatch:  # This will allow the workflow to be triggered manually
 
+# jobs:
+#   build:
+#     name: Build Web
+#     env:
+#       my_secret: ${{ secrets.commit_secret }}  # Ensure this secret is configured correctly
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v3
+
+#       # Set up Flutter
+#       - uses: subosito/flutter-action@v2
+#         with:
+#           channel: 'stable'
+
+#       # Enable web support for Flutter
+#       - run: flutter config --enable-web
+
+#       # Build the web app
+#       - run: |
+#           cd example
+#           flutter pub get
+#           flutter build web --release --base-href "/flutter_janus_client/"
+
+#       # Set up git for deployment to gh-pages
+#       - run: |
+#           # Configure git user identity
+#           git config --global user.email "shivanshtalwar0@gmail.com"
+#           git config --global user.name "shivanshtalwar0"
+
+#           # Create a new gh-pages branch (or use existing one)
+#           git fetch
+#           git checkout gh-pages || git checkout --orphan gh-pages
+
+#           # Add the build output to the repository
+#           git add --all
+#           git commit -m "Update Flutter Web Build"
+
+#           # Push the changes to gh-pages
+#           git push https://${{ secrets.GITHUB_TOKEN }}@github.com/flutterjanus/flutter_janus_client.git gh-pages -f
+
 jobs:
-  build:
-    name: Build Web
-    env:
-      my_secret: ${{ secrets.commit_secret }}  # Ensure this secret is configured correctly
+  build-and-deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the source code
       - uses: actions/checkout@v3
 
       # Set up Flutter
       - uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: stable
 
-      # Enable web support for Flutter
+      # Enable Flutter web support
       - run: flutter config --enable-web
 
-      # Build the web app
-      - run: |
-          cd example
-          flutter pub get
-          flutter build web --release --base-href "/flutter_janus_client/"
+      # Get dependencies
+      - run: flutter pub get
 
-      # Set up git for deployment to gh-pages
-      - run: |
-          # Configure git user identity
-          git config --global user.email "shivanshtalwar0@gmail.com"
-          git config --global user.name "shivanshtalwar0"
+      # Build the web release
+      - run: flutter build web --release --base-href "/flutter_janus_client/"
+        # Replace <your-repo-name> with your GitHub repo name
 
-          # Create a new gh-pages branch (or use existing one)
-          git fetch
-          git checkout gh-pages || git checkout --orphan gh-pages
-
-          # Add the build output to the repository
-          git add --all
-          git commit -m "Update Flutter Web Build"
-
-          # Push the changes to gh-pages
-          git push https://${{ secrets.GITHUB_TOKEN }}@github.com/flutterjanus/flutter_janus_client.git gh-pages -f
+      # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build/web

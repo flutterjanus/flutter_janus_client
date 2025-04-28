@@ -3,30 +3,47 @@ on:
   push:
     branches:
       - demo_v2
+
 jobs:
   build:
     name: Build Web
     env:
-      my_secret: ${{secrets.commit_secret}}
+      my_secret: ${{ secrets.commit_secret }}  # Ensure this secret is configured correctly
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
+      # Set up Flutter
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+
+      # Enable web support for Flutter
       - run: flutter config --enable-web
-      - run: cd example && flutter pub get && flutter build web --release  --base-href "/flutter_janus_client/" && dart doc .
+
+      # Build the web app
+      - run: |
+          cd example
+          flutter pub get
+          flutter build web --release --base-href "/flutter_janus_client/"
+
+      # Set up git for deployment
       - run: |
           git init
-          # type configurations: your user.email and user.name followed lines 
-          # git config --global user.email your_email 
-          # git config --global user.name your_name 
-          git config --global user.email shivanshtalwar0@gmail.com
-          git config --global user.name shivanshtalwar0
-          git status
-          # change this remote url for examle your remote url is https://github.com/onatcipli/flutter_web.git then the following:
-          git remote add origin https://${{secrets.commit_secret}}@github.com/flutterjanus/flutter_janus_client.git
-          git checkout -b gh-pages
+          git config --global user.email "shivanshtalwar0@gmail.com"
+          git config --global user.name "shivanshtalwar0"
+
+          # Ensure the repository URL is correct and the remote URL uses the commit secret
+          git remote add origin https://${{ secrets.commit_secret }}@github.com/flutterjanus/flutter_janus_client.git
+
+          # Checkout the gh-pages branch (ensure it's created or exists)
+          git fetch
+          git checkout gh-pages || git checkout --orphan gh-pages
+
+          # Add the build output to the repository
           git add --all
-          git commit -m "update"
+          git commit -m "Update Flutter Web Build"
+
+          # Push the changes to gh-pages
           git push origin gh-pages -f

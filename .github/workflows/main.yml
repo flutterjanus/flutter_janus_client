@@ -37,13 +37,12 @@ jobs:
           # Ensure the repository URL is correct and the remote URL uses the commit secret
           git remote add origin https://${{ secrets.commit_secret }}@github.com/flutterjanus/flutter_janus_client.git
 
-          # Checkout the gh-pages branch (ensure it's created or exists)
-          git fetch
-          git checkout gh-pages || git checkout --orphan gh-pages
+          # Checkout the current branch (demo_v2 in this case)
+          git checkout demo_v2
 
           # Add the build output to the repository
           git add --all
           git commit -m "Update Flutter Web Build"
 
-          # Push the changes to gh-pages
-          git push origin gh-pages -f
+          # Push the changes to the same branch (demo_v2)
+          git push origin demo_v2 -f

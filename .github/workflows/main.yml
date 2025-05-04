@@ -64,14 +64,8 @@ jobs:
       # Enable Flutter web support
       - run: flutter config --enable-web
       # Enable Flutter web support
-      - run: cd example
-      # Get dependencies
-      - run: flutter pub get
-
-      # Build the web release
-      - run: flutter build web --release --base-href "/flutter_janus_client/"
-        # Replace <your-repo-name> with your GitHub repo name
-
+      - run: cd example && flutter pub get && flutter build web --release --base-href "/flutter_janus_client/"
+  
       # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

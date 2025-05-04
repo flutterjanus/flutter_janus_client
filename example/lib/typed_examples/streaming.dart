@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client_example/conf.dart';
+import '../conf.dart';
 
 class TypedStreamingV2 extends StatefulWidget {
   @override
@@ -65,7 +65,6 @@ class _StreamingState extends State<TypedStreamingV2> {
 
   initJanusClient() async {
     setState(() {
-      rest = RestJanusTransport(url: servermap['janus_rest']);
       ws = WebSocketJanusTransport(url: servermap['janus_ws']);
       client = JanusClient(
         transport: ws,

@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client_example/conf.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:janus_client/janus_client.dart';
+
+import '../conf.dart';
 
 class TypedVideoCallV2Example extends StatefulWidget {
   @override

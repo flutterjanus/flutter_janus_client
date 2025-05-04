@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:janus_client/janus_client.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:janus_client_example/conf.dart';
+import '../conf.dart';
 
 class TypedTextRoom extends StatefulWidget {
   @override

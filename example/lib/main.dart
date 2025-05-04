@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:janus_client_example/Home.dart';
-import 'package:janus_client_example/typed_examples/audio_bridge.dart';
-import 'package:janus_client_example/typed_examples/google_meet.dart';
-import 'package:janus_client_example/typed_examples/sip.dart';
-import 'package:janus_client_example/typed_examples/streaming.dart';
-import 'package:janus_client_example/typed_examples/video_call.dart';
+import './Home.dart';
+import './typed_examples/audio_bridge.dart';
+import './typed_examples/google_meet.dart';
+import './typed_examples/sip.dart';
+import './typed_examples/streaming.dart';
+import './typed_examples/video_call.dart';
 import 'typed_examples/text_room.dart';
 
 void main() {

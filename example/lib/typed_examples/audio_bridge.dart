@@ -43,7 +43,7 @@ class _AudioRoomState extends State<TypedAudioRoomV2> {
   }
 
   Future<void> initPlatformState() async {
-    ws = WebSocketJanusTransport(url: servermap['servercheap']);
+    ws = WebSocketJanusTransport(url: servermap['janus_ws']);
     client = JanusClient(
         withCredentials: true,
         isUnifiedPlan: true,

@@ -60,9 +60,11 @@ jobs:
         with:
           channel: stable
 
+
       # Enable Flutter web support
       - run: flutter config --enable-web
-
+      # Enable Flutter web support
+      - run: cd example
       # Get dependencies
       - run: flutter pub get
 

@@ -82825,7 +82825,7 @@ return A.m(null,r)}})
 return A.n($async$ta,r)},
 qk(){var s=0,r=A.o(t.H),q=this,p
 var $async$qk=A.p(function(a,b){if(a===1)return A.l(b,r)
-while(true)switch(s){case 0:p=new A.n7($.qF.h(0,"servercheap"))
+while(true)switch(s){case 0:p=new A.n7($.qF.h(0,"janus_ws"))
 q.r=p
 p=A.yU("SecureIt",A.b([new A.hE("","","stun:stun1.l.google.com:19302")],t.Sc),!0,B.em,!1,p,!0)
 q.d=p

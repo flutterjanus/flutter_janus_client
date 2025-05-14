@@ -93,10 +93,10 @@ packages:
     dependency: transitive
     description:
       name: dart_webrtc
-      sha256: "8565f1f1f412b8a6fd862f3a157560811e61eeeac26741c735a5d2ff409a0202"
+      sha256: "5b76fd85ac95d6f5dee3e7d7de8d4b51bfbec1dc73804647c6aebb52d6297116"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.3"
+    version: "1.5.3+hotfix.2"
   dartdoc:
     dependency: "direct main"
     description:
@@ -156,10 +156,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_webrtc
-      sha256: "19ae9f06cfc1326dcbb4742a4e608f7b4e5c958341d54817df6aa3200d1d795a"
+      sha256: e84ca404ef4b0d07a0fcd676b15814fabd5bc08e8d4b8dd8b634f76beab1bb50
       url: "https://pub.dev"
     source: hosted
-    version: "0.13.0"
+    version: "0.14.0"
   glob:
     dependency: transitive
     description:
@@ -489,10 +489,10 @@ packages:
     dependency: transitive
     description:
       name: webrtc_interface
-      sha256: e92afec11152a9ccb5c9f35482754edd99696e886ab6acaf90c06dd2d09f09eb
+      sha256: "86fe3afc81a08481dfb25cf14a5a94e27062ecef25544783f352c914e0bbc1ca"
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.2+hotfix.1"
+    version: "1.2.2+hotfix.2"
   xdg_directories:
     dependency: transitive
     description:

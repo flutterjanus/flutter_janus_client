@@ -127,6 +127,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ivansapr",
+      "name": "Ivan Saprykin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4011122?v=4",
+      "profile": "https://github.com/ivansapr",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

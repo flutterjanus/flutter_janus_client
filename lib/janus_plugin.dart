@@ -261,14 +261,14 @@ class JanusPlugin {
       if (_context._maxEvent != null) {
         queryParameters["maxev"] = _context._maxEvent.toString();
       }
-      if (_context._token != null){
+      if (_context._token != null) {
         queryParameters["token"] = _context._token!;
       }
       if (_context._apiSecret != null) {
         queryParameters["apisecret"] = _context._apiSecret!;
       }
-      var response = (await http.get(Uri.https(extractDomainFromUrl(_transport!.url!), "janus/"+_session!.sessionId.toString(), queryParameters)));
-      if (response.statusCode != 200 || response.body.isEmpty){
+      var response = (await http.get(Uri.https(extractDomainFromUrl(_transport!.url!), "janus/" + _session!.sessionId.toString(), queryParameters)));
+      if (response.statusCode != 200 || response.body.isEmpty) {
         var errorMessage = "polling is failed from janus with error code : ${response.statusCode} , header : ${response.headers}";
         print(response.body);
         print(response.statusCode);
@@ -317,34 +317,49 @@ class JanusPlugin {
     }
   }
 
-  Future<void> hangup() async {
-    _cancelPollingTimer();
-    await _disposeMediaStreams();
-  }
-
   Future<void> _disposeMediaStreams({ignoreRemote = false, video = true, audio = true}) async {
     _context._logger.finest('disposing localStream and remoteStream if it already exists');
-    if (webRTCHandle!.localStream != null) {
+    if (webRTCHandle?.localStream != null) {
       if (audio) {
         webRTCHandle?.localStream?.getAudioTracks().forEach((element) async {
+          _context._logger.finest('stoping localStream => audio track ${element.toString()}');
           await element.stop();
         });
       }
       if (video) {
         webRTCHandle?.localStream?.getVideoTracks().forEach((element) async {
+          _context._logger.finest('stoping localStream => video track ${element.toString()}');
           await element.stop();
         });
       }
-      if (audio && video) {
-        webRTCHandle?.localStream?.dispose();
+      if (audio || video) {
+        try {
+          _context._logger.finest('disposing webRTCHandle?.localStream');
+          await webRTCHandle?.localStream?.dispose();
+        } catch (e) {
+          _context._logger.severe('failed to dispose webRTCHandle?.localStream with error $e');
+        }
       }
+      webRTCHandle?.localStream = null;
     }
-    if (webRTCHandle!.remoteStream != null && !ignoreRemote) {
+    if (webRTCHandle?.remoteStream != null && !ignoreRemote) {
       webRTCHandle?.remoteStream?.getTracks().forEach((element) async {
+        _context._logger.finest('stoping remoteStream => ${element.toString()}');
         await element.stop();
       });
-      webRTCHandle?.remoteStream?.dispose();
+      try {
+        _context._logger.finest('disposing webRTCHandle?.remoteStream');
+        await webRTCHandle?.remoteStream?.dispose();
+      } catch (e) {
+        _context._logger.severe('failed to dispose webRTCHandle?.remoteStream with error $e');
+      }
+      webRTCHandle?.remoteStream = null;
     }
+  }
+
+  Future<void> hangup() async {
+    _cancelPollingTimer();
+    await _disposeMediaStreams();
   }
 
   /// This function takes care of cleaning up all the internal stream controller and timers used to make janus_client compatible with streams and polling support
@@ -370,6 +385,9 @@ class JanusPlugin {
     await webRTCHandle?.remoteStream?.dispose();
     await webRTCHandle?.localStream?.dispose();
     await webRTCHandle?.peerConnection?.dispose();
+    webRTCHandle?.localStream = null;
+    webRTCHandle?.remoteStream = null;
+    webRTCHandle?.peerConnection = null;
   }
 
   /// this method Initialize data channel on handle's internal peer connection object.

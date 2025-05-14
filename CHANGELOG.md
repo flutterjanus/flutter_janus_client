@@ -1,3 +1,6 @@
+## 2.3.7
+- flutter_webrtc upgraded to version: 0.14.0
+- better logs and bugfixes on safely disposing webrtc stack
 ## 2.3.6
 - flutter_webrtc upgraded to version: 0.13.0
 - refactor method `stopAllTracksAndDispose` to `stopAllTracks`

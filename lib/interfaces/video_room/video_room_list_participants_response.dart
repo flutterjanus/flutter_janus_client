@@ -48,7 +48,7 @@ class Participants {
   }
   int? id;
   String? display;
-  String? publisher;
+  bool? publisher;
   bool? talking;
 
   Map<String, dynamic> toJson() {

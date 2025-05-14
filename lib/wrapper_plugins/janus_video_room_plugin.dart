@@ -147,7 +147,7 @@ class JanusVideoRoomPlugin extends JanusPlugin {
   T? _getPluginDataFromPayload<T>(dynamic data, T Function(dynamic) fromJson) {
     if (data.containsKey('janus') && data['janus'] == 'success' && data.containsKey('plugindata')) {
       var dat = data['plugindata']['data'];
-      return dat;
+      return fromJson(dat);
     } else {
       return null;
     }

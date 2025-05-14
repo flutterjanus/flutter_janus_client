@@ -1,3 +1,6 @@
+## 2.3.8
+- bugfix: Data isn't serialized [#178](https://github.com/flutterjanus/flutter_janus_client/pull/178)
+
 ## 2.3.7
 - flutter_webrtc upgraded to version: 0.14.0
 - better logs and bugfixes on safely disposing webrtc stack

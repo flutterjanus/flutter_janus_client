@@ -3,7 +3,7 @@
 
 [![pub package](https://img.shields.io/pub/v/janus_client.svg)](https://pub.dartlang.org/packages/janus_client)[![Gitter](https://badges.gitter.im/flutter_janus_client/Lobby.svg)](https://gitter.im/flutter_janus_client/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-13-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 It is a feature rich flutter package, which offers all webrtc operations supported by [Janus: the general purpose WebRTC server](https://janus.conf.meetecho.com/),
@@ -97,6 +97,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/musagil"><img src="https://avatars.githubusercontent.com/u/7420090?v=4?s=100" width="100px;" alt="Musagil Musabayli"/><br /><sub><b>Musagil Musabayli</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=musagil" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/mazen930"><img src="https://avatars.githubusercontent.com/u/33043493?v=4?s=100" width="100px;" alt="Mazen Amr"/><br /><sub><b>Mazen Amr</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=mazen930" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Clon1998"><img src="https://avatars.githubusercontent.com/u/10357775?v=4?s=100" width="100px;" alt="Patrick Schmidt"/><br /><sub><b>Patrick Schmidt</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=Clon1998" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ivansapr"><img src="https://avatars.githubusercontent.com/u/4011122?v=4?s=100" width="100px;" alt="Ivan Saprykin"/><br /><sub><b>Ivan Saprykin</b></sub></a><br /><a href="https://github.com/flutterjanus/flutter_janus_client/commits?author=ivansapr" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>

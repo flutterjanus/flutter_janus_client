@@ -1,3 +1,6 @@
+## 2.3.9
+- bugfix: websocket session send refactored to use Completer instead of error prone firstWhere
+
 ## 2.3.8
 - bugfix: Data isn't serialized [#178](https://github.com/flutterjanus/flutter_janus_client/pull/178)
 

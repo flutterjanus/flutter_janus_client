@@ -73,6 +73,7 @@ class WebSocketJanusTransport extends JanusTransport {
   WebSocketSink? sink;
   late Stream stream;
   bool isConnected = false;
+  final Map<String, Completer<dynamic>> _pendingTransactions = {};
 
   void dispose() {
     if (channel != null && sink != null) {
@@ -82,17 +83,28 @@ class WebSocketJanusTransport extends JanusTransport {
   }
 
   /// this method is used to send json payload to Janus Server for communicating the intent.
-  Future<dynamic> send(Map<String, dynamic> data, {int? handleId}) async {
-    if (data['transaction'] != null) {
-      data['session_id'] = sessionId;
-      if (handleId != null) {
-        data['handle_id'] = handleId;
-      }
-      sink!.add(stringify(data));
-      return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == data['transaction']), orElse: () => {}));
-    } else {
-      throw "transaction key missing in body";
+  Future<dynamic> send(Map<String, dynamic> data, {int? handleId}) {
+    final transaction = data['transaction'];
+
+    if (transaction == null) {
+      throw Exception("transaction key missing in body");
     }
+
+    data['session_id'] = sessionId;
+    if (handleId != null) {
+      data['handle_id'] = handleId;
+    }
+
+    final completer = Completer<dynamic>();
+    _pendingTransactions[transaction] = completer;
+
+    sink!.add(stringify(data));
+
+    // Optionally add a timeout
+    return completer.future.timeout(Duration(seconds: 10), onTimeout: () {
+      _pendingTransactions.remove(transaction);
+      throw TimeoutException('Timed out waiting for transaction $transaction');
+    });
   }
 
   @override
@@ -100,12 +112,11 @@ class WebSocketJanusTransport extends JanusTransport {
     if (!isConnected) {
       connect();
     }
-    Map payload = {};
+    Map<String, dynamic> payload = {};
     String transaction = getUuid().v4();
     payload['transaction'] = transaction;
     payload['janus'] = 'info';
-    sink!.add(stringify(payload));
-    return parse(await stream.firstWhere((element) => (parse(element)['transaction'] == payload['transaction']), orElse: () => {}));
+    return send(payload);
   }
 
   /// this method is internally called by plugin to establish connection with provided websocket uri.
@@ -121,5 +132,13 @@ class WebSocketJanusTransport extends JanusTransport {
     }
     sink = channel!.sink;
     stream = channel!.stream.asBroadcastStream();
+    stream.listen((event) {
+      final msg = parse(event);
+      final transaction = msg['transaction'];
+      if (transaction != null && _pendingTransactions.containsKey(transaction)) {
+        _pendingTransactions[transaction]!.complete(msg);
+        _pendingTransactions.remove(transaction);
+      }
+    });
   }
 }

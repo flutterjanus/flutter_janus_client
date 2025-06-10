@@ -21,15 +21,15 @@ A classic example of that would be changing output device on a native device for
 >``` 
 
 
-## [Demo of JanusClient](https://flutterjanus.github.io/flutter_janus_client/)
+## [Demo of JanusClient](https://januscaler.github.io/flutter_janus_client/)
 
-## [APIReference](https://flutterjanus.github.io/flutter_janus_client/doc/api/)
+## [APIReference](https://januscaler.github.io/flutter_janus_client/doc/api/)
 
-## [Wiki](https://github.com/flutterjanus/flutter_janus_client/wiki)
+## [Wiki](https://github.com/januscaler/flutter_janus_client/wiki)
 
-## [Take away apple specific pain for building flutter app](https://github.com/flutterjanus/flutter_janus_client/wiki/Take-away-Apple-IOS-and-macOS-related-pain-from-me-%F0%9F%92%AF-(building-for-apple))
+## [Take away apple specific pain for building flutter app](https://github.com/januscaler/flutter_janus_client/wiki/Take-away-Apple-IOS-and-macOS-related-pain-from-me-%F0%9F%92%AF-(building-for-apple))
 
-## [screen share example](https://github.com/flutterjanus/screenshare_example)
+## [screen share example](https://github.com/januscaler/screenshare_example)
 
 ## News & Updates
 - Introduced support for simulcast

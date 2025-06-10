@@ -28,7 +28,7 @@ class StreamingItem {
   List<Media> media;
 
   StreamingItem copyWith({
-    int? id,
+    dynamic id,
     String? type,
     String? description,
     String? metadata,

@@ -23,7 +23,7 @@ class StreamingMountPoint {
       });
     }
   }
-  int? id;
+  dynamic id;
   String? type;
   String? description;
   String? metadata;

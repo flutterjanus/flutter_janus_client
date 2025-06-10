@@ -52,7 +52,7 @@ class StreamingPluginStream {
       });
     }
   }
-  int? id;
+  dynamic id;
   String? type;
   String? description;
   bool? isPrivate;

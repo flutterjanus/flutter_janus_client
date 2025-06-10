@@ -33,7 +33,7 @@ class StreamingMountPointInfo {
       });
     }
   }
-  int? id;
+  dynamic id;
   String? name;
   String? description;
   String? metadata;

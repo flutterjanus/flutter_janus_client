@@ -13,7 +13,7 @@ class StreamingMountEdited {
     permanent = json['permanent'];
   }
   String? streaming;
-  int? id;
+  dynamic id;
   bool? permanent;
 
   Map<String, dynamic> toJson() {

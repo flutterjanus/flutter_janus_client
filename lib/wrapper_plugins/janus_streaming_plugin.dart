@@ -38,7 +38,7 @@ class JanusStreamingPlugin extends JanusPlugin {
       {String? name,
       String? description,
       String? metadata,
-      int? id,
+      dynamic id,
       String? pin,
       List<CreateMediaItem>? media,
       String? secret,

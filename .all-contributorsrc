@@ -1,6 +1,6 @@
 {
   "projectName": "flutter_janus_client",
-  "projectOwner": "flutterjanus",
+  "projectOwner": "januscaler",
   "repoType": "github",
   "repoHost": "https://github.com",
   "files": [
@@ -133,6 +133,15 @@
       "name": "Ivan Saprykin",
       "avatar_url": "https://avatars.githubusercontent.com/u/4011122?v=4",
       "profile": "https://github.com/ivansapr",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Creiger",
+      "name": "Lukas Hronec",
+      "avatar_url": "https://avatars.githubusercontent.com/u/14278509?v=4",
+      "profile": "https://github.com/Creiger",
       "contributions": [
         "code"
       ]

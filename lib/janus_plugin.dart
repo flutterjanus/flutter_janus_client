@@ -456,6 +456,7 @@ class JanusPlugin {
   ///Helper method that generates MediaStream from your device camera that will be automatically added to peer connection instance internally used by janus client
   ///
   /// [useDisplayMediaDevices] : It can be used to capture your device screen.<br>
+  /// [disableDevicePrediction] : Disable device prediction when video or audio is not specified or unknown.<br>
   /// [mediaConstraints] : Using this map you can specify media contraits such as resolution and fps etc.<br>
   /// [simulcastSendEncodings] : This list is used to specify encoding for simulcasting or (svc if room codec is vp9)<br>
   /// [transceiverDirection] : It will be ignored if you don't specify [simulcastSendEncodings]
@@ -464,27 +465,35 @@ class JanusPlugin {
   Future<MediaStream?> initializeMediaDevices({
     Map<String, dynamic>? mediaConstraints,
     bool useDisplayMediaDevices = false,
+    bool disableDevicePrediction = false,
     TransceiverDirection? transceiverDirection = TransceiverDirection.SendOnly,
     List<RTCRtpEncoding>? simulcastSendEncodings,
   }) async {
     await _disposeMediaStreams(ignoreRemote: true);
-    List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
-    List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
-    if (videoDevices.isEmpty && audioDevices.isEmpty && !useDisplayMediaDevices) {
-      throw Exception("No device found for media generation");
-    }
-    if (mediaConstraints == null) {
-      if (videoDevices.isEmpty && audioDevices.isNotEmpty) {
-        mediaConstraints = {"audio": true, "video": false};
-      } else if (videoDevices.length == 1 && audioDevices.isNotEmpty) {
-        mediaConstraints = {"audio": true, 'video': true};
-      } else {
-        mediaConstraints = {
-          "audio": audioDevices.length > 0,
-          'video': {
-            'deviceId': {'exact': videoDevices.first.deviceId},
-          },
-        };
+    if (!disableDevicePrediction) {
+      List<MediaDeviceInfo> videoDevices = await getVideoInputDevices();
+      List<MediaDeviceInfo> audioDevices = await getAudioInputDevices();
+      if (videoDevices.isEmpty && audioDevices.isEmpty &&
+          !useDisplayMediaDevices) {
+        throw Exception("No device found for media generation");
+      }
+      if (mediaConstraints == null) {
+        if (videoDevices.isEmpty && audioDevices.isNotEmpty) {
+          mediaConstraints = {"audio": true, "video": false};
+        } else if (videoDevices.length == 1 && audioDevices.isNotEmpty) {
+          mediaConstraints = {"audio": true, 'video': true};
+        } else {
+          mediaConstraints = {
+            "audio": audioDevices.length > 0,
+            'video': {
+              'deviceId': {'exact': videoDevices.first.deviceId},
+            },
+          };
+        }
+      }
+    } else {
+      if (mediaConstraints == null) {
+        throw Exception("No media constraints set");
       }
     }
     _context._logger.fine(mediaConstraints);

@@ -3,10 +3,10 @@ name: Flutter CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -18,13 +18,21 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.4' # Updated to a more recent stable version
+          flutter-version: '3.24.4' # Includes Dart 3.6.0
           channel: 'stable'
           cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Analyze code
+        run: flutter analyze --no-pub
+
+      - name: Format code
+        run: dart format --set-exit-if-changed .
+
+      - name: Run tests
+        run: flutter test
 
       - name: Check publish warnings
         run: dart pub publish --dry-run

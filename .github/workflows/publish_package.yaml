@@ -24,12 +24,6 @@ jobs:
             cache-key: flutter-3.24.4 # Force cache refresh for this version
             cache-path: ~/.pub-cache
 
-      - name: Verify Flutter version
-        run: |
-            flutter --version
-            dart --version
-
-
       - name: Install dependencies
         run: flutter pub get
 

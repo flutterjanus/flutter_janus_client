@@ -18,9 +18,17 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.4' # Includes Dart 3.6.0
-          channel: 'stable'
-          cache: true
+            flutter-version: '3.24.4' # Should include Dart 3.6.0
+            channel: 'stable'
+            cache: true
+            cache-key: flutter-3.24.4 # Force cache refresh for this version
+            cache-path: ~/.pub-cache
+
+      - name: Verify Flutter version
+        run: |
+            flutter --version
+            dart --version
+
 
       - name: Install dependencies
         run: flutter pub get

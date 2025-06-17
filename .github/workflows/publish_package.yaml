@@ -1,0 +1,48 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.3' # Updated to a more recent stable version
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze code
+        run: flutter analyze --no-pub
+
+      - name: Format code
+        run: dart format --set-exit-if-changed .
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Check publish warnings
+        run: dart pub publish --dry-run
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+      - name: Publish package
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: k-paxian/dart-package-publisher@v1.5.1
+        with:
+          accessToken: ${{ secrets.PUB_DEV_PUBLISH_ACCESS_TOKEN }}
+          refreshToken: ${{ secrets.PUB_DEV_PUBLISH_REFRESH_TOKEN }}
+          flutter: true
+          skipTests: true

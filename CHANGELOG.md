@@ -1,3 +1,5 @@
+## 2.3.11
+- feature: media constraints changes
 ## 2.3.10
 - bugfix: change type of id to dynamic instead of int to support string ids
 - update:url for org 

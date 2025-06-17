@@ -4,7 +4,7 @@ version: 2.3.11
 homepage: https://github.com/shivanshtalwar0/flutter_janus_client
 
 environment:
-  sdk: ">=2.15.0 <3.22.1"
+  sdk: ">=2.15.0 <3.32.4"
   flutter: ">=1.10.0"
 
 dev_dependencies:

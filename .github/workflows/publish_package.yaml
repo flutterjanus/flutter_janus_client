@@ -1,3 +1,4 @@
+
 name: Flutter CI
 
 on:
@@ -12,34 +13,56 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Checkout the repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Set up Flutter SDK
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-            flutter-version: '3.24.4' # Should include Dart 3.6.0
-            channel: 'stable'
-            cache: true
-            cache-key: flutter-3.24.4 # Force cache refresh for this version
-            cache-path: ~/.pub-cache
+          flutter-version: '3.24.4' # Includes Dart 3.6.0 for pubspec.yaml compatibility
+          channel: 'stable'
+          cache: true
+          cache-key: flutter-3.24.4-v3 # Unique key to avoid stale cache
+          cache-path: ~/.pub-cache
 
+      # Verify Flutter and Dart installation
+      - name: Verify Flutter installation
+        run: |
+          if ! command -v flutter &> /dev/null; then
+            echo "Error: Flutter command not found!"
+            exit 1
+          fi
+          flutter --version
+          dart --version
+          echo "PATH: $PATH"
+          echo "PUB_CACHE: $PUB_CACHE"
+
+      # Install dependencies
       - name: Install dependencies
         run: flutter pub get
+        env:
+          PUB_CACHE: ~/.pub-cache
 
+      # Analyze code for errors
       - name: Analyze code
         run: flutter analyze --no-pub
 
+      # Format code and fail if changes are needed
       - name: Format code
         run: dart format --set-exit-if-changed .
 
+      # Run tests
       - name: Run tests
         run: flutter test
 
+      # Check for publish warnings (only on master branch push)
       - name: Check publish warnings
-        run: dart pub publish --dry-run
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        run: dart pub publish --dry-run
 
+      # Publish package to pub.dev (only on master branch push)
       - name: Publish package
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: k-paxian/dart-package-publisher@v1.5.1
